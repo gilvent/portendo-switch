@@ -1,14 +1,14 @@
-import { MouseEventHandler, useEffect, useRef, useState } from 'react';
+import { MouseEventHandler, useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import styles from './WorkCard.module.css';
+import styles from './BlibliCard.module.scss';
 import blibliWhiteLogo from 'assets/work-logo/blibli-white.svg';
 
-type WorkCardProps = {
+type BlibliCardProps = {
   active: boolean,
   onClick: MouseEventHandler<HTMLDivElement>
 }
 
-function WorkCard (props: WorkCardProps) {
+function BlibliCard (props: BlibliCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -18,9 +18,8 @@ function WorkCard (props: WorkCardProps) {
   useEffect(() => {
     expandTimeline.current
       .to(cardRef.current, {
-        width: '100vw',
-        height: 450,
-        duration: 0.5
+        duration: 0.5,
+        borderRadius: 0,
       }, 0)
       .to(headingRef.current, {
         left: 24,
@@ -65,4 +64,4 @@ function WorkCard (props: WorkCardProps) {
   )
 }
 
-export default WorkCard;
+export default BlibliCard;
