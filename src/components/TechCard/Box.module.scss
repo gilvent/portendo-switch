@@ -1,0 +1,55 @@
+.box {
+  position: relative;
+  width: 135px;
+  height: 135px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  &:hover {
+    .overlay {
+      transform: scale(2);
+    }
+    .text {
+      opacity: 1;
+    }
+  }
+}
+
+%layer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+}
+
+.fg {
+  @extend %layer;
+  background-color: #fff;
+
+  img {
+    height: 65px;
+  }
+}
+
+.overlay {
+  @extend %layer;
+  border-radius: 50%;
+  transform: scale(0);
+  background-color: var(--theme);
+  transition: all 0.5s ease;
+}
+
+.text {
+  @extend %layer;
+  opacity: 0;
+  background-color: transparent;
+  transition: all 0.5s ease;
+  text-transform: capitalize;
+  color: #fff;
+}

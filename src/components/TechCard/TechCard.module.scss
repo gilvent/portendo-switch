@@ -1,0 +1,34 @@
+.tech-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 8px;
+}
+
+.heading {
+  align-self: flex-end;
+  font-size: 56px;
+  color: #fff;
+  margin-bottom: 25%;
+}
+
+.boxes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boxes-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  justify-self: center;
+  gap: 8px;
+}
+
+.box {
+  width: 135px;
+  height: 135px;
+  background-color: teal;
+  border-radius: 12px;
+}
