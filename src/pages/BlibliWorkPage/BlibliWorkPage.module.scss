@@ -1,0 +1,104 @@
+.work-page {
+  display: grid;
+  grid-template-columns: 50vw 50vw;
+  grid-template-areas:
+    'page-gap tech'
+    'pdp-revamp-guide pdp-revamp'
+    'review-revamp-guide review-revamp';
+
+  section {
+    padding: 48px;
+    color: rgba(73, 73, 73, 0.84);
+    h3 {
+      font-size: 32px;
+      margin: 24px auto;
+    }
+    p {
+      font-size: 18px;
+      padding-right: 30%;
+    }
+  }
+}
+
+.tech {
+  grid-area: tech;
+}
+
+.page-gap {
+  grid-area: page-gap;
+  height: 100vh;
+}
+
+.pdp-revamp {
+  grid-area: pdp-revamp;
+  display: grid;
+  place-content: center;
+  position: relative;
+
+  .preview {
+    display: flex;
+    position: relative;
+    width: 235px;
+    img {
+      width: 235px;
+    }
+  }
+
+  .frame {
+    --frame-height: 576px;
+    --bg-stop: calc(50% - var(--frame-height) / 2);
+    --bg-color: #333;
+    position: sticky;
+    top: 0;
+    margin-left: -235px;
+    width: 235px;
+    z-index: 1;
+    height: 100vh;
+    display: grid;
+    place-content: center;
+    background: linear-gradient(
+        to bottom,
+        var(--bg-color) var(--bg-stop),
+        transparent var(--bg-stop)
+      ),
+      linear-gradient(
+        to top,
+        var(--bg-color) var(--bg-stop),
+        transparent var(--bg-stop)
+      );
+
+    div {
+      border-radius: 12px;
+      width: 235px;
+      height: var(--frame-height);
+      box-shadow: 0 0 0 0.5em #333;
+    }
+  }
+
+  .pdp-secondary {
+    z-index: 2;
+
+    img {
+      width: 215px;
+      max-height: 470px;
+      object-fit: cover;
+      object-position: 0 0;
+
+      opacity: 0;
+    }
+  }
+}
+
+.pdp-revamp-guide {
+  grid-area: pdp-revamp-guide;
+  background-color: #e7f7ff;
+}
+
+.review-revamp-guide {
+  grid-area: review-revamp-guide;
+  background-color: #f9b260;
+}
+
+.review-revamp {
+  grid-area: review-revamp;
+}

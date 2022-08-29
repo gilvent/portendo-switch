@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import styles from './App.module.scss';
 import BlibliCard from './components/BlibliCard';
-// import BlibliWorkPage from './pages/BlibliWorkPage/BlibliWorkPage';
+import BlibliWorkPage from './pages/BlibliWorkPage/BlibliWorkPage';
 import './App.css';
 import { getClassNames } from './utils/css-module';
 
@@ -27,7 +27,7 @@ function App() {
         <BlibliCard onClick={onCardClick} active={isCardActive}/>
       </div>
       <div className={secondaryPanelStyles}>
-        {/* <BlibliWorkPage /> */}
+        <BlibliWorkPage />
       </div>
     </div>
   );
