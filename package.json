@@ -89,6 +89,8 @@
     ]
   },
   "devDependencies": {
+    "node-sass": "^7.0.1",
+    "prettier": "^2.7.1",
     "webpack-bundle-analyzer": "^4.5.0"
   },
   "jest": {
