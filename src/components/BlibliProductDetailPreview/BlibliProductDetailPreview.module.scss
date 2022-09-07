@@ -1,0 +1,44 @@
+  .preview {
+    --preview-width: 325px;
+    display: flex;
+    position: relative;
+    width: var(--preview-width);
+    margin: 0 auto;
+
+    img {
+      width: var(--preview-width);
+      padding-top: 145px;
+    }
+  }
+
+  .frame {
+    --frame-height: 576px;
+    --bg-color: #333;
+    --frame-bg-stop: calc(50% - var(--frame-height) / 2);
+
+    position: sticky;
+    top: 0;
+    margin-left: calc(-1 * var(--preview-width));
+    width: var(--preview-width);
+    z-index: 1;
+    height: 100vh;
+    display: grid;
+    place-content: center;
+    background: linear-gradient(
+        to bottom,
+        var(--bg-color) var(--frame-bg-stop),
+        transparent var(--frame-bg-stop)
+      ),
+      linear-gradient(
+        to top,
+        var(--bg-color) var(--frame-bg-stop),
+        transparent var(--frame-bg-stop)
+      );
+
+    div {
+      border-radius: 12px;
+      width: var(--preview-width);
+      height: var(--frame-height);
+      box-shadow: 0 0 0 0.5em #333;
+    }
+  }
