@@ -7,14 +7,14 @@
 
     img {
       width: var(--preview-width);
-      padding-top: 145px;
+      padding-top: var(--padding-top);
     }
   }
 
-  .frame {
-    --frame-height: 576px;
+  .overlay {
+    --transparent-layer-height: 576px;
     --bg-color: #333;
-    --frame-bg-stop: calc(50% - var(--frame-height) / 2);
+    --bg-stop: calc(50% - var(--transparent-layer-height) / 2);
 
     position: sticky;
     top: 0;
@@ -26,19 +26,19 @@
     place-content: center;
     background: linear-gradient(
         to bottom,
-        var(--bg-color) var(--frame-bg-stop),
-        transparent var(--frame-bg-stop)
+        var(--bg-color) var(--bg-stop),
+        transparent var(--bg-stop)
       ),
       linear-gradient(
         to top,
-        var(--bg-color) var(--frame-bg-stop),
-        transparent var(--frame-bg-stop)
+        var(--bg-color) var(--bg-stop),
+        transparent var(--bg-stop)
       );
 
     div {
       border-radius: 12px;
       width: var(--preview-width);
-      height: var(--frame-height);
+      height: var(--transparent-layer-height);
       box-shadow: 0 0 0 0.5em #333;
     }
   }
