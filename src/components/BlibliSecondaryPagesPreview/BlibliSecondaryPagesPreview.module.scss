@@ -1,0 +1,20 @@
+.secondary-pages {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: relative;
+  margin-top: 72px;
+  height: 800px;
+  img {
+    position: absolute;
+    top: 0;
+    width: 325px;
+    height: auto;
+    object-fit: cover;
+    object-position: 0 0;
+    border-radius: 8px;
+    filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.16));
+    opacity: 0;
+    transform-origin: 50% 50%;
+  }
+}
