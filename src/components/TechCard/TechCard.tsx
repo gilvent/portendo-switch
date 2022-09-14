@@ -48,7 +48,7 @@ function TechCard({ techList }: { techList: TECH[][]}) {
 
   return (
     <div className={styles['tech-card']}>
-      <div className={styles.heading}>What I Learn</div>
+      <div className={styles.heading}>Tech Stack</div>
       <div className={styles.boxes}>{boxes}</div>
     </div>
   );
