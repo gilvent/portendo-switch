@@ -1,15 +1,16 @@
 import BlibliCard from '@/components/BlibliCard';
 import { getClassNames } from '@/utils/css-module';
 import { useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import styles from './WorkPage.module.scss';
 
 function WorkPage() {
+  const navigate = useNavigate();
+  const workDetailPage = useOutlet();
   const { pathname } = useLocation();
   const [isCardActive, setIsCardActive] = useState(() => {
     return pathname === '/work/blibli';
   });
-  const navigate = useNavigate();
 
   const primaryPanelClasses = getClassNames(styles, [
     'panel-container',
@@ -38,7 +39,7 @@ function WorkPage() {
         <BlibliCard onClick={onCardClick} active={isCardActive} />
       </div>
       <div className={secondaryPanelClasses}>
-        <Outlet />
+        { workDetailPage }
       </div>
     </div>
   );

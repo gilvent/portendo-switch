@@ -1,29 +1,12 @@
-import { useRef } from 'react';
-import BlibliWorkPage from './pages/BlibliWorkPage/BlibliWorkPage';
 import './App.css';
-import { useRoutes } from 'react-router-dom';
-import WorkPage from './pages/WorkPage';
-
-const routes = [
-  {
-    path: 'work',
-    element: <WorkPage />,
-    children: [
-      {
-        path: 'blibli',
-        element: <BlibliWorkPage />
-      }
-    ]
-  }
-];
+import { useOutlet } from 'react-router-dom';
 
 function App() {
-  const appRef = useRef<HTMLDivElement>(null);
-  const pageElement = useRoutes(routes);
+  const pages = useOutlet();
 
   return (
-    <div className="App" ref={appRef}>
-      {pageElement}
+    <div className="App"> 
+      {pages}
     </div>
   );
 }
