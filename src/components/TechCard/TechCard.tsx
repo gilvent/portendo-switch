@@ -3,8 +3,7 @@ import { TECH } from './types';
 import Box from './Box';
 import { useEffect, useState } from 'react';
 
-function TechCard({ techList }: { techList: TECH[][]}) {
-
+function TechCard({ techList }: { techList: TECH[][] }) {
   const boxPropsByTech = {
     [TECH.PLAYWRIGHT]: {
       logoFileName: 'playwright.svg',
@@ -25,13 +24,11 @@ function TechCard({ techList }: { techList: TECH[][]}) {
       logoFileName: 'nginx.svg',
       text: 'NGINX',
       color: '#22963a'
-    },
+    }
   };
   const [boxes] = useState<JSX.Element[]>(getBoxesList());
 
-  useEffect(() => {
-    
-  }, [])
+  useEffect(() => {}, []);
 
   function getBoxesList(): JSX.Element[] {
     return techList.map((listRow, index) => {

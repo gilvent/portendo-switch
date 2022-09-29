@@ -18,21 +18,18 @@ function BlibliSecondaryPagesPreview() {
           trigger: '.pdp-shipping',
           start: 'start center',
           end: 'bottom center',
-          onLeaveBack: instance => {
-            instance.disable(true)
+          onLeaveBack: (instance) => {
+            instance.disable(true);
           }
-        },
+        }
       })
       .addLabel('start')
-      .to(
-        query('.pdp-promo'),
-        {
-          opacity: 1,
-          duration: 1,
-          top: '-100',
-          scale: '0.85'
-        }
-      )
+      .to(query('.pdp-promo'), {
+        opacity: 1,
+        duration: 1,
+        top: '-100',
+        scale: '0.85'
+      })
       .to(
         query('.pdp-discussion'),
         {

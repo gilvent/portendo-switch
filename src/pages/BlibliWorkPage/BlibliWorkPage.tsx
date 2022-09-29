@@ -7,7 +7,7 @@ import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPrevie
 function BlibliWorkPage() {
   const techList = [
     [TECH.PLAYWRIGHT, TECH.VUE],
-    [TECH.NGINX, TECH.SASS],
+    [TECH.NGINX, TECH.SASS]
   ];
 
   return (

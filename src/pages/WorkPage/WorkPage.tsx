@@ -38,9 +38,7 @@ function WorkPage() {
       <div className={primaryPanelClasses}>
         <BlibliCard onClick={onCardClick} active={isCardActive} />
       </div>
-      <div className={secondaryPanelClasses}>
-        { workDetailPage }
-      </div>
+      <div className={secondaryPanelClasses}>{workDetailPage}</div>
     </div>
   );
 }

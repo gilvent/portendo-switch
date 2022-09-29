@@ -10,7 +10,7 @@ function BlibliProductDetailPreview() {
   const initialImgPadding = 145;
   const [imgPadding, setImgPadding] = useState(initialImgPadding);
   const [imgStyle, setImgStyle] = useState({
-    '--padding-top': initialImgPadding + 'px',
+    '--padding-top': initialImgPadding + 'px'
   } as PreviewImageCSSProperty);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ function BlibliProductDetailPreview() {
 
   useEffect(() => {
     setImgStyle({
-      '--padding-top': imgPadding + 'px',
+      '--padding-top': imgPadding + 'px'
     } as PreviewImageCSSProperty);
   }, [imgPadding]);
 
