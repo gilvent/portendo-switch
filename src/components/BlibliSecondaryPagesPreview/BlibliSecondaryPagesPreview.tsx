@@ -18,7 +18,7 @@ function BlibliSecondaryPagesPreview() {
           trigger: '.pdp-shipping',
           start: 'start center',
           end: 'bottom center',
-          onLeaveBack: (instance) => {
+          onLeaveBack: instance => {
             instance.disable(true);
           }
         }

@@ -70,20 +70,11 @@
     "test": "node scripts/test.js",
     "analyze": "webpack-bundle-analyzer build/bundle-stats.json",
     "lint": "eslint .",
-    "lint:fix": "npm run format && eslint --fix --ext .tsx --ext .ts --ext .scss",
-    "format": "prettier --write './src/*.{js,jsx,ts,tsx,css,json}' --config ./.prettierrc"
+    "eslint:fix": "eslint src/ --fix  --config ./.eslintrc",
+    "format": "prettier --write './src/*.{js,jsx,ts,tsx,css,json}' --config ./.prettierrc",
+    "lint:fix": "npm run format && npm run eslint:fix"
   },
-  "eslintConfig": {
-    "rules": {
-      "space-before-function-paren": [
-        "always"
-      ]
-    },
-    "extends": [
-      "plugin:react/recommended",
-      "prettier"
-    ]
-  },
+  "eslintConfig": {},
   "browserslist": {
     "production": [
       ">0.2%",
@@ -97,6 +88,8 @@
     ]
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
