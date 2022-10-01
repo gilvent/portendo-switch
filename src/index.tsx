@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import './index.css';
 import reportWebVitals from './reportWebVitals';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import router from './router';
+import './index.scss';
 
 gsap.registerPlugin(ScrollTrigger);
 
