@@ -1,7 +1,7 @@
 import { MouseEventHandler, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import styles from './BlibliCard.module.scss';
-import blibliWhiteLogo from 'assets/work-logo/blibli-white.svg';
+import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
 
 type BlibliCardProps = {
   active: boolean;

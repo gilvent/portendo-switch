@@ -1,8 +1,8 @@
 import gsap from 'gsap';
-import pdpShippingImg from 'assets/blibli-projects/pdp-shipping.png';
-import pdpDescriptionImg from 'assets/blibli-projects/pdp-desc.png';
-import pdpDiscussionImg from 'assets/blibli-projects/pdp-discussion.png';
-import pdpPromoImg from 'assets/blibli-projects/pdp-promo.png';
+import pdpShippingImg from 'assets/img/blibli/pdp-shipping.png';
+import pdpDescriptionImg from 'assets/img/blibli/pdp-desc.png';
+import pdpDiscussionImg from 'assets/img/blibli/pdp-discussion.png';
+import pdpPromoImg from 'assets/img/blibli/pdp-promo.png';
 import styles from './BlibliSecondaryPagesPreview.module.scss';
 import { useLayoutEffect, useRef } from 'react';
 

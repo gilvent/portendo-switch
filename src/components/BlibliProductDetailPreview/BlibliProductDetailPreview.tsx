@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import pdpPageImg from 'assets/blibli-projects/pdp-full-page.png';
+import pdpPageImg from 'assets/img/blibli/pdp-full-page.png';
 import { getElementYPosition } from '@/utils/document';
 import styles from './BlibliProductDetailPreview.module.scss';
 import { PreviewImageCSSProperty } from './types';

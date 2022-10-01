@@ -12,7 +12,7 @@ function Box(props: BoxProps) {
   const boxRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    import('@/assets/img/tech-logos/' + props.logoFileName).then(src => {
+    import('@/assets/img/tech/' + props.logoFileName).then(src => {
       setImgSrc(src.default);
     });
   }, []);
