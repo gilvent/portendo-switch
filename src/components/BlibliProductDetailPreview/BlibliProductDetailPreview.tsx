@@ -1,32 +1,44 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useRef } from 'react';
 import pdpPageImg from 'assets/img/blibli/pdp-full-page.png';
-import { getElementYPosition } from '@/utils/document';
+import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger';
+import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
 import styles from './BlibliProductDetailPreview.module.scss';
-import { PreviewImageCSSProperty } from './types';
+import useStyleSetup from './useStyleSetup.hook';
 
 function BlibliProductDetailPreview() {
   const transparentLayerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  const initialImgPadding = 145;
-  const [imgPadding, setImgPadding] = useState(initialImgPadding);
-  const [imgStyle, setImgStyle] = useState({
-    '--padding-top': initialImgPadding + 'px'
-  } as PreviewImageCSSProperty);
-
-  useEffect(() => {
-    const transparentLayerY = getElementYPosition(transparentLayerRef.current);
-    const previewY = getElementYPosition(previewRef.current);
-    setImgPadding(transparentLayerY - previewY);
-  }, []);
-
-  useEffect(() => {
-    setImgStyle({
-      '--padding-top': imgPadding + 'px'
-    } as PreviewImageCSSProperty);
-  }, [imgPadding]);
+  const { imgStyle } = useStyleSetup({ transparentLayerRef, previewRef });
+  const { setActivePDPArticle } = useContext(BlibliWorkPageContext);
+  const { scrollTrigger: initialTrigger } = useStandaloneScrollTrigger({
+    trigger: '#product-detail-preview',
+    start: 'top center',
+    end: '50% center',
+    onEnter: _ => {
+      setActivePDPArticle(0);
+    },
+    onEnterBack: _ => {
+      setActivePDPArticle(0);
+    }
+  });
+  const { scrollTrigger: halfwayTrigger } = useStandaloneScrollTrigger({
+    trigger: '#product-detail-preview',
+    start: '50% center',
+    end: 'bottom center',
+    onEnter: _ => {
+      setActivePDPArticle(1);
+    },
+    onEnterBack: _ => {
+      setActivePDPArticle(1);
+    }
+  });
 
   return (
-    <figure className={styles['preview']} ref={previewRef}>
+    <figure
+      id="product-detail-preview"
+      className={styles['preview']}
+      ref={previewRef}
+    >
       <img src={pdpPageImg} style={imgStyle} alt="Blibli product detail" />
       <div className={styles['overlay']}>
         <div ref={transparentLayerRef}></div>

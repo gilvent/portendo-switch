@@ -8,17 +8,22 @@
     'review-revamp-guide review-revamp';
 
   section {
-    padding: 48px;
+    padding: 24px;
     color: rgba(73, 73, 73, 0.84);
+    h2 {
+      font-size: 40px;
+      margin: 24px auto;
+    }
     h3 {
       font-size: 32px;
       margin: 24px auto;
     }
     h4 {
       font-size: 24px;
-      margin: 24px auto;
+      margin: 16px auto;
     }
     p {
+      font-weight: 500;
       font-size: 18px;
       padding-right: 30%;
     }
@@ -50,10 +55,6 @@ section.pdp-secondary {
 section.pdp-revamp-guide {
   grid-area: pdp-revamp-guide;
   background-color: #e7f7ff;
-  .overview {
-    position: sticky;
-    top: 145px;
-  }
 }
 
 section.review-revamp-guide {

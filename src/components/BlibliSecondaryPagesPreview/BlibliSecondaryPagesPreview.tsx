@@ -67,13 +67,12 @@ function BlibliSecondaryPagesPreview() {
       <img
         src={pdpPromoImg}
         className="pdp-promo"
-        alt="Blibli product shipping page"
+        alt="Blibli product promo page"
       />
-
       <img
         src={pdpDiscussionImg}
         className="pdp-discussion"
-        alt="Blibli product shipping page"
+        alt="Blibli product discussion page"
       />
       <img
         src={pdpDescriptionImg}

@@ -1,0 +1,24 @@
+.sticky-article {
+  position: sticky;
+  top: 145px;
+  color: rgba(73, 73, 73, 0.84);
+  p {
+    font-weight: 500;
+  }
+}
+
+.details {
+  position: relative;
+  article {
+    position: absolute;
+    top: 0;
+    height: 150px;
+    overflow: hidden;
+    h4 {
+      opacity: 0;
+    }
+    p {
+      opacity: 0;
+    }
+  }
+}
