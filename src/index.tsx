@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import router from './router';
-import './index.scss';
+import 'assets/scss/_main.scss';
 
 gsap.registerPlugin(ScrollTrigger);
 
