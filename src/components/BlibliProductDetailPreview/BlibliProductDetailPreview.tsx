@@ -10,7 +10,7 @@ function BlibliProductDetailPreview() {
   const previewRef = useRef<HTMLDivElement>(null);
   const { imgStyle } = useStyleSetup({ transparentLayerRef, previewRef });
   const { setActivePDPArticle } = useContext(BlibliWorkPageContext);
-  const { scrollTrigger: initialTrigger } = useStandaloneScrollTrigger({
+  useStandaloneScrollTrigger({
     trigger: '#product-detail-preview',
     start: 'top center',
     end: '50% center',
@@ -21,7 +21,7 @@ function BlibliProductDetailPreview() {
       setActivePDPArticle(0);
     }
   });
-  const { scrollTrigger: halfwayTrigger } = useStandaloneScrollTrigger({
+  useStandaloneScrollTrigger({
     trigger: '#product-detail-preview',
     start: '50% center',
     end: 'bottom center',

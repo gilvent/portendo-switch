@@ -4,8 +4,9 @@ import pdpDescriptionImg from 'assets/img/blibli/pdp-desc.png';
 import pdpDiscussionImg from 'assets/img/blibli/pdp-discussion.png';
 import pdpPromoImg from 'assets/img/blibli/pdp-promo.png';
 import styles from './BlibliSecondaryPagesPreview.module.scss';
-import { useLayoutEffect, useRef } from 'react';
+import { useContext, useLayoutEffect, useRef } from 'react';
 import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger';
+import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
 
 function BlibliSecondaryPagesPreview() {
   const rootEl = useRef(null);
@@ -16,7 +17,10 @@ function BlibliSecondaryPagesPreview() {
     description: useRef(null),
     shipping: useRef(null)
   };
-  useStandaloneScrollTrigger(getEnterTriggerParams('#blibli-secondary-pdp'));
+  const { setActivePDPArticle } = useContext(BlibliWorkPageContext);
+  useStandaloneScrollTrigger(
+    getEnterTriggerParams('#blibli-secondary-pdp', true)
+  );
   useStandaloneScrollTrigger(getEnterTriggerParams('#discussion-lane'));
   useStandaloneScrollTrigger(getEnterTriggerParams('#description-lane'));
   useStandaloneScrollTrigger(getEnterTriggerParams('#shipping-lane'));
@@ -54,12 +58,20 @@ function BlibliSecondaryPagesPreview() {
     );
   }
 
-  function getEnterTriggerParams(trigger: string) {
+  function getEnterTriggerParams(
+    trigger: string,
+    isFirstTrigger: boolean = false
+  ) {
     return {
       trigger,
       start: 'start center',
       end: 'bottom center',
-      onEnter: () => playMasterTimeline(),
+      onEnter: () => {
+        if (isFirstTrigger) {
+          setActivePDPArticle(2);
+        }
+        playMasterTimeline();
+      },
       onLeaveBack: () => reverseMasterTimeline()
     };
   }

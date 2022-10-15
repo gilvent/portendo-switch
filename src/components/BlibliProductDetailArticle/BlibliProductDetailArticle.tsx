@@ -1,6 +1,7 @@
 import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
+import usePreviousState from '@/hooks/usePreviousState';
 import gsap, { TweenLite } from 'gsap';
-import { useContext, useLayoutEffect, useRef } from 'react';
+import { useContext, useEffect, useLayoutEffect, useRef } from 'react';
 import styles from './BlibliProductDetailArticle.module.scss';
 
 function BlibliProductDetailArticle() {
@@ -9,84 +10,115 @@ function BlibliProductDetailArticle() {
     useRef<HTMLDivElement>(null),
     useRef<HTMLDivElement>(null)
   ];
-  const articleQuery = detailArticleRef.map(ref => gsap.utils.selector(ref));
-  const { activePDPArticleIndex, prevPDPArticleIndex, setActivePDPArticle } =
-    useContext(BlibliWorkPageContext);
+  const { activePDPArticleIndex } = useContext(BlibliWorkPageContext);
+  const prevPDPArticleIndex = usePreviousState(activePDPArticleIndex);
+  const articleTimeline = useRef<gsap.core.Timeline | null>(null);
 
-  useLayoutEffect(() => {
-    let nextArticle = articleQuery[activePDPArticleIndex];
-    let prevArticle = articleQuery[prevPDPArticleIndex];
-    let headingLeave: TweenLite | null = null;
-    let paragraphLeave: TweenLite | null = null;
-    let enterDelay: number = 0;
-
-    if (activePDPArticleIndex !== prevPDPArticleIndex) {
-      enterDelay = 1;
-      headingLeave = gsap.fromTo(
-        prevArticle('h4'),
+  function articleLeave(query: gsap.utils.SelectorFunc): gsap.core.Timeline {
+    return gsap
+      .timeline()
+      .fromTo(
+        query('p'),
         {
-          opacity: 1,
           y: 0
         },
         {
           opacity: 0,
-          duration: 0.5,
-          ease: 'power2.out'
-        }
-      );
-      paragraphLeave = gsap.fromTo(
-        prevArticle('p'),
+          y: '+=100%'
+        },
+        0
+      )
+      .fromTo(
+        query('h4'),
         {
-          opacity: 1,
           y: 0
         },
         {
           opacity: 0,
-          duration: 0.5,
-          delay: 0.3,
-          ease: 'power2.out'
-        }
+          y: '+=100%'
+        },
+        '<0.1'
       );
+  }
+
+  function articleEnter(query: gsap.utils.SelectorFunc): gsap.core.Timeline {
+    return gsap
+      .timeline()
+      .fromTo(
+        query('h4'),
+        {
+          opacity: 0,
+          y: '+=100%',
+          immediateRender: false
+        },
+        {
+          opacity: 1,
+          y: 0
+        },
+        0
+      )
+      .fromTo(
+        query('p'),
+        {
+          opacity: 0,
+          y: '+=100%',
+          immediateRender: false
+        },
+        {
+          opacity: 1,
+          y: 0
+        },
+        '<0.1'
+      );
+  }
+
+  function getAnimation(
+    query: gsap.utils.SelectorFunc,
+    previousQuery: gsap.utils.SelectorFunc | null
+  ) {
+    const tl = gsap.timeline();
+
+    if (previousQuery) {
+      tl.add(articleLeave(previousQuery));
     }
 
-    let headingEnter = gsap.fromTo(
-      nextArticle('h4'),
-      {
-        opacity: 0,
-        y: '+=100%',
-        immediateRender: false
-      },
-      {
-        opacity: 1,
-        duration: 1,
-        y: 0,
-        delay: enterDelay,
-        ease: 'power2.out'
-      }
-    );
+    return tl.add(articleEnter(query));
+  }
 
-    let paragraphEnter = gsap.fromTo(
-      nextArticle('p'),
-      {
-        opacity: 0,
-        y: '+=100%',
-        immediateRender: false
-      },
-      {
-        opacity: 1,
-        duration: 1,
-        y: 0,
-        delay: enterDelay + 0.3,
-        ease: 'power2.out'
-      }
-    );
+  useLayoutEffect(() => {
+    const articleQuery = detailArticleRef.map(ref => gsap.utils.selector(ref));
+    const firstArticle = getAnimation(articleQuery[0], null);
+    const secondArticle = getAnimation(articleQuery[1], articleQuery[0]);
+    const thirdArticle = getAnimation(articleQuery[2], articleQuery[1]);
+
+    articleTimeline.current = gsap
+      .timeline({
+        defaults: {
+          duration: 0.8,
+          ease: 'ease.inOut'
+        }
+      })
+      .add(firstArticle, 'first-article')
+      .addPause('first-article')
+      .add(secondArticle, 'second-article')
+      .addPause('second-article')
+      .add(thirdArticle, 'third-article')
+      .addPause('third-article');
 
     return () => {
-      paragraphEnter.kill();
-      headingEnter.kill();
-      headingLeave?.kill();
-      paragraphLeave?.kill();
+      firstArticle.kill();
+      secondArticle.kill();
+      thirdArticle.kill();
     };
+  }, []);
+
+  useEffect(() => {
+    if (!articleTimeline.current) return;
+    if (activePDPArticleIndex > prevPDPArticleIndex) {
+      articleTimeline.current.play();
+    } else if (activePDPArticleIndex < prevPDPArticleIndex) {
+      articleTimeline.current.reverse();
+    }
   }, [activePDPArticleIndex]);
 
   return (
