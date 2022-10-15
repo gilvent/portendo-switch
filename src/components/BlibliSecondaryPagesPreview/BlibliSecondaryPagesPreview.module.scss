@@ -1,10 +1,18 @@
 .secondary-pages {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   position: relative;
   margin-top: 72px;
-  height: 800px;
+  min-height: 1500px;
+  .container {
+    position: sticky;
+    display: grid;
+    place-items: center;
+    top: 200px;
+    height: 600px;
+    width: 350px;
+  }
   img {
     position: absolute;
     top: 0;
@@ -16,5 +24,9 @@
     filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.16));
     opacity: 0;
     transform-origin: 50% 50%;
+  }
+  .placeholder {
+    width: 325px;
+    height: 520px;
   }
 }
