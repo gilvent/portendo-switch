@@ -29,7 +29,7 @@ function BlibliProductDetailArticle() {
         0
       )
       .fromTo(
-        query('h4'),
+        query('h3'),
         {
           y: 0
         },
@@ -45,7 +45,7 @@ function BlibliProductDetailArticle() {
     return gsap
       .timeline()
       .fromTo(
-        query('h4'),
+        query('h3'),
         {
           opacity: 0,
           y: '+=100%',
@@ -135,21 +135,21 @@ function BlibliProductDetailArticle() {
 
       <section className={styles.details}>
         <article ref={detailArticleRef[0]}>
-          <h4>Code fully rewritten.</h4>
+          <h3>Code fully rewritten.</h3>
           <p>
             We took the opportunity to rewrite the codebase from scratch.
             Creating reusable UI components for mobile and desktop.
           </p>
         </article>
         <article ref={detailArticleRef[1]}>
-          <h4>UI turned brand new.</h4>
+          <h3>UI turned brand new.</h3>
           <p>
             Almost all features in product detail are redesigned. Check out one
             of the examples right there.
           </p>
         </article>
         <article ref={detailArticleRef[2]}>
-          <h4>Secondary pages for mobile users.</h4>
+          <h3>Secondary pages for mobile users.</h3>
           <p>
             With limited mobile screen real estate and so much info to tell,
             secondary pages are added for better UX.
