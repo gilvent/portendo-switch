@@ -4,7 +4,6 @@
   align-items: center;
   position: relative;
   margin-top: 72px;
-  min-height: 1500px;
   .container {
     position: sticky;
     display: grid;
@@ -14,6 +13,7 @@
     width: 350px;
   }
   img {
+    cursor: pointer;
     position: absolute;
     top: 0;
     width: 325px;
@@ -24,9 +24,5 @@
     filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.16));
     opacity: 0;
     transform-origin: 50% 50%;
-  }
-  .placeholder {
-    width: 325px;
-    height: 600px;
   }
 }
