@@ -24,7 +24,6 @@ function BlibliSecondaryPagesPreview() {
     trigger: '.' + styles.container,
     start: 'start center',
     end: 'bottom center',
-    markers: true,
     onEnter: () => {
       setActivePDPArticle(2);
       playAnimation();
