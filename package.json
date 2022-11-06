@@ -70,7 +70,7 @@
     "test": "node scripts/test.js",
     "analyze": "webpack-bundle-analyzer build/bundle-stats.json",
     "lint": "eslint .",
-    "eslint:fix": "eslint src/ --fix  --config ./.eslintrc",
+    "eslint:fix": "eslint src/ --fix --config ./.eslintrc",
     "format": "prettier --write './src/*.{js,jsx,ts,tsx,css,json}' --config ./.prettierrc",
     "lint:fix": "npm run format && npm run eslint:fix"
   },
@@ -93,9 +93,14 @@
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "lint-staged": "^13.0.3",
     "node-sass": "^7.0.1",
     "prettier": "^2.7.1",
     "webpack-bundle-analyzer": "^4.5.0"
+  },
+  "lint-staged": {
+    "./src/*": "eslint --config ./.eslintrc --fix",
+    "./src/*.{js,jsx,ts,tsx,css,json}": "prettier --config ./.prettierrc --write"
   },
   "jest": {
     "roots": [
