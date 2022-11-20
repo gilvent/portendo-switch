@@ -1,7 +1,7 @@
-import BlibliCard from '@/components/BlibliCard';
-import { getClassNames } from '@/utils/css-module';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import classNames from 'classnames';
+import BlibliCard from '@/components/BlibliCard';
 import styles from './WorkPage.module.scss';
 
 function WorkPage() {
@@ -12,14 +12,14 @@ function WorkPage() {
     return pathname === '/work/blibli';
   });
 
-  const primaryPanelClasses = getClassNames(styles, [
-    'panel-container',
-    'panel-container--primary'
-  ]);
-  const secondaryPanelClasses = getClassNames(styles, [
-    'panel-container',
-    'panel-container--secondary'
-  ]);
+  const primaryPanelClasses = classNames(
+    styles['panel-container'],
+    styles['panel-container--primary']
+  );
+  const secondaryPanelClasses = classNames(
+    styles['panel-container'],
+    styles['panel-container--secondary']
+  );
 
   const onCardClick = () => {
     if (!isCardActive) {
@@ -34,7 +34,7 @@ function WorkPage() {
   }, [pathname]);
 
   return (
-    <div>
+    <div className="work-list">
       <div className={primaryPanelClasses}>
         <BlibliCard onClick={onCardClick} active={isCardActive} />
       </div>
