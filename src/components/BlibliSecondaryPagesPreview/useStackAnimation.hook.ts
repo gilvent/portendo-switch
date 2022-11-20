@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 export enum LABELS {
@@ -19,7 +19,7 @@ export type ScreenshotRef = {
 function useStackAnimation(screenshotRef: ScreenshotRef) {
   const masterTimeline = useRef<gsap.core.Timeline | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { promo, discussion, description, shipping } = screenshotRef;
     const promoEnter = getEnterAnimation(promo, []);
     const discussionEnter = getEnterAnimation(discussion, [promo]);

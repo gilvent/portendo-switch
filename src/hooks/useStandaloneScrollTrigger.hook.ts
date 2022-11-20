@@ -15,6 +15,10 @@ function useStandaloneScrollTrigger(vars: ScrollTrigger.StaticVars) {
       ...vars,
       onToggle
     });
+
+    return () => {
+      scrollTrigger.current?.kill();
+    };
   }, []);
 
   return {

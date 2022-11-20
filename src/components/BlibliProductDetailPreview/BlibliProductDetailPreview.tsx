@@ -1,6 +1,6 @@
 import { useContext, useRef } from 'react';
 import pdpPageImg from 'assets/img/blibli/pdp-full-page.png';
-import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger';
+import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger.hook';
 import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
 import styles from './BlibliProductDetailPreview.module.scss';
 import useStyleSetup from './useStyleSetup.hook';

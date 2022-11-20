@@ -1,5 +1,5 @@
 import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
-import usePreviousState from '@/hooks/usePreviousState';
+import usePreviousState from '@/hooks/usePreviousState.hook';
 import gsap, { TweenLite } from 'gsap';
 import { useContext, useEffect, useLayoutEffect, useRef } from 'react';
 import styles from './BlibliProductDetailArticle.module.scss';

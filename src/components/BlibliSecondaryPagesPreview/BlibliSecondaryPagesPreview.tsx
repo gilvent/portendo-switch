@@ -3,10 +3,10 @@ import pdpShippingImg from 'assets/img/blibli/pdp-shipping.png';
 import pdpDescriptionImg from 'assets/img/blibli/pdp-desc.png';
 import pdpDiscussionImg from 'assets/img/blibli/pdp-discussion.png';
 import pdpPromoImg from 'assets/img/blibli/pdp-promo.png';
-import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger';
+import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger.hook';
 import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
 import styles from './BlibliSecondaryPagesPreview.module.scss';
-import useStackAnimation, { LABELS } from './useStackAnimation';
+import useStackAnimation, { LABELS } from './useStackAnimation.hook';
 
 function BlibliSecondaryPagesPreview() {
   const rootEl = useRef(null);
