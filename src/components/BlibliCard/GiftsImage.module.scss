@@ -1,0 +1,40 @@
+.gifts-container {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  transform: scale(0.7);
+
+  .gift-1 {
+    position: absolute;
+    z-index: 3;
+    transition: transform 0.3s ease-in-out;
+    transition-delay: 0.1s;
+    &.active {
+      transform: translate(-105px, -125px) rotate(-10deg);
+    }
+  }
+
+  .gift-2 {
+    position: absolute;
+    z-index: 2;
+    transition: transform 0.3s ease-in-out;
+    transition-delay: 0.2s;
+    &.active {
+      transform: translate(105px, -155px) rotate(20deg);
+    }
+  }
+
+  .gift-3 {
+    position: absolute;
+    z-index: 1;
+    transition: transform 0.3s ease-in-out;
+    transition-delay: 0.3s;
+    &.active {
+      transform: translate(-15px, -245px) rotate(-7deg);
+    }
+  }
+}

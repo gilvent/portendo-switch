@@ -2,33 +2,45 @@
   display: flex;
   gap: 8px;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 50vw;
-  min-height: 100vh;
+  height: 100vh;
   position: relative;
-  
+  padding: 36px;
   color: #fff;
-  background: linear-gradient(132.36deg, #0092DA 43.16%, #0071DA 112.76%);
+  background: linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%);
   cursor: pointer;
-}
-
-.card .logo {
-  position: absolute;
-  top: 20%;
-  width: 100px;
-  height: 140px;
+  overflow: hidden;
 }
 
 .card .heading {
-  position: absolute;
-  bottom: 25%;
-  font-size: 24px;
+  font-size: 96px;
+  transition: opacity 0.3s ease-in-out;
+  &.active {
+    opacity: 0;
+  }
+  &.enter-transition {
+    transition-delay: 0.3s;
+  }
+}
+
+.card .logo {
+  align-self: center;
+  width: 100px;
+  height: 140px;
+  margin-top: 72px;
 }
 
 .card .description {
-  position: absolute;
-  top: 72px;
+  text-align: center;
   opacity: 0;
   font-size: 24px;
+  margin: 24px 0;
+  transition: all 0.3s ease-in-out;
+  transition-delay: 0.3s;
+  transform: translateY(50px);
+
+  &.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
