@@ -1,20 +1,18 @@
 .btn-outline {
+  --color: #fff;
   position: relative;
   padding: 16px 24px;
-  border-radius: 10px;
+  border-radius: 12px;
   transition: all 0.3s ease;
-  z-index: 0;
 
-  border: 2px solid #fff;
+  border: 2px solid var(--color);
   background-color: transparent;
-  color: #fff;
-  opacity: 0.9;
+  color: var(--color);
   font-size: 16px;
-
 
   &:hover {
     transition: 0.5s;
-    background-color: #fff;
+    background-color: var(--color);
     mix-blend-mode: screen;
     color: #000;
   }
