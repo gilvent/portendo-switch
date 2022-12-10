@@ -1,7 +1,9 @@
+@use 'assets/scss/variables/_colors.scss';
+
 .sticky-article {
   position: sticky;
   top: 145px;
-  color: rgba(73, 73, 73, 0.84);
+  color: colors.$dark-2;
   p {
     font-weight: 500;
   }
