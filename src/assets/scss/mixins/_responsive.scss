@@ -1,0 +1,19 @@
+@use "assets/scss/variables/breakpoints";
+
+@mixin tablets () {
+  @media (min-width: breakpoints.$md) {
+    @content;
+  }
+}
+
+@mixin desktop () {
+  @media (min-width: breakpoints.$lg) {
+    @content;
+  }
+}
+
+@mixin large-screen () {
+  @media (min-width: breakpoints.$xl) {
+    @content;
+  }
+}

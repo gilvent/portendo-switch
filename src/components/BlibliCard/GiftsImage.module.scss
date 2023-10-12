@@ -1,3 +1,5 @@
+@use 'assets/scss/mixins/responsive';
+
 .gifts-container {
   position: absolute;
   display: flex;
@@ -6,7 +8,11 @@
   left: 0;
   bottom: 0;
   z-index: 1;
-  transform: scale(0.7);
+  transform: scale(0.5);
+
+  @include responsive.desktop {
+    transform: scale(0.7);
+  }
 
   .gift-1 {
     position: absolute;

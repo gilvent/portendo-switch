@@ -1,18 +1,26 @@
+@use 'assets/scss/mixins/responsive';
+
 .panel-container {
   position: absolute;
   top: 0;
   left: 0;
   display: grid;
-  place-content: center;
-  min-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 
-  &--secondary {
-    z-index: 1;
-    background-color: #333;
+  @include responsive.desktop {
+    place-content: center;
+    min-height: 100vh;
   }
 
   &--primary {
     z-index: 2;
     background-color: transparent;
+    height: 80vh;
+  }
+
+  &--secondary {
+    z-index: 1;
+    background-color: #333;
   }
 }

@@ -1,18 +1,24 @@
+@use 'assets/scss/mixins/responsive';
+@use 'assets/scss/mixins/font';
+
 .card {
   display: flex;
-  gap: 8px;
+  gap: 40px;
   flex-direction: column;
-  width: 50vw;
-  height: 100vh;
   position: relative;
   padding: 36px;
   color: #fff;
   background: linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%);
   cursor: pointer;
   overflow: hidden;
+
+  @include responsive.desktop {
+    width: 50vw;
+    height: 100vh;
+  }
 }
 
-.card .heading {
+.heading {
   font-size: 96px;
   transition: opacity 0.3s ease-in-out;
   &.active {
@@ -21,23 +27,48 @@
   &.enter-transition {
     transition-delay: 0.3s;
   }
+  &.leave-transition {
+    & ~ .buttons {
+      transition-delay: 0.3s;
+    }
+  }
 }
 
-.card .logo {
+.logo {
   align-self: center;
   width: 100px;
   height: 140px;
-  margin-top: 72px;
 }
 
-.card .description {
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  gap: 2.4rem;
+}
+
+.buttons {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+
+  &.active {
+    opacity: 1;
+  }
+}
+
+.description {
   text-align: center;
   opacity: 0;
-  font-size: 24px;
   margin: 24px 0;
   transition: all 0.3s ease-in-out;
   transition-delay: 0.3s;
   transform: translateY(50px);
+  @include font.text-base;
+
+  @include responsive.desktop {
+    @include font.text-2xl;
+  }
 
   &.active {
     opacity: 1;

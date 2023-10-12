@@ -14,26 +14,13 @@ function BlibliWorkPage() {
   return (
     <BlibliWorkPageProvider>
       <div className={styles['work-page']}>
-        <section className={styles['page-gap']}></section>
-        <section className={styles['tech']}>
+        <section className={`${styles.block} ${styles['page-gap']}`}></section>
+        <section className={`${styles.block} ${styles['tech']}`}>
           <TechCard techList={techList} />
         </section>
-
-        <section className={styles['pdp-revamp']}>
-          <BlibliProductDetailPreview />
-        </section>
-
-        <section className={styles['pdp-secondary']}>
-          <BlibliSecondaryPagesPreview />
-        </section>
-
-        <section className={styles['pdp-revamp-guide']}>
-          <BlibliProductDetailArticle />
-        </section>
-
-        <section className={styles['review-revamp-guide']}>
+        <section className={`${styles.block} ${styles['review-revamp-guide']}`}>
           <h3>
-            Project Highlight: <br /> Redesign Review Experience
+            Project Highlight: <br /> Redesign Review Journey
           </h3>
           <p>
             The review experience on Blibli.com is renewed with major UI / UX
@@ -44,8 +31,20 @@ function BlibliWorkPage() {
             photos.
           </p>
         </section>
+        <section
+          className={`${styles.block} ${styles['review-revamp']}`}
+        ></section>
+        <section className={`${styles.block} ${styles['pdp-revamp']}`}>
+          <BlibliProductDetailPreview />
+        </section>
 
-        <section className={styles['review-revamp']}></section>
+        <section className={`${styles.block} ${styles['pdp-secondary']}`}>
+          <BlibliSecondaryPagesPreview />
+        </section>
+
+        <section className={`${styles.block} ${styles['pdp-revamp-guide']}`}>
+          <BlibliProductDetailArticle />
+        </section>
       </div>
     </BlibliWorkPageProvider>
   );
