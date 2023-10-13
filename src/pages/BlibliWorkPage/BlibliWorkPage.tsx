@@ -4,6 +4,7 @@ import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPrevie
 import BlibliProductDetailArticle from '@/components/BlibliProductDetailArticle';
 import { BlibliWorkPageProvider } from '@/context/BlibliWorkPageContext';
 import styles from './BlibliWorkPage.module.scss';
+import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
 
 function BlibliWorkPage() {
   const techList = [
@@ -19,17 +20,7 @@ function BlibliWorkPage() {
           <TechCard techList={techList} />
         </section>
         <section className={`${styles.block} ${styles['review-revamp-guide']}`}>
-          <h3>
-            Project Highlight: <br /> Redesign Review Journey
-          </h3>
-          <p>
-            The review experience on Blibli.com is renewed with major UI / UX
-            improvements.
-            <br /> <br />
-            Reviewer can now upload photos from files, or directly from camera
-            capture. On the product detail side, we add filter by rating and
-            photos.
-          </p>
+          <BlibliReviewProjectStoryBlock />
         </section>
         <section
           className={`${styles.block} ${styles['review-revamp']}`}
