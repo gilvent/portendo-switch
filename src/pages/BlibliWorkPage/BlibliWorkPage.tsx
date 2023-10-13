@@ -19,13 +19,13 @@ function BlibliWorkPage() {
         <section className={`${styles.block} ${styles['tech']}`}>
           <TechCard techList={techList} />
         </section>
-        <section className={`${styles.block} ${styles['review-revamp-guide']}`}>
+        <section className={`${styles.block} ${styles['review-revamp-story']}`}>
           <BlibliReviewProjectStoryBlock />
         </section>
         <section
           className={`${styles.block} ${styles['review-revamp']}`}
         ></section>
-        <section className={`${styles.block} ${styles['pdp-revamp']}`}>
+        <section className={`${styles.block} ${styles['pdp-revamp-preview']}`}>
           <BlibliProductDetailPreview />
         </section>
 
@@ -33,7 +33,7 @@ function BlibliWorkPage() {
           <BlibliSecondaryPagesPreview />
         </section>
 
-        <section className={`${styles.block} ${styles['pdp-revamp-guide']}`}>
+        <section className={`${styles.block} ${styles['pdp-revamp-story']}`}>
           <BlibliProductDetailArticle />
         </section>
       </div>

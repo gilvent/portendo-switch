@@ -7,10 +7,10 @@
   grid-template-areas:
     'page-gap'
     'tech'
-    'review-revamp-guide'
+    'review-revamp-story'
     'review-revamp'
-    'pdp-revamp-guide'
-    'pdp-revamp'
+    'pdp-revamp-story'
+    'pdp-revamp-preview'
     'pdp-secondary';
   text-align: center;
 
@@ -18,9 +18,9 @@
     grid-template-columns: 50vw 50vw;
     grid-template-areas:
       'page-gap tech'
-      'review-revamp review-revamp-guide'
-      'pdp-revamp-guide pdp-revamp'
-      'pdp-revamp-guide pdp-secondary';
+      'review-revamp review-revamp-story'
+      'pdp-revamp-preview pdp-revamp-story'
+      'pdp-revamp-preview pdp-secondary';
 
     text-align: left;
   }
@@ -56,8 +56,8 @@ section.page-gap {
   }
 }
 
-section.pdp-revamp {
-  grid-area: pdp-revamp;
+section.pdp-revamp-preview {
+  grid-area: pdp-revamp-preview;
   position: relative;
   padding: 0 48px;
 }
@@ -69,13 +69,13 @@ section.pdp-secondary {
   background-color: #74d3ff;
 }
 
-section.pdp-revamp-guide {
-  grid-area: pdp-revamp-guide;
+section.pdp-revamp-story {
+  grid-area: pdp-revamp-story;
   background-color: #e7f7ff;
 }
 
-section.review-revamp-guide {
-  grid-area: review-revamp-guide;
+section.review-revamp-story {
+  grid-area: review-revamp-story;
   background-color: #f9b260;
 }
 
