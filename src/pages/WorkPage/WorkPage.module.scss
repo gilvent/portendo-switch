@@ -6,7 +6,6 @@
   left: 0;
   display: grid;
   width: 100vw;
-  overflow: hidden;
 
   @include responsive.desktop {
     place-content: center;

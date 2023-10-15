@@ -17,6 +17,7 @@ function useStyleSetup({ transparentLayerRef, previewRef }: HookParams) {
   useEffect(() => {
     const transparentLayerY = getElementYPosition(transparentLayerRef.current);
     const previewY = getElementYPosition(previewRef.current);
+    // TODO approach is not fully reliable, can only works on initial window position (breaks when refreshed after window is scrolled)
     setImgPadding(transparentLayerY - previewY);
   }, []);
 

@@ -3,9 +3,7 @@ import styles from './BlibliReviewProjectStoryBlock.module.scss';
 function BlibliReviewProjectStoryBlock() {
   return (
     <div className={styles['story-block']}>
-      <h3>
-        A project I took part: <br /> Review Revamp
-      </h3>
+      <h3>Redesign the journey</h3>
       <p className={`${styles.background}`}>
         This project includes series of improvements to user journey, both as a{' '}
         <strong>reviewer</strong> and <strong>potential customers</strong>{' '}
@@ -18,7 +16,7 @@ function BlibliReviewProjectStoryBlock() {
           UI redesign across product review features (adopting the upcoming
           major theme revamp in the company)
         </li>
-        <li>Enable photo upload while submitting review. And also</li>
+        <li>Enable photo upload while submitting review</li>
         <li>Filter reviews by photo or rating</li>
         <li>
           Browse reviews by photo (gallery), which supports multiple views like

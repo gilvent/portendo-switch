@@ -1,5 +1,6 @@
 @use 'assets/scss/mixins/responsive';
 @use 'assets/scss/mixins/font';
+@use 'assets/scss/variables/colors';
 
 .work-page {
   display: grid;
@@ -7,10 +8,10 @@
   grid-template-areas:
     'page-gap'
     'tech'
-    'review-revamp-story'
     'review-revamp'
-    'pdp-revamp-story'
+    'review-revamp-story'
     'pdp-revamp-preview'
+    'pdp-revamp-story'
     'pdp-secondary';
   text-align: center;
 
@@ -24,23 +25,11 @@
 
     text-align: left;
   }
-
-
 }
 
 section.block {
-  padding: 36px;
+  padding: 32px;
   color: rgba(73, 73, 73, 0.84);
-  h2 {
-    margin: 24px auto;
-  }
-  h3 {
-    margin: 24px auto;
-  }
-  h4 {
-    font-size: 24px;
-    margin: 16px auto;
-  }
 }
 
 section.tech {
@@ -59,7 +48,10 @@ section.page-gap {
 section.pdp-revamp-preview {
   grid-area: pdp-revamp-preview;
   position: relative;
-  padding: 0 48px;
+
+  h2 {
+    color: #fff;
+  }
 }
 
 section.pdp-secondary {
@@ -67,6 +59,8 @@ section.pdp-secondary {
   z-index: 2;
   bottom: 0;
   background-color: #74d3ff;
+  overflow-x: hidden;
+  padding: 72px 36px 36px;
 }
 
 section.pdp-revamp-story {

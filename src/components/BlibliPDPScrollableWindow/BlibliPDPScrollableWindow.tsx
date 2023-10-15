@@ -2,10 +2,10 @@ import { useContext, useRef } from 'react';
 import pdpPageImg from 'assets/img/blibli/pdp-full-page.png';
 import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger.hook';
 import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
-import styles from './BlibliProductDetailPreview.module.scss';
+import styles from './BlibliPDPScrollableWindow.module.scss';
 import useStyleSetup from './useStyleSetup.hook';
 
-function BlibliProductDetailPreview() {
+function BlibliPDPScrollableWindow() {
   const transparentLayerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const { imgStyle } = useStyleSetup({ transparentLayerRef, previewRef });
@@ -41,10 +41,12 @@ function BlibliProductDetailPreview() {
     >
       <img src={pdpPageImg} style={imgStyle} alt="Blibli product detail" />
       <div className={styles['overlay']}>
-        <div ref={transparentLayerRef}></div>
+        <div className={styles.window} ref={transparentLayerRef}>
+          <div className={styles.frame}></div>
+        </div>
       </div>
     </figure>
   );
 }
 
-export default BlibliProductDetailPreview;
+export default BlibliPDPScrollableWindow;

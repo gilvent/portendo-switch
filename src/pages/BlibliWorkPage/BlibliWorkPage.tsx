@@ -1,5 +1,5 @@
 import TechCard, { TECH } from '@/components/TechCard';
-import BlibliProductDetailPreview from '@/components/BlibliProductDetailPreview';
+import BlibliPDPScrollableWindow from '@/components/BlibliPDPScrollableWindow';
 import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPreview';
 import BlibliProductDetailArticle from '@/components/BlibliProductDetailArticle';
 import { BlibliWorkPageProvider } from '@/context/BlibliWorkPageContext';
@@ -22,11 +22,16 @@ function BlibliWorkPage() {
         <section className={`${styles.block} ${styles['review-revamp-story']}`}>
           <BlibliReviewProjectStoryBlock />
         </section>
-        <section
-          className={`${styles.block} ${styles['review-revamp']}`}
-        ></section>
+        <section className={`${styles.block} ${styles['review-revamp']}`}>
+          <h2>
+            Project Highlight: <br /> Review Revamp
+          </h2>
+        </section>
         <section className={`${styles.block} ${styles['pdp-revamp-preview']}`}>
-          <BlibliProductDetailPreview />
+          <h2>
+            Project Highlight: <br /> Product Detail Revamp
+          </h2>
+          <BlibliPDPScrollableWindow />
         </section>
 
         <section className={`${styles.block} ${styles['pdp-secondary']}`}>
