@@ -1,7 +1,7 @@
 import TechCard, { TECH } from '@/components/TechCard';
 import BlibliPDPScrollableWindow from '@/components/BlibliPDPScrollableWindow';
 import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPreview';
-import BlibliProductDetailArticle from '@/components/BlibliProductDetailArticle';
+import BlibliPDPRevampStoryBlock from '@/components/BlibliPDPRevampStoryBlock';
 import { BlibliWorkPageProvider } from '@/context/BlibliWorkPageContext';
 import styles from './BlibliWorkPage.module.scss';
 import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
@@ -39,7 +39,7 @@ function BlibliWorkPage() {
         </section>
 
         <section className={`${styles.block} ${styles['pdp-revamp-story']}`}>
-          <BlibliProductDetailArticle />
+          <BlibliPDPRevampStoryBlock />
         </section>
       </div>
     </BlibliWorkPageProvider>

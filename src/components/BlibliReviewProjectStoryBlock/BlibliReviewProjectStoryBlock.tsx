@@ -1,16 +1,14 @@
-import styles from './BlibliReviewProjectStoryBlock.module.scss';
-
 function BlibliReviewProjectStoryBlock() {
   return (
-    <div className={styles['story-block']}>
+    <div className="story-block">
       <h3>Redesign the journey</h3>
-      <p className={`${styles.background}`}>
+      <p className={`overview`}>
         This project includes series of improvements to user journey, both as a{' '}
         <strong>reviewer</strong> and <strong>potential customers</strong>{' '}
         browsing products. Starting from adding basic features such as review
         filter and photo upload, to adding review photo gallery.
       </p>
-      <ul className={`${styles.challenges} text-lg`}>
+      <ul className="key-points text-lg">
         <strong>Key changes...</strong>
         <li>
           UI redesign across product review features (adopting the upcoming
@@ -23,13 +21,13 @@ function BlibliReviewProjectStoryBlock() {
           grid and list
         </li>
       </ul>
-      <ul className={`${styles.challenges} text-lg`}>
+      <ul className="key-points text-lg">
         <strong>Some of what I learnt...</strong>
         <li>
-          My first encounter with rotated image issue when photo is uploaded
+          Try our best to test on real device :). This time is my first
+          encounter with an issue that uploaded image is rotated when uploaded
           using mobile web's camera capture (caused by EXIF orientation that
-          needs to be handled). Now always be reminded to test the feature on
-          real device :)
+          needs to be handled).
         </li>
         <li>
           User generated images vary in ratio. Consider all possibilities when
