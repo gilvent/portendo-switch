@@ -9,16 +9,21 @@
   bottom: 0;
   z-index: 1;
   transform: scale(0.5);
+  --transition-delay-base: 0.3s;
 
   @include responsive.desktop {
     transform: scale(0.7);
+  }
+
+  &.leaving {
+    --transition-delay-base: 0s;
   }
 
   .gift-1 {
     position: absolute;
     z-index: 3;
     transition: transform 0.3s ease-in-out;
-    transition-delay: 0.1s;
+    transition-delay: var(--transition-delay-base);
     &.active {
       transform: translate(-105px, -125px) rotate(-10deg);
     }
@@ -28,7 +33,7 @@
     position: absolute;
     z-index: 2;
     transition: transform 0.3s ease-in-out;
-    transition-delay: 0.2s;
+    transition-delay: calc(var(--transition-delay-base) + 0.1s);
     &.active {
       transform: translate(105px, -155px) rotate(20deg);
     }
@@ -38,7 +43,7 @@
     position: absolute;
     z-index: 1;
     transition: transform 0.3s ease-in-out;
-    transition-delay: 0.3s;
+    transition-delay: calc(var(--transition-delay-base) + 0.2s);
     &.active {
       transform: translate(-15px, -245px) rotate(-7deg);
     }

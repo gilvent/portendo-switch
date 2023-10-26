@@ -37,6 +37,7 @@ function BlibliSecondaryPagesPreview() {
       className={styles['secondary-pages']}
       ref={rootEl}
     >
+      <h3>Secondary pages for mobile web.</h3>
       <div className={styles.container}>
         <img
           className="screenshot"

@@ -15,19 +15,34 @@ function BlibliCard(props: BlibliCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const { isActive: h2Entering } = useTemporaryActiveEffect(!props.active, 600);
-  const { isActive: h2Leaving } = useTemporaryActiveEffect(props.active, 600);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const { isActive: leavingDetailMode } = useTemporaryActiveEffect(
+    !props.active,
+    600
+  );
+  const { isActive: enterDetailMode } = useTemporaryActiveEffect(
+    props.active,
+    600
+  );
 
   const descriptionClass = classNames(styles.description, {
     [styles.active]: props.active
   });
   const headingClass = classNames(styles.heading, {
     [styles.active]: props.active,
-    [styles['enter-transition']]: h2Entering,
-    [styles['leave-transition']]: h2Leaving
+    [styles['enter-transition']]: enterDetailMode,
+    [styles['leave-transition']]: leavingDetailMode
   });
-  const buttonsClass = classNames(styles.buttons, {
-    [styles.active]: props.active
+  const bgClass = classNames(styles.background, {
+    [styles.active]: props.active,
+    [styles['enter-transition']]: enterDetailMode,
+    [styles['leave-transition']]: leavingDetailMode
+  });
+
+  const titleClass = classNames(styles.title, {
+    [styles.active]: props.active,
+    [styles['enter-transition']]: enterDetailMode,
+    [styles['leave-transition']]: leavingDetailMode
   });
 
   return (
@@ -46,13 +61,25 @@ function BlibliCard(props: BlibliCardProps) {
           className={styles.logo}
           alt="Blibli logo"
         />
-        {/* <h2 ref={headingRef} className={headingClass}>
-          Blibli.com
-        </h2> */}
 
-        <div className={buttonsClass}>
-          <OutlineButton>Visit website</OutlineButton>
+        <div className={styles.overview}>
+          <h2 ref={headingRef} className={headingClass}>
+            Blibli.com
+          </h2>
+          <h4 className={styles.role}>Front end developer</h4>
+          <p className={styles.product}>
+            Blibli.com is an indonesian e-commerce with wide range of products
+            from both offline business to online.
+          </p>
         </div>
+
+        <div className={titleClass}>
+          <button className={styles['btn-title']}>
+            <h2 className={styles.text}>Blibli.com</h2>
+          </button>
+        </div>
+
+        <div className={bgClass} ref={bgRef}></div>
       </div>
 
       <GiftsImage active={props.active} />

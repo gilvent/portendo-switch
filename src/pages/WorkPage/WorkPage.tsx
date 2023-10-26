@@ -30,6 +30,10 @@ function WorkPage() {
   };
 
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
     setIsCardActive(pathname === '/work/blibli');
   }, [pathname]);
 

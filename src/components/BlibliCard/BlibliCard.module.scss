@@ -1,16 +1,15 @@
 @use 'assets/scss/mixins/responsive';
 @use 'assets/scss/mixins/font';
+@use 'assets/scss/variables/colors';
 
 .card {
   display: flex;
-  gap: 40px;
   flex-direction: column;
   position: relative;
-  padding: 36px;
   color: #fff;
-  background: linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%);
   cursor: pointer;
   overflow: hidden;
+  place-content: center;
 
   @include responsive.desktop {
     width: 50vw;
@@ -18,19 +17,57 @@
   }
 }
 
-.heading {
-  font-size: 96px;
-  transition: opacity 0.3s ease-in-out;
+.background {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%);
+
+  transition: all 0.5s;
+  transform: scale(1);
+
   &.active {
-    opacity: 0;
-  }
-  &.enter-transition {
-    transition-delay: 0.3s;
+    transform: scale(10);
   }
   &.leave-transition {
-    & ~ .buttons {
+    transition-delay: 0.3s;
+  }
+}
+
+.overview {
+  top: 120%;
+  position: absolute;
+  text-align: center;
+
+  .heading {
+    font-size: 28px;
+    margin: 18px;
+    color: #0092da;
+    transition: opacity 0.3s ease-in-out;
+    text-transform: uppercase;
+
+    &.active {
+      opacity: 0;
+    }
+    &.enter-transition {
       transition-delay: 0.3s;
     }
+    &.leave-transition {
+      transition-delay: 0.3s;
+    }
+  }
+
+  .role {
+    color: colors.$dark;
+    text-transform: uppercase;
+
+    font-size: 18px;
+  }
+
+  .product {
+    color: colors.$dark-2;
+    padding: 8px 24px;
   }
 }
 
@@ -38,14 +75,18 @@
   align-self: center;
   width: 100px;
   height: 140px;
+  z-index: 4;
+  filter: drop-shadow(0px 0px 2px rgb(71, 71, 71));
 }
 
 .content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  place-content: center;
   position: relative;
   gap: 2.4rem;
+  margin-top: -30%;
 }
 
 .buttons {
@@ -58,9 +99,13 @@
 }
 
 .description {
+  position: absolute;
+  top: 0;
+  left: 0;
   text-align: center;
   opacity: 0;
-  margin: 24px 0;
+  padding: 36px;
+  z-index: 4;
   transition: all 0.3s ease-in-out;
   transition-delay: 0.3s;
   transform: translateY(50px);
@@ -73,5 +118,34 @@
   &.active {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.title {
+  position: absolute;
+  top: 120%;
+  z-index: 4;
+  opacity: 0;
+  transition-duration: 0.5s;
+
+  .btn-title {
+    text-transform: uppercase;
+    border: none;
+    background-color: transparent;
+    @include font.text-3xl;
+
+    .text {
+      color: white;
+    }
+  }
+
+  &.active {
+    opacity: 1;
+  }
+  &.enter-transition {
+    transition-delay: 0.5s;
+  }
+  &.leave-transition {
+    transition-delay: 0.3s;
   }
 }
