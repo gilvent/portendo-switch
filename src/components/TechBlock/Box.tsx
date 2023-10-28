@@ -1,15 +1,19 @@
 import styles from './Box.module.scss';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { BoxRefs } from './types';
 
 type BoxProps = {
   logoFileName: string;
   text: string;
   color: string;
+  onRefsInit: (refs: BoxRefs) => any;
 };
 
 function Box(props: BoxProps) {
   const [imgSrc, setImgSrc] = useState('');
   const boxRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     import('@/assets/img/tech/' + props.logoFileName).then(src => {
@@ -19,6 +23,11 @@ function Box(props: BoxProps) {
 
   useEffect(() => {
     boxRef.current?.style.setProperty('--theme', props.color);
+    props.onRefsInit({
+      rootRef: boxRef,
+      overlayRef,
+      textRef
+    });
   }, []);
 
   return (
@@ -26,8 +35,10 @@ function Box(props: BoxProps) {
       <div className={styles.fg}>
         <img src={imgSrc} alt="" />
       </div>
-      <div className={styles.overlay}></div>
-      <div className={styles.text}>{props.text}</div>
+      <div className={styles.overlay} ref={overlayRef}></div>
+      <div className={styles.text} ref={textRef}>
+        {props.text}
+      </div>
     </div>
   );
 }

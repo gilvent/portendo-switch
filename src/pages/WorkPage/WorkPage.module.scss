@@ -16,6 +16,9 @@
     z-index: 2;
     background-color: transparent;
     height: 80vh;
+    @include responsive.desktop {
+      width: 50vw;
+    }
   }
 
   &--secondary {

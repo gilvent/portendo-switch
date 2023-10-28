@@ -1,4 +1,4 @@
-import TechCard, { TECH } from '@/components/TechCard';
+import TechBlock, { TECH } from '@/components/TechBlock';
 import BlibliPDPScrollableWindow from '@/components/BlibliPDPScrollableWindow';
 import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPreview';
 import BlibliPDPRevampStoryBlock from '@/components/BlibliPDPRevampStoryBlock';
@@ -17,7 +17,7 @@ function BlibliWorkPage() {
       <div className={styles['work-page']}>
         <section className={`${styles.block} ${styles['page-gap']}`}></section>
         <section className={`${styles.block} ${styles['tech']}`}>
-          <TechCard techList={techList} />
+          <TechBlock techList={techList} />
         </section>
         <section className={`${styles.block} ${styles['review-revamp-story']}`}>
           <BlibliReviewProjectStoryBlock />
