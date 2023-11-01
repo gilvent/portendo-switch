@@ -3,10 +3,11 @@ function BlibliReviewProjectStoryBlock() {
     <div className="story-block">
       <h3>Redesign the journey</h3>
       <p className={`overview`}>
-        This project includes series of improvements to user journey, both as a{' '}
-        <strong>reviewer</strong> and <strong>potential customers</strong>{' '}
-        browsing products. Starting from adding basic features such as review
-        filter and photo upload, to adding review photo gallery.
+        I took part in a series of projects to improve product review journey,
+        both as a <strong>reviewer</strong> and{' '}
+        <strong>potential customers</strong> browsing products. Starting from
+        adding basic features such as review filter and photo upload, to adding
+        review photo gallery.
       </p>
       <ul className="key-points text-lg">
         <strong>Key changes...</strong>

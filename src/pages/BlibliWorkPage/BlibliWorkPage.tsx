@@ -5,6 +5,7 @@ import BlibliPDPRevampStoryBlock from '@/components/BlibliPDPRevampStoryBlock';
 import { BlibliWorkPageProvider } from '@/context/BlibliWorkPageContext';
 import styles from './BlibliWorkPage.module.scss';
 import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
+import BlibliReviewProjectInteractiveBlock from '@/components/BlibliReviewProjectInteractiveBlock/BlibliReviewProjectInteractiveBlock';
 
 function BlibliWorkPage() {
   const techList = [
@@ -23,9 +24,7 @@ function BlibliWorkPage() {
           <BlibliReviewProjectStoryBlock />
         </section>
         <section className={`${styles.block} ${styles['review-revamp']}`}>
-          <h2>
-            Project Highlight: <br /> Review Revamp
-          </h2>
+          <BlibliReviewProjectInteractiveBlock />
         </section>
         <section className={`${styles.block} ${styles['pdp-revamp-preview']}`}>
           <h2>
