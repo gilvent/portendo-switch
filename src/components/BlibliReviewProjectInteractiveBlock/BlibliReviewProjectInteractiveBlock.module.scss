@@ -1,6 +1,11 @@
 .block {
   position: relative;
-  text-align: center;
+  padding: 32px 0;
+  z-index: 1;
+}
+
+.heading {
+  position: relative;
 }
 
 .camera-container {
@@ -8,6 +13,13 @@
   justify-content: center;
   width: 100%;
   padding: 24px 0;
+}
+
+.project-screenshot {
+  position: absolute;
+  width: calc(100vw - 24px);
+  height: auto;
+  align-self: center;
 }
 
 .camera {
@@ -19,8 +31,11 @@
   background: #000;
   padding: 36px 16px 16px;
   gap: 16px;
+  z-index: 1;
+  position: relative;
 
   .screen {
+    display: block;
     position: relative;
     height: 65%;
     width: auto;
@@ -31,7 +46,6 @@
       top: 0;
       left: 0;
       height: 100%;
-      animation: moving infinite 10s alternate-reverse;
     }
 
     .grid-overlay {
@@ -116,6 +130,7 @@
       border-radius: 50%;
       overflow: hidden;
       background-color: rgb(41, 41, 41);
+      border: none;
       img {
         object-fit: cover;
         width: 50%;
@@ -155,13 +170,12 @@
   }
 }
 
-
-@keyframes moving {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
+.flashlight {
+  background-color: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
 }
