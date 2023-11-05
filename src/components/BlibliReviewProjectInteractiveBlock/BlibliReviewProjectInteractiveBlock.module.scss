@@ -8,18 +8,11 @@
   position: relative;
 }
 
-.camera-container {
+.interactive-area {
   display: flex;
   justify-content: center;
   width: 100%;
-  padding: 24px 0;
-}
-
-.project-screenshot {
-  position: absolute;
-  width: calc(100vw - 24px);
-  height: auto;
-  align-self: center;
+  padding: 48px 0;
 }
 
 .camera {
@@ -178,4 +171,38 @@
   top: 0;
   left: 0;
   opacity: 0;
+}
+
+.monitor {
+  position: absolute;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  margin-top: -30%;
+  opacity: 0;
+
+  .screen {
+    background-color: #333;
+    border: solid 1em #333;
+    border-radius: 0.5em;
+
+    .project-screenshot {
+      width: 80vw;
+      height: auto;
+      align-self: center;
+    }
+  }
+  .stand {
+    background-color: #222;
+    width: 20vw;
+    height: auto;
+    aspect-ratio: 3 / 1;
+  }
+  .plane {
+    background-color: #333;
+    width: 30vw;
+    height: auto;
+    aspect-ratio: 20;
+  }
 }

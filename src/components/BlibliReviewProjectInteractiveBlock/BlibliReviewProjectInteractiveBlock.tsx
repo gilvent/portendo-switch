@@ -2,37 +2,40 @@ import styles from './BlibliReviewProjectInteractiveBlock.module.scss';
 import latestCaptureImg from 'assets/img/blibli/pair-of-shoes-min.png';
 import resetIcon from 'assets/icons/ic-reset.webp';
 import cameraScreenImg from 'assets/img/blibli/shoe-in-a-box-min.png';
-// import projectScreenshot from 'assets/img/blibli/write-review.png';
-import { useEffect, useRef } from 'react';
-import useCameraInteraction from './useCameraInteraction.hook';
+import projectScreenshot from 'assets/img/blibli/write-review.png';
+import { MouseEvent, useEffect, useRef } from 'react';
+import useInteractiveAnimation from './useInteractiveAnimation';
 
 function BlibliReviewProjectInteractiveBlock() {
+  const cameraRef = useRef<HTMLDivElement>(null);
   const captureImgRef = useRef<HTMLImageElement>(null);
   const flashlightRef = useRef<HTMLDivElement>(null);
-  const projectScreenshotRef = useRef<HTMLImageElement>(null);
-  const { setupMovingImgAnimation, captureImage } = useCameraInteraction({
-    captureImgRef,
-    flashlightRef
-  });
+  const monitorRef = useRef<HTMLDivElement>(null);
+  const { swapToCamera, swapToMonitor, cameraStateActive } =
+    useInteractiveAnimation({
+      monitorRef,
+      cameraRef,
+      captureImgRef,
+      flashlightRef
+    });
 
-  useEffect(() => {
-    const movingAnim = setupMovingImgAnimation();
-    return () => {
-      movingAnim.kill();
-    };
-  }, []);
+  function onCaptureClick(e: MouseEvent) {
+    if (!cameraStateActive.current) return;
+    e.stopPropagation();
+    swapToMonitor.current.play(0);
+  }
+
+  function onCameraClick() {
+    if (cameraStateActive.current) return;
+    swapToCamera.current.play(0);
+  }
 
   return (
     <div className={styles.block}>
       <h2 className={styles.heading}>Product Review Revamp</h2>
       <div className={styles.flashlight} ref={flashlightRef}></div>
-      <div className={styles['camera-container']}>
-        {/* <img
-          className={styles['project-screenshot']}
-          ref={projectScreenshotRef}
-          src={projectScreenshot}
-        /> */}
-        <div className={styles.camera}>
+      <div className={styles['interactive-area']}>
+        <div className={styles.camera} ref={cameraRef} onClick={onCameraClick}>
           <div className={styles.screen}>
             <img
               ref={captureImgRef}
@@ -68,15 +71,24 @@ function BlibliReviewProjectInteractiveBlock() {
               </div>
               <button
                 className={styles['btn-capture']}
-                onClick={() => {
-                  captureImage();
-                }}
+                onClick={onCaptureClick}
               ></button>
               <button className={styles['btn-reset-capture']}>
                 <img src={resetIcon} alt="" />
               </button>
             </div>
           </div>
+        </div>
+
+        <div className={styles.monitor} ref={monitorRef}>
+          <div className={styles.screen}>
+            <img
+              className={styles['project-screenshot']}
+              src={projectScreenshot}
+            />
+          </div>
+          <div className={styles.stand}></div>
+          <div className={styles.plane}></div>
         </div>
       </div>
     </div>
