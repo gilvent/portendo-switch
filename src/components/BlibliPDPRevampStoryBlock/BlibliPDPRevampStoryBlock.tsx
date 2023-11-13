@@ -1,6 +1,9 @@
 function BlibliPDPRevampStoryBlock() {
   return (
     <article className="story-block">
+      <h2>
+        Project Highlight: <br /> Product Detail Revamp
+      </h2>
       <p className="overview">
         This is a full page redesign project which is part of major theme update
         across Blibli. Besides theme revamp, this project also introduces user

@@ -1,11 +1,11 @@
 import TechBlock, { TECH } from '@/components/TechBlock';
-import BlibliPDPScrollableWindow from '@/components/BlibliPDPScrollableWindow';
 import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPreview';
 import BlibliPDPRevampStoryBlock from '@/components/BlibliPDPRevampStoryBlock';
 import { BlibliWorkPageProvider } from '@/context/BlibliWorkPageContext';
 import styles from './BlibliWorkPage.module.scss';
 import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
 import BlibliReviewProjectInteractiveBlock from '@/components/BlibliReviewProjectInteractiveBlock/BlibliReviewProjectInteractiveBlock';
+import BlibliPDPRevampViewBlock from '@/components/BlibliPDPRevampViewBlock';
 
 function BlibliWorkPage() {
   const techList = [
@@ -27,10 +27,7 @@ function BlibliWorkPage() {
           <BlibliReviewProjectInteractiveBlock />
         </section>
         <section className={`${styles.block} ${styles['pdp-revamp-preview']}`}>
-          <h2>
-            Project Highlight: <br /> Product Detail Revamp
-          </h2>
-          <BlibliPDPScrollableWindow />
+          <BlibliPDPRevampViewBlock />
         </section>
 
         <section className={`${styles.block} ${styles['pdp-secondary']}`}>
