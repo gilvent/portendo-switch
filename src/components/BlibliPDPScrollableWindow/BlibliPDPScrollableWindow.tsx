@@ -1,14 +1,24 @@
-import { useContext, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import pdpPageImg from 'assets/img/blibli/pdp-full-page.png';
 import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger.hook';
 import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
 import styles from './BlibliPDPScrollableWindow.module.scss';
 import useStyleSetup from './useStyleSetup.hook';
 
-function BlibliPDPScrollableWindow() {
+function BlibliPDPScrollableWindow({
+  onRefLoaded
+}: {
+  onRefLoaded?: (element: HTMLDivElement) => any;
+}) {
   const transparentLayerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const { imgStyle } = useStyleSetup({ transparentLayerRef, previewRef });
+
+  useEffect(() => {
+    if (previewRef.current) {
+      onRefLoaded?.(previewRef.current);
+    }
+  }, []);
 
   // TODO Remove this later, keep for reference
   // const { setActivePDPArticle } = useContext(BlibliWorkPageContext);
