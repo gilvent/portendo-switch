@@ -1,28 +1,61 @@
+@use 'assets/scss/mixins/responsive';
+
 .secondary-pages {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  margin-top: 72px;
-  .container {
-    position: sticky;
+
+  .screenshots-wrapper {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    height: 700px;
+    align-items: center;;
+    overflow: hidden;
+  }
+
+  .screenshots-container {
+    position: absolute;
     display: grid;
     place-items: center;
-    top: 200px;
-    height: 600px;
-    width: 350px;
-  }
-  img {
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    width: 325px;
-    height: auto;
-    object-fit: cover;
-    object-position: 0 0;
-    border-radius: 8px;
-    filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.16));
-    opacity: 0;
+    transform: rotateZ(-20deg) scale(0.6);
+    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     transform-origin: 50% 50%;
+    margin-top: 40px;
+
+    @include responsive.desktop {
+      transform: rotateZ(-20deg) scale(0.8);
+    }
+  }
+
+  // img {
+  //   cursor: pointer;
+  //   position: absolute;
+  //   top: 0;
+  //   width: 325px;
+  //   height: auto;
+  //   object-fit: cover;
+  //   object-position: 0 0;
+  //   border-radius: 8px;
+  //   filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.16));
+  //   opacity: 0;
+  //   transform-origin: 50% 50%;
+  // }
+
+  .screenshot {
+    width: 326px;
+    height: auto;
+    border-radius: 8px;
+    opacity: 0;
+    
+    &:nth-child(1) {
+      grid-row: span 2;
+      transform: translateY(20%);
+    }
+    
+    &:nth-child(3) {
+      grid-column: 3 / 4;
+      grid-row: span 2;
+      transform: translateY(-20%);
+    }
   }
 }
