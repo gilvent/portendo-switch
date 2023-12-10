@@ -12,12 +12,9 @@ import useScrollTrigger from '@/hooks/useScrollTrigger.hook';
 function BlibliPDPRevampViewBlock() {
   const fileBarRef = useRef<HTMLDivElement>(null);
   const { animationRef, setupAnimation } = useFileBarAnimation({});
-  const { create: createAnimationTrigger1, instance: animTrigger1 } =
-    useScrollTrigger();
-  const { create: createAnimationTrigger2, instance: animTrigger2 } =
-    useScrollTrigger();
-  const { create: createAnimationTrigger3, instance: animTrigger3 } =
-    useScrollTrigger();
+  const { create: createAnimationTrigger1 } = useScrollTrigger();
+  const { create: createAnimationTrigger2 } = useScrollTrigger();
+  const { create: createAnimationTrigger3 } = useScrollTrigger();
 
   useEffect(() => {
     setupAnimation({
@@ -25,14 +22,6 @@ function BlibliPDPRevampViewBlock() {
       filePanelClass: styles['file-panel']
     });
   }, []);
-
-  useEffect(() => {
-    () => {
-      animTrigger1?.kill();
-      animTrigger2?.kill();
-      animTrigger3?.kill();
-    };
-  });
 
   function attachAnimationTriggers(editorWindowEl: HTMLDivElement) {
     createAnimationTrigger1({
