@@ -3,10 +3,12 @@ import latestCaptureImg from 'assets/img/blibli/pair-of-shoes-min.png';
 import resetIcon from 'assets/icons/ic-reset.webp';
 import cameraScreenImg from 'assets/img/blibli/shoe-in-a-box-min.png';
 import projectScreenshot from 'assets/img/blibli/write-review.png';
-import { MouseEvent, useEffect, useRef } from 'react';
+import { MouseEvent, useRef } from 'react';
 import useInteractiveAnimation from './useInteractiveAnimation';
+import useFloatingFade from '@/hooks/useSlidingFade.hook';
 
 function BlibliReviewProjectInteractiveBlock() {
+  const blockRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<HTMLDivElement>(null);
   const captureImgRef = useRef<HTMLImageElement>(null);
   const flashlightRef = useRef<HTMLDivElement>(null);
@@ -18,6 +20,7 @@ function BlibliReviewProjectInteractiveBlock() {
       captureImgRef,
       flashlightRef
     });
+  const { applySlidingFade } = useFloatingFade({ triggerRef: blockRef });
 
   function onCaptureClick(e: MouseEvent) {
     if (!cameraStateActive.current) return;
@@ -31,8 +34,15 @@ function BlibliReviewProjectInteractiveBlock() {
   }
 
   return (
-    <div className={styles.block}>
-      <h2 className={styles.heading}>Product Review Revamp</h2>
+    <div ref={blockRef} className={styles.block}>
+      <h2 className={styles.heading}>
+        <div ref={applySlidingFade} className="invisible">
+          Worked on:
+        </div>
+        <div ref={applySlidingFade} className="invisible">
+          Review Revamp
+        </div>
+      </h2>
       <div className={styles.flashlight} ref={flashlightRef}></div>
       <div className={styles['interactive-area']}>
         <div className={styles.camera} ref={cameraRef} onClick={onCameraClick}>

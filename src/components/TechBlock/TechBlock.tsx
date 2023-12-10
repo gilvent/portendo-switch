@@ -3,6 +3,7 @@ import { BoxRefs, TECH } from './types';
 import Box from './Box';
 import { useEffect, useRef, useState } from 'react';
 import useBoxAnimations from './useBoxAnimations.hook';
+import useSlidingFade from '@/hooks/useSlidingFade.hook';
 
 function TechBlock({ techList }: { techList: TECH[][] }) {
   const boxPropsByTech = {
@@ -29,10 +30,13 @@ function TechBlock({ techList }: { techList: TECH[][] }) {
   };
   const containerRef = useRef(null);
   const boxesRefsMap = useRef<Record<string, BoxRefs>>({});
-
   const [boxes] = useState<JSX.Element[]>(getBoxesList());
   const { setupEnterAnimation: boxesEnter, setupHoverAnimation } =
     useBoxAnimations(containerRef, boxesRefsMap.current);
+  const { applySlidingFade } = useSlidingFade({
+    triggerRef: containerRef,
+    stayVisible: true
+  });
 
   useEffect(() => {
     boxesEnter();
@@ -61,7 +65,9 @@ function TechBlock({ techList }: { techList: TECH[][] }) {
 
   return (
     <div ref={containerRef} className={styles['tech-card']}>
-      <h2 className={styles.heading}>Tech Stack</h2>
+      <h2 ref={applySlidingFade} className={`${styles.heading} invisible`}>
+        Tech Stack
+      </h2>
       <div className={styles.boxes}>{boxes}</div>
     </div>
   );

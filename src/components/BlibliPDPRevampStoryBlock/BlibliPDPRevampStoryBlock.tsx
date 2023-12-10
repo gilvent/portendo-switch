@@ -1,17 +1,29 @@
+import useSlidingFade from '@/hooks/useSlidingFade.hook';
+import styles from './BlibliPDPRevampStoryBlock.module.scss';
+import { useRef } from 'react';
+
 function BlibliPDPRevampStoryBlock() {
+  const blockRef = useRef<HTMLDivElement>(null);
+  const { applySlidingFade } = useSlidingFade({ triggerRef: blockRef });
   return (
-    <article className="story-block">
+    <article ref={blockRef} className={`story-block ${styles['pdp-revamp']}`}>
       <h2>
-        Project Highlight: <br /> Product Detail Revamp
+        <div ref={applySlidingFade} className="invisible">
+          Worked on:
+        </div>
+        <div ref={applySlidingFade} className="invisible">
+          Product Detail Revamp
+        </div>
       </h2>
-      <p className="overview">
+
+      <p ref={applySlidingFade} className="overview invisible">
         This is a full page redesign project which is part of major theme update
         across Blibli. Besides theme revamp, this project also introduces user
         experience improvements such as secondary pages and sticky navigation
         for mobile web.
       </p>
 
-      <ul className={`key-points text-lg`}>
+      <ul ref={applySlidingFade} className={`key-points text-lg invisible`}>
         <strong>Key changes...</strong>
         <li>New and newer UI components</li>
         <li>Rewrite the codebase to accomodate new flow</li>
@@ -21,7 +33,7 @@ function BlibliPDPRevampStoryBlock() {
         </li>
       </ul>
 
-      <ul className={`key-points text-lg`}>
+      <ul ref={applySlidingFade} className={`key-points text-lg invisible`}>
         <strong>Lessons I learnt while doing this project...</strong>
         <li>
           Software development principles. One that stick to mind is{' '}

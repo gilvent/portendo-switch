@@ -1,15 +1,22 @@
+import useFloatingFade from '@/hooks/useSlidingFade.hook';
+import { useRef } from 'react';
+
 function BlibliReviewProjectStoryBlock() {
+  const rootRef = useRef(null);
+  const { applySlidingFade } = useFloatingFade({ triggerRef: rootRef });
   return (
-    <div className="story-block">
-      <h3>Redesign the journey</h3>
-      <p className={`overview`}>
+    <div ref={rootRef} className={`story-block`}>
+      <h3 ref={applySlidingFade} className="invisible">
+        Redesign the journey
+      </h3>
+      <p ref={applySlidingFade} className={`overview invisible`}>
         I took part in a series of projects to improve product review journey,
         both as a <strong>reviewer</strong> and{' '}
         <strong>potential customers</strong> browsing products. Starting from
         adding basic features such as review filter and photo upload, to adding
         review photo gallery.
       </p>
-      <ul className="key-points text-lg">
+      <ul ref={applySlidingFade} className="key-points text-lg invisible">
         <strong>Key changes...</strong>
         <li>
           UI redesign across product review features (adopting the upcoming
@@ -22,7 +29,7 @@ function BlibliReviewProjectStoryBlock() {
           grid and list
         </li>
       </ul>
-      <ul className="key-points text-lg">
+      <ul ref={applySlidingFade} className="key-points text-lg invisible">
         <strong>Some of what I learnt...</strong>
         <li>
           Try our best to test on real device :). This time is my first
