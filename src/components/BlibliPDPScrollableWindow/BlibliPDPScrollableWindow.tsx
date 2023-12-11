@@ -1,9 +1,6 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import pdpPageImg from 'assets/img/blibli/pdp-full-page.png';
-import useStandaloneScrollTrigger from '@/hooks/useStandaloneScrollTrigger.hook';
-import BlibliWorkPageContext from '@/context/BlibliWorkPageContext';
 import styles from './BlibliPDPScrollableWindow.module.scss';
-import useStyleSetup from './useStyleSetup.hook';
 
 function BlibliPDPScrollableWindow({
   onRefLoaded
@@ -12,7 +9,6 @@ function BlibliPDPScrollableWindow({
 }) {
   const transparentLayerRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  const { imgStyle } = useStyleSetup({ transparentLayerRef, previewRef });
 
   useEffect(() => {
     if (previewRef.current) {
@@ -53,7 +49,7 @@ function BlibliPDPScrollableWindow({
       className={styles['preview']}
       ref={previewRef}
     >
-      <img src={pdpPageImg} style={imgStyle} alt="Blibli product detail" />
+      <img src={pdpPageImg} alt="Blibli product detail" />
       <div className={styles['overlay']}>
         <div className={styles.window} ref={transparentLayerRef}>
           <div className={styles.frame}></div>

@@ -4,19 +4,22 @@
 .preview {
   --transparent-layer-height: 526px;
   --preview-width: 275px;
+  --overlay-bg-color: #1f1f1f;
+  --overlay-bg-stop: calc(50vh - var(--transparent-layer-height) / 2);
   display: flex;
   position: relative;
   width: var(--preview-width);
   margin: 0 auto;
   // min-height: 4551px;
-  
+
   @include responsive.desktop {
+    --transparent-layer-height: 576px;
     --preview-width: 325px;
   }
 
   img {
     width: var(--preview-width);
-    padding-top: var(--padding-top);
+    padding-top: var(--overlay-bg-stop);
   }
 }
 
@@ -26,9 +29,7 @@
 }
 
 .overlay {
-  --bg-color: #1f1f1f;
-  --bg-stop: calc(50vh - var(--transparent-layer-height) / 2);
-  
+
   position: sticky;
   top: 0;
   margin-left: calc(-1 * var(--preview-width));
@@ -39,18 +40,14 @@
   place-content: center;
   background: linear-gradient(
       to bottom,
-      var(--bg-color) var(--bg-stop),
-      transparent var(--bg-stop)
+      var(--overlay-bg-color) var(--overlay-bg-stop),
+      transparent var(--overlay-bg-stop)
     ),
     linear-gradient(
       to top,
-      var(--bg-color) var(--bg-stop),
-      transparent var(--bg-stop)
+      var(--overlay-bg-color) var(--overlay-bg-stop),
+      transparent var(--overlay-bg-stop)
     );
-
-  @include responsive.desktop {
-    --transparent-layer-height: 576px;
-  }
 
   .window {
     border-radius: 8px;
