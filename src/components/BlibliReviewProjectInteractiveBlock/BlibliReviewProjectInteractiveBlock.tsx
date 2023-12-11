@@ -3,9 +3,9 @@ import latestCaptureImg from 'assets/img/blibli/pair-of-shoes-min.png';
 import resetIcon from 'assets/icons/ic-reset.webp';
 import cameraScreenImg from 'assets/img/blibli/shoe-in-a-box-min.png';
 import projectScreenshot from 'assets/img/blibli/write-review.png';
-import { MouseEvent, useRef } from 'react';
+import { MouseEvent, useEffect, useRef } from 'react';
 import useInteractiveAnimation from './useInteractiveAnimation';
-import useFloatingFade from '@/hooks/useSlidingFade.hook';
+import useSlidingFade from '@/hooks/useSlidingFade.hook';
 
 function BlibliReviewProjectInteractiveBlock() {
   const blockRef = useRef<HTMLDivElement>(null);
@@ -20,7 +20,14 @@ function BlibliReviewProjectInteractiveBlock() {
       captureImgRef,
       flashlightRef
     });
-  const { applySlidingFade } = useFloatingFade({ triggerRef: blockRef });
+  const { applySlidingFade } = useSlidingFade({
+    triggerRef: blockRef,
+    stayVisible: true
+  });
+
+  useEffect(() => {
+    applySlidingFade(cameraRef.current);
+  }, []);
 
   function onCaptureClick(e: MouseEvent) {
     if (!cameraStateActive.current) return;
@@ -45,7 +52,11 @@ function BlibliReviewProjectInteractiveBlock() {
       </h2>
       <div className={styles.flashlight} ref={flashlightRef}></div>
       <div className={styles['interactive-area']}>
-        <div className={styles.camera} ref={cameraRef} onClick={onCameraClick}>
+        <div
+          className={`${styles.camera} invisible`}
+          ref={cameraRef}
+          onClick={onCameraClick}
+        >
           <div className={styles.screen}>
             <img
               ref={captureImgRef}
@@ -82,7 +93,9 @@ function BlibliReviewProjectInteractiveBlock() {
               <button
                 className={styles['btn-capture']}
                 onClick={onCaptureClick}
-              ></button>
+              >
+                <div className={styles['inner-circle']}></div>
+              </button>
               <button className={styles['btn-reset-capture']}>
                 <img src={resetIcon} alt="" />
               </button>

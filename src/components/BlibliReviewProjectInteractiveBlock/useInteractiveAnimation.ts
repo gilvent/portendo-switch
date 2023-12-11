@@ -15,17 +15,19 @@ export default function useInteractiveAnimation({
   const cameraHoveringAnimation = useRef<gsap.core.Timeline>(gsap.timeline());
   const swapToCamera = useRef<gsap.core.Timeline>(gsap.timeline());
   const swapToMonitor = useRef<gsap.core.Timeline>(gsap.timeline());
+  const cameraWiggleAnimation = useRef<gsap.core.Timeline>(gsap.timeline());
   const cameraStateActive = useRef<boolean>(true);
 
   useEffect(() => {
     swapToCamera.current = setupSwapToCameraAnimation();
     cameraHoveringAnimation.current = setupCameraHoveringAnimation();
     swapToMonitor.current = setupSwapToMonitorAnimation();
-
+    cameraWiggleAnimation.current = setupCameraWiggleAnimation();
     return () => {
       swapToCamera.current.kill();
       cameraHoveringAnimation.current.kill();
       swapToMonitor.current.kill();
+      cameraWiggleAnimation.current.kill();
     };
   }, []);
 
@@ -36,6 +38,31 @@ export default function useInteractiveAnimation({
       repeat: -1,
       yoyo: true
     });
+  }
+
+  function setupCameraWiggleAnimation(): gsap.core.Timeline {
+    return gsap
+      .timeline()
+      .fromTo(
+        cameraRef.current,
+        { rotate: '0deg' },
+        {
+          rotate: 5,
+          duration: 0.25
+        }
+      )
+      .to(cameraRef.current, {
+        rotate: -5,
+        duration: 0.25
+      })
+      .to(cameraRef.current, {
+        rotate: 5,
+        duration: 0.25
+      })
+      .to(cameraRef.current, {
+        rotate: 0,
+        duration: 0.25
+      });
   }
 
   function setupSwapDeviceAnimation(): gsap.core.Timeline {
@@ -97,6 +124,7 @@ export default function useInteractiveAnimation({
       .add(swapToMonitor)
       .eventCallback('onComplete', () => {
         cameraStateActive.current = false;
+        cameraWiggleAnimation.current.play().repeat(-1).repeatDelay(4);
       });
   }
 
@@ -104,6 +132,9 @@ export default function useInteractiveAnimation({
     const swapToCamera = setupSwapDeviceAnimation().reversed(true);
     return gsap
       .timeline({ paused: true })
+      .eventCallback('onStart', () => {
+        cameraWiggleAnimation.current.pause(0);
+      })
       .add(swapToCamera)
       .eventCallback('onComplete', () => {
         cameraStateActive.current = true;
