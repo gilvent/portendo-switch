@@ -10,8 +10,7 @@ import useScrollTrigger from '@/hooks/useScrollTrigger.hook';
 function BlibliSecondaryPagesPreview() {
   const rootEl = useRef(null);
   const screenshotsContainerRef = useRef(null);
-  const { create: createScrollTrigger, instance: animTrigger } =
-    useScrollTrigger();
+  const { create: createScrollTrigger } = useScrollTrigger();
   const { setupAnimation, animationRef } = useImagesEnterAnimation();
 
   // TODO remove later, keep for reference
@@ -40,8 +39,8 @@ function BlibliSecondaryPagesPreview() {
     setupAnimation(screenshotsContainerRef.current ?? new HTMLDivElement());
     createScrollTrigger({
       trigger: screenshotsContainerRef.current,
-      start: '20% center',
-      end: '20% center',
+      start: 'top 80%',
+      end: '60% top',
       onEnter: () => {
         animationRef.current.play();
       },
