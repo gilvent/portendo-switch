@@ -1,0 +1,50 @@
+@use 'assets/scss/mixins/responsive';
+@use 'assets/scss/mixins/font';
+@use 'assets/scss/variables/colors';
+
+.work-nav {
+  display: flex;
+  position: relative;
+  height: 80vh;
+  width: 100vw;
+  overflow: hidden;
+
+  @include responsive.desktop {
+    width: 50vw;
+    height: 100vh;
+  }
+}
+
+.ball {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: black;
+  will-change: transform x y;
+}
+
+.banner-wrapper {
+  display: flex;
+  position: relative;
+  gap: 50vw;
+}
+
+.banner-container {
+  flex: 1 0 100vw;
+}
+
+.next {
+  position: fixed;
+  top: 80%;
+  right: 0;
+  background-color: colors.$dark;
+  height: 50px;
+}
+
+.prev {
+  height: 50px;
+  position: fixed;
+  top: 80%;
+  background-color: colors.$dark;
+}

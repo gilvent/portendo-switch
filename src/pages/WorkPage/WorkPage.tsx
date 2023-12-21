@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import { useOutlet } from 'react-router-dom';
 import classNames from 'classnames';
-import BlibliCard from '@/components/BlibliCard';
 import styles from './WorkPage.module.scss';
+import WorkListBlock from '@/components/WorkListBlock';
 
 function WorkPage() {
-  const navigate = useNavigate();
+  // TODO update navigation logic
+  // const navigate = useNavigate();
   const workDetailPage = useOutlet();
-  const { pathname } = useLocation();
-  const [isCardActive, setIsCardActive] = useState(() => {
-    return pathname === '/work/blibli';
-  });
+  // const { pathname } = useLocation();
+  // const [isCardActive, setIsCardActive] = useState(() => {
+  //   return pathname === '/work/blibli';
+  // });
 
   const primaryPanelClasses = classNames(
     styles['panel-container'],
@@ -21,26 +21,26 @@ function WorkPage() {
     styles['panel-container--secondary']
   );
 
-  const onCardClick = () => {
-    if (!isCardActive) {
-      navigate('blibli');
-    } else {
-      navigate('/work');
-    }
-  };
+  // const onCardClick = () => {
+  //   if (!isCardActive) {
+  //     navigate('blibli');
+  //   } else {
+  //     navigate('/work');
+  //   }
+  // };
 
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-    setIsCardActive(pathname === '/work/blibli');
-  }, [pathname]);
+  // useEffect(() => {
+  //   window.scrollTo({
+  //     top: 0,
+  //     behavior: 'smooth'
+  //   });
+  //   setIsCardActive(pathname === '/work/blibli');
+  // }, [pathname]);
 
   return (
     <div className="work-list">
       <div className={primaryPanelClasses}>
-        <BlibliCard onClick={onCardClick} active={isCardActive} />
+        <WorkListBlock></WorkListBlock>
       </div>
       <div className={secondaryPanelClasses}>{workDetailPage}</div>
     </div>
