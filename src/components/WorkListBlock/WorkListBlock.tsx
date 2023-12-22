@@ -5,19 +5,24 @@ import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
 import GiftsImage from '../BlibliCard/GiftsImage';
 import useWorkListAnimation from './useWorkListAnimation.hook';
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 function WorkListBlock() {
   const ballRef = useRef(null);
   const sliderRef = useRef(null);
-  const { enterFromHome, slideTo } = useWorkListAnimation({
-    ballRef,
-    sliderRef
-  });
+  const { enterAnimation, nextAnimation, prevAnimation } = useWorkListAnimation(
+    {
+      ballRef,
+      sliderRef
+    }
+  );
 
   useEffect(() => {
-    enterFromHome();
-  });
+    enterAnimation.current?.play();
+
+    return () => {
+      enterAnimation.current?.kill();
+    };
+  }, []);
 
   return (
     <div className={styles['work-nav']}>
@@ -82,7 +87,7 @@ function WorkListBlock() {
       <button
         className={styles.next}
         onClick={() => {
-          slideTo(1);
+          nextAnimation.current?.play();
         }}
       >
         next
@@ -90,7 +95,7 @@ function WorkListBlock() {
       <button
         className={styles.prev}
         onClick={() => {
-          slideTo(0);
+          prevAnimation.current?.play();
         }}
       >
         prev

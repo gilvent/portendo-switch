@@ -9,14 +9,8 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: 'work',
-        element: <WorkPage />,
-        children: [
-          {
-            path: 'blibli',
-            element: <BlibliWorkPage />
-          }
-        ]
+        path: 'work/:title',
+        element: <WorkPage />
       }
     ]
   }
