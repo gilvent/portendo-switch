@@ -29,10 +29,10 @@ function BlibliPDPRevampViewBlock() {
       start: '30% center',
       end: '30% center',
       onEnter: () => {
-        animationRef.current.tweenTo('first-bar-collapse');
+        animationRef.current?.tweenTo('first-bar-collapse');
       },
       onLeaveBack: () => {
-        animationRef.current.tweenTo('start');
+        animationRef.current?.tweenTo('start');
       }
     });
 
@@ -41,10 +41,10 @@ function BlibliPDPRevampViewBlock() {
       start: '60% center',
       end: '60% center',
       onEnter: () => {
-        animationRef.current.tweenTo('second-bar-collapse');
+        animationRef.current?.tweenTo('second-bar-collapse');
       },
       onLeaveBack: () => {
-        animationRef.current.tweenTo('first-bar-collapse');
+        animationRef.current?.tweenTo('first-bar-collapse');
       }
     });
 
@@ -53,10 +53,10 @@ function BlibliPDPRevampViewBlock() {
       start: '85% center',
       end: '85% center',
       onEnter: () => {
-        animationRef.current.tweenTo('last-bar-collapse');
+        animationRef.current?.tweenTo('last-bar-collapse');
       },
       onLeaveBack: () => {
-        animationRef.current.tweenTo('second-bar-collapse');
+        animationRef.current?.tweenTo('second-bar-collapse');
       }
     });
   }
@@ -69,7 +69,7 @@ function BlibliPDPRevampViewBlock() {
           <img src={icMenu} />
         </div>
         <div className={styles.nav}>
-          <img src={icDoc} onClick={() => animationRef.current.play()} />
+          <img src={icDoc} onClick={() => animationRef.current?.play()} />
         </div>
         <div className={styles.nav}>
           <img src={icSearch} />

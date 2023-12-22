@@ -32,12 +32,12 @@ function BlibliReviewProjectInteractiveBlock() {
   function onCaptureClick(e: MouseEvent) {
     if (!cameraStateActive.current) return;
     e.stopPropagation();
-    swapToMonitor.current.play(0);
+    swapToMonitor.current?.play(0);
   }
 
   function onCameraClick() {
     if (cameraStateActive.current) return;
-    swapToCamera.current.play(0);
+    swapToCamera.current?.play(0);
   }
 
   return (

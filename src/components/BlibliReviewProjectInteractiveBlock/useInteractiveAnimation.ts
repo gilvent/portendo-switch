@@ -12,10 +12,10 @@ export default function useInteractiveAnimation({
   captureImgRef: RefObject<HTMLImageElement>;
   flashlightRef: RefObject<HTMLDivElement>;
 }) {
-  const cameraHoveringAnimation = useRef<gsap.core.Timeline>(gsap.timeline());
-  const swapToCamera = useRef<gsap.core.Timeline>(gsap.timeline());
-  const swapToMonitor = useRef<gsap.core.Timeline>(gsap.timeline());
-  const cameraWiggleAnimation = useRef<gsap.core.Timeline>(gsap.timeline());
+  const cameraHoveringAnimation = useRef<gsap.core.Timeline | null>(null);
+  const swapToCamera = useRef<gsap.core.Timeline | null>(null);
+  const swapToMonitor = useRef<gsap.core.Timeline | null>(null);
+  const cameraWiggleAnimation = useRef<gsap.core.Timeline | null>(null);
   const cameraStateActive = useRef<boolean>(true);
 
   useEffect(() => {
@@ -24,10 +24,10 @@ export default function useInteractiveAnimation({
     swapToMonitor.current = setupSwapToMonitorAnimation();
     cameraWiggleAnimation.current = setupCameraWiggleAnimation();
     return () => {
-      swapToCamera.current.kill();
-      cameraHoveringAnimation.current.kill();
-      swapToMonitor.current.kill();
-      cameraWiggleAnimation.current.kill();
+      swapToCamera.current?.kill();
+      cameraHoveringAnimation.current?.kill();
+      swapToMonitor.current?.kill();
+      cameraWiggleAnimation.current?.kill();
     };
   }, []);
 
@@ -118,13 +118,13 @@ export default function useInteractiveAnimation({
     return gsap
       .timeline({ paused: true })
       .eventCallback('onStart', () => {
-        cameraHoveringAnimation.current.pause();
+        cameraHoveringAnimation.current?.pause();
       })
       .add(flash)
       .add(swapToMonitor)
       .eventCallback('onComplete', () => {
         cameraStateActive.current = false;
-        cameraWiggleAnimation.current.play().repeat(-1).repeatDelay(4);
+        cameraWiggleAnimation.current?.play().repeat(-1).repeatDelay(4);
       });
   }
 
@@ -133,12 +133,12 @@ export default function useInteractiveAnimation({
     return gsap
       .timeline({ paused: true })
       .eventCallback('onStart', () => {
-        cameraWiggleAnimation.current.pause(0);
+        cameraWiggleAnimation.current?.pause(0);
       })
       .add(swapToCamera)
       .eventCallback('onComplete', () => {
         cameraStateActive.current = true;
-        cameraHoveringAnimation.current.play();
+        cameraHoveringAnimation.current?.play();
       });
   }
 

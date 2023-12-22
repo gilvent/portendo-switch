@@ -4,11 +4,11 @@ import { useEffect, useRef } from 'react';
 export enum AnimationLabels {}
 
 export default function useFileBarAnimation({}: {}) {
-  const animation = useRef<gsap.core.Timeline>(gsap.timeline());
+  const animation = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     return () => {
-      animation.current.kill();
+      animation.current?.kill();
     };
   });
 
