@@ -29,5 +29,6 @@
       "files": ["src/**/*.{ts,tsx,js}"],
       "rules": {}
     }
-  ]
+  ],
+  "ignorePatterns": ["**/*.css", "**/*.scss"]
 }
