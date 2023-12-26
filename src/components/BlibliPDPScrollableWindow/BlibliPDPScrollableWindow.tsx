@@ -16,33 +16,6 @@ function BlibliPDPScrollableWindow({
     }
   }, []);
 
-  // TODO Remove this later, keep for reference
-  // const { setActivePDPArticle } = useContext(BlibliWorkPageContext);
-
-  // useStandaloneScrollTrigger({
-  //   trigger: '#product-detail-preview',
-  //   start: 'top center',
-  //   end: '50% center',
-  //   onEnter: _ => {
-  //     setActivePDPArticle(0);
-  //   },
-  //   onEnterBack: _ => {
-  //     setActivePDPArticle(0);
-  //   }
-  // });
-
-  // useStandaloneScrollTrigger({
-  //   trigger: '#product-detail-preview',
-  //   start: '50% center',
-  //   end: 'bottom center',
-  //   onEnter: _ => {
-  //     setActivePDPArticle(1);
-  //   },
-  //   onEnterBack: _ => {
-  //     setActivePDPArticle(1);
-  //   }
-  // });
-
   return (
     <figure
       id="product-detail-preview"

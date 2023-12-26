@@ -2,7 +2,7 @@ import styles from './WorkListBlock.module.scss';
 import WorkBannerBlock from '@/components/WorkBanner';
 import mopertyLogo from 'assets/img/brand/moperty-white.svg';
 import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
-import GiftsImage from '../BlibliCard/GiftsImage';
+import GiftsImage from '@/components/GiftsImage';
 import useWorkListAnimation from './useWorkListAnimation.hook';
 import { useContext, useEffect, useRef } from 'react';
 import ControllerButtonContext from '@/context/ControllerButtonContext';

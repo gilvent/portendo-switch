@@ -13,28 +13,6 @@ function BlibliSecondaryPagesPreview() {
   const { create: createScrollTrigger } = useScrollTrigger();
   const { setupAnimation, animationRef } = useImagesEnterAnimation();
 
-  // TODO remove later, keep for reference
-  // const screenshotRef = {
-  //   promo: useRef(null),
-  //   discussion: useRef(null),
-  //   description: useRef(null),
-  //   shipping: useRef(null)
-  // };
-  // const { playAnimation, reverseAnimation, moveAnimationTo } =
-  //   useStackAnimation(screenshotRef);
-  // const { setActivePDPArticle } = useContext(BlibliWorkPageContext);
-
-  // useStandaloneScrollTrigger({
-  //   trigger: '.' + styles.container,
-  //   start: 'start center',
-  //   end: 'bottom center',
-  //   onEnter: () => {
-  //     setActivePDPArticle(2);
-  //     playAnimation();
-  //   },
-  //   onLeaveBack: () => reverseAnimation()
-  // });
-
   useEffect(() => {
     setupAnimation(screenshotsContainerRef.current ?? new HTMLDivElement());
     createScrollTrigger({
@@ -70,19 +48,16 @@ function BlibliSecondaryPagesPreview() {
             className={styles.screenshot}
             src={pdpDiscussionImg}
             alt="Blibli product discussion page"
-            // onClick={() => moveAnimationTo(LABELS.PROMO_ENTER)}
           />
           <img
             className={styles.screenshot}
             src={pdpDescriptionImg}
             alt="Blibli product description page"
-            // onClick={() => moveAnimationTo(LABELS.DISCUSSION_ENTER)}
           />
           <img
             className={styles.screenshot}
             src={pdpShippingImg}
             alt="Blibli product shipping page"
-            // onClick={() => moveAnimationTo(LABELS.DESCRIPTION_ENTER)}
           />
         </div>
       </div>
