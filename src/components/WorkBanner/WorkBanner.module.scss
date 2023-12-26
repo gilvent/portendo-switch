@@ -48,24 +48,12 @@
     font-size: 28px;
     margin: 18px;
     color: var(--title-color);
-    transition: opacity 0.3s ease-in-out;
     text-transform: uppercase;
-
-    &.active {
-      opacity: 0;
-    }
-    &.enter-transition {
-      transition-delay: 0.3s;
-    }
-    &.leave-transition {
-      transition-delay: 0.3s;
-    }
   }
 
   .role {
     color: colors.$dark;
     text-transform: uppercase;
-
     font-size: 18px;
   }
 
@@ -93,35 +81,17 @@
   margin-top: -30%;
 }
 
-.buttons {
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-
-  &.active {
-    opacity: 1;
-  }
-}
-
 .summary {
   position: absolute;
   top: 0;
   left: 0;
   text-align: center;
-  opacity: 0;
   padding: 36px;
   z-index: 4;
-  transition: all 0.3s ease-in-out;
-  transition-delay: 0.3s;
-  transform: translateY(50px);
   @include font.text-base;
 
   @include responsive.desktop {
     @include font.text-2xl;
-  }
-
-  &.active {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -130,7 +100,6 @@
   top: 120%;
   z-index: 4;
   opacity: 0;
-  transition-duration: 0.5s;
 
   .btn-title {
     text-transform: uppercase;
@@ -142,14 +111,13 @@
       color: white;
     }
   }
+}
 
-  &.active {
-    opacity: 1;
-  }
-  &.enter-transition {
-    transition-delay: 0.5s;
-  }
-  &.leave-transition {
-    transition-delay: 0.3s;
-  }
+.bg-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
 }

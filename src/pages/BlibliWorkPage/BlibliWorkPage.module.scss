@@ -35,6 +35,7 @@ section.tech {
 section.page-gap {
   grid-area: page-gap;
   height: 80vh;
+  background: #fff;
   @include responsive.desktop {
     height: 100vh;
   }

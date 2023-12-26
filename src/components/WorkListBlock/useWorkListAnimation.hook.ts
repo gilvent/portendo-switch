@@ -37,6 +37,7 @@ function useWorkListAnimation({
   const enterAnimation = useRef<gsap.core.Timeline | null>(null);
   const nextAnimation = useRef<gsap.core.Timeline | null>(null);
   const prevAnimation = useRef<gsap.core.Timeline | null>(null);
+  const enterWorkDetailAnimation = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     enterAnimation.current = enter();
@@ -54,6 +55,10 @@ function useWorkListAnimation({
     } else {
       prevAnimation.current = gsap.timeline();
     }
+  }, [activeBannerIndex]);
+
+  useEffect(() => {
+    enterWorkDetailAnimation.current = enterWorkDetail();
   }, [activeBannerIndex]);
 
   function getBallPlaceholderEl(workBannerId: string): Element | null {
@@ -236,7 +241,69 @@ function useWorkListAnimation({
       );
   }
 
-  return { nextAnimation, enterAnimation, prevAnimation };
+  function enterWorkDetail(): gsap.core.Timeline {
+    const activeBannerSelector = gsap.utils.selector(
+      BANNERS[activeBannerIndex].selector
+    );
+    const currentPlaceholderEl = getBallPlaceholderEl(
+      BANNERS[activeBannerIndex].selector
+    );
+
+    const { y: currentY } = currentPlaceholderEl?.getBoundingClientRect() ?? {
+      y: 0
+    };
+
+    const bannerBg = activeBannerSelector('div[data-anim-target="banner-bg"]');
+
+    return gsap
+      .timeline({ paused: true })
+      .set(
+        bannerBg,
+        {
+          background: BANNERS[activeBannerIndex].background
+        },
+        0
+      )
+      .add(
+        bounce({
+          bouncePointY: currentY - BALL_TOP_POS,
+          airCount: 1
+        })
+      )
+      .to(
+        ballRef.current,
+        {
+          y: BALL_TOP_POS - currentY,
+          ease: 'power2.inOut',
+          duration: 0.5
+        },
+        '>-0.3'
+      )
+      .add(fadeOut(getBannerCoverEls(BANNERS[activeBannerIndex].selector)), '<')
+      .to(
+        bannerBg,
+        {
+          y: '-100%'
+        },
+        '>-0.1'
+      )
+      .add(
+        fadeIn(activeBannerSelector('[data-anim-target="summary"]')),
+        '>-0.1'
+      )
+      .add(
+        fadeIn(activeBannerSelector('[data-anim-target="work-title"]')),
+        '<0.1'
+      );
+  }
+
+  return {
+    nextAnimation,
+    enterAnimation,
+    prevAnimation,
+    enterWorkDetailAnimation,
+    activeBannerIndex
+  };
 }
 
 export default useWorkListAnimation;

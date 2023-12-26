@@ -4,17 +4,26 @@ import mopertyLogo from 'assets/img/brand/moperty-white.svg';
 import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
 import GiftsImage from '../BlibliCard/GiftsImage';
 import useWorkListAnimation from './useWorkListAnimation.hook';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
+import ControllerButtonContext from '@/context/ControllerButtonContext';
+import WorkPageContext, { WorkDetailName } from '@/context/WorkPageContext';
 
 function WorkListBlock() {
   const ballRef = useRef(null);
   const sliderRef = useRef(null);
-  const { enterAnimation, nextAnimation, prevAnimation } = useWorkListAnimation(
-    {
-      ballRef,
-      sliderRef
-    }
-  );
+  const {
+    enterAnimation,
+    nextAnimation,
+    prevAnimation,
+    enterWorkDetailAnimation,
+    activeBannerIndex
+  } = useWorkListAnimation({
+    ballRef,
+    sliderRef
+  });
+  const { setAction } = useContext(ControllerButtonContext);
+  const { openWorkDetail, activeWorkDetail, closeWorkDetail } =
+    useContext(WorkPageContext);
 
   useEffect(() => {
     enterAnimation.current?.play();
@@ -24,9 +33,33 @@ function WorkListBlock() {
     };
   }, []);
 
+  useEffect(() => {
+    setAction('onRightClick', () => {
+      nextAnimation.current?.play();
+    });
+    setAction('onLeftClick', () => {
+      prevAnimation.current?.play();
+    });
+    setAction('onDownClick', () => {
+      const anim = enterWorkDetailAnimation.current?.eventCallback(
+        'onComplete',
+        () => {
+          openWorkDetail();
+        }
+      );
+
+      anim?.play();
+    });
+    setAction('onUpClick', () => {
+      closeWorkDetail();
+      enterWorkDetailAnimation.current?.reverse();
+    });
+  }, [activeBannerIndex, activeWorkDetail]);
+
   return (
     <div className={styles['work-nav']}>
       <div ref={ballRef} className={styles.ball}></div>
+      <div className={styles.slidescreen}></div>
       <div ref={sliderRef} className={styles['banner-wrapper']}>
         <div
           id="blibli-banner-container"
@@ -47,9 +80,8 @@ function WorkListBlock() {
                 application.
               </>
             )}
-            active={false}
+            active={activeWorkDetail === WorkDetailName.Blibli}
             logo={blibliWhiteLogo}
-            background="linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%)"
             titleColor="#0092da"
             renderBgAnimation={active => <GiftsImage active={active} />}
             onClick={() => {}}
@@ -74,32 +106,13 @@ function WorkListBlock() {
                 <br />
               </>
             )}
-            active={false}
+            active={activeWorkDetail === WorkDetailName.Moperty}
             logo={mopertyLogo}
-            background="conic-gradient(from 157.97deg at 55.38% 44.18%, #503FB5 -27.91deg, #3F51B5 202.5deg, #503FB5 332.09deg, #3F51B5 562.5deg)
-          "
             titleColor="#3f51b5"
             onClick={() => {}}
           />
         </div>
       </div>
-
-      <button
-        className={styles.next}
-        onClick={() => {
-          nextAnimation.current?.play();
-        }}
-      >
-        next
-      </button>
-      <button
-        className={styles.prev}
-        onClick={() => {
-          prevAnimation.current?.play();
-        }}
-      >
-        prev
-      </button>
     </div>
   );
 }

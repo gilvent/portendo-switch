@@ -1,7 +1,6 @@
-import { MouseEventHandler, useRef, useState } from 'react';
+import { MouseEventHandler, useRef } from 'react';
 import classNames from 'classnames';
 import styles from './WorkBanner.module.scss';
-import useTemporaryActiveEffect from '@/hooks/useTemporaryActiveEffect.hook';
 
 type WorkBannerProps = {
   id: string;
@@ -11,7 +10,7 @@ type WorkBannerProps = {
   active: boolean;
   logo: string;
   onClick: MouseEventHandler<HTMLDivElement>;
-  background: string;
+  background?: string;
   titleColor: string;
   renderSummaryText: () => any;
   renderBgAnimation?: (active: boolean) => any;
@@ -22,40 +21,17 @@ function WorkBanner(props: WorkBannerProps) {
   const logoRef = useRef<HTMLImageElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
-  const { isActive: leavingDetailMode } = useTemporaryActiveEffect(
-    !props.active,
-    600
-  );
-  const { isActive: enterDetailMode } = useTemporaryActiveEffect(
-    props.active,
-    600
-  );
   const cssVars = {
     '--background': 'transparent', //props.background,
     '--title-color': props.titleColor
   } as React.CSSProperties;
 
-  const summaryClass = classNames(styles.summary, {
-    [styles.active]: props.active
-  });
-  const coverTitleClass = classNames('invisible', styles.heading, {
-    [styles.active]: props.active
-    // [styles['enter-transition']]: enterDetailMode,
-    // [styles['leave-transition']]: leavingDetailMode
-  });
+  const summaryClass = classNames('invisible', styles.summary);
+  const coverTitleClass = classNames('invisible', styles.heading);
   const coverRoleClass = classNames('invisible', styles.role);
   const coverDescriptionClass = classNames('invisible', styles.product);
-  const bgClass = classNames(styles.background, {
-    [styles.active]: props.active,
-    [styles['enter-transition']]: enterDetailMode,
-    [styles['leave-transition']]: leavingDetailMode
-  });
-
-  const titleClass = classNames(styles.title, {
-    [styles.active]: props.active,
-    [styles['enter-transition']]: enterDetailMode,
-    [styles['leave-transition']]: leavingDetailMode
-  });
+  const bgClass = classNames('invisible', styles.background);
+  const titleClass = classNames('invisible', styles.title);
 
   return (
     <div
@@ -65,7 +41,9 @@ function WorkBanner(props: WorkBannerProps) {
       ref={cardRef}
       onClick={props.onClick}
     >
-      <p className={summaryClass}>{props.renderSummaryText()}</p>
+      <p data-anim-target="summary" className={summaryClass}>
+        {props.renderSummaryText()}
+      </p>
 
       <div className={styles.content}>
         <img src={props.logo} ref={logoRef} className={styles.logo} />
@@ -89,7 +67,7 @@ function WorkBanner(props: WorkBannerProps) {
           </p>
         </div>
 
-        <div className={titleClass}>
+        <div data-anim-target="work-title" className={titleClass}>
           <button className={styles['btn-title']}>
             <h2 className={styles.text}>{props.title}</h2>
           </button>
@@ -103,6 +81,11 @@ function WorkBanner(props: WorkBannerProps) {
       </div>
 
       {props.renderBgAnimation?.(props.active)}
+
+      <div
+        className={`${styles['bg-overlay']}`}
+        data-anim-target="banner-bg"
+      ></div>
     </div>
   );
 }
