@@ -8,6 +8,7 @@
   height: 80vh;
   width: 100vw;
   overflow: hidden;
+  background-color: #fff;
 
   @include responsive.desktop {
     width: 50vw;

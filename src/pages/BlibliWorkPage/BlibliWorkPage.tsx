@@ -5,15 +5,16 @@ import styles from './BlibliWorkPage.module.scss';
 import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
 import BlibliReviewProjectInteractiveBlock from '@/components/BlibliReviewProjectInteractiveBlock/BlibliReviewProjectInteractiveBlock';
 import BlibliPDPRevampViewBlock from '@/components/BlibliPDPRevampViewBlock';
+import { ForwardedRef, forwardRef } from 'react';
 
-function BlibliWorkPage() {
+function BlibliWorkPage(_: any, ref: ForwardedRef<any>) {
   const techList = [
     [TECH.PLAYWRIGHT, TECH.VUE],
     [TECH.NGINX, TECH.SASS]
   ];
 
   return (
-    <div className={styles['work-page']}>
+    <div className={styles['work-page']} ref={ref}>
       <section className={`${styles.block} ${styles['page-gap']}`}></section>
       <section className={`${styles.block} ${styles['tech']}`}>
         <TechBlock techList={techList} />
@@ -39,4 +40,4 @@ function BlibliWorkPage() {
   );
 }
 
-export default BlibliWorkPage;
+export default forwardRef(BlibliWorkPage);

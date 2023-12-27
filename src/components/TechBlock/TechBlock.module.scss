@@ -1,8 +1,10 @@
 .tech-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
   gap: 24px;
+  padding: 36px 35px 60px;
 }
 
 .heading {
@@ -30,4 +32,13 @@
   height: 135px;
   background-color: teal;
   border-radius: 12px;
+}
+
+.bg {
+  background-color: #333;
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
