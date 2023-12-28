@@ -34,13 +34,13 @@ function WorkListBlock() {
   }, []);
 
   useEffect(() => {
-    setAction('onRightClick', () => {
+    setAction('onControlXClick', () => {
       nextAnimation.current?.play();
     });
-    setAction('onLeftClick', () => {
+    setAction('onControlYClick', () => {
       prevAnimation.current?.play();
     });
-    setAction('onDownClick', () => {
+    setAction('onControlBClick', () => {
       const anim = enterWorkDetailAnimation.current?.eventCallback(
         'onComplete',
         () => {
@@ -50,7 +50,10 @@ function WorkListBlock() {
 
       anim?.play();
     });
-    setAction('onUpClick', () => {
+    setAction('onControlAClick', () => {
+      window.scrollTo({
+        top: 0
+      });
       closeWorkDetail();
       enterWorkDetailAnimation.current?.reverse();
     });

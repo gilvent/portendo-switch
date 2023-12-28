@@ -20,6 +20,7 @@ const indexByRouteParam: Record<string, number> = {
   moperty: 1
 };
 
+// TODO handle case when enterWorkDetailAnimation is run in the middle of enterAnimation
 function useWorkListAnimation({
   ballRef,
   sliderRef

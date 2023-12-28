@@ -1,10 +1,10 @@
 import { RefObject, createContext, useRef } from 'react';
 
 type ControlActions =
-  | 'onLeftClick'
-  | 'onRightClick'
-  | 'onUpClick'
-  | 'onDownClick';
+  | 'onControlYClick'
+  | 'onControlAClick'
+  | 'onControlXClick'
+  | 'onControlBClick';
 
 type ControllerButtonProviderValue = {
   setAction: (control: ControlActions, fn: () => void) => void;
@@ -21,10 +21,10 @@ const ControllerButtonContext = createContext<ControllerButtonProviderValue>({
 function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
   const actions = useRef<Record<ControlActions, () => void | undefined | null>>(
     {
-      onLeftClick: () => {},
-      onDownClick: () => {},
-      onRightClick: () => {},
-      onUpClick: () => {}
+      onControlYClick: () => {},
+      onControlBClick: () => {},
+      onControlAClick: () => {},
+      onControlXClick: () => {}
     }
   );
 
