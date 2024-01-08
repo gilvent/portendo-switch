@@ -1,13 +1,17 @@
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@/App';
-import BlibliWorkPage from '@/pages/BlibliWorkPage';
 import WorkPage from '@/pages/WorkPage';
+import HomePage from '@/pages/HomePage';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
+      {
+        path: '',
+        element: <HomePage />
+      },
       {
         path: 'work/:title',
         element: <WorkPage />
