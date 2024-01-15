@@ -1,3 +1,4 @@
+import gsap from 'gsap';
 import styles from './WorkListBlock.module.scss';
 import WorkBannerBlock from '@/components/WorkBanner';
 import mopertyLogo from 'assets/img/brand/moperty-white.svg';
@@ -10,6 +11,7 @@ import WorkPageContext, { WorkDetailName } from '@/context/WorkPageContext';
 import { Transition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
+import useControllerAnimations from '../ControllerButton/useControllerAnimations.hook';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
@@ -28,6 +30,8 @@ function WorkListBlock() {
   const { setAction } = useContext(ControllerButtonContext);
   const { openWorkDetail, activeWorkDetail, closeWorkDetail } =
     useContext(WorkPageContext);
+  const { toSingleConModeTransition } = useControllerAnimations();
+  const toDetailTransition = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     slideAnimation.current?.play(0);
@@ -66,14 +70,26 @@ function WorkListBlock() {
   }
 
   function transitionToWorkDetail() {
-    const anim = enterWorkDetailAnimation.current?.eventCallback(
-      'onComplete',
-      () => {
-        openWorkDetail();
-      }
-    );
+    toDetailTransition.current = gsap.timeline();
 
-    anim?.play();
+    if (toSingleConModeTransition.current) {
+      toDetailTransition.current.add(
+        toSingleConModeTransition.current.paused(false)
+      );
+    }
+
+    if (enterWorkDetailAnimation.current) {
+      toDetailTransition.current.add(
+        enterWorkDetailAnimation.current.paused(false),
+        '<'
+      );
+    }
+
+    toDetailTransition.current
+      .eventCallback('onComplete', () => {
+        openWorkDetail();
+      })
+      .play();
   }
 
   function transitionToWorkList() {
@@ -81,7 +97,7 @@ function WorkListBlock() {
       top: 0
     });
     closeWorkDetail();
-    enterWorkDetailAnimation.current?.reverse();
+    toDetailTransition.current?.reverse();
   }
 
   function backToHome() {

@@ -2,7 +2,7 @@ import { WorkDetailName } from '@/context/WorkPageContext';
 import usePreviousState from '@/hooks/usePreviousState.hook';
 import gsap from 'gsap';
 import { RefObject, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 type Banner = {
   url: string;

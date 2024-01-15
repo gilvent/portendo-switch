@@ -39,7 +39,7 @@ function WorkDetail() {
       }}
       appear={true}
       in={activeWorkDetail !== null}
-      onExiting={() => {
+      onExit={() => {
         setupExitAnimation().play();
       }}
       unmountOnExit={true}

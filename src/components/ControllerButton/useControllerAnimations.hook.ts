@@ -133,7 +133,7 @@ function useControllerAnimations() {
         paused: true
       })
       .to(document.querySelector('[data-anim-target="controller-button"]'), {
-        right: 40
+        right: 24
       })
       .to(
         q('[data-anim-target="left-joycon"]'),
@@ -141,7 +141,7 @@ function useControllerAnimations() {
           top: 0,
           translateY: 0,
           translateX: 0,
-          rotate: -90,
+          rotate: 5,
           autoAlpha: 0
         },
         '<'
@@ -152,7 +152,7 @@ function useControllerAnimations() {
           top: 0,
           translateY: 0,
           translateX: 0,
-          rotate: -90
+          rotate: 5
         },
         '<'
       );
