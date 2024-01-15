@@ -1,20 +1,34 @@
+/**
+ * For reference using the createBrowserRouter API
+ */
+
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@/App';
 import WorkPage from '@/pages/WorkPage';
 import HomePage from '@/pages/HomePage';
+import RouteTransition from '@/components/RouteTransition/RouteTransition';
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: '/*',
     element: <App />,
     children: [
       {
         path: '',
-        element: <HomePage />
+        index: true,
+        element: (
+          <RouteTransition>
+            <HomePage />
+          </RouteTransition>
+        )
       },
       {
         path: 'work/:title',
-        element: <WorkPage />
+        element: (
+          <RouteTransition>
+            <WorkPage />
+          </RouteTransition>
+        )
       }
     ]
   }

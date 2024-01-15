@@ -16,6 +16,7 @@ function useWorkRouteTransition(previousPath: string) {
   }
 
   function onEnter() {
+    console.log('enter work', previousPath);
     enterAnimations.find(i => matchPath(i.path, previousPath))?.fn();
   }
 

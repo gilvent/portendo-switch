@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import router from './router';
 import 'assets/scss/_main.scss';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,7 +14,10 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    {/* <RouterProvider router={router} /> */}
+    <BrowserRouter>
+      <App></App>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
