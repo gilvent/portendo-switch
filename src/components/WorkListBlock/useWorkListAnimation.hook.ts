@@ -1,23 +1,32 @@
+import { WorkDetailName } from '@/context/WorkPageContext';
+import usePreviousState from '@/hooks/usePreviousState.hook';
 import gsap from 'gsap';
 import { RefObject, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const BANNERS = [
-  {
+type Banner = {
+  url: string;
+  selector: string;
+  background: string;
+  prevBannerTitle: WorkDetailName.Blibli;
+  nextBannerTitle: WorkDetailName.Moperty;
+};
+
+const bannersByTitle: Record<WorkDetailName, Banner> = {
+  [WorkDetailName.Blibli]: {
     url: '/work/blibli',
     selector: '#blibli-banner',
-    background: 'linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%)'
+    background: 'linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%)',
+    prevBannerTitle: WorkDetailName.Blibli,
+    nextBannerTitle: WorkDetailName.Moperty
   },
-  {
+  [WorkDetailName.Moperty]: {
     url: '/work/moperty',
     selector: '#moperty-banner',
-    background: 'linear-gradient(132.36deg, #503FB5 43%, #3F51B5 112%)'
+    background: 'linear-gradient(132.36deg, #503FB5 43%, #3F51B5 112%)',
+    prevBannerTitle: WorkDetailName.Blibli,
+    nextBannerTitle: WorkDetailName.Moperty
   }
-];
-
-const indexByRouteParam: Record<string, number> = {
-  blibli: 0,
-  moperty: 1
 };
 
 // TODO handle case when enterWorkDetailAnimation is run in the middle of enterAnimation
@@ -29,15 +38,16 @@ function useWorkListAnimation({
   sliderRef: RefObject<Element>;
 }) {
   const BALL_TOP_POS = -150; // based on "top" value set in css
-  const { title } = useParams();
-  const navigate = useNavigate();
-  const [activeBannerIndex, setActiveBannerIndex] = useState<number>(() => {
-    const index = indexByRouteParam[title as string] ?? 0;
-    return index;
+  const params = useParams();
+  const [activeBanner, setActiveBanner] = useState<Banner>(() => {
+    const banner =
+      bannersByTitle[params.title as WorkDetailName] ??
+      bannersByTitle[WorkDetailName.Blibli];
+    return banner;
   });
+  const prevBanner = usePreviousState(activeBanner);
   const enterAnimation = useRef<gsap.core.Timeline | null>(null);
-  const nextAnimation = useRef<gsap.core.Timeline | null>(null);
-  const prevAnimation = useRef<gsap.core.Timeline | null>(null);
+  const slideAnimation = useRef<gsap.core.Timeline | null>(null);
   const enterWorkDetailAnimation = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
@@ -45,22 +55,25 @@ function useWorkListAnimation({
   }, []);
 
   useEffect(() => {
-    if (activeBannerIndex < BANNERS.length - 1) {
-      nextAnimation.current = sceneSlideTo(activeBannerIndex + 1);
-    } else {
-      nextAnimation.current = gsap.timeline();
+    if (params.title !== undefined) {
+      setActiveBanner(
+        bannersByTitle[params.title as WorkDetailName] ??
+          bannersByTitle[WorkDetailName.Blibli]
+      );
     }
+  }, [params]);
 
-    if (activeBannerIndex > 0) {
-      prevAnimation.current = sceneSlideTo(activeBannerIndex - 1);
+  useEffect(() => {
+    if (prevBanner.url !== activeBanner.url) {
+      slideAnimation.current = sceneSlideTo(activeBanner, prevBanner);
     } else {
-      prevAnimation.current = gsap.timeline();
+      slideAnimation.current = null;
     }
-  }, [activeBannerIndex]);
+  }, [activeBanner]);
 
   useEffect(() => {
     enterWorkDetailAnimation.current = enterWorkDetail();
-  }, [activeBannerIndex]);
+  }, [activeBanner]);
 
   function getBallPlaceholderEl(workBannerId: string): Element | null {
     return document.querySelector(
@@ -149,20 +162,18 @@ function useWorkListAnimation({
         autoAlpha: 1,
         y: 0,
         ease: 'back',
-        stagger: 0.15
+        stagger: 0.15,
+        immediateRender: false
       }
     );
   }
 
-  function sceneSlideTo(targetIndex: number) {
+  function sceneSlideTo(toBanner: Banner, fromBanner: Banner) {
     const duration = 1.5;
-    const targetPlaceholderEl = getBallPlaceholderEl(
-      BANNERS[targetIndex].selector
-    );
-    const currentPlaceholderEl = getBallPlaceholderEl(
-      BANNERS[activeBannerIndex].selector
-    );
-
+    const targetPlaceholderEl = getBallPlaceholderEl(toBanner.selector);
+    const currentPlaceholderEl = getBallPlaceholderEl(fromBanner.selector);
+    const currentCoverEls = getBannerCoverEls(fromBanner.selector);
+    const nextCoverEls = getBannerCoverEls(toBanner.selector);
     const { x: targetX } = targetPlaceholderEl?.getBoundingClientRect() ?? {
       x: 0,
       y: 0
@@ -175,10 +186,7 @@ function useWorkListAnimation({
 
     return gsap
       .timeline({ paused: true })
-      .eventCallback('onStart', () => {
-        navigate(BANNERS[targetIndex].url);
-      })
-      .add(fadeOut(getBannerCoverEls(BANNERS[activeBannerIndex].selector)))
+      .add(fadeOut(currentCoverEls))
       .add(
         bounce({
           bouncePointY: currentY - BALL_TOP_POS,
@@ -190,21 +198,18 @@ function useWorkListAnimation({
       .to(
         ballRef.current,
         {
-          background: BANNERS[targetIndex].background
+          background: toBanner.background
         },
         0
       )
-      .add(fadeIn(getBannerCoverEls(BANNERS[targetIndex].selector)), '-=1')
-      .eventCallback('onComplete', () => {
-        setActiveBannerIndex(targetIndex);
-      });
+      .add(fadeIn(nextCoverEls), '-=1');
   }
 
   function enter() {
-    const firstBallEl = getBallPlaceholderEl(BANNERS[0].selector);
-    const targetBallEl = getBallPlaceholderEl(
-      BANNERS[activeBannerIndex].selector
+    const firstBallEl = getBallPlaceholderEl(
+      bannersByTitle[WorkDetailName.Blibli].selector
     );
+    const targetBallEl = getBallPlaceholderEl(activeBanner.selector);
     const { x: targetX, y: targetY } =
       targetBallEl?.getBoundingClientRect() ?? {
         x: 0,
@@ -217,7 +222,7 @@ function useWorkListAnimation({
 
     gsap.set(ballRef.current, {
       x: targetX,
-      background: BANNERS[activeBannerIndex].background
+      background: activeBanner.background
     });
     gsap.set(sliderRef.current, {
       x: '-' + (targetX - initialX)
@@ -226,7 +231,6 @@ function useWorkListAnimation({
     return gsap
       .timeline({ paused: true })
       .to(ballRef.current, {
-        x: targetX,
         y: targetY - BALL_TOP_POS,
         ease: 'power1.inOut'
       })
@@ -236,19 +240,12 @@ function useWorkListAnimation({
           airCount: 1
         })
       )
-      .add(
-        fadeIn(getBannerCoverEls(BANNERS[activeBannerIndex].selector)),
-        '-=1'
-      );
+      .add(fadeIn(getBannerCoverEls(activeBanner.selector)), '-=1');
   }
 
   function enterWorkDetail(): gsap.core.Timeline {
-    const activeBannerSelector = gsap.utils.selector(
-      BANNERS[activeBannerIndex].selector
-    );
-    const currentPlaceholderEl = getBallPlaceholderEl(
-      BANNERS[activeBannerIndex].selector
-    );
+    const activeBannerSelector = gsap.utils.selector(activeBanner.selector);
+    const currentPlaceholderEl = getBallPlaceholderEl(activeBanner.selector);
 
     const { y: currentY } = currentPlaceholderEl?.getBoundingClientRect() ?? {
       y: 0
@@ -261,7 +258,7 @@ function useWorkListAnimation({
       .set(
         bannerBg,
         {
-          background: BANNERS[activeBannerIndex].background
+          background: activeBanner.background
         },
         0
       )
@@ -280,7 +277,7 @@ function useWorkListAnimation({
         },
         '>-0.3'
       )
-      .add(fadeOut(getBannerCoverEls(BANNERS[activeBannerIndex].selector)), '<')
+      .add(fadeOut(getBannerCoverEls(activeBanner.selector)), '<')
       .to(
         bannerBg,
         {
@@ -299,11 +296,10 @@ function useWorkListAnimation({
   }
 
   return {
-    nextAnimation,
     enterAnimation,
-    prevAnimation,
     enterWorkDetailAnimation,
-    activeBannerIndex
+    slideAnimation,
+    activeBanner
   };
 }
 

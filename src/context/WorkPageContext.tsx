@@ -3,8 +3,8 @@ import { createContext } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export enum WorkDetailName {
-  Blibli = 'BLIBLI',
-  Moperty = 'MOPERTY'
+  Blibli = 'blibli',
+  Moperty = 'moperty'
 }
 
 type WorkPageProviderValue = {
