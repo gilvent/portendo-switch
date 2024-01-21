@@ -74,7 +74,9 @@ function useControllerAnimations() {
       .timeline({
         paused: true
       })
-      .add(setScreenFromBelow())
+      .call(() => {
+        setScreenFromBelow();
+      })
       .addLabel('detached')
       .to(q('[data-anim-target="left-joycon"]'), {
         clearProps: 'all',
@@ -138,7 +140,6 @@ function useControllerAnimations() {
       .to(
         q('[data-anim-target="left-joycon"]'),
         {
-          top: 0,
           translateY: 0,
           translateX: 0,
           rotate: 5,
@@ -149,7 +150,6 @@ function useControllerAnimations() {
       .to(
         q('[data-anim-target="right-joycon"]'),
         {
-          top: 0,
           translateY: 0,
           translateX: 0,
           rotate: 5
@@ -239,13 +239,17 @@ function useControllerAnimations() {
         {
           scale: 20,
           transformOrigin: 'center 75%',
-          autoAlpha: 0,
           duration: 1.5
         },
         '<1'
       )
       .add(gatherCon())
-      .add(setScreenFromBelow())
+      .call(() => {
+        setScreenFromBelow();
+        gsap.set(screen, {
+          display: 'none'
+        });
+      })
       .addLabel('detached');
   }
 

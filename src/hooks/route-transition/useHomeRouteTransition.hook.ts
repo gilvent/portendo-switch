@@ -25,7 +25,7 @@ function useHomeRouteAnimation(previousPath: string) {
 
   function onExit() {
     console.log('exit home');
-    toDetachedModeTransition.current?.play(0);
+    toDetachedModeTransition.current?.duration(5).play(0);
   }
 
   return {
