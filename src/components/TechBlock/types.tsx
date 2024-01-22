@@ -4,7 +4,10 @@ export enum TECH {
   VUE = 'VUE',
   SASS = 'SASS',
   NGINX = 'NGINX',
-  PLAYWRIGHT = 'PLAYWRIGHT'
+  PLAYWRIGHT = 'PLAYWRIGHT',
+  LARAVEL = 'LARAVEL',
+  POSTGRES = 'POSTGRES',
+  GCLOUD = 'GCLOUD'
 }
 
 export type BoxRefs = {

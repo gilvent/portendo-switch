@@ -12,7 +12,8 @@ import { Transition } from 'react-transition-group';
 import useTechBlockAnimations from './useTechBlockAnimations.hook';
 
 const detailComponentByRoute: Record<string, FunctionComponent> = {
-  '/work/blibli': lazy(async () => await import('@/pages/BlibliWorkPage'))
+  '/work/blibli': lazy(async () => await import('@/pages/BlibliWorkPage')),
+  '/work/moperty': lazy(async () => await import('@/pages/MopertyWorkPage'))
 };
 
 function WorkDetail() {

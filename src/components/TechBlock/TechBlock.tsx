@@ -23,6 +23,21 @@ const boxPropsByTech = {
     logoFileName: 'nginx.svg',
     text: 'NGINX',
     color: '#22963a'
+  },
+  [TECH.LARAVEL]: {
+    logoFileName: 'laravel.svg',
+    text: 'LARAVEL',
+    color: '#F9322C'
+  },
+  [TECH.POSTGRES]: {
+    logoFileName: 'postgres.png',
+    text: 'POSTGRES',
+    color: '#336791'
+  },
+  [TECH.GCLOUD]: {
+    logoFileName: 'gcloud.png',
+    text: 'GOOGLE CLOUD',
+    color: '#fbbd05'
   }
 };
 
