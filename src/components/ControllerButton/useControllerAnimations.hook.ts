@@ -273,23 +273,16 @@ function useControllerAnimations() {
       .play();
   }
 
-  function enterHandheldMode(): void {
+  function enterHandheldMode(): gsap.core.Timeline {
     const controller = document.querySelector(
       '[data-anim-target="controller-button"]'
     );
-    gsap.timeline().fromTo(
-      controller,
-      {
-        translateY: 250
-      },
-      {
-        translateY: 0,
-        duration: 1.25,
-        ease: 'back.out'
-      }
-    );
+    return gsap.timeline().to(controller, {
+      translateY: 0,
+      duration: 1.25,
+      ease: 'back.out'
+    });
   }
-
   return {
     toSingleConModeTransition,
     toHandheldModeTransition,

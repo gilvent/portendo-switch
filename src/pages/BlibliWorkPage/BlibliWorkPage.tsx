@@ -15,25 +15,25 @@ function BlibliWorkPage(_: any, ref: ForwardedRef<any>) {
 
   return (
     <div className={styles['work-page']} ref={ref}>
-      <section className={`${styles.block} ${styles['page-gap']}`}></section>
-      <section className={`${styles.block} ${styles['tech']}`}>
+      <section className={`${styles['page-gap']}`}></section>
+      <section className={`${styles['tech']}`}>
         <TechBlock techList={techList} />
       </section>
-      <section className={`${styles.block} ${styles['review-revamp-story']}`}>
+      <section className={`${styles['review-revamp-story']}`}>
         <BlibliReviewProjectStoryBlock />
       </section>
-      <section className={`${styles.block} ${styles['review-revamp']}`}>
+      <section className={`${styles['review-revamp']}`}>
         <BlibliReviewProjectInteractiveBlock />
       </section>
-      <section className={`${styles.block} ${styles['pdp-revamp-preview']}`}>
+      <section className={`${styles['pdp-revamp-preview']}`}>
         <BlibliPDPRevampViewBlock />
       </section>
 
-      <section className={`${styles.block} ${styles['pdp-secondary']}`}>
+      <section className={`${styles['pdp-secondary']}`}>
         <BlibliSecondaryPagesPreview />
       </section>
 
-      <section className={`${styles.block} ${styles['pdp-revamp-story']}`}>
+      <section className={`${styles['pdp-revamp-story']}`}>
         <BlibliPDPRevampStoryBlock />
       </section>
     </div>

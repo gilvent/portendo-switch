@@ -1,6 +1,8 @@
+import gsap from 'gsap';
+import { matchPath } from 'react-router-dom';
 import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
-import { matchPath } from 'react-router-dom';
+import useHomePageAnimations from '@/hooks/animations/useHomePageAnimations.hook';
 
 function useHomeRouteAnimation(previousPath: string) {
   const {
@@ -8,14 +10,24 @@ function useHomeRouteAnimation(previousPath: string) {
     toDetachedModeTransition,
     toHandheldModeTransition
   } = useControllerAnimations();
+  const { homeEnter } = useHomePageAnimations();
 
   const enterAnimations = [
-    { path: ROUTE_PATH_PATTERNS.HOME, fn: enterHandheldMode },
+    { path: ROUTE_PATH_PATTERNS.HOME, fn: enterHomePage },
     { path: ROUTE_PATH_PATTERNS.WORK, fn: enterFromWorkPage }
   ];
 
   function enterFromWorkPage() {
-    toHandheldModeTransition.current?.play(0);
+    const anim = gsap.timeline();
+    if (toHandheldModeTransition.current) {
+      anim.add(toHandheldModeTransition.current.paused(false));
+    }
+    anim.add(homeEnter());
+    anim.play(0);
+  }
+
+  function enterHomePage() {
+    gsap.timeline().add(homeEnter()).add(enterHandheldMode()).play(0);
   }
 
   function onEnter() {
