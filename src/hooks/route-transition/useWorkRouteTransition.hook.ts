@@ -3,16 +3,26 @@ import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import { matchPath } from 'react-router-dom';
 
 function useWorkRouteTransition(previousPath: string) {
-  const { enterDetachedMode, toDetachedModeTransition } =
+  const { startScreenMode, dockToScreenMode, screenModeToDock } =
     useControllerAnimations();
 
   const enterAnimations = [
     { path: ROUTE_PATH_PATTERNS.HOME, fn: enterFromHomePage },
-    { path: ROUTE_PATH_PATTERNS.WORK, fn: enterDetachedMode }
+    { path: ROUTE_PATH_PATTERNS.WORK, fn: startScreenMode }
+  ];
+
+  const exitAnimationsByTargetPath = [
+    { path: ROUTE_PATH_PATTERNS.HOME, fn: exitToHomePage }
   ];
 
   function enterFromHomePage() {
-    console.log('enter work', previousPath);
+    // TODO cache the timeline
+    dockToScreenMode().play(0);
+  }
+
+  function exitToHomePage() {
+    console.log('exiting to home page');
+    screenModeToDock().duration(3).play(0);
   }
 
   function onEnter() {
@@ -22,13 +32,16 @@ function useWorkRouteTransition(previousPath: string) {
 
   function onExit() {
     console.log('exit work');
+    exitAnimationsByTargetPath
+      .find(i => matchPath(i.path, window.location.pathname))
+      ?.fn();
   }
 
   return {
     onEnter,
     onExit,
     appear: true,
-    timeout: 1000,
+    timeout: 3000,
     unmountOnExit: true
   };
 }

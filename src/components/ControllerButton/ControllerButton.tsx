@@ -34,29 +34,48 @@ function ControllerButton() {
           </button>
         </div>
 
-        <div data-anim-target="screen" className={styles.screen}>
+        <div
+          data-anim-target="dock-screen-wrapper"
+          className={styles['dock-screen-wrapper']}
+        >
           <div
-            data-anim-target="inner-screen"
-            className={styles['inner-screen']}
+            data-anim-target="dock-back"
+            className={`${styles['dock-back']} invisible`}
+          ></div>
+          <div
+            data-anim-target="dock-front"
+            className={`${styles['dock-front']} invisible`}
           >
+            <div data-anim-target="led" className={styles.led}></div>
+          </div>
+          <div data-anim-target="screen" className={styles.screen}>
             <div
-              data-anim-target="screen-foreground"
-              className={styles['work-landing-screen']}
+              data-anim-target="inner-screen"
+              className={styles['inner-screen']}
             >
-              <h3 className={styles.title}>Work</h3>
-              <div className={styles.guide}>
-                <span data-anim-target="guide-text">Press B to start</span>
-                <div
-                  data-anim-target="loading-bar"
-                  className={`${styles['loading-bar']} invisible`}
-                >
+              <div
+                data-anim-target="screen-foreground"
+                className={styles['work-landing-screen']}
+              >
+                <h3 className={styles.title}>Work</h3>
+                <div className={styles.guide}>
+                  <span data-anim-target="guide-text">Press B to view</span>
                   <div
-                    data-anim-target="loading-progress"
-                    className={styles['inner-loading-bar']}
-                  ></div>
+                    data-anim-target="loading-bar"
+                    className={`${styles['loading-bar']} invisible`}
+                  >
+                    <div
+                      data-anim-target="loading-progress"
+                      className={styles['inner-loading-bar']}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
+            <div
+              data-anim-target="shut-down-overlay"
+              className={styles['shut-down-overlay']}
+            ></div>
           </div>
         </div>
 

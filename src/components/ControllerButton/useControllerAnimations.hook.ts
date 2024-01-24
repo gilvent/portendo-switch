@@ -3,31 +3,43 @@ import gsap from 'gsap';
 
 function useControllerAnimations() {
   const toSingleConModeTransition = useRef<gsap.core.Timeline | null>(null);
-  const toHandheldModeTransition = useRef<gsap.core.Timeline | null>(null);
-  const toDetachedModeTransition = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     toSingleConModeTransition.current = toSingleConMode();
-    toHandheldModeTransition.current = toHandheldMode();
-    toDetachedModeTransition.current = toDetachedMode();
   }, []);
 
-  function setScreenFromBelow(): gsap.core.Timeline {
+  // * Reference for full timeline approach
+  // * Caveat: Requires hack to add animation to child labels.
+  // * eg: When detached from dock, display home page
+  // const forwardAnimation = useRef<gsap.core.Timeline | null>(null);
+
+  // useEffect(() => {
+  //   const toDock = handheldToDocked().paused(false);
+  //   const toScreenMode = dockToScreenMode().paused(false);
+
+  //   forwardAnimation.current = gsap
+  //     .timeline({ paused: true })
+  //     .addLabel('handheld-mode')
+  //     .add(toDock)
+  //     .addLabel('docked')
+  //     .add(toScreenMode)
+  //     .addLabel('screen-mode');
+  // }, []);
+
+  function reset(): gsap.core.Timeline {
     const q = gsap.utils.selector('[data-anim-target="controller-button"]');
     const screen = q('[data-anim-target="screen"]');
     const guideText = q('[data-anim-target="guide-text"]');
     const loadingBar = q('[data-anim-target="loading-bar"]');
     const loadingProgress = q('[data-anim-target="loading-progress"]');
-    const screenForeground = q('[data-anim-target="screen-foreground"]');
-    const innerScreen = q('[data-anim-target="inner-screen"]');
+    const dockFront = q('[data-anim-target="dock-front"');
+    const dockBack = q('[data-anim-target="dock-back"');
+    const shutDownOverlay = q('[data-anim-target="shut-down-overlay"]');
 
     return gsap
       .timeline()
       .set(screen, {
         clearProps: 'all'
-      })
-      .set(screen, {
-        translateY: 250
       })
       .set(
         guideText,
@@ -44,50 +56,107 @@ function useControllerAnimations() {
         0
       )
       .set(
-        screenForeground,
-        {
-          clearProps: 'all'
-        },
-        0
-      )
-      .set(
-        innerScreen,
-        {
-          clearProps: 'all'
-        },
-        0
-      )
-      .set(
         loadingProgress,
         {
           clearProps: 'all'
         },
         0
+      )
+      .set(
+        dockFront,
+        {
+          clearProps: true
+        },
+        0
+      )
+      .set(
+        dockBack,
+        {
+          clearProps: true
+        },
+        0
+      )
+      .set(
+        shutDownOverlay,
+        {
+          clearProps: true
+        },
+        0
       );
   }
 
-  function toHandheldMode(): gsap.core.Timeline {
+  function dockToHandheld(): gsap.core.Timeline {
     const q = gsap.utils.selector('[data-anim-target="controller-button"]');
     const screen = q('[data-anim-target="screen"]');
+    const leftCon = q('[data-anim-target="left-joycon"]');
+    const rightCon = q('[data-anim-target="right-joycon"]');
+    const dockFront = q('[data-anim-target="dock-front"]');
+    const dockBack = q('[data-anim-target="dock-back"]');
+    const shutDownOverlay = q('[data-anim-target="shut-down-overlay"]');
+    const led = q('[data-anim-target="led"]');
 
     return gsap
       .timeline({
         paused: true
       })
-      .call(() => {
-        setScreenFromBelow();
+      .addLabel('docked')
+      .to(screen, {
+        translateY: '-80%',
+        rotate: 15
       })
-      .addLabel('detached')
-      .to(q('[data-anim-target="left-joycon"]'), {
-        clearProps: 'all',
+      .to(
+        led,
+        {
+          clearProps: true
+        },
+        '<'
+      )
+      .to(
+        shutDownOverlay,
+        {
+          clearProps: true
+        },
+        '<'
+      )
+      .addLabel('detached-from-dock')
+      .to(
+        dockFront,
+        {
+          zIndex: 2,
+          delay: 2
+        },
+        '<'
+      )
+      .to(
+        dockFront,
+        {
+          scale: 0.8
+        },
+        '<'
+      )
+      .to(
+        dockBack,
+        {
+          scale: 0.8
+        },
+        '<'
+      )
+      .to(
+        screen,
+        {
+          translateY: 0,
+          rotate: 0
+        },
+        '>-0.2'
+      )
+      .to(leftCon, {
         translateY: 0,
         translateX: -125,
         rotate: 0
       })
       .to(
-        q('[data-anim-target="right-joycon"]'),
+        rightCon,
         {
-          clearProps: 'all',
           translateY: 0,
           translateX: 125,
           rotate: 0
@@ -99,32 +168,78 @@ function useControllerAnimations() {
         ease: 'back.out',
         duration: 0.75
       })
+      .add(reset())
       .addLabel('handheld');
   }
 
-  function gatherCon(): gsap.core.Timeline {
+  function dockToScreenMode(): gsap.core.Timeline {
     const q = gsap.utils.selector('[data-anim-target="controller-button"]');
+    const leftCon = q('[data-anim-target="left-joycon"]');
+    const rightCon = q('[data-anim-target="right-joycon"]');
+    const dockScreenWrapper = q('[data-anim-target="dock-screen-wrapper"]');
 
     return gsap
       .timeline({
+        paused: true,
         defaults: {
           duration: 0.5
         }
       })
-      .to(q('[data-anim-target="left-joycon"]'), {
+      .addLabel('dock-visible')
+      .to(dockScreenWrapper, {
+        delay: 2,
+        translateY: '150%',
+        ease: 'back.in'
+      })
+      .to(leftCon, {
         translateY: -26,
         translateX: -30,
         rotate: 50
       })
       .to(
-        q('[data-anim-target="right-joycon"]'),
+        rightCon,
         {
           translateY: 26,
           translateX: 35,
           rotate: 50
         },
         '<'
-      );
+      )
+      .addLabel('screen-mode')
+      .call(() => {
+        gsap.set(dockScreenWrapper, {
+          display: 'none'
+        });
+      });
+  }
+
+  function screenModeToDock(): gsap.core.Timeline {
+    const q = gsap.utils.selector('[data-anim-target="controller-button"]');
+    const dockScreenWrapper = q('[data-anim-target="dock-screen-wrapper"]');
+
+    return gsap
+      .timeline()
+      .set(dockScreenWrapper, {
+        display: 'unset'
+      })
+      .to(q('[data-anim-target="left-joycon"]'), {
+        translateY: 0,
+        translateX: -150,
+        rotate: 0
+      })
+      .to(
+        q('[data-anim-target="right-joycon"]'),
+        {
+          translateY: 0,
+          translateX: 150,
+          rotate: 0
+        },
+        '<'
+      )
+      .to(dockScreenWrapper, {
+        translateY: 0,
+        ease: 'back.out'
+      });
   }
 
   function toSingleConMode(): gsap.core.Timeline {
@@ -163,8 +278,6 @@ function useControllerAnimations() {
     const guideText = q('[data-anim-target="guide-text"]');
     const loadingBar = q('[data-anim-target="loading-bar"]');
     const loadingProgress = q('[data-anim-target="loading-progress"]');
-    const screenForeground = q('[data-anim-target="screen-foreground"]');
-    const innerScreen = q('[data-anim-target="inner-screen"]');
 
     return gsap
       .timeline({
@@ -181,35 +294,32 @@ function useControllerAnimations() {
       .to(loadingProgress, {
         translateX: 0
       })
-      .to(screenForeground, {
+      .to(loadingBar, {
         autoAlpha: 0
-      })
-      .to(
-        innerScreen,
-        {
-          background: '#fff'
-        },
-        '<'
-      );
+      });
   }
 
-  function toDetachedMode(): gsap.core.Timeline {
+  function handheldToDocked(): gsap.core.Timeline {
     const q = gsap.utils.selector('[data-anim-target="controller-button"]');
     const screen = q('[data-anim-target="screen"]');
-    const con1 = q('[data-anim-target="left-joycon"]');
-    const con2 = q('[data-anim-target="right-joycon"]');
+    const leftCon = q('[data-anim-target="left-joycon"]');
+    const rightCon = q('[data-anim-target="right-joycon"]');
+    const dockFront = q('[data-anim-target="dock-front"]');
+    const dockBack = q('[data-anim-target="dock-back"]');
+    const shutDownOverlay = q('[data-anim-target="shut-down-overlay"]');
+    const led = q('[data-anim-target="led"]');
 
     return gsap
       .timeline({ paused: true })
       .addLabel('handheld')
       .add(screenLoading())
-      .to(con1, {
+      .to(leftCon, {
         translateY: -25,
         duration: 0.5,
         ease: 'back.out'
       })
       .to(
-        con2,
+        rightCon,
         {
           translateY: 25,
           duration: 0.5,
@@ -218,7 +328,7 @@ function useControllerAnimations() {
         '<'
       )
       .to(
-        con1,
+        leftCon,
         {
           translateY: -25,
           translateX: -145,
@@ -227,38 +337,80 @@ function useControllerAnimations() {
         '>-0.1'
       )
       .to(
-        con2,
+        rightCon,
         {
           translateX: 145,
           rotate: 15
         },
         '<'
       )
-      .to(
-        screen,
-        {
-          scale: 20,
-          transformOrigin: 'center 75%',
-          duration: 1.5
-        },
-        '<1'
-      )
-      .add(gatherCon())
-      .call(() => {
-        setScreenFromBelow();
-        gsap.set(screen, {
-          display: 'none'
-        });
+      .to(screen, {
+        translateY: '-50%'
       })
-      .addLabel('detached');
+      .to(dockFront, {
+        translateY: '-5%',
+        autoAlpha: 1
+      })
+      .to(
+        dockBack,
+        {
+          translateY: '-5%',
+          autoAlpha: 1
+        },
+        '<'
+      )
+      .to(screen, {
+        translateY: 0,
+        ease: 'back.out'
+      })
+      .to(
+        dockFront,
+        {
+          translateY: 0,
+          autoAlpha: 1,
+          ease: 'back.out'
+        },
+        '<'
+      )
+      .to(
+        dockBack,
+        {
+          translateY: 0,
+          autoAlpha: 1,
+          ease: 'back.out'
+        },
+        '<'
+      )
+      .to(
+        shutDownOverlay,
+        {
+          background: '#000'
+        },
+        '<'
+      )
+      .to(
+        led,
+        {
+          background: 'rgb(178, 252, 125)'
+        },
+        '<'
+      )
+      .addLabel('docked');
   }
 
-  function enterDetachedMode(): void {
+  function startScreenMode(): void {
     const controller = document.querySelector(
       '[data-anim-target="controller-button"]'
     );
-    toDetachedModeTransition?.current
-      ?.seek('detached')
+
+    gsap
+      .timeline()
+      .call(() => {
+        handheldToDocked().seek('docked');
+      })
+      .call(() => {
+        dockToScreenMode().seek('screen-mode');
+      })
       .fromTo(
         controller,
         {
@@ -273,7 +425,7 @@ function useControllerAnimations() {
       .play();
   }
 
-  function enterHandheldMode(): gsap.core.Timeline {
+  function startHandheldMode(): gsap.core.Timeline {
     const controller = document.querySelector(
       '[data-anim-target="controller-button"]'
     );
@@ -283,12 +435,15 @@ function useControllerAnimations() {
       ease: 'back.out'
     });
   }
+
   return {
     toSingleConModeTransition,
-    toHandheldModeTransition,
-    toDetachedModeTransition,
-    enterDetachedMode,
-    enterHandheldMode
+    dockToHandheld,
+    handheldToDocked,
+    startScreenMode,
+    startHandheldMode,
+    dockToScreenMode,
+    screenModeToDock
   };
 }
 
