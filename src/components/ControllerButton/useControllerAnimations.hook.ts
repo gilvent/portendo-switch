@@ -2,12 +2,6 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 function useControllerAnimations() {
-  const toSingleConModeTransition = useRef<gsap.core.Timeline | null>(null);
-
-  useEffect(() => {
-    toSingleConModeTransition.current = toSingleConMode();
-  }, []);
-
   // * Reference for full timeline approach
   // * Caveat: Requires hack to add animation to child labels.
   // * eg: When detached from dock, display home page
@@ -242,15 +236,20 @@ function useControllerAnimations() {
       });
   }
 
-  function toSingleConMode(): gsap.core.Timeline {
+  function screenModeToSingleCon(): gsap.core.Timeline {
     const q = gsap.utils.selector('[data-anim-target="controller-button"]');
+    const con = document.querySelector(
+      '[data-anim-target="controller-button"]'
+    );
+    const conRightPos =
+      window.innerWidth / 2 + (con?.getBoundingClientRect()?.width ?? 75) / 2;
+    const conTranslateDistance = window.innerWidth - 24 - conRightPos;
 
     return gsap
-      .timeline({
-        paused: true
-      })
-      .to(document.querySelector('[data-anim-target="controller-button"]'), {
-        right: 24
+      .timeline()
+      .addLabel('screen-mode')
+      .to(con, {
+        translateX: conTranslateDistance
       })
       .to(
         q('[data-anim-target="left-joycon"]'),
@@ -270,7 +269,42 @@ function useControllerAnimations() {
           rotate: 5
         },
         '<'
-      );
+      )
+      .addLabel('single-con-mode');
+  }
+
+  function singleConToScreenMode(): gsap.core.Timeline {
+    const q = gsap.utils.selector('[data-anim-target="controller-button"]');
+    const leftCon = q('[data-anim-target="left-joycon"]');
+    const rightCon = q('[data-anim-target="right-joycon"]');
+
+    return gsap
+      .timeline()
+      .addLabel('single-con-mode')
+      .to(document.querySelector('[data-anim-target="controller-button"]'), {
+        translateX: 0,
+        translateY: 0
+      })
+      .to(
+        leftCon,
+        {
+          translateY: -26,
+          translateX: -30,
+          rotate: 50,
+          autoAlpha: 1
+        },
+        '<'
+      )
+      .to(
+        rightCon,
+        {
+          translateY: 26,
+          translateX: 35,
+          rotate: 50
+        },
+        '<'
+      )
+      .addLabel('screen-mode');
   }
 
   function screenLoading(): gsap.core.Timeline {
@@ -398,12 +432,12 @@ function useControllerAnimations() {
       .addLabel('docked');
   }
 
-  function startScreenMode(): void {
+  function startScreenMode(): gsap.core.Timeline {
     const controller = document.querySelector(
       '[data-anim-target="controller-button"]'
     );
 
-    gsap
+    return gsap
       .timeline()
       .call(() => {
         handheldToDocked().seek('docked');
@@ -421,8 +455,7 @@ function useControllerAnimations() {
           duration: 1.25,
           ease: 'back.out'
         }
-      )
-      .play();
+      );
   }
 
   function startHandheldMode(): gsap.core.Timeline {
@@ -436,14 +469,45 @@ function useControllerAnimations() {
     });
   }
 
+  function startSingleConMode(): gsap.core.Timeline {
+    const controller = document.querySelector(
+      '[data-anim-target="controller-button"]'
+    );
+
+    return gsap
+      .timeline()
+      .call(() => {
+        handheldToDocked().seek('docked');
+      })
+      .call(() => {
+        dockToScreenMode().seek('screen-mode');
+      })
+      .call(() => {
+        screenModeToSingleCon().seek('single-con-mode');
+      })
+      .fromTo(
+        controller,
+        {
+          translateY: 250
+        },
+        {
+          translateY: 0,
+          duration: 1.25,
+          ease: 'back.out'
+        }
+      );
+  }
+
   return {
-    toSingleConModeTransition,
+    startSingleConMode,
     dockToHandheld,
     handheldToDocked,
     startScreenMode,
     startHandheldMode,
     dockToScreenMode,
-    screenModeToDock
+    screenModeToDock,
+    screenModeToSingleCon,
+    singleConToScreenMode
   };
 }
 

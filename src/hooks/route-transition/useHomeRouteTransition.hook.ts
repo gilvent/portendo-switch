@@ -3,6 +3,7 @@ import { matchPath } from 'react-router-dom';
 import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import useHomePageAnimations from '@/hooks/animations/useHomePageAnimations.hook';
+import { RefObject } from 'react';
 
 function useHomeRouteAnimation(previousPath: string) {
   const { startHandheldMode, handheldToDocked, dockToHandheld } =
@@ -21,26 +22,32 @@ function useHomeRouteAnimation(previousPath: string) {
   function enterFromWorkPage() {
     const anim = dockToHandheld().paused(false);
     anim.add(homeEnter(), 'detached-from-dock');
-    anim.play(0);
+    return anim.play(0);
   }
 
   function enterHomePage() {
-    gsap.timeline().add(homeEnter()).add(startHandheldMode()).play(0);
+    return gsap.timeline().add(homeEnter()).add(startHandheldMode()).play(0);
   }
 
-  function onEnter() {
-    console.log('enter home', previousPath);
-    enterAnimationsByPrevPath.find(i => matchPath(i.path, previousPath))?.fn();
+  function onEnter(): gsap.core.Timeline {
+    console.log('enter home from', previousPath);
+    return (
+      enterAnimationsByPrevPath
+        .find(i => matchPath(i.path, previousPath))
+        ?.fn() ?? gsap.timeline()
+    );
   }
 
   function exitToWorkPage() {
-    handheldToDocked().duration(5).play(0);
+    return handheldToDocked().duration(5).play(0);
   }
 
-  function onExit() {
-    exitAnimationsByTargetPath
-      .find(i => matchPath(i.path, window.location.pathname))
-      ?.fn();
+  function onExit(): gsap.core.Timeline {
+    return (
+      exitAnimationsByTargetPath
+        .find(i => matchPath(i.path, window.location.pathname))
+        ?.fn() ?? gsap.timeline()
+    );
   }
 
   return {

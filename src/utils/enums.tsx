@@ -1,6 +1,12 @@
 export enum ROUTE_PATH_PATTERNS {
   HOME = '/',
-  WORK = '/work/:title'
+  WORK = '/work/:title',
+  WORK_DETAIL = '/work/:title/detail'
+}
+
+export enum WorkPageTitle {
+  Blibli = 'blibli',
+  Moperty = 'moperty'
 }
 
 export enum MediaQueryScreen {

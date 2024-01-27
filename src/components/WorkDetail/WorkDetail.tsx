@@ -1,57 +1,55 @@
-import WorkPageContext from '@/context/WorkPageContext';
 import {
   FunctionComponent,
+  Suspense,
   lazy,
   useContext,
   useEffect,
-  useRef,
   useState
 } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Transition } from 'react-transition-group';
-import useTechBlockAnimations from './useTechBlockAnimations.hook';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
+import ControllerButtonContext from '@/context/ControllerButtonContext';
 
-const detailComponentByRoute: Record<string, FunctionComponent> = {
-  '/work/blibli': lazy(async () => await import('@/pages/BlibliWorkPage')),
-  '/work/moperty': lazy(async () => await import('@/pages/MopertyWorkPage'))
+const detailComponentByParams: Record<string, FunctionComponent> = {
+  [WorkPageTitle.Blibli]: lazy(
+    async () => await import('@/pages/BlibliWorkPage')
+  ),
+  [WorkPageTitle.Moperty]: lazy(
+    async () => await import('@/pages/MopertyWorkPage')
+  )
 };
 
 function WorkDetail() {
   const { pathname } = useLocation();
+  const params = useParams();
   const [ActiveComponent, setActiveComponent] = useState<any>(
-    detailComponentByRoute['/work/blibli']
+    detailComponentByParams[WorkPageTitle.Blibli]
   );
-  const { activeWorkDetail } = useContext(WorkPageContext);
-  const pageRef = useRef<any>(null);
-  const { setupEnterAnimation, setupExitAnimation } = useTechBlockAnimations();
+  const { setAction } = useContext(ControllerButtonContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setActiveComponent(
-      detailComponentByRoute[pathname] ?? detailComponentByRoute['/work/blibli']
+      detailComponentByParams[params.title as WorkPageTitle] ??
+        detailComponentByParams[WorkPageTitle.Blibli]
     );
   }, [pathname]);
 
+  useEffect(() => {
+    setAction('onControlBClick', () => {});
+    setAction('onControlAClick', () => {
+      const url = ROUTE_PATH_PATTERNS.WORK.replace(
+        ':title',
+        params.title ?? WorkPageTitle.Blibli
+      );
+      navigate(url);
+    });
+  }, [params]);
+
   return (
-    <Transition
-      nodeRef={pageRef}
-      mountOnEnter={true}
-      onEnter={() => {
-        setupEnterAnimation().play();
-      }}
-      appear={true}
-      in={activeWorkDetail !== null}
-      onExit={() => {
-        setupExitAnimation().play();
-      }}
-      unmountOnExit={true}
-      timeout={{
-        enter: 1500,
-        appear: 1500,
-        exit: 3000
-      }}
-    >
-      <ActiveComponent ref={pageRef} />
-    </Transition>
+    <Suspense>
+      <ActiveComponent />;
+    </Suspense>
   );
 }
 

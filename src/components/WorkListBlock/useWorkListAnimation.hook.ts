@@ -8,8 +8,9 @@ type Banner = {
   url: string;
   selector: string;
   background: string;
-  prevBannerTitle: WorkDetailName.Blibli;
-  nextBannerTitle: WorkDetailName.Moperty;
+  title: WorkDetailName;
+  prevBannerTitle: WorkDetailName;
+  nextBannerTitle: WorkDetailName;
 };
 
 const bannersByTitle: Record<WorkDetailName, Banner> = {
@@ -17,6 +18,7 @@ const bannersByTitle: Record<WorkDetailName, Banner> = {
     url: '/work/blibli',
     selector: '#blibli-banner',
     background: 'linear-gradient(132.36deg, #0092da 43.16%, #0071da 112.76%)',
+    title: WorkDetailName.Blibli,
     prevBannerTitle: WorkDetailName.Blibli,
     nextBannerTitle: WorkDetailName.Moperty
   },
@@ -24,6 +26,7 @@ const bannersByTitle: Record<WorkDetailName, Banner> = {
     url: '/work/moperty',
     selector: '#moperty-banner',
     background: 'linear-gradient(132.36deg, #503FB5 43%, #3F51B5 112%)',
+    title: WorkDetailName.Moperty,
     prevBannerTitle: WorkDetailName.Blibli,
     nextBannerTitle: WorkDetailName.Moperty
   }

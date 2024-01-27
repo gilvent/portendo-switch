@@ -11,7 +11,6 @@ import WorkPageContext, { WorkDetailName } from '@/context/WorkPageContext';
 import { Transition } from 'react-transition-group';
 import { useNavigate } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
-import useControllerAnimations from '../ControllerButton/useControllerAnimations.hook';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
@@ -21,6 +20,7 @@ function WorkListBlock() {
   const {
     enterAnimation,
     slideAnimation,
+    // TODO move to corresponding page
     enterWorkDetailAnimation,
     activeBanner
   } = useWorkListAnimation({
@@ -28,10 +28,8 @@ function WorkListBlock() {
     sliderRef
   });
   const { setAction } = useContext(ControllerButtonContext);
-  const { openWorkDetail, activeWorkDetail, closeWorkDetail } =
-    useContext(WorkPageContext);
-  const { toSingleConModeTransition } = useControllerAnimations();
-  const toDetailTransition = useRef<gsap.core.Timeline | null>(null);
+  // TODO activeWorkDetail is deprecated, use params title instead
+  const { activeWorkDetail } = useContext(WorkPageContext);
 
   useEffect(() => {
     slideAnimation.current?.play(0);
@@ -54,54 +52,8 @@ function WorkListBlock() {
     });
   }, [activeBanner]);
 
-  useEffect(() => {
-    setAction(
-      'onControlBClick',
-      activeWorkDetail ? () => {} : transitionToWorkDetail
-    );
-    setAction(
-      'onControlAClick',
-      activeWorkDetail ? transitionToWorkList : backToHome
-    );
-  }, [activeWorkDetail]);
-
   function onEnter() {
     enterAnimation.current?.delay(0).restart(true).play();
-  }
-
-  function transitionToWorkDetail() {
-    toDetailTransition.current = gsap.timeline();
-
-    if (toSingleConModeTransition.current) {
-      toDetailTransition.current.add(
-        toSingleConModeTransition.current.paused(false)
-      );
-    }
-
-    if (enterWorkDetailAnimation.current) {
-      toDetailTransition.current.add(
-        enterWorkDetailAnimation.current.paused(false),
-        '<'
-      );
-    }
-
-    toDetailTransition.current
-      .eventCallback('onComplete', () => {
-        openWorkDetail();
-      })
-      .play();
-  }
-
-  function transitionToWorkList() {
-    window.scrollTo({
-      top: 0
-    });
-    closeWorkDetail();
-    toDetailTransition.current?.reverse();
-  }
-
-  function backToHome() {
-    navigate('/');
   }
 
   return (
@@ -136,6 +88,7 @@ function WorkListBlock() {
                   application.
                 </>
               )}
+              // TODO activeWorkDetail is deprecated, use params title instead
               active={activeWorkDetail === WorkDetailName.Blibli}
               logo={blibliWhiteLogo}
               titleColor="#0092da"

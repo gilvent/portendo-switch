@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import styles from './WorkPage.module.scss';
 import WorkListBlock from '@/components/WorkListBlock';
 import { WorkPageProvider } from '@/context/WorkPageContext';
-import WorkDetail from '@/components/WorkDetail';
+import { Outlet } from 'react-router-dom';
 
 function WorkPage() {
   const primaryPanelClasses = classNames(
@@ -22,7 +22,7 @@ function WorkPage() {
         </div>
 
         <div className={secondaryPanelClasses}>
-          <WorkDetail />
+          <Outlet />
         </div>
       </div>
     </WorkPageProvider>

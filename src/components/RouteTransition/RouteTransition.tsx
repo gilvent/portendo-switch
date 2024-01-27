@@ -1,4 +1,4 @@
-import { createRef } from 'react';
+import { createRef, useRef } from 'react';
 import { SwitchTransition, Transition } from 'react-transition-group';
 import { matchPath, useLocation } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
@@ -11,18 +11,32 @@ const RouteTransition = ({ children }: { children: any }) => {
   const nodeRef = createRef<any>();
   const location = useLocation();
   const prevLocation = usePreviousState(location);
+  const transitionDone = useRef<Function | null>(null);
   // const { toggleCompleted } = useContext(TransitionContext);
 
   const homeRouteTransition = useHomeRouteAnimation(prevLocation.pathname);
   const workRouteTransition = useWorkRouteTransition(prevLocation.pathname);
 
-  const transitionConfig = {
+  const defaultConfig = {
+    onEnter: () => {},
+    onEntered: () => {
+      console.log('entered');
+    },
+    onExit: () => {},
+    onExited: () => {
+      console.log('exited');
+    },
+    appear: true,
+    unmountOnExit: true
+  };
+
+  const transitionConfig: Record<string, any> = {
     [ROUTE_PATH_PATTERNS.HOME]: {
-      onEnter: homeRouteTransition.onEnter,
+      onEnter: doneAfterCall(homeRouteTransition.onEnter),
       onEntered: () => {
         console.log('entered home');
       },
-      onExit: homeRouteTransition.onExit,
+      onExit: doneAfterCall(homeRouteTransition.onExit),
       onExited: () => {
         console.log('exited home');
       },
@@ -31,11 +45,11 @@ const RouteTransition = ({ children }: { children: any }) => {
       unmountOnExit: homeRouteTransition.unmountOnExit
     },
     [ROUTE_PATH_PATTERNS.WORK]: {
-      onEnter: workRouteTransition.onEnter,
+      onEnter: doneAfterCall(workRouteTransition.onEnter),
       onEntered: () => {
         console.log('entered work');
       },
-      onExit: workRouteTransition.onExit,
+      onExit: doneAfterCall(workRouteTransition.onExit),
       onExited: () => {
         console.log('exited work');
       },
@@ -46,24 +60,51 @@ const RouteTransition = ({ children }: { children: any }) => {
   };
 
   function getTransitionConfig(pathname: string) {
-    const key = Object.keys(transitionConfig).find(
+    const transitionKeyByPath = {
+      [ROUTE_PATH_PATTERNS.HOME]: ROUTE_PATH_PATTERNS.HOME,
+      [ROUTE_PATH_PATTERNS.WORK]: ROUTE_PATH_PATTERNS.WORK,
+      // work detail is work page's child route, so use the same key to prevent re-transition
+      [ROUTE_PATH_PATTERNS.WORK_DETAIL]: ROUTE_PATH_PATTERNS.WORK
+    };
+    const matchedPath = Object.keys(transitionKeyByPath).find(
       pattern => !!matchPath(pattern, pathname)
     );
+    const transitionKey =
+      transitionKeyByPath[matchedPath as ROUTE_PATH_PATTERNS];
+
+    if (!transitionKey) {
+      return {
+        config: defaultConfig,
+        key: location.pathname
+      };
+    }
 
     return {
-      config: transitionConfig[key as ROUTE_PATH_PATTERNS],
-      key
+      config: transitionConfig[transitionKey as string] ?? defaultConfig,
+      key: transitionKey
     };
   }
 
   const { key, config } = getTransitionConfig(location.pathname);
+
+  function addEndListener(done: Function) {
+    transitionDone.current = done;
+  }
+
+  function doneAfterCall(transition: () => gsap.core.Timeline) {
+    return () => {
+      transition().then(() => {
+        transitionDone.current?.();
+      });
+    };
+  }
 
   return (
     <SwitchTransition>
       <Transition
         nodeRef={nodeRef}
         key={key}
-        timeout={config.timeout}
+        addEndListener={addEndListener}
         unmountOnExit={true}
         onEnter={config.onEnter}
         onEntered={config.onEntered}
