@@ -10,7 +10,11 @@ function MopertyWorkPage(_: any, ref: ForwardedRef<any>) {
   ];
 
   return (
-    <div className={styles['work-page']} ref={ref}>
+    <div
+      data-anim-target="work-detail"
+      className={styles['work-page']}
+      ref={ref}
+    >
       <section className={`${styles['page-gap']}`}></section>
       <section className={`${styles['tech']}`}>
         <TechBlock techList={techList} />

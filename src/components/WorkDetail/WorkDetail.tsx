@@ -10,29 +10,24 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 
-const detailComponentByParams: Record<string, FunctionComponent> = {
-  [WorkPageTitle.Blibli]: lazy(
-    async () => await import('@/pages/BlibliWorkPage')
-  ),
-  [WorkPageTitle.Moperty]: lazy(
-    async () => await import('@/pages/MopertyWorkPage')
-  )
-};
+const BlibliWorkPage = lazy(() => import('@/pages/BlibliWorkPage'));
+const MopertyWorkPage = lazy(() => import('@/pages/MopertyWorkPage'));
 
 function WorkDetail() {
+  const detailComponentByParams: Record<string, FunctionComponent> = {
+    [WorkPageTitle.Blibli]: BlibliWorkPage,
+    [WorkPageTitle.Moperty]: MopertyWorkPage
+  };
   const { pathname } = useLocation();
   const params = useParams();
-  const [ActiveComponent, setActiveComponent] = useState<any>(
-    detailComponentByParams[WorkPageTitle.Blibli]
-  );
+  const [ActiveComponent, setActiveComponent] = useState<any>(() => {
+    return detailComponentByParams[params.title as string];
+  });
   const { setAction } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setActiveComponent(
-      detailComponentByParams[params.title as WorkPageTitle] ??
-        detailComponentByParams[WorkPageTitle.Blibli]
-    );
+    setActiveComponent(detailComponentByParams[params.title as string]);
   }, [pathname]);
 
   useEffect(() => {
