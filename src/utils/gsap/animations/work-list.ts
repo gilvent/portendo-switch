@@ -238,15 +238,17 @@ export function sceneSlideTo({
   const currentPlaceholderEl = getBallPlaceholderEl(currentElSelector);
   const currentCoverEls = getBannerCoverEls(currentElSelector);
   const nextCoverEls = getBannerCoverEls(targetElSelector);
+  const { y: currentY } = currentPlaceholderEl?.getBoundingClientRect() ?? {
+    y: 0
+  };
   const { x: targetX } = targetPlaceholderEl?.getBoundingClientRect() ?? {
     x: 0,
     y: 0
   };
-  const { x: currentX, y: currentY } =
-    currentPlaceholderEl?.getBoundingClientRect() ?? {
-      x: 0,
-      y: 0
-    };
+  const { x: currentX } = pointerBall?.getBoundingClientRect() ?? {
+    x: 0,
+    y: 0
+  };
 
   return gsap
     .timeline({ paused: true })
