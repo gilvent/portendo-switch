@@ -10,6 +10,7 @@ import {
   workSummaryFadeIn
 } from '@/utils/gsap/animations/work-list';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
+import useCustomEvent from '@/hooks/useCustomEvent.hook';
 
 function useWorkDetailRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
@@ -20,6 +21,12 @@ function useWorkDetailRouteTransition() {
   const { setupEnterAnimation, setupExitAnimation } = useTechBlockAnimations();
   const { done, addEndListener } = useTransitionEndListener(
     'workroute.transitionend'
+  );
+  const { dispatchEvent: showWorkSummaryBg } = useCustomEvent(
+    'worklistblock.showWorkSummaryBg'
+  );
+  const { dispatchEvent: hideWorkBannerBg } = useCustomEvent(
+    'worklistblock.hideWorkSummaryBg'
   );
 
   function showWorkSummary(): gsap.core.Timeline {
@@ -48,14 +55,20 @@ function useWorkDetailRouteTransition() {
         .call(() => {
           bounceEnter(activeBanner.selector).seek('work-list-done');
         })
-        .add(startSingleConMode())
         .add(showWorkSummary())
-        .add(setupEnterAnimation(), '>-=1');
+        .call(() => {
+          showWorkSummaryBg();
+        })
+        .add(setupEnterAnimation(), '>-=1')
+        .add(startSingleConMode());
     } else if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
       console.log('[work detail route] enter from work');
       enterTransition
         .add(screenModeToSingleCon())
         .add(showWorkSummary())
+        .call(() => {
+          showWorkSummaryBg();
+        })
         .add(setupEnterAnimation(), '>-=1');
     }
 
@@ -81,6 +94,7 @@ function useWorkDetailRouteTransition() {
           window.scrollTo({
             top: 0
           });
+          hideWorkBannerBg();
         })
         .add(singleConToScreenMode())
         .add(setupExitAnimation())

@@ -1,5 +1,5 @@
-import { WorkDetailName } from '@/context/WorkPageContext';
 import usePreviousState from '@/hooks/usePreviousState.hook';
+import { WorkDetailName } from '@/utils/enums';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 

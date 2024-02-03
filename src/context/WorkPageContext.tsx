@@ -1,11 +1,8 @@
+// TODO currently unused, remove this later
 import React, { useEffect, useState } from 'react';
 import { createContext } from 'react';
 import { useLocation } from 'react-router-dom';
-
-export enum WorkDetailName {
-  Blibli = 'blibli',
-  Moperty = 'moperty'
-}
+import { WorkDetailName } from '@/utils/enums';
 
 type WorkPageProviderValue = {
   openWorkDetail: () => void;

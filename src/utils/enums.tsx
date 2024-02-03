@@ -14,3 +14,8 @@ export enum MediaQueryScreen {
   Desktop = '(min-width: 992px)',
   LargeDesktop = '(min-width: 1200px)'
 }
+
+export enum WorkDetailName {
+  Blibli = 'blibli',
+  Moperty = 'moperty'
+}

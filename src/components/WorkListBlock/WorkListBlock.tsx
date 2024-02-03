@@ -3,25 +3,32 @@ import WorkBannerBlock from '@/components/WorkBanner';
 import mopertyLogo from 'assets/img/brand/moperty-white.svg';
 import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
 import GiftsImage from '@/components/GiftsImage';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
-import WorkPageContext, { WorkDetailName } from '@/context/WorkPageContext';
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
+import { ROUTE_PATH_PATTERNS, WorkDetailName } from '@/utils/enums';
 import { useGSAP } from '@gsap/react';
 import useActiveWorkBanner from './useActiveWorkBanner.hook';
 import {
   sceneSlideTo,
   setupBallAndSlider
 } from '@/utils/gsap/animations/work-list';
+import useCustomEvent from '@/hooks/useCustomEvent.hook';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
   const navigate = useNavigate();
   const { activeBanner, bannersByTitle, prevBanner } = useActiveWorkBanner();
   const { setAction } = useContext(ControllerButtonContext);
-  // TODO activeWorkDetail is deprecated, use params title instead
-  const { activeWorkDetail } = useContext(WorkPageContext);
+  const [activeBg, setActiveBg] = useState<WorkDetailName | null>(null);
+  const {
+    addListener: addShowBgListener,
+    removeListener: removeShowBgListener
+  } = useCustomEvent('worklistblock.showWorkSummaryBg');
+  const {
+    addListener: addHideBgListener,
+    removeListener: removeHideBgListener
+  } = useCustomEvent('worklistblock.hideWorkSummaryBg');
 
   useGSAP(() => {
     setupBallAndSlider({
@@ -40,6 +47,20 @@ function WorkListBlock() {
       }).play(0);
     }
   }, [activeBanner]);
+
+  useEffect(() => {
+    addShowBgListener(() => {
+      setActiveBg(activeBanner.title);
+    });
+    addHideBgListener(() => {
+      setActiveBg(null);
+    });
+
+    return () => {
+      removeShowBgListener();
+      removeHideBgListener();
+    };
+  }, []);
 
   useEffect(() => {
     setAction('onControlXClick', () => {
@@ -85,8 +106,7 @@ function WorkListBlock() {
                 application.
               </>
             )}
-            // TODO activeWorkDetail is deprecated, use params title instead
-            active={activeWorkDetail === WorkDetailName.Blibli}
+            active={activeBg === WorkDetailName.Blibli}
             logo={blibliWhiteLogo}
             titleColor="#0092da"
             renderBgAnimation={active => <GiftsImage active={active} />}
@@ -112,7 +132,7 @@ function WorkListBlock() {
                 <br />
               </>
             )}
-            active={activeWorkDetail === WorkDetailName.Moperty}
+            active={activeBg === WorkDetailName.Moperty}
             logo={mopertyLogo}
             titleColor="#3f51b5"
             onClick={() => {}}
