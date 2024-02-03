@@ -8,7 +8,7 @@ import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 function useWorkIndexRouteTransition() {
   const { isFromPath } = useRouteTransitionHelper();
   const { done, addEndListener } = useTransitionEndListener(
-    'workroute.index.transitionend'
+    'workroute.transitionend'
   );
   const { activeBanner } = useActiveWorkBanner();
 

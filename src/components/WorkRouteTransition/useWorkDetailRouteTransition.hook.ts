@@ -19,7 +19,7 @@ function useWorkDetailRouteTransition() {
     useControllerAnimations();
   const { setupEnterAnimation, setupExitAnimation } = useTechBlockAnimations();
   const { done, addEndListener } = useTransitionEndListener(
-    'workroute.detail.transitionend'
+    'workroute.transitionend'
   );
 
   function showWorkSummary(): gsap.core.Timeline {
