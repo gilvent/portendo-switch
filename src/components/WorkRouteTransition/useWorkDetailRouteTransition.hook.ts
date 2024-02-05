@@ -19,9 +19,8 @@ function useWorkDetailRouteTransition() {
   const { startSingleConMode, screenModeToSingleCon, singleConToScreenMode } =
     useControllerAnimations();
   const { setupEnterAnimation, setupExitAnimation } = useTechBlockAnimations();
-  const { done, addEndListener } = useTransitionEndListener(
-    'workroute.transitionend'
-  );
+  const { done, addEndListener, doneWithoutTransition } =
+    useTransitionEndListener('workroute.transitionend');
   const { dispatchEvent: showWorkSummaryBg } = useCustomEvent(
     'worklistblock.showWorkSummaryBg'
   );
@@ -60,7 +59,8 @@ function useWorkDetailRouteTransition() {
           showWorkSummaryBg();
         })
         .add(setupEnterAnimation(), '>-=1')
-        .add(startSingleConMode());
+        .add(startSingleConMode())
+        .play(0);
     } else if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
       console.log('[work detail route] enter from work');
       enterTransition
@@ -69,18 +69,20 @@ function useWorkDetailRouteTransition() {
         .call(() => {
           showWorkSummaryBg();
         })
-        .add(setupEnterAnimation(), '>-=1');
+        .add(setupEnterAnimation(), '>-=1')
+        .play(0);
+    } else {
+      doneWithoutTransition();
     }
-
-    enterTransition.play(0);
   }
 
   function onEntered() {
-    console.log('[work route] entered work detail');
+    console.log('[work detail route] entered work detail');
   }
 
   function onExit() {
-    console.log('[work detail] exit');
+    console.log('[work detail route] exit');
+
     let exitTransition = gsap
       .timeline({ paused: true })
       .eventCallback('onComplete', () => {
@@ -98,10 +100,11 @@ function useWorkDetailRouteTransition() {
         })
         .add(singleConToScreenMode())
         .add(setupExitAnimation())
-        .add(hideWorkSummary());
+        .add(hideWorkSummary())
+        .play(0);
+    } else {
+      doneWithoutTransition();
     }
-
-    exitTransition.play(0);
   }
 
   function onExited() {

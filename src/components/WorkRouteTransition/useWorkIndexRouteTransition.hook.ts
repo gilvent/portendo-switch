@@ -7,29 +7,26 @@ import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 
 function useWorkIndexRouteTransition() {
   const { isFromPath } = useRouteTransitionHelper();
-  const { done, addEndListener } = useTransitionEndListener(
-    'workroute.transitionend'
-  );
+  const { done, addEndListener, doneWithoutTransition } =
+    useTransitionEndListener('workroute.transitionend');
   const { activeBanner } = useActiveWorkBanner();
 
   function onEntering() {}
 
   function onEnter() {
     console.log('[work index route] enter');
-    const enterAnim = gsap
-      .timeline({ paused: true })
-      .eventCallback('onComplete', () => {
-        done();
-      });
 
     if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
+      const enterAnim = gsap
+        .timeline({ paused: true })
+        .eventCallback('onComplete', () => {
+          done();
+        });
       enterAnim.add(bounceEnter(activeBanner.selector).paused(false));
       enterAnim.play(0);
       return;
     } else {
-      setTimeout(() => {
-        done();
-      }, 50);
+      doneWithoutTransition();
     }
   }
 
@@ -39,9 +36,7 @@ function useWorkIndexRouteTransition() {
 
   function onExit() {
     console.log('[work index route] exit work list');
-    gsap.timeline().eventCallback('onComplete', () => {
-      done();
-    });
+    doneWithoutTransition();
   }
 
   function onExited() {
@@ -53,10 +48,7 @@ function useWorkIndexRouteTransition() {
     onEntering,
     onExit,
     onExited,
-    addEndListener: (done: any) => {
-      console.log('adding end listener for index route');
-      addEndListener(done);
-    }
+    addEndListener
   };
 }
 
