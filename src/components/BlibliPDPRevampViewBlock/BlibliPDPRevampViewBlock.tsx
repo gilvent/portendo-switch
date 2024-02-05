@@ -38,8 +38,8 @@ function BlibliPDPRevampViewBlock() {
 
     createAnimationTrigger2({
       trigger: editorWindowEl,
-      start: '60% center',
-      end: '60% center',
+      start: '65% center',
+      end: '65% center',
       onEnter: () => {
         animationRef.current?.tweenTo('second-bar-collapse');
       },

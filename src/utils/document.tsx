@@ -31,3 +31,38 @@ export function waitForElements(selectors: Array<string>, maxTimeout = 4000) {
     revalidate();
   });
 }
+
+export function lockScroll() {
+  const bodyEl = document.querySelector('body');
+  if (bodyEl) {
+    bodyEl.style.overflow = 'hidden';
+    bodyEl.style.height = '100%';
+  }
+}
+
+export function disableScrollLock() {
+  const bodyEl = document.querySelector('body');
+  if (bodyEl) {
+    bodyEl.style.overflow = '';
+    bodyEl.style.height = '';
+  }
+}
+
+function disableClickHandler(e: Event) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+export function disableController() {
+  const controller = document.querySelector(
+    '[data-anim-target="controller-button"]'
+  );
+  controller?.addEventListener('click', disableClickHandler, true);
+}
+
+export function enableController() {
+  const controller = document.querySelector(
+    '[data-anim-target="controller-button"]'
+  );
+  controller?.removeEventListener('click', disableClickHandler, true);
+}

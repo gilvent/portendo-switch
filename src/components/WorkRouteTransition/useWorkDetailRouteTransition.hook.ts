@@ -11,7 +11,13 @@ import {
 } from '@/utils/gsap/animations/work-list';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
-import useDisableController from '@/hooks/useDisableController.hook';
+import {
+  disableController,
+  disableScrollLock,
+  enableController,
+  lockScroll
+} from '@/utils/document';
+import { useGSAP } from '@gsap/react';
 
 function useWorkDetailRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
@@ -28,7 +34,7 @@ function useWorkDetailRouteTransition() {
   const { dispatchEvent: hideWorkBannerBg } = useCustomEvent(
     'worklistblock.hideWorkSummaryBg'
   );
-  const { enableClick, disableClick } = useDisableController();
+  const { contextSafe } = useGSAP();
 
   function showWorkSummary(): gsap.core.Timeline {
     showWorkSummaryAnimation.current = workSummaryFadeIn({
@@ -43,14 +49,13 @@ function useWorkDetailRouteTransition() {
     return showWorkSummaryAnimation.current?.reverse() ?? gsap.timeline();
   }
 
-  function onEnter() {
+  const onEnter = contextSafe(() => {
     let enterTransition = gsap
       .timeline({ paused: true })
       .eventCallback('onStart', () => {
-        disableClick();
+        disableController();
       })
       .eventCallback('onComplete', () => {
-        enableClick();
         done();
       });
 
@@ -80,22 +85,19 @@ function useWorkDetailRouteTransition() {
     } else {
       doneWithoutTransition();
     }
-  }
+  });
 
   function onEntered() {
     console.log('[work detail route] entered work detail');
+    enableController();
   }
 
-  function onExit() {
+  const onExit = contextSafe(() => {
     console.log('[work detail route] exit');
 
     let exitTransition = gsap
       .timeline({ paused: true })
-      .eventCallback('onStart', () => {
-        disableClick();
-      })
       .eventCallback('onComplete', () => {
-        enableClick();
         done();
       });
 
@@ -103,6 +105,8 @@ function useWorkDetailRouteTransition() {
       exitTransition
         .eventCallback('onStart', () => {
           console.log('starting exit animation');
+          disableController();
+          lockScroll();
           window.scrollTo({
             top: 0
           });
@@ -115,10 +119,12 @@ function useWorkDetailRouteTransition() {
     } else {
       doneWithoutTransition();
     }
-  }
+  });
 
   function onExited() {
     console.log('[work route] exited work detail');
+    enableController();
+    disableScrollLock();
   }
 
   return {

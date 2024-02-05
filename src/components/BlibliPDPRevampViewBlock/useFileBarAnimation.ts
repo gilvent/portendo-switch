@@ -1,8 +1,6 @@
 import gsap from 'gsap';
 import { useEffect, useRef } from 'react';
 
-export enum AnimationLabels {}
-
 export default function useFileBarAnimation({}: {}) {
   const animation = useRef<gsap.core.Timeline | null>(null);
 

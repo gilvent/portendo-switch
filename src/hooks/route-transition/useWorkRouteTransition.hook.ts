@@ -2,12 +2,11 @@ import gsap from 'gsap';
 import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import { matchPath } from 'react-router-dom';
-import useDisableController from '@/hooks/useDisableController.hook';
+import { disableController, enableController } from '@/utils/document';
 
 function useWorkRouteTransition(previousPath: string) {
   const { startScreenMode, dockToScreenMode, screenModeToDock } =
     useControllerAnimations();
-  const { enableClick, disableClick } = useDisableController();
 
   const enterAnimations = [
     { path: ROUTE_PATH_PATTERNS.HOME, fn: enterFromHomePage },
@@ -40,10 +39,10 @@ function useWorkRouteTransition(previousPath: string) {
 
     enter
       .eventCallback('onStart', () => {
-        disableClick();
+        disableController();
       })
       .eventCallback('onComplete', () => {
-        enableClick();
+        enableController();
       })
       .play(0);
     return enter;
@@ -58,10 +57,10 @@ function useWorkRouteTransition(previousPath: string) {
 
     exit
       .eventCallback('onStart', () => {
-        disableClick();
+        disableController();
       })
       .eventCallback('onComplete', () => {
-        enableClick();
+        enableController();
       })
       .play(0);
     return exit;

@@ -4,7 +4,10 @@ import { useRef } from 'react';
 
 function BlibliPDPRevampStoryBlock() {
   const blockRef = useRef<HTMLDivElement>(null);
-  const { applySlidingFade } = useSlidingFade({ triggerRef: blockRef });
+  const { applySlidingFade } = useSlidingFade({
+    triggerRef: blockRef,
+    stayVisible: true
+  });
   return (
     <article ref={blockRef} className={`story-block ${styles['pdp-revamp']}`}>
       <h2>

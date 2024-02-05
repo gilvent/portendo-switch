@@ -47,24 +47,28 @@ function HomePage() {
         <h3 className={`invisible`}>I develop Web Frontends.</h3>
         <a
           href="https://linkedin.com/in/alvaro-lukmanto"
+          target="_blank"
           className={`${styles.contact} ${styles.linkedin} invisible`}
         >
           <img src={linkedin} />
         </a>
         <a
           href="https://github.com/gilvent"
+          target="_blank"
           className={`${styles.contact} ${styles.github} invisible`}
         >
           <img src={github} />
         </a>
         <a
           href="https://twitter.com/alfonsiusalvaro"
+          target="_blank"
           className={`${styles.contact} ${styles.twitter} invisible`}
         >
           <img src={twitter} />
         </a>
         <a
           href="mailto:alvarolukmanto@gmail.com"
+          target="_blank"
           className={`${styles.contact} ${styles.gmail} invisible`}
         >
           <img src={gmail} />

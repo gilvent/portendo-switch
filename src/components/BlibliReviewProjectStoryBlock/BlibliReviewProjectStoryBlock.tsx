@@ -3,7 +3,10 @@ import { useRef } from 'react';
 
 function BlibliReviewProjectStoryBlock() {
   const rootRef = useRef(null);
-  const { applySlidingFade } = useFloatingFade({ triggerRef: rootRef });
+  const { applySlidingFade } = useFloatingFade({
+    triggerRef: rootRef,
+    stayVisible: true
+  });
   return (
     <div ref={rootRef} className={`story-block`}>
       <h3 ref={applySlidingFade} className="invisible">

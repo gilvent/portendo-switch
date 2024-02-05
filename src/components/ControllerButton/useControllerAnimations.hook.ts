@@ -182,7 +182,7 @@ function useControllerAnimations() {
       .addLabel('dock-visible')
       .to(dockScreenWrapper, {
         delay: 2,
-        translateY: '150%',
+        translateY: '155%',
         ease: 'back.in'
       })
       .to(leftCon, {
@@ -219,14 +219,16 @@ function useControllerAnimations() {
       .to(q('[data-anim-target="left-joycon"]'), {
         translateY: 0,
         translateX: -150,
-        rotate: 0
+        rotate: 0,
+        duration: 0.25
       })
       .to(
         q('[data-anim-target="right-joycon"]'),
         {
           translateY: 0,
           translateX: 150,
-          rotate: 0
+          rotate: 0,
+          duration: 0.25
         },
         '<'
       )
@@ -349,14 +351,14 @@ function useControllerAnimations() {
       .add(screenLoading())
       .to(leftCon, {
         translateY: -25,
-        duration: 0.5,
+        duration: 0.25,
         ease: 'back.out'
       })
       .to(
         rightCon,
         {
           translateY: 25,
-          duration: 0.5,
+          duration: 0.25,
           ease: 'back.out'
         },
         '<'
@@ -366,7 +368,8 @@ function useControllerAnimations() {
         {
           translateY: -25,
           translateX: -145,
-          rotate: -15
+          rotate: -15,
+          duration: 0.25
         },
         '>-0.1'
       )
@@ -374,13 +377,18 @@ function useControllerAnimations() {
         rightCon,
         {
           translateX: 145,
-          rotate: 15
+          rotate: 15,
+          duration: 0.25
         },
         '<'
       )
-      .to(screen, {
-        translateY: '-50%'
-      })
+      .to(
+        screen,
+        {
+          translateY: '-50%'
+        },
+        '<'
+      )
       .to(dockFront, {
         translateY: '-5%',
         autoAlpha: 1

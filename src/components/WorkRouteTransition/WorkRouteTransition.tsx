@@ -9,7 +9,7 @@ import useWorkIndexRouteTransition from './useWorkIndexRouteTransition.hook';
 
 const WorkRouteTransition = ({ children }: { children: any }) => {
   const nodeRef = useRef<any>(null);
-  const { done, addEndListener } = useTransitionEndListener(
+  const { addEndListener, doneWithoutTransition } = useTransitionEndListener(
     'workroute.default.transitionend'
   );
   const detailRouteConfig = useWorkDetailRouteTransition();
@@ -50,11 +50,11 @@ const WorkRouteTransition = ({ children }: { children: any }) => {
 
   const noTransitionConfig = {
     onEnter: () => {
-      done();
+      doneWithoutTransition();
     },
     onEntered: () => {},
     onExit: () => {
-      done();
+      doneWithoutTransition();
     },
     onExited: () => {},
     addEndListener

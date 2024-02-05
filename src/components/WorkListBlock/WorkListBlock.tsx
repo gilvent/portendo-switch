@@ -14,7 +14,7 @@ import {
   setupBallAndSlider
 } from '@/utils/gsap/animations/work-list';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
-import useDisableController from '@/hooks/useDisableController.hook';
+import { disableController, enableController } from '@/utils/document';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
@@ -30,7 +30,6 @@ function WorkListBlock() {
     addListener: addHideBgListener,
     removeListener: removeHideBgListener
   } = useCustomEvent('worklistblock.hideWorkSummaryBg');
-  const { enableClick, disableClick } = useDisableController();
 
   useGSAP(() => {
     setupBallAndSlider({
@@ -48,10 +47,10 @@ function WorkListBlock() {
         ballColor: activeBanner.background
       })
         .eventCallback('onStart', () => {
-          disableClick();
+          disableController();
         })
         .eventCallback('onComplete', () => {
-          enableClick();
+          enableController();
         })
         .play(0);
     }
