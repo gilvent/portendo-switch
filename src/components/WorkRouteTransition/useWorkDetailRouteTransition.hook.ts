@@ -11,6 +11,7 @@ import {
 } from '@/utils/gsap/animations/work-list';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
+import useDisableController from '@/hooks/useDisableController.hook';
 
 function useWorkDetailRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
@@ -27,6 +28,7 @@ function useWorkDetailRouteTransition() {
   const { dispatchEvent: hideWorkBannerBg } = useCustomEvent(
     'worklistblock.hideWorkSummaryBg'
   );
+  const { enableClick, disableClick } = useDisableController();
 
   function showWorkSummary(): gsap.core.Timeline {
     showWorkSummaryAnimation.current = workSummaryFadeIn({
@@ -44,7 +46,11 @@ function useWorkDetailRouteTransition() {
   function onEnter() {
     let enterTransition = gsap
       .timeline({ paused: true })
+      .eventCallback('onStart', () => {
+        disableClick();
+      })
       .eventCallback('onComplete', () => {
+        enableClick();
         done();
       });
 
@@ -59,7 +65,7 @@ function useWorkDetailRouteTransition() {
           showWorkSummaryBg();
         })
         .add(setupEnterAnimation(), '>-=1')
-        .add(startSingleConMode())
+        .add(startSingleConMode(), '<+1')
         .play(0);
     } else if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
       console.log('[work detail route] enter from work');
@@ -85,7 +91,11 @@ function useWorkDetailRouteTransition() {
 
     let exitTransition = gsap
       .timeline({ paused: true })
+      .eventCallback('onStart', () => {
+        disableClick();
+      })
       .eventCallback('onComplete', () => {
+        enableClick();
         done();
       });
 
