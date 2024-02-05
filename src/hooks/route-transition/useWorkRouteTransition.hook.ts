@@ -2,10 +2,12 @@ import gsap from 'gsap';
 import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import { matchPath } from 'react-router-dom';
+import useDisableController from '@/hooks/useDisableController.hook';
 
 function useWorkRouteTransition(previousPath: string) {
   const { startScreenMode, dockToScreenMode, screenModeToDock } =
     useControllerAnimations();
+  const { enableClick, disableClick } = useDisableController();
 
   const enterAnimations = [
     { path: ROUTE_PATH_PATTERNS.HOME, fn: enterFromHomePage },
@@ -18,33 +20,51 @@ function useWorkRouteTransition(previousPath: string) {
 
   function enterFromHomePage(): gsap.core.Timeline {
     // TODO cache the timeline
-    return dockToScreenMode().play(0);
+    return dockToScreenMode();
   }
 
   function enterDirectly(): gsap.core.Timeline {
-    return startScreenMode().play(0);
+    return startScreenMode();
   }
 
   function exitToHomePage(): gsap.core.Timeline {
     console.log('exiting to home page');
-    return screenModeToDock().duration(2).play(0);
+    return screenModeToDock().duration(2);
   }
 
   function onEnter(): gsap.core.Timeline {
     console.log('enter work', previousPath);
-    return (
+    const enter =
       enterAnimations.find(i => matchPath(i.path, previousPath))?.fn() ??
-      gsap.timeline()
-    );
+      gsap.timeline();
+
+    enter
+      .eventCallback('onStart', () => {
+        disableClick();
+      })
+      .eventCallback('onComplete', () => {
+        enableClick();
+      })
+      .play(0);
+    return enter;
   }
 
   function onExit(): gsap.core.Timeline {
     console.log('exit work');
-    return (
+    const exit =
       exitAnimationsByTargetPath
         .find(i => matchPath(i.path, window.location.pathname))
-        ?.fn() ?? gsap.timeline()
-    );
+        ?.fn() ?? gsap.timeline();
+
+    exit
+      .eventCallback('onStart', () => {
+        disableClick();
+      })
+      .eventCallback('onComplete', () => {
+        enableClick();
+      })
+      .play(0);
+    return exit;
   }
 
   return {
