@@ -1,24 +1,8 @@
-import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 function useControllerAnimations() {
-  // * Reference for full timeline approach
-  // * Caveat: Requires hack to add animation to child labels.
-  // * eg: When detached from dock, display home page
-  // const forwardAnimation = useRef<gsap.core.Timeline | null>(null);
-
-  // useEffect(() => {
-  //   const toDock = handheldToDocked().paused(false);
-  //   const toScreenMode = dockToScreenMode().paused(false);
-
-  //   forwardAnimation.current = gsap
-  //     .timeline({ paused: true })
-  //     .addLabel('handheld-mode')
-  //     .add(toDock)
-  //     .addLabel('docked')
-  //     .add(toScreenMode)
-  //     .addLabel('screen-mode');
-  // }, []);
+  // value should be the same as initially set in CSS
+  const joyconInitialTranslateX = 112;
 
   function reset(): gsap.core.Timeline {
     const q = gsap.utils.selector('[data-anim-target="controller-button"]');
@@ -96,6 +80,7 @@ function useControllerAnimations() {
       .addLabel('docked')
       .to(screen, {
         translateY: '-80%',
+        translateX: 10,
         rotate: 15
       })
       .to(
@@ -139,20 +124,21 @@ function useControllerAnimations() {
         screen,
         {
           translateY: 0,
+          translateX: 0,
           rotate: 0
         },
         '>-0.2'
       )
       .to(leftCon, {
         translateY: 0,
-        translateX: -125,
+        translateX: -joyconInitialTranslateX,
         rotate: 0
       })
       .to(
         rightCon,
         {
           translateY: 0,
-          translateX: 125,
+          translateX: joyconInitialTranslateX,
           rotate: 0
         },
         '<'
@@ -186,15 +172,15 @@ function useControllerAnimations() {
         ease: 'back.in'
       })
       .to(leftCon, {
-        translateY: -26,
-        translateX: -30,
+        translateX: -28,
+        translateY: -24,
         rotate: 50
       })
       .to(
         rightCon,
         {
-          translateY: 26,
-          translateX: 35,
+          translateX: 33,
+          translateY: 24,
           rotate: 50
         },
         '<'
@@ -218,7 +204,7 @@ function useControllerAnimations() {
       })
       .to(q('[data-anim-target="left-joycon"]'), {
         translateY: 0,
-        translateX: -150,
+        translateX: -128,
         rotate: 0,
         duration: 0.25
       })
@@ -226,7 +212,7 @@ function useControllerAnimations() {
         q('[data-anim-target="right-joycon"]'),
         {
           translateY: 0,
-          translateX: 150,
+          translateX: 128,
           rotate: 0,
           duration: 0.25
         },
@@ -258,7 +244,7 @@ function useControllerAnimations() {
         {
           translateY: 0,
           translateX: 0,
-          rotate: 5,
+          rotate: 0,
           autoAlpha: 0
         },
         '<'
@@ -268,7 +254,7 @@ function useControllerAnimations() {
         {
           translateY: 0,
           translateX: 0,
-          rotate: 5
+          rotate: 0
         },
         '<'
       )
@@ -290,8 +276,8 @@ function useControllerAnimations() {
       .to(
         leftCon,
         {
-          translateY: -26,
-          translateX: -30,
+          translateX: -28,
+          translateY: -24,
           rotate: 50,
           autoAlpha: 1
         },
@@ -300,8 +286,8 @@ function useControllerAnimations() {
       .to(
         rightCon,
         {
-          translateY: 26,
-          translateX: 35,
+          translateX: 33,
+          translateY: 24,
           rotate: 50
         },
         '<'

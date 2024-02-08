@@ -1,5 +1,7 @@
 @use 'assets/scss/variables/colors';
 @use 'assets/scss/variables/fonts';
+@use 'assets/scss/mixins/font';
+@use 'assets/scss/mixins/responsive';
 
 .controller {
   position: fixed;
@@ -28,9 +30,9 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  height: 156px;
-  width: 70px;
-  gap: 40px;
+  justify-content: space-between;
+  height: 140px;
+  width: 63px;
   padding: 8px;
 
   z-index: 2;
@@ -38,15 +40,17 @@
   border-radius: 24px 8px 8px 24px;
   background-color: #828282; // #ff3c28;
 
-  transform: translateX(-125px);
+  transform: translateX(-112px);
+
 }
 
 .right-joycon {
   position: absolute;
   display: flex;
   flex-direction: column;
-  height: 156px;
-  width: 70px;
+  justify-content: space-between;
+  height: 140px;
+  width: 63px;
   gap: 40px;
   padding: 8px;
 
@@ -55,7 +59,7 @@
   border-left: 4px solid colors.$dark;
   border-radius: 8px 24px 24px 8px;
 
-  transform: translateX(125px);
+  transform: translateX(112px);
 }
 
 .btn-joycon-1,
@@ -77,8 +81,8 @@
 button.btn-joycon-1 {
   position: relative;
   background-color: colors.$dark-2;
-  height: 50px;
-  width: 50px;
+  height: 42px;
+  width: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -103,8 +107,8 @@ button.btn-joycon-1 {
 button.btn-joycon-2 {
   position: relative;
   background-color: colors.$dark-2;
-  height: 50px;
-  width: 50px;
+  height: 42px;
+  width: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -118,6 +122,7 @@ button.btn-joycon-2 {
 .dock-screen-wrapper {
   position: relative;
   text-align: center;
+  z-index: 3;
 }
 
 .dock-back {
@@ -164,10 +169,15 @@ button.btn-joycon-2 {
   justify-content: center;
   align-items: center;
   background: black;
-  height: 156px;
-  width: 180px;
   border-radius: 4px;
   z-index: 2;
+  height: 140px;
+  width: 164px;
+
+  @include responsive.tablets {
+    // height: 156px;
+    // width: 180px;
+  }
 
   .shut-down-overlay {
     background-color: transparent;
@@ -196,12 +206,12 @@ button.btn-joycon-2 {
         transform-style: preserve-3d;
         font-family: fonts.$outline-gaban;
         text-transform: uppercase;
-
+        margin: 18px;
       }
 
       .guide {
         position: relative;
-        font-size: 1rem;
+        @include font.text-sm;
 
         .loading-bar {
           top: 30%;

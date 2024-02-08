@@ -19,6 +19,9 @@ function HomePage() {
     setAction('onControlBClick', () => {
       navigate('/work/blibli');
     });
+    setAction('onControlAClick', () => {});
+    setAction('onControlXClick', () => {});
+    setAction('onControlYClick', () => {});
   }, []);
 
   function clouds() {
