@@ -10,8 +10,8 @@ export function getBallPlaceholderEl(workBannerId: string): Element | null {
 
 export function getBannerCoverEls(workBannerId: string): Array<any> {
   const selectors = [
-    `${workBannerId} [data-anim-target="cover-title"]`,
     `${workBannerId} [data-anim-target="cover-role"]`,
+    `${workBannerId} [data-anim-target="cover-title"]`,
     `${workBannerId} [data-anim-target="cover-description"]`
   ];
   return selectors.map(selector => document.querySelector(selector));

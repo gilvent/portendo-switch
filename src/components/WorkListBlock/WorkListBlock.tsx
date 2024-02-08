@@ -104,7 +104,7 @@ function WorkListBlock() {
             title="Blibli.com"
             description="An indonesian e-commerce with wide range of products
         from both offline business to online."
-            role="Front-end Developer"
+            role="Front-end Developer @"
             renderSummaryText={() => (
               <>
                 Being a <strong>front end developer</strong>, I worked in <br />
@@ -129,7 +129,7 @@ function WorkListBlock() {
             id="moperty-banner"
             title="Moperty"
             description="A progressive web app to browse available real estate in local area around my hometown."
-            role="Product Builder"
+            role="Use My Free Time Building"
             renderSummaryText={() => (
               <>
                 This is a <strong>"build the whole thing"</strong> project for

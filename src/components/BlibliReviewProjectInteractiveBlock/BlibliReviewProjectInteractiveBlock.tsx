@@ -78,13 +78,13 @@ function BlibliReviewProjectInteractiveBlock() {
 
           <div className={styles.bottom}>
             <div className={styles.modes}>
-              <div className={`${styles['btn-option']} text-xs`}>Fun</div>
-              <div className={`${styles['btn-option']} text-xs`}>Portrait</div>
+              <div className={`${styles['btn-option']}`}>Fun</div>
+              <div className={`${styles['btn-option']}`}>Portrait</div>
               <div className={`${styles['btn-option']} ${styles.active}`}>
                 Photo
               </div>
-              <div className={`${styles['btn-option']} text-xs`}>Video</div>
-              <div className={`${styles['btn-option']} text-xs`}>More</div>
+              <div className={`${styles['btn-option']}`}>Video</div>
+              <div className={`${styles['btn-option']}`}>More</div>
             </div>
             <div className={styles.controls}>
               <div className={styles['btn-last-capture']}>

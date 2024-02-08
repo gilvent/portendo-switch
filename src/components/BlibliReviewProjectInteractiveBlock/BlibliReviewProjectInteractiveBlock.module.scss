@@ -1,4 +1,5 @@
 @use 'assets/scss/mixins/responsive';
+@use 'assets/scss/mixins/font';
 
 .block {
   position: relative;
@@ -8,6 +9,9 @@
 
 .heading {
   position: relative;
+  margin: 24px;
+  @include font.heading-solid;
+  line-height: 1.15;
   @include responsive.desktop {
     text-align: center;
   }

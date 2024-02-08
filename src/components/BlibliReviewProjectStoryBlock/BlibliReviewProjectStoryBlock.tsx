@@ -19,7 +19,7 @@ function BlibliReviewProjectStoryBlock() {
         adding basic features such as review filter and photo upload, to adding
         review photo gallery.
       </p>
-      <ul ref={applySlidingFade} className="key-points text-lg invisible">
+      <ul ref={applySlidingFade} className="key-points invisible">
         <strong>Key changes...</strong>
         <li>
           UI redesign across product review features (adopting the upcoming
@@ -32,7 +32,7 @@ function BlibliReviewProjectStoryBlock() {
           grid and list
         </li>
       </ul>
-      <ul ref={applySlidingFade} className="key-points text-lg invisible">
+      <ul ref={applySlidingFade} className="key-points invisible">
         <strong>Some of what I learnt...</strong>
         <li>
           Try our best to test on real device :). This time is my first

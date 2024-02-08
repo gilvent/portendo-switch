@@ -1,3 +1,4 @@
+@use 'assets/scss/variables/fonts';
 @use 'assets/scss/variables/colors';
 @use 'assets/scss/mixins/responsive';
 
@@ -19,9 +20,13 @@
   z-index: 2;
   h2 {
     font-size: 64px;
+    font-family: fonts.$solid-fredoka;
+    font-weight: 700;
   }
   h3 {
     color: colors.$dark-3;
+    font-family: fonts.$solid-fredoka;
+    font-weight: 600;
     margin: 0;
   }
   .contact {

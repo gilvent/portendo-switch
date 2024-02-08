@@ -26,7 +26,7 @@ function BlibliPDPRevampStoryBlock() {
         for mobile web.
       </p>
 
-      <ul ref={applySlidingFade} className={`key-points text-lg invisible`}>
+      <ul ref={applySlidingFade} className={`key-points invisible`}>
         <strong>Key changes...</strong>
         <li>New and newer UI components</li>
         <li>Rewrite the codebase to accomodate new flow</li>
@@ -36,7 +36,7 @@ function BlibliPDPRevampStoryBlock() {
         </li>
       </ul>
 
-      <ul ref={applySlidingFade} className={`key-points text-lg invisible`}>
+      <ul ref={applySlidingFade} className={`key-points invisible`}>
         <strong>Lessons I learnt while doing this project...</strong>
         <li>
           Software development principles. One that stick to mind is{' '}

@@ -1,6 +1,7 @@
 @use 'assets/scss/mixins/responsive';
 @use 'assets/scss/mixins/font';
 @use 'assets/scss/variables/colors';
+@use 'assets/scss/variables/fonts';
 
 .card {
   display: flex;
@@ -44,21 +45,25 @@
   text-align: center;
 
   .heading {
-    font-size: 28px;
+    font-size: 32px;
     margin: 18px;
     color: var(--title-color);
     text-transform: uppercase;
+    font-family: fonts.$solid-tabardo;
   }
 
   .role {
     color: colors.$dark;
     text-transform: uppercase;
-    font-size: 18px;
+    margin: 18px;
+    font-size: 16px;
+    font-family: fonts.$outline-gaban;
   }
 
   .product {
     color: colors.$dark-2;
-    padding: 8px 24px;
+    padding: 0 24px;
+    @include font.text-sm;
   }
 }
 
@@ -85,12 +90,14 @@
   top: 0;
   left: 0;
   text-align: center;
-  padding: 36px;
+  padding: 10vw 12.5vw;
   z-index: 4;
-  @include font.text-base;
+  font-family: fonts.$solid-fredoka;
+  font-weight: 500;
+  @include font.text-sm;
 
   @include responsive.desktop {
-    @include font.text-2xl;
+    @include font.text-xl;
   }
 }
 
@@ -104,10 +111,10 @@
     text-transform: uppercase;
     border: none;
     background-color: transparent;
-    @include font.text-3xl;
-
+    
     .text {
-      color: white;
+      @include font.title-outline;
+      color: #fff;
     }
   }
 }

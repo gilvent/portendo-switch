@@ -1,4 +1,5 @@
 @use 'assets/scss/variables/colors';
+@use 'assets/scss/mixins/font';
 
 .story-block {
   color: colors.$dark-3;
@@ -8,11 +9,19 @@
   padding: 32px;
   p.overview {
     text-align: justify;
+    @include font.text-sm;
   }
 
   ul.key-points {
-    font-weight: 500;
     text-align: left;
     padding-inline-start: 0px;
+    @include font.text-sm;
+  }
+
+  h2 {
+    @include font.heading-solid;
+  }
+  h3 {
+    @include font.heading-2-solid;
   }
 }
