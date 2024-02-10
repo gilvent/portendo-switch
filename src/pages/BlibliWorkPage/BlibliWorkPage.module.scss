@@ -42,33 +42,20 @@ section.page-gap {
 
 section.pdp-revamp-preview {
   grid-area: pdp-revamp-preview;
-  position: relative;
-
-  h2 {
-    color: #fff;
-  }
 }
 
 section.pdp-secondary {
   grid-area: pdp-secondary;
-  z-index: 2;
-  bottom: 0;
-  background-color: #74d3ff;
-  overflow-x: hidden;
 }
 
 section.pdp-revamp-story {
   grid-area: pdp-revamp-story;
-  background-color: #e7f7ff;
 }
 
 section.review-revamp-story {
   grid-area: review-revamp-story;
-  background-color: #f9b260;
 }
 
 section.review-revamp {
   grid-area: review-revamp;
-  background-color: #fff4e1;
-  padding: 0;
 }

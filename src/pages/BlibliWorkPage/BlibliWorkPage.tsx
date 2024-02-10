@@ -1,5 +1,5 @@
 import TechBlock, { TECH } from '@/components/TechBlock';
-import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPreview';
+import BlibliSecondaryPagesBlock from '@/components/BlibliSecondaryPagesBlock';
 import BlibliPDPRevampStoryBlock from '@/components/BlibliPDPRevampStoryBlock';
 import styles from './BlibliWorkPage.module.scss';
 import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
@@ -19,21 +19,21 @@ function BlibliWorkPage(_: any, ref: ForwardedRef<any>) {
       <section className={`${styles['tech']}`}>
         <TechBlock techList={techList} />
       </section>
-      <section className={`${styles['review-revamp-story']}`}>
+      <section className={`block-container ${styles['review-revamp-story']}`}>
         <BlibliReviewProjectStoryBlock />
       </section>
-      <section className={`${styles['review-revamp']}`}>
+      <section className={`block-container ${styles['review-revamp']}`}>
         <BlibliReviewProjectInteractiveBlock />
       </section>
-      <section className={`${styles['pdp-revamp-preview']}`}>
+      <section className={`block-container ${styles['pdp-revamp-preview']}`}>
         <BlibliPDPRevampViewBlock />
       </section>
 
-      <section className={`${styles['pdp-secondary']}`}>
-        <BlibliSecondaryPagesPreview />
+      <section className={`block-container ${styles['pdp-secondary']}`}>
+        <BlibliSecondaryPagesBlock />
       </section>
 
-      <section className={`${styles['pdp-revamp-story']}`}>
+      <section className={`block-container ${styles['pdp-revamp-story']}`}>
         <BlibliPDPRevampStoryBlock />
       </section>
     </div>

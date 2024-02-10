@@ -3,6 +3,8 @@
   --vscode-bg-dark-2: #1f1f1f;
   --sidebar-width: 50px;
   background-color: var(--vscode-bg-dark);
+  position: relative;
+  will-change: transform, visibility, opacity;
 }
 
 .sidebar {

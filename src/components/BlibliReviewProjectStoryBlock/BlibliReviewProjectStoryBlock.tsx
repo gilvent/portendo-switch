@@ -1,25 +1,31 @@
-import useFloatingFade from '@/hooks/useSlidingFade.hook';
+import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
 import { useRef } from 'react';
+import styles from './BlibliReviewProjectStoryBlock.module.scss';
+import { slideFadeIn } from '@/utils/gsap/fade-animation';
+import gsap from 'gsap';
 
 function BlibliReviewProjectStoryBlock() {
   const rootRef = useRef(null);
-  const { applySlidingFade } = useFloatingFade({
-    triggerRef: rootRef,
-    stayVisible: true
+
+  useBlockEnterAnimation({
+    ref: rootRef,
+    from: 'right',
+    createContentEnter() {
+      return gsap.timeline().add(slideFadeIn('h3, p, ul'));
+    }
   });
+
   return (
-    <div ref={rootRef} className={`story-block`}>
-      <h3 ref={applySlidingFade} className="invisible">
-        Redesign the journey
-      </h3>
-      <p ref={applySlidingFade} className={`overview invisible`}>
+    <div ref={rootRef} className={`story-block ${styles.block}`}>
+      <h3 className="invisible">Redesign the journey</h3>
+      <p className={`overview invisible`}>
         I took part in a series of projects to improve product review journey,
         both as a <strong>reviewer</strong> and{' '}
         <strong>potential customers</strong> browsing products. Starting from
         adding basic features such as review filter and photo upload, to adding
         review photo gallery.
       </p>
-      <ul ref={applySlidingFade} className="key-points invisible">
+      <ul className="key-points invisible">
         <strong>Key changes...</strong>
         <li>
           UI redesign across product review features (adopting the upcoming
@@ -32,7 +38,7 @@ function BlibliReviewProjectStoryBlock() {
           grid and list
         </li>
       </ul>
-      <ul ref={applySlidingFade} className="key-points invisible">
+      <ul className="key-points invisible">
         <strong>Some of what I learnt...</strong>
         <li>
           Try our best to test on real device :). This time is my first

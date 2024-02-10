@@ -5,6 +5,8 @@
   position: relative;
   padding: 32px 0;
   z-index: 1;
+  background-color: #fff4e1;
+  will-change: transform, visibility, opacity;
 }
 
 .heading {

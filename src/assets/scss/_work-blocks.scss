@@ -25,3 +25,7 @@
     @include font.heading-2-solid;
   }
 }
+
+.block-container {
+  contain: paint;
+}

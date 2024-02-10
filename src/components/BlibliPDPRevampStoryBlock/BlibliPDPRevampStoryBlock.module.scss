@@ -1,4 +1,7 @@
 .pdp-revamp {
   position: sticky;
   top: 0;
+  background-color: #e7f7ff;
+  height: 100%;
+  will-change: transform, visibility, opacity;
 }

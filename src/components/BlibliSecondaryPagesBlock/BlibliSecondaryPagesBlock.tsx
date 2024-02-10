@@ -1,37 +1,30 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import pdpShippingImg from 'assets/img/blibli/pdp-shipping.png';
 import pdpDescriptionImg from 'assets/img/blibli/pdp-desc.png';
 import pdpDiscussionImg from 'assets/img/blibli/pdp-discussion.png';
 import pdpPromoImg from 'assets/img/blibli/pdp-promo.png';
-import styles from './BlibliSecondaryPagesPreview.module.scss';
-import useImagesEnterAnimation from './useImagesEnterAnimation.hook';
-import useScrollTrigger from '@/hooks/useScrollTrigger.hook';
+import styles from './BlibliSecondaryPagesBlock.module.scss';
+import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
+import { screenshotsAppear } from '@/utils/gsap/animations/blibli-secondary-pages-block';
 
-function BlibliSecondaryPagesPreview() {
+function BlibliSecondaryPagesBlock() {
   const rootEl = useRef(null);
   const screenshotsContainerRef = useRef(null);
-  const { create: createScrollTrigger } = useScrollTrigger();
-  const { setupAnimation, animationRef } = useImagesEnterAnimation();
 
-  useEffect(() => {
-    setupAnimation(screenshotsContainerRef.current ?? new HTMLDivElement());
-    createScrollTrigger({
-      trigger: screenshotsContainerRef.current,
-      start: 'top 80%',
-      end: '60% top',
-      onEnter: () => {
-        animationRef.current.play();
-      },
-      onLeaveBack: () => {
-        animationRef.current.tweenTo('start');
-      }
-    });
-  }, []);
+  useBlockEnterAnimation({
+    ref: rootEl,
+    from: 'left',
+    createContentEnter() {
+      return screenshotsAppear(
+        screenshotsContainerRef.current ?? new HTMLDivElement()
+      );
+    }
+  });
 
   return (
     <div
       id="blibli-secondary-pdp"
-      className={styles['secondary-pages']}
+      className={styles['secondary-pages-block']}
       ref={rootEl}
     >
       <div className={styles['screenshots-wrapper']}>
@@ -65,4 +58,4 @@ function BlibliSecondaryPagesPreview() {
   );
 }
 
-export default BlibliSecondaryPagesPreview;
+export default BlibliSecondaryPagesBlock;

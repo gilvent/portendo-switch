@@ -3,9 +3,11 @@ import latestCaptureImg from 'assets/img/blibli/pair-of-shoes-min.png';
 import resetIcon from 'assets/icons/ic-reset.webp';
 import cameraScreenImg from 'assets/img/blibli/shoe-in-a-box-min.png';
 import projectScreenshot from 'assets/img/blibli/write-review.png';
-import { MouseEvent, useEffect, useRef } from 'react';
+import { MouseEvent, useRef } from 'react';
 import useInteractiveAnimation from './useInteractiveAnimation';
-import useSlidingFade from '@/hooks/useSlidingFade.hook';
+import { slideFadeIn } from '@/utils/gsap/fade-animation';
+import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
+import gsap from 'gsap';
 
 function BlibliReviewProjectInteractiveBlock() {
   const blockRef = useRef<HTMLDivElement>(null);
@@ -20,14 +22,18 @@ function BlibliReviewProjectInteractiveBlock() {
       captureImgRef,
       flashlightRef
     });
-  const { applySlidingFade } = useSlidingFade({
-    triggerRef: blockRef,
-    stayVisible: true
-  });
 
-  useEffect(() => {
-    applySlidingFade(cameraRef.current);
-  }, []);
+  useBlockEnterAnimation({
+    ref: blockRef,
+    from: 'left',
+    createContentEnter() {
+      const selectors = [
+        '[data-anim-target="heading"] > div',
+        '[data-anim-target="camera"]'
+      ];
+      return gsap.timeline().add(slideFadeIn(selectors.join(', ')));
+    }
+  });
 
   function onCaptureClick(e: MouseEvent) {
     if (!cameraStateActive.current) return;
@@ -42,18 +48,15 @@ function BlibliReviewProjectInteractiveBlock() {
 
   return (
     <div ref={blockRef} className={styles.block}>
-      <h2 className={styles.heading}>
-        <div ref={applySlidingFade} className="invisible">
-          Worked on:
-        </div>
-        <div ref={applySlidingFade} className="invisible">
-          Review Revamp
-        </div>
+      <h2 data-anim-target="heading" className={styles.heading}>
+        <div className="invisible">Worked on:</div>
+        <div className="invisible">Review Revamp</div>
       </h2>
       <div className={styles.flashlight} ref={flashlightRef}></div>
       <div className={styles['interactive-area']}>
         <div
           className={`${styles.camera} invisible`}
+          data-anim-target="camera"
           ref={cameraRef}
           onClick={onCameraClick}
         >
