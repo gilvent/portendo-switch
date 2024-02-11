@@ -8,7 +8,7 @@ import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import {
   bounceEnter,
   workSummaryFadeIn
-} from '@/utils/gsap/animations/work-list';
+} from '@/utils/gsap/animation-helpers/work-list-block';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
 import {

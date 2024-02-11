@@ -12,7 +12,7 @@ import useActiveWorkBanner from './useActiveWorkBanner.hook';
 import {
   sceneSlideTo,
   setupBallAndSlider
-} from '@/utils/gsap/animations/work-list';
+} from '@/utils/gsap/animation-helpers/work-list-block';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
 import { disableController, enableController } from '@/utils/document';
 

@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 import { useRef } from 'react';
-import { slideFadeIn } from '@/utils/gsap/fade-animation';
+import { slideFadeIn } from '@/utils/gsap/animation-helpers/fades';
 import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
 import styles from './BlibliPDPRevampStoryBlock.module.scss';
 

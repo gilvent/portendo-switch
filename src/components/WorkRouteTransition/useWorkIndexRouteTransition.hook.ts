@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import useTransitionEndListener from '@/hooks/useTransitionEndListener.hook';
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
-import { bounceEnter } from '@/utils/gsap/animations/work-list';
+import { bounceEnter } from '@/utils/gsap/animation-helpers/work-list-block';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import { useGSAP } from '@gsap/react';
 

@@ -1,5 +1,5 @@
-import { slideFadeIn } from '@/utils/gsap/fade-animation';
-import { floating } from '@/utils/gsap/idle-animation';
+import { slideFadeIn } from '@/utils/gsap/animation-helpers/fades';
+import { floating } from '@/utils/gsap/animation-helpers/idles';
 import gsap from 'gsap';
 
 function useHomePageAnimations() {

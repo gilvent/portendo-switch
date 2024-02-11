@@ -5,7 +5,7 @@ import cameraScreenImg from 'assets/img/blibli/shoe-in-a-box-min.png';
 import projectScreenshot from 'assets/img/blibli/write-review.png';
 import { MouseEvent, useRef } from 'react';
 import useInteractiveAnimation from './useInteractiveAnimation';
-import { slideFadeIn } from '@/utils/gsap/fade-animation';
+import { slideFadeIn } from '@/utils/gsap/animation-helpers/fades';
 import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
 import gsap from 'gsap';
 

@@ -5,7 +5,7 @@ import pdpDiscussionImg from 'assets/img/blibli/pdp-discussion.png';
 import pdpPromoImg from 'assets/img/blibli/pdp-promo.png';
 import styles from './BlibliSecondaryPagesBlock.module.scss';
 import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
-import { screenshotsAppear } from '@/utils/gsap/animations/blibli-secondary-pages-block';
+import { screenshotsAppear } from '@/utils/gsap/animation-helpers/blibli-secondary-pages-block';
 
 function BlibliSecondaryPagesBlock() {
   const rootEl = useRef(null);

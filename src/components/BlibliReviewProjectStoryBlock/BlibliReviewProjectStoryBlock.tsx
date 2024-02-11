@@ -1,7 +1,7 @@
 import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
 import { useRef } from 'react';
 import styles from './BlibliReviewProjectStoryBlock.module.scss';
-import { slideFadeIn } from '@/utils/gsap/fade-animation';
+import { slideFadeIn } from '@/utils/gsap/animation-helpers/fades';
 import gsap from 'gsap';
 
 function BlibliReviewProjectStoryBlock() {
