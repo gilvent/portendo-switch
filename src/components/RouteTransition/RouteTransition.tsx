@@ -3,8 +3,8 @@ import { SwitchTransition, Transition } from 'react-transition-group';
 import { matchPath, useLocation } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import usePreviousState from '@/hooks/usePreviousState.hook';
-import useHomeRouteAnimation from '../../hooks/route-transition/useHomeRouteTransition.hook';
-import useWorkRouteTransition from '../../hooks/route-transition/useWorkRouteTransition.hook';
+import useHomeRouteAnimation from './useHomeRouteTransition.hook';
+import useWorkRouteTransition from './useWorkRouteTransition.hook';
 // import TransitionContext from '../context/TransitionContext';
 
 const RouteTransition = ({ children }: { children: any }) => {

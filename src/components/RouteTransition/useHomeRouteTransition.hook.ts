@@ -2,13 +2,12 @@ import gsap from 'gsap';
 import { matchPath } from 'react-router-dom';
 import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
-import useHomePageAnimations from '@/hooks/animations/useHomePageAnimations.hook';
 import { disableController, enableController } from '@/utils/document';
+import { homeEnter } from '@/utils/gsap/animation-helpers/home-page';
 
 function useHomeRouteAnimation(previousPath: string) {
   const { startHandheldMode, handheldToDocked, dockToHandheld } =
     useControllerAnimations();
-  const { homeEnter } = useHomePageAnimations();
 
   const enterAnimationsByPrevPath = [
     { path: ROUTE_PATH_PATTERNS.HOME, fn: enterHomePage },
