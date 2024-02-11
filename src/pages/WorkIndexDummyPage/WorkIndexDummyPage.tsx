@@ -6,7 +6,7 @@ import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
 import { useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const WorkListDummyComponent = () => {
+const WorkIndexDummyPage = () => {
   const params = useParams();
   const { setAction } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
@@ -27,4 +27,4 @@ const WorkListDummyComponent = () => {
   return <div></div>;
 };
 
-export default WorkListDummyComponent;
+export default WorkIndexDummyPage;

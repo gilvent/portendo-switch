@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { useRef } from 'react';
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
 import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
-import useTechBlockAnimations from '@/components/WorkHighlightPage/useTechBlockAnimations.hook';
+import useTechBlockAnimations from '@/pages/WorkHighlightPage/useTechBlockAnimations.hook';
 import useTransitionEndListener from '@/hooks/useTransitionEndListener.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import {

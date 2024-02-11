@@ -10,13 +10,13 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 
-const BlibliWorkPage = lazy(() => import('@/pages/BlibliWorkPage'));
-const MopertyWorkPage = lazy(() => import('@/pages/MopertyWorkPage'));
+const BlibliHighlights = lazy(() => import('./BlibliHighlights'));
+const MopertyHighlight = lazy(() => import('./MopertyHighlights'));
 
 function WorkHighlight() {
   const detailComponentByParams: Record<string, FunctionComponent> = {
-    [WorkPageTitle.Blibli]: BlibliWorkPage,
-    [WorkPageTitle.Moperty]: MopertyWorkPage
+    [WorkPageTitle.Blibli]: BlibliHighlights,
+    [WorkPageTitle.Moperty]: MopertyHighlight
   };
   const { pathname } = useLocation();
   const params = useParams();

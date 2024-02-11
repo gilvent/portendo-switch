@@ -1,13 +1,13 @@
 import TechBlock, { TECH } from '@/components/TechBlock';
 import BlibliSecondaryPagesBlock from '@/components/BlibliSecondaryPagesBlock';
 import BlibliPDPRevampStoryBlock from '@/components/BlibliPDPRevampStoryBlock';
-import styles from './BlibliWorkPage.module.scss';
+import styles from './BlibliHighlights.module.scss';
 import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
 import BlibliReviewProjectInteractiveBlock from '@/components/BlibliReviewProjectInteractiveBlock/BlibliReviewProjectInteractiveBlock';
 import BlibliPDPRevampViewBlock from '@/components/BlibliPDPRevampViewBlock';
 import { ForwardedRef, forwardRef } from 'react';
 
-function BlibliWorkPage(_: any, ref: ForwardedRef<any>) {
+function BlibliWorkHighlight(_: any, ref: ForwardedRef<any>) {
   const techList = [
     [TECH.PLAYWRIGHT, TECH.VUE],
     [TECH.NGINX, TECH.SASS]
@@ -40,4 +40,4 @@ function BlibliWorkPage(_: any, ref: ForwardedRef<any>) {
   );
 }
 
-export default forwardRef(BlibliWorkPage);
+export default forwardRef(BlibliWorkHighlight);
