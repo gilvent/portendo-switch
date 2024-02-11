@@ -63,8 +63,8 @@ const RouteTransition = ({ children }: { children: any }) => {
     const transitionKeyByPath = {
       [ROUTE_PATH_PATTERNS.HOME]: ROUTE_PATH_PATTERNS.HOME,
       [ROUTE_PATH_PATTERNS.WORK]: ROUTE_PATH_PATTERNS.WORK,
-      // work detail is work page's child route, so use the same key to prevent re-transition
-      [ROUTE_PATH_PATTERNS.WORK_DETAIL]: ROUTE_PATH_PATTERNS.WORK
+      // work highlight is work page's child route, so use the same key to prevent re-transition
+      [ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT]: ROUTE_PATH_PATTERNS.WORK
     };
     const matchedPath = Object.keys(transitionKeyByPath).find(
       pattern => !!matchPath(pattern, pathname)

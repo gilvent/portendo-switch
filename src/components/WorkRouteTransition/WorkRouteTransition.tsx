@@ -4,7 +4,7 @@ import { matchPath } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import useTransitionEndListener from '@/hooks/useTransitionEndListener.hook';
 import { waitForElements } from '@/utils/document';
-import useWorkDetailRouteTransition from './useWorkDetailRouteTransition.hook';
+import useWorkHighlightRouteTransition from './useWorkHighlightRouteTransition.hook';
 import useWorkIndexRouteTransition from './useWorkIndexRouteTransition.hook';
 
 const WorkRouteTransition = ({ children }: { children: any }) => {
@@ -12,32 +12,32 @@ const WorkRouteTransition = ({ children }: { children: any }) => {
   const { addEndListener, doneWithoutTransition } = useTransitionEndListener(
     'workroute.default.transitionend'
   );
-  const detailRouteConfig = useWorkDetailRouteTransition();
+  const highlightRouteConfig = useWorkHighlightRouteTransition();
   const indexRouteConfig = useWorkIndexRouteTransition();
   // prevent onEnter running twice on Strict mode
   // animation is run as promise callback, needs to be manually validated
-  const enterWorkDetailInQueue = useRef<boolean>(false);
+  const enterWorkHighlightInQueue = useRef<boolean>(false);
 
   const transitionConfig = {
-    [ROUTE_PATH_PATTERNS.WORK_DETAIL]: {
+    [ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT]: {
       onEnter: () => {
         waitForElements([
           '[data-anim-target="work-detail"]',
           '[data-anim-target="tech-block"]'
         ]).then(() => {
-          if (!enterWorkDetailInQueue.current) {
-            enterWorkDetailInQueue.current = true;
-            detailRouteConfig.onEnter();
+          if (!enterWorkHighlightInQueue.current) {
+            enterWorkHighlightInQueue.current = true;
+            highlightRouteConfig.onEnter();
           }
         });
       },
       onEntered: () => {
-        enterWorkDetailInQueue.current = false;
-        detailRouteConfig.onEntered();
+        enterWorkHighlightInQueue.current = false;
+        highlightRouteConfig.onEntered();
       },
-      onExit: detailRouteConfig.onExit,
-      onExited: detailRouteConfig.onExited,
-      addEndListener: detailRouteConfig.addEndListener
+      onExit: highlightRouteConfig.onExit,
+      onExited: highlightRouteConfig.onExited,
+      addEndListener: highlightRouteConfig.addEndListener
     },
     [ROUTE_PATH_PATTERNS.WORK]: {
       onEnter: indexRouteConfig.onEnter,
@@ -67,10 +67,10 @@ const WorkRouteTransition = ({ children }: { children: any }) => {
         config: transitionConfig[ROUTE_PATH_PATTERNS.WORK]
       };
     }
-    if (!!matchPath(ROUTE_PATH_PATTERNS.WORK_DETAIL, location.pathname)) {
+    if (!!matchPath(ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT, location.pathname)) {
       return {
-        key: ROUTE_PATH_PATTERNS.WORK_DETAIL,
-        config: transitionConfig[ROUTE_PATH_PATTERNS.WORK_DETAIL]
+        key: ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT,
+        config: transitionConfig[ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT]
       };
     }
     return {

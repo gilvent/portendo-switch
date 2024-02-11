@@ -13,7 +13,7 @@ import ControllerButtonContext from '@/context/ControllerButtonContext';
 const BlibliWorkPage = lazy(() => import('@/pages/BlibliWorkPage'));
 const MopertyWorkPage = lazy(() => import('@/pages/MopertyWorkPage'));
 
-function WorkDetail() {
+function WorkHighlight() {
   const detailComponentByParams: Record<string, FunctionComponent> = {
     [WorkPageTitle.Blibli]: BlibliWorkPage,
     [WorkPageTitle.Moperty]: MopertyWorkPage
@@ -48,4 +48,4 @@ function WorkDetail() {
   );
 }
 
-export default WorkDetail;
+export default WorkHighlight;

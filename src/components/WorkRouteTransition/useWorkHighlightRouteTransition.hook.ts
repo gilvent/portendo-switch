@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { useRef } from 'react';
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
 import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
-import useTechBlockAnimations from '@/components/WorkDetail/useTechBlockAnimations.hook';
+import useTechBlockAnimations from '@/components/WorkHighlightPage/useTechBlockAnimations.hook';
 import useTransitionEndListener from '@/hooks/useTransitionEndListener.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import {
@@ -19,7 +19,7 @@ import {
 } from '@/utils/document';
 import { useGSAP } from '@gsap/react';
 
-function useWorkDetailRouteTransition() {
+function useWorkHighlightRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
   const { isFromPath, isToPath } = useRouteTransitionHelper();
   const { activeBanner } = useActiveWorkBanner();
@@ -59,7 +59,7 @@ function useWorkDetailRouteTransition() {
         done();
       });
 
-    if (isFromPath(ROUTE_PATH_PATTERNS.WORK_DETAIL)) {
+    if (isFromPath(ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT)) {
       console.log('[work detail route] direct enter');
       enterTransition
         .call(() => {
@@ -139,4 +139,4 @@ function useWorkDetailRouteTransition() {
   };
 }
 
-export default useWorkDetailRouteTransition;
+export default useWorkHighlightRouteTransition;

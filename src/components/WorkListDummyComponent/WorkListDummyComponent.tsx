@@ -13,7 +13,7 @@ const WorkListDummyComponent = () => {
 
   useEffect(() => {
     setAction('onControlBClick', () => {
-      const nextUrl = ROUTE_PATH_PATTERNS.WORK_DETAIL.replace(
+      const nextUrl = ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT.replace(
         ':title',
         params.title ?? WorkPageTitle.Blibli
       );
