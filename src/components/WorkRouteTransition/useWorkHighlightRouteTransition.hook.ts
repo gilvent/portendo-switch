@@ -1,7 +1,6 @@
 import gsap from 'gsap';
 import { useRef } from 'react';
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
-import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import useTechBlockAnimations from '@/pages/WorkHighlightPage/useTechBlockAnimations.hook';
 import useTransitionEndListener from '@/hooks/useTransitionEndListener.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
@@ -17,13 +16,16 @@ import {
   enableController,
   lockScroll
 } from '@/utils/document';
+import {
+  screenModeToSingleCon,
+  singleConToScreenMode,
+  startSingleConMode
+} from '@/utils/gsap/animation-helpers/controller-button';
 
 function useWorkHighlightRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
   const { isFromPath, isToPath } = useRouteTransitionHelper();
   const { activeBanner } = useActiveWorkBanner();
-  const { startSingleConMode, screenModeToSingleCon, singleConToScreenMode } =
-    useControllerAnimations();
   const { setupEnterAnimation, setupExitAnimation } = useTechBlockAnimations();
   const { done, addEndListener, doneWithoutTransition } =
     useTransitionEndListener('workroute.transitionend');

@@ -16,17 +16,15 @@ function WorkPage() {
   );
 
   return (
-    <WorkPageProvider>
-      <div className="work-list">
-        <div className={primaryPanelClasses}>
-          <WorkListBlock></WorkListBlock>
-        </div>
-
-        <div className={secondaryPanelClasses}>
-          <Outlet />
-        </div>
+    <div className="work-list">
+      <div className={primaryPanelClasses}>
+        <WorkListBlock></WorkListBlock>
       </div>
-    </WorkPageProvider>
+
+      <div className={secondaryPanelClasses}>
+        <Outlet />
+      </div>
+    </div>
   );
 }
 

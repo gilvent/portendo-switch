@@ -93,9 +93,11 @@ const RouteTransition = ({ children }: { children: any }) => {
 
   function doneAfterCall(transition: () => gsap.core.Timeline) {
     return () => {
-      transition().then(() => {
-        transitionDone.current?.();
-      });
+      transition()
+        .play(0)
+        .then(() => {
+          transitionDone.current?.();
+        });
     };
   }
 

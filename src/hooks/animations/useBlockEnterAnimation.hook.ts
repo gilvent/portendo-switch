@@ -47,8 +47,6 @@ function useBlockEnterAnimation({
         once: true,
         onEnter
       });
-
-      console.log('use gsap here', context.data.length, onEnter);
     },
     { scope: ref }
   );
