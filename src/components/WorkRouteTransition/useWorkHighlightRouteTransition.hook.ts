@@ -17,7 +17,6 @@ import {
   enableController,
   lockScroll
 } from '@/utils/document';
-import { useGSAP } from '@gsap/react';
 
 function useWorkHighlightRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
@@ -34,7 +33,6 @@ function useWorkHighlightRouteTransition() {
   const { dispatchEvent: hideWorkBannerBg } = useCustomEvent(
     'worklistblock.hideWorkSummaryBg'
   );
-  const { contextSafe } = useGSAP();
 
   function showWorkSummary(): gsap.core.Timeline {
     showWorkSummaryAnimation.current = workSummaryFadeIn({
@@ -49,7 +47,7 @@ function useWorkHighlightRouteTransition() {
     return showWorkSummaryAnimation.current?.reverse() ?? gsap.timeline();
   }
 
-  const onEnter = contextSafe(() => {
+  function onEnter() {
     let enterTransition = gsap
       .timeline({ paused: true })
       .eventCallback('onStart', () => {
@@ -85,14 +83,14 @@ function useWorkHighlightRouteTransition() {
     } else {
       doneWithoutTransition();
     }
-  });
+  }
 
   function onEntered() {
     console.log('[work detail route] entered work detail');
     enableController();
   }
 
-  const onExit = contextSafe(() => {
+  const onExit = () => {
     console.log('[work detail route] exit');
 
     let exitTransition = gsap
@@ -119,7 +117,7 @@ function useWorkHighlightRouteTransition() {
     } else {
       doneWithoutTransition();
     }
-  });
+  };
 
   function onExited() {
     console.log('[work route] exited work detail');
