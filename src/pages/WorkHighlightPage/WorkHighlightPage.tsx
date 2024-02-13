@@ -43,7 +43,7 @@ function WorkHighlight() {
 
   return (
     <Suspense>
-      <ActiveComponent />;
+      <ActiveComponent />
     </Suspense>
   );
 }
