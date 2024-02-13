@@ -51,7 +51,7 @@ function lightCloudsEnter(): gsap.core.Timeline {
     )
     .eventCallback('onComplete', () => {
       floating(clouds, {
-        maxTranslate: 15
+        maxTranslate: 20
       });
     });
   return animation;
