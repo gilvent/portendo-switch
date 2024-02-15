@@ -4,7 +4,7 @@
 
 .work-page {
   display: grid;
-  grid-template-columns: 100vw;
+  grid-template-columns: minmax(100%, 100%);
   grid-template-areas:
     'page-gap'
     'tech';

@@ -11,7 +11,7 @@
   transform: scale(0.5);
   --transition-delay-base: 0.3s;
 
-  @include responsive.desktop {
+  @include responsive.tablets {
     transform: scale(0.7);
   }
 

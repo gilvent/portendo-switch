@@ -1,5 +1,6 @@
 @use 'assets/scss/variables/colors';
 @use 'assets/scss/mixins/font';
+@use 'assets/scss/mixins/responsive';
 
 .story-block {
   color: colors.$dark-3;
@@ -28,4 +29,7 @@
 
 .block-container {
   contain: paint;
+  @include responsive.tablets {
+    min-height: 100vw;
+  }
 }

@@ -15,8 +15,8 @@ function MopertyHighlights(_: any, ref: ForwardedRef<any>) {
       className={styles['work-page']}
       ref={ref}
     >
-      <section className={`${styles['page-gap']}`}></section>
-      <section className={`${styles['tech']}`}>
+      <section className={`block-container ${styles['page-gap']}`}></section>
+      <section className={`block-container ${styles['tech']}`}>
         <TechBlock techList={techList} />
       </section>
     </div>

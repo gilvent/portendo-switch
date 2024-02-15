@@ -15,8 +15,8 @@ function BlibliWorkHighlight(_: any, ref: ForwardedRef<any>) {
 
   return (
     <div data-anim-target="work-detail" className={styles['work-page']}>
-      <section className={`${styles['page-gap']}`}></section>
-      <section className={`${styles['tech']}`}>
+      <section className={`block-container ${styles['page-gap']}`}></section>
+      <section className={`block-container ${styles['tech']}`}>
         <TechBlock techList={techList} />
       </section>
       <section className={`block-container ${styles['review-revamp-story']}`}>

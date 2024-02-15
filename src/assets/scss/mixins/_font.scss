@@ -1,4 +1,5 @@
 @use 'assets/scss/variables/fonts';
+@use 'assets/scss/mixins/responsive';
 
 @mixin text-xs {
   font-size: 0.75rem; /* 12px */
@@ -36,6 +37,9 @@
 @mixin title-outline {
   font-size: 3.55rem;
   font-family: fonts.$outline-gaban;
+  @include responsive.tablets {
+    font-size: 4.5rem;
+  }
 }
 
 @mixin heading-solid {

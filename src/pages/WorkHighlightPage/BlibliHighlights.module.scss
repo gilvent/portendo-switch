@@ -4,7 +4,7 @@
 
 .work-page {
   display: grid;
-  grid-template-columns: 100vw;
+  grid-template-columns: minmax(100%, 100%);
   grid-template-areas:
     'page-gap'
     'tech'
@@ -14,7 +14,6 @@
     'pdp-revamp-story'
     'pdp-secondary';
   text-align: center;
-
   @include responsive.desktop {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
@@ -35,6 +34,7 @@ section.page-gap {
   grid-area: page-gap;
   height: 80vh;
   background: #fff;
+
   @include responsive.desktop {
     height: 100vh;
   }

@@ -31,6 +31,11 @@
   transform: scale(1);
   z-index: -1;
 
+  @include responsive.tablets {
+    width: 175px;
+    height: 175px;
+  }
+
   &.active {
     transform: scale(10);
   }
@@ -50,6 +55,10 @@
     color: var(--title-color);
     text-transform: uppercase;
     font-family: fonts.$solid-tabardo;
+
+    @include responsive.tablets {
+      font-size: 3.25rem;
+    }
   }
 
   .role {
@@ -58,12 +67,21 @@
     margin: 18px;
     font-size: 16px;
     font-family: fonts.$outline-gaban;
+
+    @include responsive.tablets {
+      @include font.text-xl;
+    }
   }
 
   .product {
     color: colors.$dark-2;
     padding: 0 24px;
     @include font.text-sm;
+
+    @include responsive.tablets {
+      padding: 0 25%;
+      @include font.text-base;
+    }
   }
 }
 
@@ -73,6 +91,11 @@
   height: 140px;
   z-index: 4;
   filter: drop-shadow(0px 0px 2px rgb(71, 71, 71));
+
+  @include responsive.tablets {
+    width: 125px;
+    height: 175px;
+  }
 }
 
 .content {
@@ -83,6 +106,10 @@
   position: relative;
   gap: 2.4rem;
   margin-top: -30%;
+
+  @include responsive.tablets {
+    margin-top: -15%;
+  }
 }
 
 .summary {
@@ -95,6 +122,11 @@
   font-family: fonts.$solid-fredoka;
   font-weight: 500;
   @include font.text-sm;
+
+  @include responsive.tablets {
+    @include font.text-xl;
+    padding: 10vw 15vw;
+  }
 
   @include responsive.desktop {
     @include font.text-xl;
@@ -111,7 +143,7 @@
     text-transform: uppercase;
     border: none;
     background-color: transparent;
-    
+
     .text {
       @include font.title-outline;
       color: #fff;

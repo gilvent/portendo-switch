@@ -207,16 +207,17 @@ export function setupBallAndSlider({
   const sliderWrapper = document.querySelector(
     '[data-anim-target="work-slider-wrapper"]'
   );
-
   const slideDistance =
-    targetBallEl?.getBoundingClientRect().x -
+    targetBallEl.getBoundingClientRect().x -
     firstBallEl?.getBoundingClientRect().x;
 
   gsap.set(sliderWrapper, {
     x: '-' + slideDistance
   });
   gsap.set(pointerBall, {
-    x: targetBallEl?.getBoundingClientRect().x,
+    x: targetBallEl.getBoundingClientRect().x,
+    width: targetBallEl.getBoundingClientRect().width,
+    height: targetBallEl.getBoundingClientRect().height,
     background: ballColor
   });
 }
