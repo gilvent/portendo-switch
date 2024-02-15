@@ -13,15 +13,23 @@
 
 .foreground {
   position: absolute;
-  top: 10%;
+  top: 15%;
   padding: 24px;
   text-align: center;
   width: 100%;
   z-index: 2;
+
+  @include responsive.tablets {
+    top: 22.5%;
+  }
+
   h2 {
-    font-size: 64px;
+    font-size: 3.65rem;
     font-family: fonts.$solid-fredoka;
     font-weight: 700;
+    @include responsive.tablets {
+      font-size: 7.5rem;
+    }
   }
   h3 {
     color: colors.$dark-3;
@@ -50,24 +58,40 @@
     &.linkedin {
       transform: rotate(10deg);
       bottom: -125px;
+      @include responsive.tablets {
+        bottom: -100px;
+        left: 105px;
+      }
     }
 
     &.github {
       transform: rotate(-5deg);
       bottom: -150px;
       left: 145px;
+
+      @include responsive.tablets {
+        left: 275px;
+      }
     }
 
     &.twitter {
       transform: rotate(20deg);
       bottom: -250px;
       right: 75px;
+      @include responsive.tablets {
+        bottom: -185px;
+        right: 225px;
+      }
     }
 
     &.gmail {
       transform: rotate(-25deg);
       bottom: -125px;
       right: 25px;
+      @include responsive.tablets {
+        bottom: -95px;
+        right: 75px;
+      }
     }
   }
 }

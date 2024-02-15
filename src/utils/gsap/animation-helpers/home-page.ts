@@ -77,7 +77,7 @@ function contactCardsEnter() {
       {
         scale: 1,
         autoAlpha: 1,
-        stagger: 0.3
+        stagger: 0.12
       }
     )
     .eventCallback('onComplete', () => {
@@ -90,6 +90,6 @@ export function homeEnter(): gsap.core.Timeline {
     .timeline()
     .add(darkCloudsEnter())
     .add(lightCloudsEnter(), '<0.2')
-    .add(foregroundTextsEnter())
-    .add(contactCardsEnter());
+    .add(foregroundTextsEnter(), '<')
+    .add(contactCardsEnter(), '<0.5');
 }
