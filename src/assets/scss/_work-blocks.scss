@@ -8,20 +8,32 @@
   flex-direction: column;
   gap: 24px;
   padding: 32px;
+
+  @include responsive.tablets {
+    padding: 10vw 17.5vw;
+  }
+
   p.overview {
     text-align: justify;
     @include font.text-sm;
+    @include responsive.tablets {
+      @include font.text-lg;
+    }
   }
 
   ul.key-points {
     text-align: left;
     padding-inline-start: 0px;
     @include font.text-sm;
+    @include responsive.tablets {
+      @include font.text-lg;
+    }
   }
 
   h2 {
     @include font.heading-solid;
   }
+
   h3 {
     @include font.heading-2-solid;
   }
@@ -29,7 +41,9 @@
 
 .block-container {
   contain: paint;
-  @include responsive.tablets {
-    min-height: 100vw;
+  min-height: 100vw;
+
+  @include responsive.desktop {
+    min-height: 0;
   }
 }

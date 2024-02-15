@@ -209,6 +209,10 @@
   margin-top: -30%;
   opacity: 0;
 
+  @include responsive.tablets {
+    margin-top: -10%;
+  }
+
   .screen {
     background-color: #333;
     border: solid 1em #333;
@@ -218,6 +222,10 @@
       width: 80vw;
       height: auto;
       align-self: center;
+
+      @include responsive.tablets {
+        width: 60vw;
+      }
 
       @include responsive.desktop {
         width: 25vw;
@@ -230,6 +238,10 @@
     height: auto;
     aspect-ratio: 3 / 1;
 
+    @include responsive.tablets {
+      width: 12.5vw;
+    }
+
     @include responsive.desktop {
       width: 6vw;
     }
@@ -239,6 +251,11 @@
     width: 30vw;
     height: auto;
     aspect-ratio: 20;
+
+    @include responsive.tablets {
+      width: 22.5vw;
+    }
+
     @include responsive.desktop {
       width: 10vw;
     }

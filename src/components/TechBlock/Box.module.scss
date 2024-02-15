@@ -1,4 +1,5 @@
 @use 'assets/scss/mixins/font';
+@use 'assets/scss/mixins/responsive';
 
 %layer {
   display: flex;
@@ -21,6 +22,11 @@
   transform: scale(0.3);
   opacity: 0;
   @include font.text-base;
+
+  @include responsive.tablets {
+    width: 150px;
+    height: 150px;
+  }
 }
 
 .fg {

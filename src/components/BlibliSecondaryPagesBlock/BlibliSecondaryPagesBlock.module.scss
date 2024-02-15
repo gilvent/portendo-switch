@@ -2,6 +2,7 @@
 
 .secondary-pages-block {
   background-color: #74d3ff;
+  min-height: 700px;
   height: 100%;
   will-change: transform, visibility, opacity;
   
@@ -9,7 +10,7 @@
     display: flex;
     justify-content: center;
     position: relative;
-    height: 700px;
+    height: 100%;
     align-items: center;;
     overflow: hidden;
   }
@@ -36,6 +37,10 @@
     border-radius: 8px;
     opacity: 0;
     
+    @include responsive.tablets {
+      width: 439px;
+    }
+
     &:nth-child(1) {
       grid-row: span 2;
       transform: translateY(20%);
