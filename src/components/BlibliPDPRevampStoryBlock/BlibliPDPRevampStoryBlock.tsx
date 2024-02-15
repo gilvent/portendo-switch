@@ -1,32 +1,35 @@
-import useSlidingFade from '@/hooks/useSlidingFade.hook';
-import styles from './BlibliPDPRevampStoryBlock.module.scss';
+import gsap from 'gsap';
 import { useRef } from 'react';
+import { slideFadeIn } from '@/utils/gsap/animation-helpers/fades';
+import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
+import styles from './BlibliPDPRevampStoryBlock.module.scss';
 
 function BlibliPDPRevampStoryBlock() {
   const blockRef = useRef<HTMLDivElement>(null);
-  const { applySlidingFade } = useSlidingFade({
-    triggerRef: blockRef,
-    stayVisible: true
+
+  useBlockEnterAnimation({
+    ref: blockRef,
+    from: 'right',
+    createContentEnter() {
+      return gsap.timeline().add(slideFadeIn('h2 > div, p, ul'));
+    }
   });
+
   return (
     <article ref={blockRef} className={`story-block ${styles['pdp-revamp']}`}>
       <h2>
-        <div ref={applySlidingFade} className="invisible">
-          Worked on:
-        </div>
-        <div ref={applySlidingFade} className="invisible">
-          Product Detail Revamp
-        </div>
+        <div className="invisible">Worked on:</div>
+        <div className="invisible">Product Detail Revamp</div>
       </h2>
 
-      <p ref={applySlidingFade} className="overview invisible">
+      <p className="overview invisible">
         This is a full page redesign project which is part of major theme update
         across Blibli. Besides theme revamp, this project also introduces user
         experience improvements such as secondary pages and sticky navigation
         for mobile web.
       </p>
 
-      <ul ref={applySlidingFade} className={`key-points text-lg invisible`}>
+      <ul className={`key-points invisible`}>
         <strong>Key changes...</strong>
         <li>New and newer UI components</li>
         <li>Rewrite the codebase to accomodate new flow</li>
@@ -36,7 +39,7 @@ function BlibliPDPRevampStoryBlock() {
         </li>
       </ul>
 
-      <ul ref={applySlidingFade} className={`key-points text-lg invisible`}>
+      <ul className={`key-points invisible`}>
         <strong>Lessons I learnt while doing this project...</strong>
         <li>
           Software development principles. One that stick to mind is{' '}

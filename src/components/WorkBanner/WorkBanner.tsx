@@ -49,6 +49,9 @@ function WorkBanner(props: WorkBannerProps) {
         <img src={props.logo} ref={logoRef} className={styles.logo} />
 
         <div className={styles.cover}>
+          <h4 data-anim-target="cover-role" className={coverRoleClass}>
+            {props.role}
+          </h4>
           <h2
             data-anim-target="cover-title"
             ref={headingRef}
@@ -56,9 +59,6 @@ function WorkBanner(props: WorkBannerProps) {
           >
             {props.title}
           </h2>
-          <h4 data-anim-target="cover-role" className={coverRoleClass}>
-            {props.role}
-          </h4>
           <p
             data-anim-target="cover-description"
             className={coverDescriptionClass}
@@ -69,7 +69,7 @@ function WorkBanner(props: WorkBannerProps) {
 
         <div data-anim-target="work-title" className={titleClass}>
           <button className={styles['btn-title']}>
-            <h2 className={styles.text}>{props.title}</h2>
+            <h1 className={styles.text}>{props.title}</h1>
           </button>
         </div>
 

@@ -1,3 +1,5 @@
+import useMediaQuery from '@/hooks/useMediaQuery.hook';
+import { MediaQueryScreen } from '@/utils/enums';
 import gsap from 'gsap';
 import { RefObject, useEffect, useRef } from 'react';
 
@@ -17,6 +19,7 @@ export default function useInteractiveAnimation({
   const swapToMonitor = useRef<gsap.core.Timeline | null>(null);
   const cameraWiggleAnimation = useRef<gsap.core.Timeline | null>(null);
   const cameraStateActive = useRef<boolean>(true);
+  const isTablet = useMediaQuery(MediaQueryScreen.Tablet);
 
   useEffect(() => {
     swapToCamera.current = setupSwapToCameraAnimation();
@@ -79,7 +82,7 @@ export default function useInteractiveAnimation({
         },
         {
           scale: 0.4,
-          x: '50%',
+          x: isTablet ? '75%' : '50%',
           y: 50
         }
       )

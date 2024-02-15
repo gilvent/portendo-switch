@@ -1,6 +1,7 @@
 @use 'assets/scss/mixins/responsive';
 @use 'assets/scss/mixins/font';
 @use 'assets/scss/variables/colors';
+@use 'assets/scss/variables/fonts';
 
 .card {
   display: flex;
@@ -30,6 +31,11 @@
   transform: scale(1);
   z-index: -1;
 
+  @include responsive.tablets {
+    width: 175px;
+    height: 175px;
+  }
+
   &.active {
     transform: scale(10);
   }
@@ -44,21 +50,38 @@
   text-align: center;
 
   .heading {
-    font-size: 28px;
+    font-size: 32px;
     margin: 18px;
     color: var(--title-color);
     text-transform: uppercase;
+    font-family: fonts.$solid-tabardo;
+
+    @include responsive.tablets {
+      font-size: 3.25rem;
+    }
   }
 
   .role {
     color: colors.$dark;
     text-transform: uppercase;
-    font-size: 18px;
+    margin: 18px;
+    font-size: 16px;
+    font-family: fonts.$outline-gaban;
+
+    @include responsive.tablets {
+      @include font.text-xl;
+    }
   }
 
   .product {
     color: colors.$dark-2;
-    padding: 8px 24px;
+    padding: 0 24px;
+    @include font.text-sm;
+
+    @include responsive.tablets {
+      padding: 0 25%;
+      @include font.text-base;
+    }
   }
 }
 
@@ -68,6 +91,11 @@
   height: 140px;
   z-index: 4;
   filter: drop-shadow(0px 0px 2px rgb(71, 71, 71));
+
+  @include responsive.tablets {
+    width: 125px;
+    height: 175px;
+  }
 }
 
 .content {
@@ -78,6 +106,10 @@
   position: relative;
   gap: 2.4rem;
   margin-top: -30%;
+
+  @include responsive.tablets {
+    margin-top: -15%;
+  }
 }
 
 .summary {
@@ -85,12 +117,19 @@
   top: 0;
   left: 0;
   text-align: center;
-  padding: 36px;
+  padding: 10vw 12.5vw;
   z-index: 4;
-  @include font.text-base;
+  font-family: fonts.$solid-fredoka;
+  font-weight: 500;
+  @include font.text-sm;
+
+  @include responsive.tablets {
+    @include font.text-xl;
+    padding: 10vw 15vw;
+  }
 
   @include responsive.desktop {
-    @include font.text-2xl;
+    @include font.text-xl;
   }
 }
 
@@ -104,10 +143,10 @@
     text-transform: uppercase;
     border: none;
     background-color: transparent;
-    @include font.text-3xl;
 
     .text {
-      color: white;
+      @include font.title-outline;
+      color: #fff;
     }
   }
 }

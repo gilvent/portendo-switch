@@ -4,11 +4,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  display: grid;
-  width: 100vw;
+  width: 100%;
 
   @include responsive.desktop {
-    place-content: center;
     min-height: 100vh;
   }
 
@@ -17,7 +15,7 @@
     background-color: transparent;
     height: 80vh;
     @include responsive.desktop {
-      width: 50vw;
+      width: 50%;
     }
   }
 

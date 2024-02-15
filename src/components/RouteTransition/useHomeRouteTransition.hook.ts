@@ -1,15 +1,15 @@
 import gsap from 'gsap';
 import { matchPath } from 'react-router-dom';
-import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
-import useHomePageAnimations from '@/hooks/animations/useHomePageAnimations.hook';
 import { disableController, enableController } from '@/utils/document';
+import { homeEnter } from '@/utils/gsap/animation-helpers/home-page';
+import {
+  dockToHandheld,
+  handheldToDocked,
+  startHandheldMode
+} from '@/utils/gsap/animation-helpers/controller-button';
 
 function useHomeRouteAnimation(previousPath: string) {
-  const { startHandheldMode, handheldToDocked, dockToHandheld } =
-    useControllerAnimations();
-  const { homeEnter } = useHomePageAnimations();
-
   const enterAnimationsByPrevPath = [
     { path: ROUTE_PATH_PATTERNS.HOME, fn: enterHomePage },
     { path: ROUTE_PATH_PATTERNS.WORK, fn: enterFromWorkPage }
@@ -26,7 +26,10 @@ function useHomeRouteAnimation(previousPath: string) {
   }
 
   function enterHomePage() {
-    return gsap.timeline().add(homeEnter()).add(startHandheldMode());
+    return gsap
+      .timeline({ paused: true })
+      .add(homeEnter())
+      .add(startHandheldMode());
   }
 
   function onEnter(): gsap.core.Timeline {
@@ -42,14 +45,13 @@ function useHomeRouteAnimation(previousPath: string) {
       })
       .eventCallback('onComplete', () => {
         enableController();
-      })
-      .play(0);
+      });
 
     return enter;
   }
 
   function exitToWorkPage() {
-    return handheldToDocked().duration(5);
+    return gsap.timeline({ paused: true }).add(handheldToDocked()).duration(5);
   }
 
   function onExit(): gsap.core.Timeline {
@@ -64,8 +66,7 @@ function useHomeRouteAnimation(previousPath: string) {
       })
       .eventCallback('onComplete', () => {
         enableController();
-      })
-      .play(0);
+      });
 
     return exit;
   }

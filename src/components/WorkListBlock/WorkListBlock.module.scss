@@ -6,12 +6,11 @@
   display: flex;
   position: relative;
   height: 80vh;
-  width: 100vw;
+  width: 100%;
   overflow: hidden;
   background-color: #fff;
 
   @include responsive.desktop {
-    width: 50vw;
     height: 100vh;
   }
 }

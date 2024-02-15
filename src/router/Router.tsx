@@ -3,9 +3,9 @@ import { Routes, Route } from 'react-router-dom';
 import RouteTransition from '@/components/RouteTransition';
 import HomePage from '@/pages/HomePage';
 import WorkPage from '@/pages/WorkPage';
-import WorkDetail from '@/components/WorkDetail';
+import WorkHighlight from '@/pages/WorkHighlightPage';
 import WorkRouteTransition from '@/components/WorkRouteTransition';
-import WorkListDummyComponent from '@/components/WorkListDummyComponent';
+import WorkIndexDummyPage from '@/pages/WorkIndexDummyPage';
 
 const Router = () => {
   return (
@@ -30,15 +30,15 @@ const Router = () => {
           index
           element={
             <WorkRouteTransition>
-              <WorkListDummyComponent />
+              <WorkIndexDummyPage />
             </WorkRouteTransition>
           }
         ></Route>
         <Route
-          path="detail"
+          path="highlight"
           element={
             <WorkRouteTransition>
-              <WorkDetail />
+              <WorkHighlight />
             </WorkRouteTransition>
           }
         ></Route>

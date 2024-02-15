@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 
 export function slideFadeIn(
-  els: Element[],
+  els: Element[] | string,
   slideUp: boolean = true
 ): gsap.core.Timeline {
   const FLOATING_DISTANCE = 50;

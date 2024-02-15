@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import {
   techBlockEnter,
   techBlockExit
-} from '@/utils/gsap/animations/tech-block';
+} from '@/utils/gsap/animation-helpers/tech-block';
 import { useGSAP } from '@gsap/react';
 
 function useTechBlockAnimations() {

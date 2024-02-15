@@ -6,13 +6,13 @@ import GiftsImage from '@/components/GiftsImage';
 import { useContext, useEffect, useRef, useState } from 'react';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH_PATTERNS, WorkDetailName } from '@/utils/enums';
+import { ROUTE_PATH_PATTERNS, WorkHighlightName } from '@/utils/enums';
 import { useGSAP } from '@gsap/react';
 import useActiveWorkBanner from './useActiveWorkBanner.hook';
 import {
   sceneSlideTo,
   setupBallAndSlider
-} from '@/utils/gsap/animations/work-list';
+} from '@/utils/gsap/animation-helpers/work-list-block';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
 import { disableController, enableController } from '@/utils/document';
 
@@ -21,7 +21,7 @@ function WorkListBlock() {
   const navigate = useNavigate();
   const { activeBanner, bannersByTitle, prevBanner } = useActiveWorkBanner();
   const { setAction } = useContext(ControllerButtonContext);
-  const [activeBg, setActiveBg] = useState<WorkDetailName | null>(null);
+  const [activeBg, setActiveBg] = useState<WorkHighlightName | null>(null);
   const {
     addListener: addShowBgListener,
     removeListener: removeShowBgListener
@@ -33,7 +33,7 @@ function WorkListBlock() {
 
   useGSAP(() => {
     setupBallAndSlider({
-      firstElSelector: bannersByTitle[WorkDetailName.Blibli].selector,
+      firstElSelector: bannersByTitle[WorkHighlightName.Blibli].selector,
       targetElSelector: activeBanner.selector,
       ballColor: activeBanner.background
     });
@@ -104,7 +104,7 @@ function WorkListBlock() {
             title="Blibli.com"
             description="An indonesian e-commerce with wide range of products
         from both offline business to online."
-            role="Front-end Developer"
+            role="Front-end Developer @"
             renderSummaryText={() => (
               <>
                 Being a <strong>front end developer</strong>, I worked in <br />
@@ -114,7 +114,7 @@ function WorkListBlock() {
                 application.
               </>
             )}
-            active={activeBg === WorkDetailName.Blibli}
+            active={activeBg === WorkHighlightName.Blibli}
             logo={blibliWhiteLogo}
             titleColor="#0092da"
             renderBgAnimation={active => <GiftsImage active={active} />}
@@ -129,7 +129,7 @@ function WorkListBlock() {
             id="moperty-banner"
             title="Moperty"
             description="A progressive web app to browse available real estate in local area around my hometown."
-            role="Product Builder"
+            role="Use My Free Time Building"
             renderSummaryText={() => (
               <>
                 This is a <strong>"build the whole thing"</strong> project for
@@ -140,7 +140,7 @@ function WorkListBlock() {
                 <br />
               </>
             )}
-            active={activeBg === WorkDetailName.Moperty}
+            active={activeBg === WorkHighlightName.Moperty}
             logo={mopertyLogo}
             titleColor="#3f51b5"
             onClick={() => {}}

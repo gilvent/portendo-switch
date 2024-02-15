@@ -1,13 +1,14 @@
 import gsap from 'gsap';
-import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import { matchPath } from 'react-router-dom';
 import { disableController, enableController } from '@/utils/document';
+import {
+  dockToScreenMode,
+  screenModeToDock,
+  startScreenMode
+} from '@/utils/gsap/animation-helpers/controller-button';
 
 function useWorkRouteTransition(previousPath: string) {
-  const { startScreenMode, dockToScreenMode, screenModeToDock } =
-    useControllerAnimations();
-
   const enterAnimations = [
     { path: ROUTE_PATH_PATTERNS.HOME, fn: enterFromHomePage },
     { path: ROUTE_PATH_PATTERNS.WORK, fn: enterDirectly }
@@ -19,23 +20,23 @@ function useWorkRouteTransition(previousPath: string) {
 
   function enterFromHomePage(): gsap.core.Timeline {
     // TODO cache the timeline
-    return dockToScreenMode();
+    return gsap.timeline({ paused: true }).add(dockToScreenMode());
   }
 
   function enterDirectly(): gsap.core.Timeline {
-    return startScreenMode();
+    return gsap.timeline({ paused: true }).add(startScreenMode());
   }
 
   function exitToHomePage(): gsap.core.Timeline {
     console.log('exiting to home page');
-    return screenModeToDock().duration(2);
+    return gsap.timeline({ paused: true }).add(screenModeToDock()).duration(2);
   }
 
   function onEnter(): gsap.core.Timeline {
     console.log('enter work', previousPath);
     const enter =
       enterAnimations.find(i => matchPath(i.path, previousPath))?.fn() ??
-      gsap.timeline();
+      gsap.timeline({ paused: true });
 
     enter
       .eventCallback('onStart', () => {
@@ -43,8 +44,7 @@ function useWorkRouteTransition(previousPath: string) {
       })
       .eventCallback('onComplete', () => {
         enableController();
-      })
-      .play(0);
+      });
     return enter;
   }
 
@@ -53,7 +53,7 @@ function useWorkRouteTransition(previousPath: string) {
     const exit =
       exitAnimationsByTargetPath
         .find(i => matchPath(i.path, window.location.pathname))
-        ?.fn() ?? gsap.timeline();
+        ?.fn() ?? gsap.timeline({ paused: true });
 
     exit
       .eventCallback('onStart', () => {
@@ -61,8 +61,7 @@ function useWorkRouteTransition(previousPath: string) {
       })
       .eventCallback('onComplete', () => {
         enableController();
-      })
-      .play(0);
+      });
     return exit;
   }
 

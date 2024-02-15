@@ -1,13 +1,13 @@
 import TechBlock, { TECH } from '@/components/TechBlock';
-import BlibliSecondaryPagesPreview from '@/components/BlibliSecondaryPagesPreview';
+import BlibliSecondaryPagesBlock from '@/components/BlibliSecondaryPagesBlock';
 import BlibliPDPRevampStoryBlock from '@/components/BlibliPDPRevampStoryBlock';
-import styles from './BlibliWorkPage.module.scss';
+import styles from './BlibliHighlights.module.scss';
 import BlibliReviewProjectStoryBlock from '@/components/BlibliReviewProjectStoryBlock';
 import BlibliReviewProjectInteractiveBlock from '@/components/BlibliReviewProjectInteractiveBlock/BlibliReviewProjectInteractiveBlock';
 import BlibliPDPRevampViewBlock from '@/components/BlibliPDPRevampViewBlock';
 import { ForwardedRef, forwardRef } from 'react';
 
-function BlibliWorkPage(_: any, ref: ForwardedRef<any>) {
+function BlibliWorkHighlight(_: any, ref: ForwardedRef<any>) {
   const techList = [
     [TECH.PLAYWRIGHT, TECH.VUE],
     [TECH.NGINX, TECH.SASS]
@@ -15,29 +15,29 @@ function BlibliWorkPage(_: any, ref: ForwardedRef<any>) {
 
   return (
     <div data-anim-target="work-detail" className={styles['work-page']}>
-      <section className={`${styles['page-gap']}`}></section>
-      <section className={`${styles['tech']}`}>
+      <section className={`block-container ${styles['page-gap']}`}></section>
+      <section className={`block-container ${styles['tech']}`}>
         <TechBlock techList={techList} />
       </section>
-      <section className={`${styles['review-revamp-story']}`}>
+      <section className={`block-container ${styles['review-revamp-story']}`}>
         <BlibliReviewProjectStoryBlock />
       </section>
-      <section className={`${styles['review-revamp']}`}>
+      <section className={`block-container ${styles['review-revamp']}`}>
         <BlibliReviewProjectInteractiveBlock />
       </section>
-      <section className={`${styles['pdp-revamp-preview']}`}>
+      <section className={`block-container ${styles['pdp-revamp-preview']}`}>
         <BlibliPDPRevampViewBlock />
       </section>
 
-      <section className={`${styles['pdp-secondary']}`}>
-        <BlibliSecondaryPagesPreview />
+      <section className={`block-container ${styles['pdp-secondary']}`}>
+        <BlibliSecondaryPagesBlock />
       </section>
 
-      <section className={`${styles['pdp-revamp-story']}`}>
+      <section className={`block-container ${styles['pdp-revamp-story']}`}>
         <BlibliPDPRevampStoryBlock />
       </section>
     </div>
   );
 }
 
-export default forwardRef(BlibliWorkPage);
+export default forwardRef(BlibliWorkHighlight);

@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import type { MediaQueryScreen } from '@/utils/enums';
 
 function useMediaQuery(query: MediaQueryScreen) {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => {
+    return window.matchMedia(query).matches;
+  });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const matchQueryList = window.matchMedia(query);
     setMatches(matchQueryList.matches);
     matchQueryList.addEventListener('change', handleChange);

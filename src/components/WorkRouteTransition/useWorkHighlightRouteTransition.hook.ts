@@ -1,14 +1,13 @@
 import gsap from 'gsap';
 import { useRef } from 'react';
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
-import useControllerAnimations from '@/components/ControllerButton/useControllerAnimations.hook';
-import useTechBlockAnimations from '@/components/WorkDetail/useTechBlockAnimations.hook';
+import useTechBlockAnimations from '@/pages/WorkHighlightPage/useTechBlockAnimations.hook';
 import useTransitionEndListener from '@/hooks/useTransitionEndListener.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import {
   bounceEnter,
   workSummaryFadeIn
-} from '@/utils/gsap/animations/work-list';
+} from '@/utils/gsap/animation-helpers/work-list-block';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
 import {
@@ -17,14 +16,16 @@ import {
   enableController,
   lockScroll
 } from '@/utils/document';
-import { useGSAP } from '@gsap/react';
+import {
+  screenModeToSingleCon,
+  singleConToScreenMode,
+  startSingleConMode
+} from '@/utils/gsap/animation-helpers/controller-button';
 
-function useWorkDetailRouteTransition() {
+function useWorkHighlightRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
   const { isFromPath, isToPath } = useRouteTransitionHelper();
   const { activeBanner } = useActiveWorkBanner();
-  const { startSingleConMode, screenModeToSingleCon, singleConToScreenMode } =
-    useControllerAnimations();
   const { setupEnterAnimation, setupExitAnimation } = useTechBlockAnimations();
   const { done, addEndListener, doneWithoutTransition } =
     useTransitionEndListener('workroute.transitionend');
@@ -34,7 +35,6 @@ function useWorkDetailRouteTransition() {
   const { dispatchEvent: hideWorkBannerBg } = useCustomEvent(
     'worklistblock.hideWorkSummaryBg'
   );
-  const { contextSafe } = useGSAP();
 
   function showWorkSummary(): gsap.core.Timeline {
     showWorkSummaryAnimation.current = workSummaryFadeIn({
@@ -49,7 +49,7 @@ function useWorkDetailRouteTransition() {
     return showWorkSummaryAnimation.current?.reverse() ?? gsap.timeline();
   }
 
-  const onEnter = contextSafe(() => {
+  function onEnter() {
     let enterTransition = gsap
       .timeline({ paused: true })
       .eventCallback('onStart', () => {
@@ -59,7 +59,7 @@ function useWorkDetailRouteTransition() {
         done();
       });
 
-    if (isFromPath(ROUTE_PATH_PATTERNS.WORK_DETAIL)) {
+    if (isFromPath(ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT)) {
       console.log('[work detail route] direct enter');
       enterTransition
         .call(() => {
@@ -85,14 +85,14 @@ function useWorkDetailRouteTransition() {
     } else {
       doneWithoutTransition();
     }
-  });
+  }
 
   function onEntered() {
     console.log('[work detail route] entered work detail');
     enableController();
   }
 
-  const onExit = contextSafe(() => {
+  const onExit = () => {
     console.log('[work detail route] exit');
 
     let exitTransition = gsap
@@ -119,7 +119,7 @@ function useWorkDetailRouteTransition() {
     } else {
       doneWithoutTransition();
     }
-  });
+  };
 
   function onExited() {
     console.log('[work route] exited work detail');
@@ -139,4 +139,4 @@ function useWorkDetailRouteTransition() {
   };
 }
 
-export default useWorkDetailRouteTransition;
+export default useWorkHighlightRouteTransition;

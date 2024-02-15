@@ -1,7 +1,10 @@
+@use 'assets/scss/mixins/font';
+
 .tech-card {
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   height: 100%;
   gap: 24px;
   padding: 36px 35px 60px;
@@ -9,8 +12,8 @@
 
 .heading {
   align-self: flex-end;
-  font-size: 56px;
   color: #fff;
+  @include font.heading-solid;
 }
 
 .boxes {

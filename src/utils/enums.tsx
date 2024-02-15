@@ -1,7 +1,7 @@
 export enum ROUTE_PATH_PATTERNS {
   HOME = '/',
   WORK = '/work/:title',
-  WORK_DETAIL = '/work/:title/detail'
+  WORK_HIGHLIGHT = '/work/:title/highlight'
 }
 
 export enum WorkPageTitle {
@@ -15,7 +15,7 @@ export enum MediaQueryScreen {
   LargeDesktop = '(min-width: 1200px)'
 }
 
-export enum WorkDetailName {
+export enum WorkHighlightName {
   Blibli = 'blibli',
   Moperty = 'moperty'
 }

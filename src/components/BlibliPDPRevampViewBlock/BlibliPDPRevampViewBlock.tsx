@@ -8,13 +8,20 @@ import icVue from '@/assets/img/tech/vue.svg';
 import { useEffect, useRef } from 'react';
 import useFileBarAnimation from './useFileBarAnimation';
 import useScrollTrigger from '@/hooks/useScrollTrigger.hook';
+import useBlockEnterAnimation from '@/hooks/animations/useBlockEnterAnimation.hook';
 
 function BlibliPDPRevampViewBlock() {
   const fileBarRef = useRef<HTMLDivElement>(null);
+  const blockRef = useRef<HTMLDivElement>(null);
   const { animationRef, setupAnimation } = useFileBarAnimation({});
   const { create: createAnimationTrigger1 } = useScrollTrigger();
   const { create: createAnimationTrigger2 } = useScrollTrigger();
   const { create: createAnimationTrigger3 } = useScrollTrigger();
+
+  useBlockEnterAnimation({
+    ref: blockRef,
+    from: 'left'
+  });
 
   useEffect(() => {
     setupAnimation({
@@ -62,13 +69,14 @@ function BlibliPDPRevampViewBlock() {
   }
 
   return (
-    <div className={styles.block}>
+    <div ref={blockRef} className={styles.block}>
       <div className={styles.title}>product-detail-revamp</div>
       <div className={styles.sidebar}>
         <div className={styles.nav}>
           <img src={icMenu} />
         </div>
         <div className={styles.nav}>
+          {/* TODO remove this on click handler */}
           <img src={icDoc} onClick={() => animationRef.current?.play()} />
         </div>
         <div className={styles.nav}>

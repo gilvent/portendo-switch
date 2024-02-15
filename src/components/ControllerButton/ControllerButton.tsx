@@ -12,6 +12,7 @@ function ControllerButton() {
       data-anim-target="controller-button"
       className={styles.controller}
     >
+      {/* TODO check if this div is necessary*/}
       <div data-anim-target="tendo" className={styles.tendo}>
         <div data-anim-target="left-joycon" className={styles['left-joycon']}>
           <button
@@ -59,7 +60,7 @@ function ControllerButton() {
               >
                 <h3 className={styles.title}>Work</h3>
                 <div className={styles.guide}>
-                  <span data-anim-target="guide-text">Press B to view</span>
+                  <span data-anim-target="guide-text">Press B to start</span>
                   <div
                     data-anim-target="loading-bar"
                     className={`${styles['loading-bar']} invisible`}

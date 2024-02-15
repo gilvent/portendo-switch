@@ -1,3 +1,5 @@
+@use 'assets/scss/variables/fonts';
+@use 'assets/scss/mixins/responsive';
 
 @mixin text-xs {
   font-size: 0.75rem; /* 12px */
@@ -6,10 +8,14 @@
 @mixin text-sm {
   font-size: 0.875rem; /* 14px */
   line-height: 1.25rem; /* 20px */
+  font-family: fonts.$solid-fredoka;
+  font-weight: 500;
 }
 @mixin text-base {
   font-size: 1rem; /* 16px */
   line-height: 1.5rem; /* 24px */
+  font-family: fonts.$solid-fredoka;
+  font-weight: 500;
 }
 @mixin text-lg {
   font-size: 1.125rem; /* 18px */
@@ -26,4 +32,30 @@
 @mixin text-3xl {
   font-size: 1.875rem; /* 30px */
   line-height: 2.25rem; /* 36px */
+}
+
+@mixin title-outline {
+  font-size: 3.55rem;
+  font-family: fonts.$outline-gaban;
+  @include responsive.tablets {
+    font-size: 4.5rem;
+  }
+}
+
+@mixin heading-solid {
+  font-size: 3.25rem;
+  font-family: fonts.$solid-fredoka;
+
+  @include responsive.tablets {
+    font-size: 4.25rem;
+  }
+}
+
+@mixin heading-2-solid {
+  font-size: 2.45rem;
+  font-family: fonts.$solid-fredoka;
+
+  @include responsive.tablets {
+    font-size: 3.25rem;
+  }
 }

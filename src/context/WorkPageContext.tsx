@@ -2,49 +2,49 @@
 import React, { useEffect, useState } from 'react';
 import { createContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import { WorkDetailName } from '@/utils/enums';
+import { WorkHighlightName } from '@/utils/enums';
 
 type WorkPageProviderValue = {
-  openWorkDetail: () => void;
-  closeWorkDetail: () => void;
-  activeWorkDetail: WorkDetailName | null;
-  workDetailNameByPath: Record<string, WorkDetailName>;
+  openWorkHighlight: () => void;
+  closeWorkHighlight: () => void;
+  activeWorkHighlight: WorkHighlightName | null;
+  workDetailNameByPath: Record<string, WorkHighlightName>;
 };
 
-const workDetailNameByPath: Record<string, WorkDetailName> = {
-  '/work/blibli': WorkDetailName.Blibli,
-  '/work/moperty': WorkDetailName.Moperty
+const workDetailNameByPath: Record<string, WorkHighlightName> = {
+  '/work/blibli': WorkHighlightName.Blibli,
+  '/work/moperty': WorkHighlightName.Moperty
 };
 
 const WorkPageContext = createContext<WorkPageProviderValue>({
-  activeWorkDetail: null,
-  openWorkDetail: () => {},
-  closeWorkDetail: () => {},
+  activeWorkHighlight: null,
+  openWorkHighlight: () => {},
+  closeWorkHighlight: () => {},
   workDetailNameByPath
 });
 
 function WorkPageProvider({ children }: { children: React.ReactNode }) {
-  const [activeWorkDetail, setActiveWorkDetail] =
-    useState<WorkDetailName | null>(null);
+  const [activeWorkHighlight, setActiveWorkHighlight] =
+    useState<WorkHighlightName | null>(null);
   const { pathname } = useLocation();
 
   useEffect(() => {
-    closeWorkDetail();
+    closeWorkHighlight();
   }, [pathname]);
 
-  function openWorkDetail() {
-    setActiveWorkDetail(workDetailNameByPath[pathname] ?? null);
+  function openWorkHighlight() {
+    setActiveWorkHighlight(workDetailNameByPath[pathname] ?? null);
   }
 
-  function closeWorkDetail() {
-    setActiveWorkDetail(null);
+  function closeWorkHighlight() {
+    setActiveWorkHighlight(null);
   }
 
   const providerValue = {
-    activeWorkDetail,
+    activeWorkHighlight,
     workDetailNameByPath,
-    closeWorkDetail,
-    openWorkDetail
+    closeWorkHighlight,
+    openWorkHighlight
   };
 
   return (

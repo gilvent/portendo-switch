@@ -14,20 +14,16 @@ function HomePage() {
   const navigate = useNavigate();
   const ref = useRef<any>(null);
   const isTablet = useMediaQuery(MediaQueryScreen.Tablet);
+  const clouds = isTablet ? createClouds(6) : createClouds(3);
 
   useEffect(() => {
     setAction('onControlBClick', () => {
       navigate('/work/blibli');
     });
+    setAction('onControlAClick', () => {});
+    setAction('onControlXClick', () => {});
+    setAction('onControlYClick', () => {});
   }, []);
-
-  function clouds() {
-    if (isTablet) {
-      return createClouds(6);
-    }
-
-    return createClouds(3);
-  }
 
   function createClouds(num: number) {
     return [...new Array(num)].map((_, idx) => (
@@ -76,11 +72,11 @@ function HomePage() {
       </div>
 
       <div data-anim-target="clouds-light" className={styles['clouds-light']}>
-        {clouds()}
+        {clouds}
       </div>
 
       <div data-anim-target="clouds-dark" className={styles['clouds-dark']}>
-        {clouds()}
+        {clouds}
       </div>
     </div>
   );
