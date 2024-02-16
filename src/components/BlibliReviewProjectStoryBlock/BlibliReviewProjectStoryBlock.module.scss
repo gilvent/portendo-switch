@@ -1,5 +1,10 @@
+@use 'assets/scss/mixins/responsive';
+
 .block {
   background-color: #f9b260;
   height: 100%;
   will-change: transform, visibility, opacity;
+  @include responsive.desktop {
+    padding-top: 56px;
+  }
 }
