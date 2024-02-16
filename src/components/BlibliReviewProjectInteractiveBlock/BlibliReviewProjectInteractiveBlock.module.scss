@@ -6,6 +6,7 @@
   padding: 32px 0;
   z-index: 1;
   background-color: #fff4e1;
+  height: 100%;
   will-change: transform, visibility, opacity;
 }
 
@@ -228,7 +229,7 @@
       }
 
       @include responsive.desktop {
-        width: 25vw;
+        width: 30vw;
       }
     }
   }
@@ -243,7 +244,7 @@
     }
 
     @include responsive.desktop {
-      width: 6vw;
+      width: 8vw;
     }
   }
   .plane {
@@ -257,7 +258,7 @@
     }
 
     @include responsive.desktop {
-      width: 10vw;
+      width: 12.5vw;
     }
   }
 }

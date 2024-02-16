@@ -15,7 +15,7 @@
   --title-color: $dark-2;
 
   @include responsive.desktop {
-    width: 50vw;
+    width: 50%;
     height: 100vh;
   }
 }
@@ -34,6 +34,11 @@
   @include responsive.tablets {
     width: 175px;
     height: 175px;
+  }
+
+  @include responsive.desktop {
+    width: 150px;
+    height: 150px;
   }
 
   &.active {
@@ -59,6 +64,10 @@
     @include responsive.tablets {
       font-size: 3.25rem;
     }
+
+    @include responsive.desktop {
+      font-size: 2.65rem;
+    }
   }
 
   .role {
@@ -71,6 +80,10 @@
     @include responsive.tablets {
       @include font.text-xl;
     }
+
+    @include responsive.desktop {
+      @include font.text-lg;
+    }
   }
 
   .product {
@@ -81,6 +94,10 @@
     @include responsive.tablets {
       padding: 0 25%;
       @include font.text-base;
+    }
+
+    @include responsive.desktop {
+      @include font.text-sm;
     }
   }
 }
@@ -96,6 +113,11 @@
     width: 125px;
     height: 175px;
   }
+
+  @include responsive.desktop {
+    width: 100px;
+    height: 140px;
+  }
 }
 
 .content {
@@ -109,6 +131,10 @@
 
   @include responsive.tablets {
     margin-top: -15%;
+  }
+
+  @include responsive.desktop {
+    margin-top: -35%;
   }
 }
 
@@ -129,7 +155,8 @@
   }
 
   @include responsive.desktop {
-    @include font.text-xl;
+    @include font.text-base;
+    padding: 48px 9.5vw;
   }
 }
 
@@ -138,6 +165,10 @@
   top: 120%;
   z-index: 4;
   opacity: 0;
+
+  @include responsive.desktop {
+    top: 150%;
+  }
 
   .btn-title {
     text-transform: uppercase;

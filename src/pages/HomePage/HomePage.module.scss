@@ -23,6 +23,10 @@
     top: 22.5%;
   }
 
+  @include responsive.desktop {
+    top: 15%;
+  }
+
   h2 {
     font-size: 3.65rem;
     font-family: fonts.$solid-fredoka;
@@ -62,6 +66,10 @@
         bottom: -100px;
         left: 105px;
       }
+      @include responsive.desktop {
+        bottom: -50px;
+        left: 105px;
+      }
     }
 
     &.github {
@@ -71,6 +79,11 @@
 
       @include responsive.tablets {
         left: 275px;
+      }
+
+      @include responsive.desktop {
+        bottom: -180px;
+        left: 185px;
       }
     }
 
@@ -82,6 +95,11 @@
         bottom: -185px;
         right: 225px;
       }
+
+      @include responsive.desktop {
+        bottom: -155px;
+        right: 225px;
+      }
     }
 
     &.gmail {
@@ -91,6 +109,10 @@
       @include responsive.tablets {
         bottom: -95px;
         right: 75px;
+      }
+      @include responsive.tablets {
+        bottom: -45px;
+        right: 105px;
       }
     }
   }
@@ -109,6 +131,10 @@
 
   @include responsive.tablets {
     height: 25%;
+  }
+
+  @include responsive.desktop {
+    height: 30%;
   }
 
   .cloud {
@@ -172,6 +198,10 @@
         top: -17vw;
         transform: translateY(30%);
       }
+
+      @include responsive.desktop {
+        width: 35vw;
+      }
     }
     &:nth-child(5) {
       @include responsive.tablets {
@@ -182,6 +212,12 @@
         top: -32vw;
         transform: translateY(30%);
       }
+
+      @include responsive.desktop {
+        height: 31vw;
+        width: 30vw;
+        top: -28vw;
+      }
     }
     &:nth-child(6) {
       @include responsive.tablets {
@@ -191,6 +227,11 @@
         right: -13vw;
         top: -40.5vw;
         transform: translateY(100%);
+      }
+
+      @include responsive.desktop {
+        top: -25.5vw;
+        transform: translateY(50%);
       }
     }
   }
@@ -210,6 +251,10 @@
 
   @include responsive.tablets {
     height: 10%;
+  }
+
+  @include responsive.desktop {
+    height: 7.5%;
   }
 
   .cloud {

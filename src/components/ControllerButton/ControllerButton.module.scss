@@ -21,6 +21,10 @@
   @include responsive.tablets {
     transform: translateY(250px) scale(1.25);
   }
+
+  @include responsive.desktop {
+    transform: translateY(250px);
+  }
 }
 
 .tendo {
