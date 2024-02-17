@@ -8,12 +8,13 @@ import { MediaQueryScreen } from './utils/enums';
 function App() {
   const isDesktop = useMediaQuery(MediaQueryScreen.Desktop);
   const routerKey = isDesktop ? 'landscape-mode' : 'portrait-mode';
+  const controllerKey = 'controller-' + routerKey;
 
   return (
     <ControllerButtonProvider>
       <div className="app">
         <Router key={routerKey} />
-        <ControllerButton />
+        <ControllerButton key={controllerKey} />
       </div>
     </ControllerButtonProvider>
   );
