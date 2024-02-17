@@ -1,3 +1,4 @@
+import valueForScreen from '@/utils/window';
 import gsap from 'gsap';
 
 // value should be the same as initially set in CSS
@@ -231,7 +232,7 @@ export function screenModeToSingleCon(): gsap.core.Timeline {
     .timeline()
     .addLabel('screen-mode')
     .to(con, {
-      translateX: conTranslateDistance
+      translateX: valueForScreen({ desktop: 0 }, conTranslateDistance)
     })
     .to(
       q('[data-anim-target="left-joycon"]'),

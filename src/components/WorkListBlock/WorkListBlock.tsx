@@ -15,6 +15,7 @@ import {
 } from '@/utils/gsap/animation-helpers/work-list-block';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
 import { disableController, enableController } from '@/utils/document';
+import classNames from 'classnames';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
@@ -90,14 +91,16 @@ function WorkListBlock() {
   return (
     <div ref={nodeRef} className={styles['work-nav']}>
       <div data-anim-target="work-pointer-ball" className={styles.ball}></div>
-      <div className={styles.slidescreen}></div>
+
       <div
         data-anim-target="work-slider-wrapper"
-        className={styles['banner-wrapper']}
+        className={styles['slider-wrapper']}
       >
         <div
           id="blibli-banner-container"
-          className={styles['banner-container']}
+          className={classNames(styles['banner-container'], {
+            [styles.active]: activeBanner.title === WorkHighlightName.Blibli
+          })}
         >
           <WorkBannerBlock
             id="blibli-banner"
@@ -123,7 +126,9 @@ function WorkListBlock() {
         </div>
         <div
           id="moperty-banner-container"
-          className={styles['banner-container']}
+          className={classNames(styles['banner-container'], {
+            [styles.active]: activeBanner.title === WorkHighlightName.Moperty
+          })}
         >
           <WorkBannerBlock
             id="moperty-banner"
@@ -146,6 +151,11 @@ function WorkListBlock() {
             onClick={() => {}}
           />
         </div>
+
+        <div
+          data-anim-target="work-slider-bg"
+          className={styles['slider-bg']}
+        ></div>
       </div>
     </div>
   );

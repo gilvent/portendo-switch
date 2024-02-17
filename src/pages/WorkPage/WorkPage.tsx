@@ -17,7 +17,10 @@ function WorkPage() {
 
   return (
     <div className="work-list">
-      <div className={primaryPanelClasses}>
+      <div
+        data-anim-target="work-list-container"
+        className={primaryPanelClasses}
+      >
         <WorkListBlock></WorkListBlock>
       </div>
 

@@ -15,12 +15,12 @@
   --title-color: $dark-2;
 
   @include responsive.desktop {
-    width: 50%;
+    width: 100%;
     height: 100vh;
   }
 }
 
-.background {
+.pointer-ball-placeholder {
   position: absolute;
   width: 150px;
   height: 150px;

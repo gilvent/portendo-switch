@@ -30,7 +30,10 @@ function WorkBanner(props: WorkBannerProps) {
   const coverTitleClass = classNames('invisible', styles.heading);
   const coverRoleClass = classNames('invisible', styles.role);
   const coverDescriptionClass = classNames('invisible', styles.product);
-  const bgClass = classNames('invisible', styles.background);
+  const ballPlaceholderClass = classNames(
+    'invisible',
+    styles['pointer-ball-placeholder']
+  );
   const titleClass = classNames('invisible', styles.title);
 
   return (
@@ -75,7 +78,7 @@ function WorkBanner(props: WorkBannerProps) {
 
         <div
           data-anim-target="ball-placeholder"
-          className={bgClass}
+          className={ballPlaceholderClass}
           ref={bgRef}
         ></div>
       </div>
