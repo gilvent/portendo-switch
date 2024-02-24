@@ -69,7 +69,7 @@ function WorkListBlock() {
       removeShowBgListener();
       removeHideBgListener();
     };
-  }, []);
+  }, [activeBanner]);
 
   useEffect(() => {
     setAction('onControlXClick', () => {
