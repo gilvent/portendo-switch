@@ -2,7 +2,7 @@ import { useContext, useRef } from 'react';
 import gsap from 'gsap';
 import styles from './ControllerHelpPanel.module.scss';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
-import ScreenModeController from './ScreenModeController';
+import JoyconPreview from './JoyconPreview';
 import { Transition } from 'react-transition-group';
 import { useGSAP } from '@gsap/react';
 
@@ -52,12 +52,12 @@ function ControllerHelpPanel() {
         <div data-anim-target="help-panel" className={styles['help-panel']}>
           <div className={styles['help-panel-inner']}>
             <div className={styles.tips}>
-              Use the controller to navigate pages. <br /> You can open help
+              Use the controllers to navigate pages. <br /> You can open help
               panel from anywhere to check what it does.
             </div>
 
             <figure className={styles.controller}>
-              <ScreenModeController></ScreenModeController>
+              <JoyconPreview active={visibleHelpPanel} />
             </figure>
             <div className={styles.guides}>
               <div className={styles.guide}>
