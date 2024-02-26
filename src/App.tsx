@@ -1,5 +1,6 @@
 import './App.scss';
 import ControllerButton from './components/ControllerButton';
+import ControllerHelpPanel from './components/ControllerHelpPanel';
 import { ControllerButtonProvider } from './context/ControllerButtonContext';
 import useMediaQuery from './hooks/useMediaQuery.hook';
 import Router from './router/Router';
@@ -15,6 +16,7 @@ function App() {
       <div className="app">
         <Router key={routerKey} />
         <ControllerButton key={controllerKey} />
+        <ControllerHelpPanel />
       </div>
     </ControllerButtonProvider>
   );

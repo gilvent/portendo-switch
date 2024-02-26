@@ -1,0 +1,158 @@
+@use 'assets/scss/variables/colors';
+@use 'assets/scss/mixins/font';
+@use 'assets/scss/mixins/responsive';
+@use 'assets/scss/mixins/shapes';
+
+.help-wrapper {
+  position: fixed;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 12;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  display: none;
+  --panel-color: #4b4b4b;
+}
+
+.help-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  height: auto;
+  aspect-ratio: 2 / 2.5;
+  filter: drop-shadow(0 2px 3px hsla(0, 0%, 0%, 0.25));
+  background-color: var(--panel-color);
+  padding: 0 24px;
+  z-index: 3;
+  visibility: hidden;
+  opacity: 0;
+  max-width: 365px;
+  transform: translateY(-30%);
+
+  &-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    z-index: 2;
+    height: 100%;
+    flex: 1;
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 24px 24px 48px 24px;
+
+    .btn-close-wrapper {
+      position: absolute;
+      left: 0;
+      bottom: -25px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .btn-close {
+      cursor: pointer;
+      padding: 12px;
+      border-radius: 25%;
+      box-shadow: inset 0 -0.0625em 0.125em rgba(0, 0, 0, 0.75),
+        inset 0 0.125em 0.125em -0.0625em rgba(255, 255, 255, 0.4),
+        0 0 0.03125em 0.0625em rgba(0, 0, 0, 0.6),
+        0 0.0625em 0.25em 0.03125em rgba(0, 0, 0, 0.5);
+
+      &:active {
+        box-shadow: inset 0 -0.0625em 0.125em rgba(0, 0, 0, 0.75),
+          inset 0 0.125em 0.125em -0.0625em rgba(255, 255, 255, 0.69),
+          0 0 0.03125em 0.0625em rgba(0, 0, 0, 0.6);
+      }
+
+      @include font.text-lg;
+    }
+  }
+
+  &::before {
+    position: absolute;
+    content: '';
+    top: -12.5%;
+    width: 100%;
+    height: 25%;
+    background-color: var(--panel-color);
+    border-radius: 50%;
+  }
+
+  &::after {
+    position: absolute;
+    content: '';
+    bottom: -7.5%;
+    width: 100%;
+    height: 15%;
+    background-color: var(--panel-color);
+    border-radius: 50%;
+  }
+}
+
+.tips {
+  font-style: italic;
+  text-align: center;
+  @include font.text-sm;
+}
+
+.guides {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guide {
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  gap: 4px;
+  @include font.text-sm;
+
+  @include responsive.tablets {
+    @include font.text-base;
+  }
+
+  @include responsive.desktop {
+    @include font.text-sm;
+  }
+
+  .joycon-btn {
+    position: relative;
+    background-color: colors.$dark-2;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+
+    .arrow-up {
+      @include shapes.triangle(10px, #fff, up);
+      margin-top: -5px;
+    }
+
+    .arrow-down {
+      @include shapes.triangle(10px, #fff, down);
+      margin-bottom: -5px;
+    }
+  }
+}
+
+.overlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: colors.$dark-3;
+  visibility: hidden;
+  opacity: 0;
+
+  z-index: 2;
+}

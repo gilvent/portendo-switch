@@ -20,6 +20,8 @@
 @mixin text-lg {
   font-size: 1.125rem; /* 18px */
   line-height: 1.75rem; /* 28px */
+  font-family: fonts.$solid-fredoka;
+  font-weight: 600;
 }
 @mixin text-xl {
   font-size: 1.25rem; /* 20px */

@@ -1,10 +1,28 @@
 import { useContext, useRef } from 'react';
 import styles from './ControllerButton.module.scss';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
+import debounced from '@/utils/debounced';
 
 function ControllerButton() {
-  const { actions } = useContext(ControllerButtonContext);
+  const { actions, setVisibleHelpPanel } = useContext(ControllerButtonContext);
   const rootRef = useRef<any>(null);
+  const clickCount = useRef<number>(0);
+
+  function runActionB() {
+    if (clickCount.current >= 2) {
+      setVisibleHelpPanel(true);
+    } else {
+      actions?.current?.['onControlBClick']();
+    }
+    clickCount.current = 0;
+  }
+
+  const handleActionB = debounced(runActionB, 300);
+
+  function handleBtnBClick() {
+    clickCount.current++;
+    handleActionB();
+  }
 
   return (
     <div
@@ -93,9 +111,7 @@ function ControllerButton() {
           <button
             data-anim-target="button-b"
             className={`${styles['btn-joycon-2']} ${styles['btn-b']}`}
-            onClick={() => {
-              actions?.current?.['onControlBClick']();
-            }}
+            onClick={handleBtnBClick}
           >
             <div className={styles.letter}>B</div>
           </button>

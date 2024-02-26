@@ -1,4 +1,4 @@
-import { RefObject, createContext, useRef } from 'react';
+import { RefObject, createContext, useRef, useState } from 'react';
 
 type ControlActions =
   | 'onControlYClick'
@@ -11,11 +11,15 @@ type ControllerButtonProviderValue = {
   actions: RefObject<
     Record<ControlActions, () => void | undefined | null>
   > | null;
+  visibleHelpPanel: boolean;
+  setVisibleHelpPanel: (visible: boolean) => void;
 };
 
 const ControllerButtonContext = createContext<ControllerButtonProviderValue>({
   setAction: (control: ControlActions, fn: () => void) => {},
-  actions: null
+  actions: null,
+  visibleHelpPanel: false,
+  setVisibleHelpPanel: (visible: boolean) => {}
 });
 
 function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
@@ -27,12 +31,18 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
       onControlXClick: () => {}
     }
   );
+  const [visibleHelpPanel, setVisibleHelpPanel] = useState<boolean>(false);
 
   function setAction(control: ControlActions, fn: () => void) {
     actions.current[control] = fn;
   }
 
-  const providerValue = { setAction, actions };
+  const providerValue = {
+    setAction,
+    actions,
+    visibleHelpPanel,
+    setVisibleHelpPanel
+  };
 
   return (
     <ControllerButtonContext.Provider value={providerValue}>
