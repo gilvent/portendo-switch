@@ -1,10 +1,11 @@
-import { useContext, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import styles from './ControllerHelpPanel.module.scss';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 import JoyconPreview from './JoyconPreview';
 import { Transition } from 'react-transition-group';
 import { useGSAP } from '@gsap/react';
+import { useLocation } from 'react-router-dom';
 
 function ControllerHelpPanel() {
   const { visibleHelpPanel, setVisibleHelpPanel } = useContext(
@@ -13,7 +14,12 @@ function ControllerHelpPanel() {
   const nodeRef = useRef<any>(null);
   const animationDone = useRef<Function | null>(null);
   const enterAnim = useRef<gsap.core.Timeline | null>(null);
+  const location = useLocation();
   const { contextSafe } = useGSAP({ scope: nodeRef });
+
+  useEffect(() => {
+    setVisibleHelpPanel(false);
+  }, [location]);
 
   function onCloseBtnClick() {
     setVisibleHelpPanel(false);
