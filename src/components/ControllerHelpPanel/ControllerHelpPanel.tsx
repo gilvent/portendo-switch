@@ -8,7 +8,7 @@ import { useGSAP } from '@gsap/react';
 import { useLocation } from 'react-router-dom';
 
 function ControllerHelpPanel() {
-  const { visibleHelpPanel, setVisibleHelpPanel } = useContext(
+  const { visibleHelpPanel, setVisibleHelpPanel, helpPanelGuides } = useContext(
     ControllerButtonContext
   );
   const nodeRef = useRef<any>(null);
@@ -16,6 +16,7 @@ function ControllerHelpPanel() {
   const enterAnim = useRef<gsap.core.Timeline | null>(null);
   const location = useLocation();
   const { contextSafe } = useGSAP({ scope: nodeRef });
+  const guides = renderGuides();
 
   useEffect(() => {
     setVisibleHelpPanel(false);
@@ -46,6 +47,35 @@ function ControllerHelpPanel() {
     animationDone.current = done;
   }
 
+  function renderGuides() {
+    const guides = [
+      ['Double tap', '{B}', 'to open help panel'],
+      ...helpPanelGuides
+    ];
+    const buttonByCode: Record<string, React.ReactElement> = {
+      '{A}': <div className={styles['joycon-btn']}>A</div>,
+      '{B}': <div className={styles['joycon-btn']}>B</div>,
+      '{UP}': (
+        <div className={styles['joycon-btn']}>
+          <div className={styles['arrow-up']}></div>
+        </div>
+      ),
+      '{DOWN}': (
+        <div className={styles['joycon-btn']}>
+          <div className={styles['arrow-down']}></div>
+        </div>
+      )
+    };
+
+    return guides.map(textArr => (
+      <div className={styles.guide}>
+        {textArr.map(
+          (text: string) => buttonByCode[text as string] ?? <span>{text}</span>
+        )}
+      </div>
+    ));
+  }
+
   return (
     <Transition
       nodeRef={nodeRef}
@@ -66,36 +96,7 @@ function ControllerHelpPanel() {
               <JoyconPreview active={visibleHelpPanel} />
             </figure>
             <div className={styles.guides}>
-              <div className={styles.guide}>
-                <span>Double tap</span>
-                <div className={styles['joycon-btn']}>B</div>
-                <span>to open help panel</span>
-              </div>
-              <div className={styles.guide}>
-                <span>Press</span>
-                <div className={styles['joycon-btn']}>A</div>
-                <span>to go back</span>
-              </div>
-
-              <div className={styles.guide}>
-                <span>Press</span>
-                <div className={styles['joycon-btn']}>B</div>
-                <span>to view work highlights!</span>
-              </div>
-
-              <div className={styles.guide}>
-                <span>Press</span>
-                <div className={styles['joycon-btn']}>
-                  <div className={styles['arrow-up']}></div>
-                </div>
-                <div
-                  className={`${styles['joycon-btn']} ${styles['joycon-btn--r180']}`}
-                >
-                  <div className={styles['arrow-down']}></div>
-                </div>
-                <span>to navigate list</span>
-              </div>
-
+              {guides}
               <div className={styles['btn-close-wrapper']}>
                 <button
                   onClick={onCloseBtnClick}

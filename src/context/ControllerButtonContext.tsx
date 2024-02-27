@@ -13,13 +13,17 @@ type ControllerButtonProviderValue = {
   > | null;
   visibleHelpPanel: boolean;
   setVisibleHelpPanel: (visible: boolean) => void;
+  helpPanelGuides: Array<Array<string>>;
+  setHelpPanelGuides: (guides: Array<Array<string>>) => void;
 };
 
 const ControllerButtonContext = createContext<ControllerButtonProviderValue>({
   setAction: (control: ControlActions, fn: () => void) => {},
   actions: null,
   visibleHelpPanel: false,
-  setVisibleHelpPanel: (visible: boolean) => {}
+  setVisibleHelpPanel: (visible: boolean) => {},
+  helpPanelGuides: [],
+  setHelpPanelGuides: (guides: Array<Array<string>>) => {}
 });
 
 function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
@@ -32,6 +36,9 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
     }
   );
   const [visibleHelpPanel, setVisibleHelpPanel] = useState<boolean>(false);
+  const [helpPanelGuides, setHelpPanelGuides] = useState<Array<Array<string>>>(
+    []
+  );
 
   function setAction(control: ControlActions, fn: () => void) {
     actions.current[control] = fn;
@@ -41,7 +48,9 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
     setAction,
     actions,
     visibleHelpPanel,
-    setVisibleHelpPanel
+    setVisibleHelpPanel,
+    helpPanelGuides,
+    setHelpPanelGuides
   };
 
   return (

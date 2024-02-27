@@ -23,7 +23,7 @@ function WorkHighlight() {
   const [ActiveComponent, setActiveComponent] = useState<any>(() => {
     return detailComponentByParams[params.title as string];
   });
-  const { setAction } = useContext(ControllerButtonContext);
+  const { setAction, setHelpPanelGuides } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +40,13 @@ function WorkHighlight() {
       navigate(url);
     });
   }, [params]);
+
+  useEffect(() => {
+    setHelpPanelGuides([
+      ['Press', '{A}', 'to go back'],
+      ['Press', '{B}', 'to scroll down']
+    ]);
+  }, []);
 
   return (
     <Suspense>

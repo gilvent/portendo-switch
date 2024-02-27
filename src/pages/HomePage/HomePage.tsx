@@ -10,7 +10,7 @@ import useMediaQuery from '@/hooks/useMediaQuery.hook';
 import { MediaQueryScreen } from '@/utils/enums';
 
 function HomePage() {
-  const { setAction } = useContext(ControllerButtonContext);
+  const { setAction, setHelpPanelGuides } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
   const ref = useRef<any>(null);
   const isTablet = useMediaQuery(MediaQueryScreen.Tablet);
@@ -23,6 +23,13 @@ function HomePage() {
     setAction('onControlAClick', () => {});
     setAction('onControlXClick', () => {});
     setAction('onControlYClick', () => {});
+  }, []);
+
+  useEffect(() => {
+    setHelpPanelGuides([
+      ['Press', '{A}', "to change controller's color"],
+      ['Press', '{B}', 'to start page!']
+    ]);
   }, []);
 
   function createClouds(num: number) {

@@ -3,10 +3,8 @@ import WorkBannerBlock from '@/components/WorkBanner';
 import mopertyLogo from 'assets/img/brand/moperty-white.svg';
 import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
 import GiftsImage from '@/components/GiftsImage';
-import { useContext, useEffect, useRef, useState } from 'react';
-import ControllerButtonContext from '@/context/ControllerButtonContext';
-import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH_PATTERNS, WorkHighlightName } from '@/utils/enums';
+import { useEffect, useRef, useState } from 'react';
+import { WorkHighlightName } from '@/utils/enums';
 import { useGSAP } from '@gsap/react';
 import useActiveWorkBanner from './useActiveWorkBanner.hook';
 import {
@@ -19,9 +17,7 @@ import classNames from 'classnames';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
-  const navigate = useNavigate();
   const { activeBanner, bannersByTitle, prevBanner } = useActiveWorkBanner();
-  const { setAction } = useContext(ControllerButtonContext);
   const [activeBg, setActiveBg] = useState<WorkHighlightName | null>(null);
   const {
     addListener: addShowBgListener,
@@ -69,23 +65,6 @@ function WorkListBlock() {
       removeShowBgListener();
       removeHideBgListener();
     };
-  }, [activeBanner]);
-
-  useEffect(() => {
-    setAction('onControlXClick', () => {
-      const nextUrl = ROUTE_PATH_PATTERNS.WORK.replace(
-        ':title',
-        activeBanner.nextBannerTitle
-      );
-      navigate(nextUrl, { replace: true });
-    });
-    setAction('onControlYClick', () => {
-      const prevUrl = ROUTE_PATH_PATTERNS.WORK.replace(
-        ':title',
-        activeBanner.prevBannerTitle
-      );
-      navigate(prevUrl, { replace: true });
-    });
   }, [activeBanner]);
 
   return (
