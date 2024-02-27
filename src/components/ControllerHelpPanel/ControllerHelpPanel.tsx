@@ -16,7 +16,6 @@ function ControllerHelpPanel() {
   const enterAnim = useRef<gsap.core.Timeline | null>(null);
   const location = useLocation();
   const { contextSafe } = useGSAP({ scope: nodeRef });
-  const guides = renderGuides();
 
   useEffect(() => {
     setVisibleHelpPanel(false);
@@ -48,33 +47,36 @@ function ControllerHelpPanel() {
   }
 
   function renderGuides() {
-    const guides = [
-      ['Double tap', '{B}', 'to open help panel'],
-      ...helpPanelGuides
-    ];
-    const buttonByCode: Record<string, React.ReactElement> = {
-      '{A}': <div className={styles['joycon-btn']}>A</div>,
-      '{B}': <div className={styles['joycon-btn']}>B</div>,
-      '{UP}': (
-        <div className={styles['joycon-btn']}>
-          <div className={styles['arrow-up']}></div>
+    const guides = ['Double tap {B} to open help panel', ...helpPanelGuides];
+    const buttonByCode: Record<string, string> = {
+      '{A}': `<div class="${styles['joycon-btn']}">A</div>`,
+      '{B}': `<div class="${styles['joycon-btn']}">B</div>`,
+      '{UP}': `<div class="${styles['joycon-btn']}"><div class="${styles['arrow-up']}"></div></div>`,
+      '{DOWN}': `
+        <div class="${styles['joycon-btn']}">
+          <div class="${styles['arrow-down']}"></div>
         </div>
-      ),
-      '{DOWN}': (
-        <div className={styles['joycon-btn']}>
-          <div className={styles['arrow-down']}></div>
-        </div>
-      )
+      `
     };
 
-    return guides.map(textArr => (
-      <div className={styles.guide}>
-        {textArr.map(
-          (text: string) => buttonByCode[text as string] ?? <span>{text}</span>
-        )}
-      </div>
-    ));
+    return guides.map((text, index) => {
+      const key = `guide-text-${index}`;
+      const htmlStr = text.replace(
+        /{(A|B|UP|DOWN)}/gi,
+        code => buttonByCode[code]
+      );
+
+      return (
+        <div
+          key={key}
+          className={styles.guide}
+          dangerouslySetInnerHTML={{ __html: htmlStr }}
+        ></div>
+      );
+    });
   }
+
+  const guides = renderGuides();
 
   return (
     <Transition

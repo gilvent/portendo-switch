@@ -15,9 +15,9 @@ const WorkIndexDummyPage = () => {
 
   useEffect(() => {
     setHelpPanelGuides([
-      ['Press', '{A}', 'to go back'],
-      ['Press', '{B}', 'to view work highlights'],
-      ['Press', '{UP}', '{DOWN}', 'to move between works']
+      'Press {A} to go back',
+      'Press {B} to view work highlights',
+      'Press {UP} {DOWN} to move between works'
     ]);
   }, []);
 

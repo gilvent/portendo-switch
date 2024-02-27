@@ -42,10 +42,7 @@ function WorkHighlight() {
   }, [params]);
 
   useEffect(() => {
-    setHelpPanelGuides([
-      ['Press', '{A}', 'to go back'],
-      ['Press', '{B}', 'to scroll down']
-    ]);
+    setHelpPanelGuides(['Press {A} to go back', 'Press {B} to scroll down']);
   }, []);
 
   return (

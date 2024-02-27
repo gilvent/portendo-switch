@@ -27,8 +27,8 @@ function HomePage() {
 
   useEffect(() => {
     setHelpPanelGuides([
-      ['Press', '{A}', "to change controller's color"],
-      ['Press', '{B}', 'to start page!']
+      "Press {A} to change controller's color",
+      'Press {B} to start page!'
     ]);
   }, []);
 
