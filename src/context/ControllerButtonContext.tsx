@@ -1,4 +1,11 @@
-import { RefObject, createContext, useRef, useState } from 'react';
+import { ControllerScreenTitle } from '@/utils/enums';
+import {
+  MutableRefObject,
+  RefObject,
+  createContext,
+  useRef,
+  useState
+} from 'react';
 
 type ControlActions =
   | 'onControlYClick'
@@ -15,6 +22,9 @@ type ControllerButtonProviderValue = {
   setVisibleHelpPanel: (visible: boolean) => void;
   helpPanelGuides: Array<string>;
   setHelpPanelGuides: (guides: Array<string>) => void;
+  activeScreen: ControllerScreenTitle;
+  setActiveGameScreen: (activeScreen: ControllerScreenTitle) => void;
+  changeScreenDirection: MutableRefObject<'up' | 'down'>;
 };
 
 const ControllerButtonContext = createContext<ControllerButtonProviderValue>({
@@ -23,7 +33,10 @@ const ControllerButtonContext = createContext<ControllerButtonProviderValue>({
   visibleHelpPanel: false,
   setVisibleHelpPanel: (visible: boolean) => {},
   helpPanelGuides: [],
-  setHelpPanelGuides: (guides: Array<string>) => {}
+  setHelpPanelGuides: (guides: Array<string>) => {},
+  activeScreen: ControllerScreenTitle.Home,
+  setActiveGameScreen: (activeScreen: ControllerScreenTitle) => {},
+  changeScreenDirection: { current: 'up' }
 });
 
 function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
@@ -37,6 +50,10 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
   );
   const [visibleHelpPanel, setVisibleHelpPanel] = useState<boolean>(false);
   const [helpPanelGuides, setHelpPanelGuides] = useState<Array<string>>([]);
+  const [activeScreen, setActiveGameScreen] = useState<ControllerScreenTitle>(
+    ControllerScreenTitle.Home
+  );
+  const changeScreenDirection = useRef<'up' | 'down'>('up');
 
   function setAction(control: ControlActions, fn: () => void) {
     actions.current[control] = fn;
@@ -48,7 +65,10 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
     visibleHelpPanel,
     setVisibleHelpPanel,
     helpPanelGuides,
-    setHelpPanelGuides
+    setHelpPanelGuides,
+    activeScreen,
+    setActiveGameScreen,
+    changeScreenDirection
   };
 
   return (

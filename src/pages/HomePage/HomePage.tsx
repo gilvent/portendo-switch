@@ -7,30 +7,69 @@ import github from 'assets/img/brand/github.png';
 import gmail from 'assets/img/brand/gmail.png';
 import twitter from 'assets/img/brand/twitter.png';
 import useMediaQuery from '@/hooks/useMediaQuery.hook';
-import { MediaQueryScreen } from '@/utils/enums';
+import { ControllerScreenTitle, MediaQueryScreen } from '@/utils/enums';
 
 function HomePage() {
-  const { setAction, setHelpPanelGuides } = useContext(ControllerButtonContext);
+  const {
+    setAction,
+    setVisibleHelpPanel,
+    setHelpPanelGuides,
+    activeScreen,
+    setActiveGameScreen,
+    changeScreenDirection
+  } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
   const ref = useRef<any>(null);
   const isTablet = useMediaQuery(MediaQueryScreen.Tablet);
   const clouds = isTablet ? createClouds(6) : createClouds(3);
+  const controllerScreensNavigation = {
+    [ControllerScreenTitle.Home]: {
+      prev: ControllerScreenTitle.Work,
+      next: ControllerScreenTitle.Work
+    },
+    [ControllerScreenTitle.Work]: {
+      prev: ControllerScreenTitle.Home,
+      next: ControllerScreenTitle.Home,
+      url: '/work/blibli'
+    }
+  };
+
+  useEffect(() => {
+    setHelpPanelGuides([
+      "Press {A} to change controller's color",
+      'Press {UP} {DOWN} to change screen'
+    ]);
+  }, []);
 
   useEffect(() => {
     setAction('onControlBClick', () => {
       navigate('/work/blibli');
     });
     setAction('onControlAClick', () => {});
-    setAction('onControlXClick', () => {});
-    setAction('onControlYClick', () => {});
   }, []);
 
   useEffect(() => {
-    setHelpPanelGuides([
-      "Press {A} to change controller's color",
-      'Press {B} to start page!'
-    ]);
-  }, []);
+    setAction('onControlXClick', () => {
+      changeScreenDirection.current = 'up';
+      setActiveGameScreen(controllerScreensNavigation[activeScreen].prev);
+    });
+    setAction('onControlYClick', () => {
+      changeScreenDirection.current = 'down';
+      setActiveGameScreen(controllerScreensNavigation[activeScreen].next);
+    });
+  }, [activeScreen]);
+
+  useEffect(() => {
+    if (activeScreen === ControllerScreenTitle.Home) {
+      setAction('onControlBClick', () => {
+        setVisibleHelpPanel(true);
+      });
+    } else {
+      setAction('onControlBClick', () => {
+        navigate(controllerScreensNavigation[activeScreen].url);
+      });
+    }
+  }, [activeScreen]);
 
   function createClouds(num: number) {
     return [...new Array(num)].map((_, idx) => (

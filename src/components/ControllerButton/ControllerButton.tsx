@@ -2,6 +2,7 @@ import { useContext, useRef } from 'react';
 import styles from './ControllerButton.module.scss';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 import debounced from '@/utils/debounced';
+import ControllerScreen from '@/components/ControllerScreen';
 
 function ControllerButton() {
   const { actions, setVisibleHelpPanel } = useContext(ControllerButtonContext);
@@ -72,25 +73,9 @@ function ControllerButton() {
               data-anim-target="inner-screen"
               className={styles['inner-screen']}
             >
-              <div
-                data-anim-target="screen-foreground"
-                className={styles['work-landing-screen']}
-              >
-                <h3 className={styles.title}>Work</h3>
-                <div className={styles.guide}>
-                  <span data-anim-target="guide-text">Press B to start</span>
-                  <div
-                    data-anim-target="loading-bar"
-                    className={`${styles['loading-bar']} invisible`}
-                  >
-                    <div
-                      data-anim-target="loading-progress"
-                      className={styles['inner-loading-bar']}
-                    ></div>
-                  </div>
-                </div>
-              </div>
+              <ControllerScreen />
             </div>
+
             <div
               data-anim-target="shut-down-overlay"
               className={styles['shut-down-overlay']}
