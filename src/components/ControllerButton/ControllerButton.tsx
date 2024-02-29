@@ -1,11 +1,13 @@
-import { useContext, useRef } from 'react';
+import { CSSProperties, useContext, useRef } from 'react';
 import styles from './ControllerButton.module.scss';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 import debounced from '@/utils/debounced';
 import ControllerScreen from '@/components/ControllerScreen';
 
 function ControllerButton() {
-  const { actions, setVisibleHelpPanel } = useContext(ControllerButtonContext);
+  const { actions, setVisibleHelpPanel, joyconColors } = useContext(
+    ControllerButtonContext
+  );
   const rootRef = useRef<any>(null);
   const clickCount = useRef<number>(0);
 
@@ -33,7 +35,11 @@ function ControllerButton() {
     >
       {/* TODO check if this div is necessary*/}
       <div data-anim-target="tendo" className={styles.tendo}>
-        <div data-anim-target="left-joycon" className={styles['left-joycon']}>
+        <div
+          data-anim-target="left-joycon"
+          className={styles['left-joycon']}
+          style={{ '--left-joycon-color': joyconColors.left } as CSSProperties}
+        >
           <button
             data-anim-target="button-x"
             className={`${styles['btn-joycon-1']} ${styles['btn-up']}`}
@@ -83,7 +89,13 @@ function ControllerButton() {
           </div>
         </div>
 
-        <div data-anim-target="right-joycon" className={styles['right-joycon']}>
+        <div
+          data-anim-target="right-joycon"
+          className={styles['right-joycon']}
+          style={
+            { '--right-joycon-color': joyconColors.right } as CSSProperties
+          }
+        >
           <button
             data-anim-target="button-a"
             className={`${styles['btn-joycon-2']} ${styles['btn-a']}`}

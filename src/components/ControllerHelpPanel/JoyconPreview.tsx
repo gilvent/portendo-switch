@@ -1,10 +1,12 @@
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import styles from './JoyconPreview.module.scss';
-import { useRef } from 'react';
+import { CSSProperties, useContext, useRef } from 'react';
+import ControllerButtonContext from '@/context/ControllerButtonContext';
 
 function JoyconPreview({ active }: { active: boolean }) {
   const nodeRef = useRef<any>(null);
+  const { joyconColors } = useContext(ControllerButtonContext);
 
   useGSAP(
     () => {
@@ -51,6 +53,7 @@ function JoyconPreview({ active }: { active: boolean }) {
       <div
         data-anim-target="left-joycon-figure"
         className={styles['left-joycon']}
+        style={{ '--left-joycon-color': joyconColors.left } as CSSProperties}
       >
         <button
           data-anim-target="button-x"
@@ -68,6 +71,7 @@ function JoyconPreview({ active }: { active: boolean }) {
       <div
         data-anim-target="right-joycon-figure"
         className={styles['right-joycon']}
+        style={{ '--right-joycon-color': joyconColors.right } as CSSProperties}
       >
         <button
           data-anim-target="button-x"

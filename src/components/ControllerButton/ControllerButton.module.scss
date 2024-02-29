@@ -40,11 +40,12 @@
   height: 140px;
   width: 63px;
   padding: 8px;
+  transition: background-color 0.5s;
 
   z-index: 2;
   border-right: 4px solid colors.$dark;
   border-radius: 24px 8px 8px 24px;
-  background-color: #828282; // #ff3c28;
+  background-color: var(--left-joycon-color);
 
   transform: translateX(-112px);
 }
@@ -58,9 +59,10 @@
   width: 63px;
   gap: 40px;
   padding: 8px;
+  transition: background-color 0.5s;
 
   z-index: 2;
-  background-color: #828282; //#0ab9e6;
+  background-color: var(--right-joycon-color);
   border-left: 4px solid colors.$dark;
   border-radius: 8px 24px 24px 8px;
 
@@ -179,11 +181,6 @@ button.btn-joycon-2 {
   z-index: 2;
   height: 140px;
   width: 164px;
-
-  @include responsive.tablets {
-    // height: 156px;
-    // width: 180px;
-  }
 
   .shut-down-overlay {
     background-color: transparent;

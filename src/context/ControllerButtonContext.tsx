@@ -25,21 +25,23 @@ type ControllerButtonProviderValue = {
   activeScreen: ControllerScreenTitle;
   setActiveGameScreen: (activeScreen: ControllerScreenTitle) => void;
   changeScreenDirection: MutableRefObject<'up' | 'down'>;
+  joyconColors: { left: string; right: string };
+  changeJoyconColor: () => void;
 };
 
-const ControllerButtonContext = createContext<ControllerButtonProviderValue>({
-  setAction: (control: ControlActions, fn: () => void) => {},
-  actions: null,
-  visibleHelpPanel: false,
-  setVisibleHelpPanel: (visible: boolean) => {},
-  helpPanelGuides: [],
-  setHelpPanelGuides: (guides: Array<string>) => {},
-  activeScreen: ControllerScreenTitle.Home,
-  setActiveGameScreen: (activeScreen: ControllerScreenTitle) => {},
-  changeScreenDirection: { current: 'up' }
-});
+const ControllerButtonContext = createContext<ControllerButtonProviderValue>(
+  {} as ControllerButtonProviderValue
+);
 
 function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
+  const joyconColorSets = [
+    { left: '#828282', right: '#828282' },
+    {
+      left: '#ff3c28',
+      right: '#0ab9e6'
+    },
+    { left: '#C88C32', right: '#FFDC00' }
+  ];
   const actions = useRef<Record<ControlActions, () => void | undefined | null>>(
     {
       onControlYClick: () => {},
@@ -54,9 +56,23 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
     ControllerScreenTitle.Home
   );
   const changeScreenDirection = useRef<'up' | 'down'>('up');
+  const [joyconColors, setJoyconColors] = useState<{
+    left: string;
+    right: string;
+  }>({ left: '#828282', right: '#828282' });
+
+  const joyconColorIndex = useRef<number>(0);
 
   function setAction(control: ControlActions, fn: () => void) {
     actions.current[control] = fn;
+  }
+
+  function changeJoyconColor() {
+    joyconColorIndex.current =
+      joyconColorIndex.current === joyconColorSets.length - 1
+        ? 0
+        : joyconColorIndex.current + 1;
+    setJoyconColors(joyconColorSets[joyconColorIndex.current]);
   }
 
   const providerValue = {
@@ -68,7 +84,9 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
     setHelpPanelGuides,
     activeScreen,
     setActiveGameScreen,
-    changeScreenDirection
+    changeScreenDirection,
+    joyconColors,
+    changeJoyconColor
   };
 
   return (

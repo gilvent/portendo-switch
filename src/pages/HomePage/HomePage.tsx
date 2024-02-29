@@ -16,7 +16,8 @@ function HomePage() {
     setHelpPanelGuides,
     activeScreen,
     setActiveGameScreen,
-    changeScreenDirection
+    changeScreenDirection,
+    changeJoyconColor
   } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
   const ref = useRef<any>(null);
@@ -45,7 +46,9 @@ function HomePage() {
     setAction('onControlBClick', () => {
       navigate('/work/blibli');
     });
-    setAction('onControlAClick', () => {});
+    setAction('onControlAClick', () => {
+      changeJoyconColor();
+    });
   }, []);
 
   useEffect(() => {
