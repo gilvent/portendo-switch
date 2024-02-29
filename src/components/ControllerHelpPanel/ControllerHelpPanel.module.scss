@@ -122,27 +122,28 @@
   @include responsive.desktop {
     @include font.text-sm;
   }
+}
 
-  .joycon-btn {
-    position: relative;
-    background-color: colors.$dark-2;
-    height: 24px;
-    width: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
+.joycon-btn {
+  position: relative;
+  background-color: colors.$dark-2;
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-style: normal;
 
-    .arrow-up {
-      @include shapes.triangle(10px, #fff, up);
-      margin-top: -5px;
-    }
+  .arrow-up {
+    @include shapes.triangle(10px, #fff, up);
+    margin-top: -5px;
+  }
 
-    .arrow-down {
-      @include shapes.triangle(10px, #fff, down);
-      margin-bottom: -5px;
-    }
+  .arrow-down {
+    @include shapes.triangle(10px, #fff, down);
+    margin-bottom: -5px;
   }
 }
 

@@ -47,7 +47,6 @@ function ControllerHelpPanel() {
   }
 
   function renderGuides() {
-    const guides = ['Double tap {B} to open help panel', ...helpPanelGuides];
     const buttonByCode: Record<string, string> = {
       '{A}': `<div class="${styles['joycon-btn']}">A</div>`,
       '{B}': `<div class="${styles['joycon-btn']}">B</div>`,
@@ -59,7 +58,7 @@ function ControllerHelpPanel() {
       `
     };
 
-    return guides.map((text, index) => {
+    return helpPanelGuides.map((text, index) => {
       const key = `guide-text-${index}`;
       const htmlStr = text.replace(
         /{(A|B|UP|DOWN)}/gi,
@@ -90,8 +89,9 @@ function ControllerHelpPanel() {
         <div data-anim-target="help-panel" className={styles['help-panel']}>
           <div className={styles['help-panel-inner']}>
             <div className={styles.tips}>
-              Use the controllers to navigate pages. <br /> You can open help
-              panel from anywhere to check what it does.
+              Use the controllers to navigate pages. <br /> Double tap{' '}
+              <div className={styles['joycon-btn']}>B</div> from any page to
+              open help panel
             </div>
 
             <figure className={styles.controller}>
