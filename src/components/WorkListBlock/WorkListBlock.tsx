@@ -3,10 +3,8 @@ import WorkBannerBlock from '@/components/WorkBanner';
 import mopertyLogo from 'assets/img/brand/moperty-white.svg';
 import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
 import GiftsImage from '@/components/GiftsImage';
-import { useContext, useEffect, useRef, useState } from 'react';
-import ControllerButtonContext from '@/context/ControllerButtonContext';
-import { useNavigate } from 'react-router-dom';
-import { ROUTE_PATH_PATTERNS, WorkHighlightName } from '@/utils/enums';
+import { useEffect, useRef, useState } from 'react';
+import { WorkHighlightName } from '@/utils/enums';
 import { useGSAP } from '@gsap/react';
 import useActiveWorkBanner from './useActiveWorkBanner.hook';
 import {
@@ -15,12 +13,11 @@ import {
 } from '@/utils/gsap/animation-helpers/work-list-block';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
 import { disableController, enableController } from '@/utils/document';
+import classNames from 'classnames';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
-  const navigate = useNavigate();
   const { activeBanner, bannersByTitle, prevBanner } = useActiveWorkBanner();
-  const { setAction } = useContext(ControllerButtonContext);
   const [activeBg, setActiveBg] = useState<WorkHighlightName | null>(null);
   const {
     addListener: addShowBgListener,
@@ -68,36 +65,21 @@ function WorkListBlock() {
       removeShowBgListener();
       removeHideBgListener();
     };
-  }, []);
-
-  useEffect(() => {
-    setAction('onControlXClick', () => {
-      const nextUrl = ROUTE_PATH_PATTERNS.WORK.replace(
-        ':title',
-        activeBanner.nextBannerTitle
-      );
-      navigate(nextUrl, { replace: true });
-    });
-    setAction('onControlYClick', () => {
-      const prevUrl = ROUTE_PATH_PATTERNS.WORK.replace(
-        ':title',
-        activeBanner.prevBannerTitle
-      );
-      navigate(prevUrl, { replace: true });
-    });
   }, [activeBanner]);
 
   return (
     <div ref={nodeRef} className={styles['work-nav']}>
       <div data-anim-target="work-pointer-ball" className={styles.ball}></div>
-      <div className={styles.slidescreen}></div>
+
       <div
         data-anim-target="work-slider-wrapper"
-        className={styles['banner-wrapper']}
+        className={styles['slider-wrapper']}
       >
         <div
           id="blibli-banner-container"
-          className={styles['banner-container']}
+          className={classNames(styles['banner-container'], {
+            [styles.active]: activeBanner.title === WorkHighlightName.Blibli
+          })}
         >
           <WorkBannerBlock
             id="blibli-banner"
@@ -123,7 +105,9 @@ function WorkListBlock() {
         </div>
         <div
           id="moperty-banner-container"
-          className={styles['banner-container']}
+          className={classNames(styles['banner-container'], {
+            [styles.active]: activeBanner.title === WorkHighlightName.Moperty
+          })}
         >
           <WorkBannerBlock
             id="moperty-banner"
@@ -146,6 +130,11 @@ function WorkListBlock() {
             onClick={() => {}}
           />
         </div>
+
+        <div
+          data-anim-target="work-slider-bg"
+          className={styles['slider-bg']}
+        ></div>
       </div>
     </div>
   );

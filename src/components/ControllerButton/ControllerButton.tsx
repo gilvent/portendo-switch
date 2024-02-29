@@ -1,10 +1,31 @@
-import { useContext, useRef } from 'react';
+import { CSSProperties, useContext, useRef } from 'react';
 import styles from './ControllerButton.module.scss';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
+import debounced from '@/utils/debounced';
+import ControllerScreen from '@/components/ControllerScreen';
 
 function ControllerButton() {
-  const { actions } = useContext(ControllerButtonContext);
+  const { actions, setVisibleHelpPanel, joyconColors } = useContext(
+    ControllerButtonContext
+  );
   const rootRef = useRef<any>(null);
+  const clickCount = useRef<number>(0);
+
+  function runActionB() {
+    if (clickCount.current >= 2) {
+      setVisibleHelpPanel(true);
+    } else {
+      actions?.current?.['onControlBClick']();
+    }
+    clickCount.current = 0;
+  }
+
+  const handleActionB = debounced(runActionB, 300);
+
+  function handleBtnBClick() {
+    clickCount.current++;
+    handleActionB();
+  }
 
   return (
     <div
@@ -12,9 +33,12 @@ function ControllerButton() {
       data-anim-target="controller-button"
       className={styles.controller}
     >
-      {/* TODO check if this div is necessary*/}
-      <div data-anim-target="tendo" className={styles.tendo}>
-        <div data-anim-target="left-joycon" className={styles['left-joycon']}>
+      <div className={styles.tendo}>
+        <div
+          data-anim-target="left-joycon"
+          className={styles['left-joycon']}
+          style={{ '--left-joycon-color': joyconColors.left } as CSSProperties}
+        >
           <button
             data-anim-target="button-x"
             className={`${styles['btn-joycon-1']} ${styles['btn-up']}`}
@@ -54,25 +78,9 @@ function ControllerButton() {
               data-anim-target="inner-screen"
               className={styles['inner-screen']}
             >
-              <div
-                data-anim-target="screen-foreground"
-                className={styles['work-landing-screen']}
-              >
-                <h3 className={styles.title}>Work</h3>
-                <div className={styles.guide}>
-                  <span data-anim-target="guide-text">Press B to start</span>
-                  <div
-                    data-anim-target="loading-bar"
-                    className={`${styles['loading-bar']} invisible`}
-                  >
-                    <div
-                      data-anim-target="loading-progress"
-                      className={styles['inner-loading-bar']}
-                    ></div>
-                  </div>
-                </div>
-              </div>
+              <ControllerScreen />
             </div>
+
             <div
               data-anim-target="shut-down-overlay"
               className={styles['shut-down-overlay']}
@@ -80,7 +88,13 @@ function ControllerButton() {
           </div>
         </div>
 
-        <div data-anim-target="right-joycon" className={styles['right-joycon']}>
+        <div
+          data-anim-target="right-joycon"
+          className={styles['right-joycon']}
+          style={
+            { '--right-joycon-color': joyconColors.right } as CSSProperties
+          }
+        >
           <button
             data-anim-target="button-a"
             className={`${styles['btn-joycon-2']} ${styles['btn-a']}`}
@@ -93,9 +107,7 @@ function ControllerButton() {
           <button
             data-anim-target="button-b"
             className={`${styles['btn-joycon-2']} ${styles['btn-b']}`}
-            onClick={() => {
-              actions?.current?.['onControlBClick']();
-            }}
+            onClick={handleBtnBClick}
           >
             <div className={styles.letter}>B</div>
           </button>

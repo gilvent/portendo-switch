@@ -6,7 +6,7 @@ import useTransitionEndListener from '@/hooks/useTransitionEndListener.hook';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import {
   bounceEnter,
-  workSummaryFadeIn
+  workSummaryEnter
 } from '@/utils/gsap/animation-helpers/work-list-block';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
@@ -21,6 +21,7 @@ import {
   singleConToScreenMode,
   startSingleConMode
 } from '@/utils/gsap/animation-helpers/controller-button';
+import valueForScreen from '@/utils/window';
 
 function useWorkHighlightRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
@@ -37,7 +38,7 @@ function useWorkHighlightRouteTransition() {
   );
 
   function showWorkSummary(): gsap.core.Timeline {
-    showWorkSummaryAnimation.current = workSummaryFadeIn({
+    showWorkSummaryAnimation.current = workSummaryEnter({
       background: activeBanner.background,
       targetElSelector: activeBanner.selector
     });
@@ -69,7 +70,15 @@ function useWorkHighlightRouteTransition() {
         .call(() => {
           showWorkSummaryBg();
         })
-        .add(setupEnterAnimation(), '>-=1')
+        .add(
+          setupEnterAnimation(),
+          valueForScreen<string>(
+            {
+              desktop: '>-=2'
+            },
+            '>-=1'
+          )
+        )
         .add(startSingleConMode(), '<+1')
         .play(0);
     } else if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
@@ -80,7 +89,15 @@ function useWorkHighlightRouteTransition() {
         .call(() => {
           showWorkSummaryBg();
         })
-        .add(setupEnterAnimation(), '>-=1')
+        .add(
+          setupEnterAnimation(),
+          valueForScreen<string>(
+            {
+              desktop: '>-=2'
+            },
+            '>-=1'
+          )
+        )
         .play(0);
     } else {
       doneWithoutTransition();

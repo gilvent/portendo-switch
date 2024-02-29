@@ -42,12 +42,17 @@
   }
 }
 
+
 @mixin heading-solid {
   font-size: 3.25rem;
   font-family: fonts.$solid-fredoka;
 
   @include responsive.tablets {
     font-size: 4.25rem;
+  }
+
+  @include responsive.desktop {
+    font-size: 3.75rem;
   }
 }
 
@@ -57,5 +62,9 @@
 
   @include responsive.tablets {
     font-size: 3.25rem;
+  }
+
+  @include responsive.tablets {
+    font-size: 2.65rem;
   }
 }

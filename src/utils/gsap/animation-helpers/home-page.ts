@@ -23,7 +23,7 @@ function darkCloudsEnter(): gsap.core.Timeline {
       0.3
     )
     .eventCallback('onComplete', () => {
-      floating(clouds, { maxTranslate: 15 });
+      floating(clouds, { maxTranslate: 15, delay: Math.random() * 1 });
     });
   return animation;
 }
@@ -51,7 +51,8 @@ function lightCloudsEnter(): gsap.core.Timeline {
     )
     .eventCallback('onComplete', () => {
       floating(clouds, {
-        maxTranslate: 20
+        maxTranslate: 20,
+        delay: Math.random() * 1
       });
     });
   return animation;
@@ -66,23 +67,18 @@ function foregroundTextsEnter() {
 function contactCardsEnter() {
   const homeSelector = gsap.utils.selector('[data-anim-target="home-page"]');
   const els = homeSelector('[data-anim-target="foreground"] > a');
-  return gsap
-    .timeline()
-    .fromTo(
-      els,
-      {
-        scale: 1.2,
-        autoAlpha: 0
-      },
-      {
-        scale: 1,
-        autoAlpha: 1,
-        stagger: 0.12
-      }
-    )
-    .eventCallback('onComplete', () => {
-      floating(els, { maxTranslate: 20 });
-    });
+  return gsap.timeline().fromTo(
+    els,
+    {
+      scale: 1.2,
+      autoAlpha: 0
+    },
+    {
+      scale: 1,
+      autoAlpha: 1,
+      stagger: 0.12
+    }
+  );
 }
 
 export function homeEnter(): gsap.core.Timeline {

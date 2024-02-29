@@ -13,11 +13,20 @@
     padding: 10vw 17.5vw;
   }
 
+  @include responsive.desktop {
+    padding: 32px 12.5%;
+  }
+
   p.overview {
     text-align: justify;
     @include font.text-sm;
+    
     @include responsive.tablets {
       @include font.text-lg;
+    }
+
+    @include responsive.desktop {
+      @include font.text-base;
     }
   }
 
@@ -25,8 +34,13 @@
     text-align: left;
     padding-inline-start: 0px;
     @include font.text-sm;
+    
     @include responsive.tablets {
       @include font.text-lg;
+    }
+
+    @include responsive.desktop {
+      @include font.text-base;
     }
   }
 

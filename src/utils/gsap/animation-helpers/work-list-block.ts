@@ -1,3 +1,4 @@
+import valueForScreen from '@/utils/window';
 import gsap from 'gsap';
 // based on ball element's css "top" property
 export const BALL_TOP_POS = -150;
@@ -33,13 +34,16 @@ export function bounceImpact(pointerBallEl: Element | null) {
 }
 
 export function bounce({
-  bouncePointY,
-  airCount
+  bounceGroundY,
+  airCount,
+  bounceHeightY = 150
 }: {
-  bouncePointY: number;
+  bounceGroundY: number;
   airCount: number;
+  bounceHeightY?: number;
 }): gsap.core.Timeline {
   let tl = gsap.timeline();
+  const bounceHeight = '-=' + bounceHeightY + 'px';
   const pointerBall = document.querySelector(
     '[data-anim-target="work-pointer-ball"]'
   );
@@ -51,11 +55,11 @@ export function bounce({
         scaleX: 1,
         scaleY: 1,
         ease: 'power2.out',
-        y: '-=150px'
+        y: bounceHeight
       })
       .to(pointerBall, {
         ease: 'power2.in',
-        y: bouncePointY
+        y: bounceGroundY
       });
   }
 
@@ -70,6 +74,12 @@ export function slide(currentX: number, targetX: number): gsap.core.Timeline {
   const sliderWrapper = document.querySelector(
     '[data-anim-target="work-slider-wrapper"]'
   );
+  const sliderBg = document.querySelector(
+    '[data-anim-target="work-slider-bg"]'
+  );
+  gsap.set(sliderBg, {
+    x: '+=' + (targetX - currentX)
+  });
   return gsap.timeline().to(sliderWrapper, {
     x: '-=' + (targetX - currentX),
     duration
@@ -104,7 +114,50 @@ export function fadeIn(
   );
 }
 
-export function workSummaryFadeIn({
+function shrinkSliderBlock() {
+  const firstWorkBanner = document.querySelector(
+    '[data-anim-target="work-slider-wrapper"] :nth-child(1)'
+  );
+  const workListContainer = document.querySelector(
+    '[data-anim-target="work-list-container"]'
+  );
+
+  return gsap
+    .timeline()
+    .to(firstWorkBanner, {
+      marginLeft: 0
+    })
+    .to(
+      workListContainer,
+      {
+        width: '50%'
+      },
+      0
+    )
+    .duration(0.75);
+}
+
+function showSliderBg() {
+  const sliderBg = document.querySelector(
+    '[data-anim-target="work-slider-bg"]'
+  );
+  const tl = gsap.timeline().to(sliderBg, {
+    translateY: '-100%',
+    duration: 0.75
+  });
+
+  // wrap value as fn to prevent timeline from being run
+  const getAnimationForScreen = valueForScreen(
+    {
+      desktop: () => tl.add(shrinkSliderBlock())
+    },
+    () => tl
+  );
+
+  return getAnimationForScreen();
+}
+
+export function workSummaryEnter({
   background,
   targetElSelector
 }: {
@@ -119,12 +172,14 @@ export function workSummaryFadeIn({
   const { y: currentY } = currentPlaceholderEl?.getBoundingClientRect() ?? {
     y: 0
   };
-  const bannerBg = activeBannerSelector('[data-anim-target="banner-bg"]');
+  const sliderBg = document.querySelector(
+    '[data-anim-target="work-slider-bg"]'
+  );
 
   return gsap
     .timeline()
     .set(
-      bannerBg,
+      sliderBg,
       {
         background
       },
@@ -132,7 +187,7 @@ export function workSummaryFadeIn({
     )
     .add(
       bounce({
-        bouncePointY: currentY - BALL_TOP_POS,
+        bounceGroundY: currentY - BALL_TOP_POS,
         airCount: 1
       })
     )
@@ -146,14 +201,7 @@ export function workSummaryFadeIn({
       '>-0.3'
     )
     .add(fadeOut(getBannerCoverEls(targetElSelector)), '<')
-    .to(
-      bannerBg,
-      {
-        translateY: '-100%',
-        duration: 0.75
-      },
-      '>-0.1'
-    )
+    .add(showSliderBg())
     .add(fadeIn(activeBannerSelector('[data-anim-target="summary"]')), '>-0.1')
     .add(
       fadeIn(activeBannerSelector('[data-anim-target="work-title"]')),
@@ -180,7 +228,7 @@ export function bounceEnter(targetElSelector: string) {
     })
     .add(
       bounce({
-        bouncePointY: targetY - BALL_TOP_POS,
+        bounceGroundY: targetY - BALL_TOP_POS,
         airCount: 1
       })
     )
@@ -202,10 +250,14 @@ export function setupBallAndSlider({
   );
   const firstBallEl = getBallPlaceholderEl(firstElSelector);
   const targetBallEl = getBallPlaceholderEl(targetElSelector);
+
   if (!firstBallEl || !targetBallEl) return;
 
   const sliderWrapper = document.querySelector(
     '[data-anim-target="work-slider-wrapper"]'
+  );
+  const sliderBg = document.querySelector(
+    '[data-anim-target="work-slider-bg"]'
   );
   const slideDistance =
     targetBallEl.getBoundingClientRect().x -
@@ -213,6 +265,10 @@ export function setupBallAndSlider({
 
   gsap.set(sliderWrapper, {
     x: '-' + slideDistance
+  });
+  gsap.set(sliderBg, {
+    background: ballColor,
+    translateX: slideDistance
   });
   gsap.set(pointerBall, {
     x: targetBallEl.getBoundingClientRect().x,
@@ -256,8 +312,14 @@ export function sceneSlideTo({
     .add(fadeOut(currentCoverEls))
     .add(
       bounce({
-        bouncePointY: currentY - BALL_TOP_POS,
-        airCount: 2
+        bounceGroundY: currentY - BALL_TOP_POS,
+        airCount: 2,
+        bounceHeightY: valueForScreen(
+          {
+            desktop: 75
+          },
+          150
+        )
       }).duration(duration),
       0
     )

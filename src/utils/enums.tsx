@@ -19,3 +19,8 @@ export enum WorkHighlightName {
   Blibli = 'blibli',
   Moperty = 'moperty'
 }
+
+export enum ControllerScreenTitle {
+  Home = 'GET_STARTED',
+  Work = 'BOUNCING_WORKS'
+}

@@ -23,15 +23,23 @@ function WorkHighlight() {
   const [ActiveComponent, setActiveComponent] = useState<any>(() => {
     return detailComponentByParams[params.title as string];
   });
-  const { setAction } = useContext(ControllerButtonContext);
+  const { setAction, setHelpPanelGuides } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setAction('onControlBClick', () => {
+      window.scrollTo({
+        top: document.documentElement.scrollTop + window.innerHeight,
+        behavior: 'smooth'
+      });
+    });
+  }, []);
 
   useEffect(() => {
     setActiveComponent(detailComponentByParams[params.title as string]);
   }, [pathname]);
 
   useEffect(() => {
-    setAction('onControlBClick', () => {});
     setAction('onControlAClick', () => {
       const url = ROUTE_PATH_PATTERNS.WORK.replace(
         ':title',
@@ -40,6 +48,10 @@ function WorkHighlight() {
       navigate(url);
     });
   }, [params]);
+
+  useEffect(() => {
+    setHelpPanelGuides(['Press {A} to go back', 'Press {B} to scroll down']);
+  }, []);
 
   return (
     <Suspense>

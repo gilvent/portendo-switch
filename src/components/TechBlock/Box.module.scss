@@ -27,6 +27,11 @@
     width: 150px;
     height: 150px;
   }
+
+  @include responsive.desktop {
+    width: 135px;
+    height: 135px;
+  }
 }
 
 .fg {

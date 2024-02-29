@@ -1,6 +1,4 @@
 @use 'assets/scss/variables/colors';
-@use 'assets/scss/variables/fonts';
-@use 'assets/scss/mixins/font';
 @use 'assets/scss/mixins/responsive';
 
 .controller {
@@ -21,6 +19,10 @@
   @include responsive.tablets {
     transform: translateY(250px) scale(1.25);
   }
+
+  @include responsive.desktop {
+    transform: translateY(250px);
+  }
 }
 
 .tendo {
@@ -38,11 +40,12 @@
   height: 140px;
   width: 63px;
   padding: 8px;
+  transition: background-color 0.5s;
 
   z-index: 2;
   border-right: 4px solid colors.$dark;
   border-radius: 24px 8px 8px 24px;
-  background-color: #828282; // #ff3c28;
+  background-color: var(--left-joycon-color);
 
   transform: translateX(-112px);
 }
@@ -56,9 +59,10 @@
   width: 63px;
   gap: 40px;
   padding: 8px;
+  transition: background-color 0.5s;
 
   z-index: 2;
-  background-color: #828282; //#0ab9e6;
+  background-color: var(--right-joycon-color);
   border-left: 4px solid colors.$dark;
   border-radius: 8px 24px 24px 8px;
 
@@ -166,6 +170,7 @@ button.btn-joycon-2 {
   }
 }
 
+
 .screen {
   position: relative;
   display: flex;
@@ -176,11 +181,6 @@ button.btn-joycon-2 {
   z-index: 2;
   height: 140px;
   width: 164px;
-
-  @include responsive.tablets {
-    // height: 156px;
-    // width: 180px;
-  }
 
   .shut-down-overlay {
     background-color: transparent;
@@ -194,47 +194,11 @@ button.btn-joycon-2 {
   .inner-screen {
     width: 80%;
     height: 80%;
-    background: #3377d7;
     color: #fff;
     display: flex;
     place-items: center;
     justify-content: center;
-
-    .work-landing-screen {
-      padding: 4px;
-      text-align: center;
-
-      .title {
-        font-size: 1.6rem;
-        transform-style: preserve-3d;
-        font-family: fonts.$outline-gaban;
-        text-transform: uppercase;
-        margin: 18px;
-      }
-
-      .guide {
-        position: relative;
-        @include font.text-sm;
-
-        .loading-bar {
-          top: 30%;
-          position: absolute;
-          height: 12px;
-          width: 100%;
-          background-color: transparent;
-          border: 1px solid #fff;
-          overflow: hidden;
-
-          .inner-loading-bar {
-            position: absolute;
-            top: 0;
-            transform: translateX(-100%);
-            background-color: #fff;
-            height: 12px;
-            width: 100%;
-          }
-        }
-      }
-    }
+    position: relative;
+    contain: paint;
   }
 }

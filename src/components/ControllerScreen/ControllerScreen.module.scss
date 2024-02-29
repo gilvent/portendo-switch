@@ -1,0 +1,102 @@
+@use 'assets/scss/variables/fonts';
+@use 'assets/scss/mixins/font';
+@use 'assets/scss/variables/colors';
+
+.help {
+  color: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  gap: 4px;
+
+  .btn-joycon-preview {
+    position: relative;
+    background-color: #fff;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: colors.$dark-2;
+  }
+}
+
+.work-landing-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  text-align: center;
+  background: #3377d7;
+
+  .title {
+    font-size: 1.6rem;
+    font-family: fonts.$outline-gaban;
+    text-transform: uppercase;
+    margin: 18px;
+  }
+
+  .guide {
+    position: relative;
+    @include font.text-sm;
+
+    .loading-bar {
+      top: 30%;
+      position: absolute;
+      height: 12px;
+      width: 100%;
+      background-color: transparent;
+      border: 1px solid #fff;
+      overflow: hidden;
+
+      .inner-loading-bar {
+        position: absolute;
+        top: 0;
+        transform: translateX(-100%);
+        background-color: #fff;
+        height: 12px;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.home-landing-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 22px 4px 4px;
+  background: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  .home-picture {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    padding: 8px;
+    img {
+      object-fit: contain;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  .guide {
+    position: relative;
+    @include font.text-sm;
+  }
+}

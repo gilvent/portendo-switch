@@ -76,8 +76,7 @@ function BlibliPDPRevampViewBlock() {
           <img src={icMenu} />
         </div>
         <div className={styles.nav}>
-          {/* TODO remove this on click handler */}
-          <img src={icDoc} onClick={() => animationRef.current?.play()} />
+          <img src={icDoc} />
         </div>
         <div className={styles.nav}>
           <img src={icSearch} />

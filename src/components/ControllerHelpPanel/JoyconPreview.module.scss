@@ -1,0 +1,73 @@
+@use 'assets/scss/variables/colors';
+@use 'assets/scss/mixins/font';
+@use 'assets/scss/mixins/responsive';
+@use 'assets/scss/mixins/shapes';
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  --joycon-width: 55px;
+  --joycon-height: 125px;
+}
+
+.left-joycon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--joycon-height);
+  width: var(--joycon-width);
+  padding: 8px;
+
+  background-color: var(--left-joycon-color);
+  border-radius: 24px 8px 8px 24px;
+}
+
+.right-joycon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--joycon-height);
+  width: var(--joycon-width);
+  padding: 8px;
+
+  background-color: var(--right-joycon-color);
+  border-radius: 8px 24px 24px 8px;
+}
+
+.btn-joycon-1,
+.btn-joycon-2 {
+  cursor: pointer;
+  outline: none;
+  background: transparent;
+  background-color: colors.$dark-2;
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.btn-joycon-1 {
+  .arrow-up {
+    @include shapes.triangle(12px, #fff, up);
+    margin-top: -6px;
+  }
+
+  .arrow-down {
+    @include shapes.triangle(12px, #fff, down);
+    margin-bottom: -6px;
+  }
+}
+
+button.btn-joycon-2 {
+  .letter {
+    color: #fff;
+    @include font.text-base;
+  }
+}
