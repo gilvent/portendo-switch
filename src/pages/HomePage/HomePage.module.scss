@@ -1,6 +1,7 @@
 @use 'assets/scss/variables/fonts';
 @use 'assets/scss/variables/colors';
 @use 'assets/scss/mixins/responsive';
+@use 'assets/scss/mixins/animation';
 
 .page {
   position: relative;
@@ -53,6 +54,7 @@
     padding: 12px;
     box-shadow: 0 0 0 1px hsla(0, 0%, 100%, 0.5);
     object-fit: contain;
+
     img {
       object-fit: contain;
       width: 100%;
@@ -62,6 +64,13 @@
     &.linkedin {
       transform: rotate(10deg);
       bottom: -125px;
+      @include animation.floating(
+        $id: linkedin-btn,
+        $maxDistance: 10,
+        $otherTransforms: rotate(10deg),
+        $delay: 0.75s
+      );
+
       @include responsive.tablets {
         bottom: -100px;
         left: 105px;
@@ -76,6 +85,12 @@
       transform: rotate(-5deg);
       bottom: -150px;
       left: 145px;
+      @include animation.floating(
+        $id: github-btn,
+        $maxDistance: 7,
+        $otherTransforms: rotate(-5deg),
+        $delay: 0.35s
+      );
 
       @include responsive.tablets {
         left: 275px;
@@ -84,6 +99,9 @@
       @include responsive.desktop {
         bottom: -180px;
         left: 185px;
+
+        width: 105px;
+        height: 105px;
       }
     }
 
@@ -91,6 +109,13 @@
       transform: rotate(20deg);
       bottom: -250px;
       right: 75px;
+      @include animation.floating(
+        $id: twitter-btn,
+        $maxDistance: 10,
+        $otherTransforms: rotate(20deg),
+        $delay: 0.55s
+      );
+
       @include responsive.tablets {
         bottom: -185px;
         right: 225px;
@@ -106,13 +131,23 @@
       transform: rotate(-25deg);
       bottom: -125px;
       right: 25px;
+      @include animation.floating(
+        $id: gmail-btn,
+        $maxDistance: 4,
+        $delay: 0s,
+        $otherTransforms: rotate(-25deg)
+      );
+
       @include responsive.tablets {
         bottom: -95px;
         right: 75px;
       }
-      @include responsive.tablets {
+      @include responsive.desktop {
         bottom: -45px;
         right: 105px;
+
+        width: 95px;
+        height: 95px;
       }
     }
   }

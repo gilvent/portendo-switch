@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import styles from './WorkPage.module.scss';
 import WorkListBlock from '@/components/WorkListBlock';
-import { WorkPageProvider } from '@/context/WorkPageContext';
 import { Outlet } from 'react-router-dom';
 import 'assets/scss/_work-blocks.scss';
 

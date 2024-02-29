@@ -2,8 +2,9 @@ import gsap from 'gsap';
 
 export function floating(
   els: Array<any>,
-  { maxTranslate = 10 } = {
-    maxTranslate: 10
+  { maxTranslate = 10, delay } = {
+    maxTranslate: 10,
+    delay: 0
   }
 ): void {
   els.forEach(c => {
@@ -14,7 +15,7 @@ export function floating(
       duration: 5,
       yoyoEase: 'ease.inOut',
       repeat: -1,
-      delay: Math.random() * 1
+      delay
     });
   });
 }
