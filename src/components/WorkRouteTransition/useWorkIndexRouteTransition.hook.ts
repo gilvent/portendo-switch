@@ -15,7 +15,6 @@ function useWorkIndexRouteTransition() {
     console.log('[work index route] enter');
 
     if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
-      console.log('RUN');
       const enterAnim = gsap
         .timeline({ paused: true })
         .eventCallback('onComplete', () => {

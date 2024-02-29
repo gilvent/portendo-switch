@@ -121,7 +121,6 @@ function shrinkSliderBlock() {
   const workListContainer = document.querySelector(
     '[data-anim-target="work-list-container"]'
   );
-  console.log(firstWorkBanner);
 
   return gsap
     .timeline()

@@ -33,8 +33,7 @@ function ControllerButton() {
       data-anim-target="controller-button"
       className={styles.controller}
     >
-      {/* TODO check if this div is necessary*/}
-      <div data-anim-target="tendo" className={styles.tendo}>
+      <div className={styles.tendo}>
         <div
           data-anim-target="left-joycon"
           className={styles['left-joycon']}
