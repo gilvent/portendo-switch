@@ -27,11 +27,19 @@ function WorkHighlight() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setAction('onControlBClick', () => {
+      window.scrollTo({
+        top: document.documentElement.scrollTop + window.innerHeight,
+        behavior: 'smooth'
+      });
+    });
+  }, []);
+
+  useEffect(() => {
     setActiveComponent(detailComponentByParams[params.title as string]);
   }, [pathname]);
 
   useEffect(() => {
-    setAction('onControlBClick', () => {});
     setAction('onControlAClick', () => {
       const url = ROUTE_PATH_PATTERNS.WORK.replace(
         ':title',
