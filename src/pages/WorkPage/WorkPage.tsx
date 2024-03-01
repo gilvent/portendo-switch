@@ -43,6 +43,11 @@ function WorkPage() {
       <div className={secondaryPanelClasses}>
         {activeBanner !== undefined && <Outlet />}
       </div>
+
+      <div data-anim-target="work-page-heading" className={styles.heading}>
+        <div>WORKS</div>
+        <div>Press B to view</div>
+      </div>
     </div>
   );
 }
