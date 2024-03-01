@@ -52,7 +52,7 @@ const WorkIndexDummyPage = () => {
     });
   }, [activeBanner]);
 
-  return <div></div>;
+  return <></>;
 };
 
 export default WorkIndexDummyPage;

@@ -34,19 +34,13 @@ const bannersByTitle: Record<WorkHighlightName, Banner> = {
 function useActiveWorkBanner() {
   const params = useParams();
   const [activeBanner, setActiveBanner] = useState<Banner>(() => {
-    const banner =
-      bannersByTitle[params.title as WorkHighlightName] ??
-      bannersByTitle[WorkHighlightName.Blibli];
-    return banner;
+    return bannersByTitle[params.title as WorkHighlightName];
   });
   const prevBanner = usePreviousState(activeBanner);
 
   useEffect(() => {
     if (params.title !== undefined) {
-      setActiveBanner(
-        bannersByTitle[params.title as WorkHighlightName] ??
-          bannersByTitle[WorkHighlightName.Blibli]
-      );
+      setActiveBanner(bannersByTitle[params.title as WorkHighlightName]);
     }
   }, [params]);
 

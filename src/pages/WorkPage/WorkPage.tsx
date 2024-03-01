@@ -3,6 +3,9 @@ import styles from './WorkPage.module.scss';
 import WorkListBlock from '@/components/WorkListBlock';
 import { Outlet } from 'react-router-dom';
 import 'assets/scss/_work-blocks.scss';
+import { useEffect } from 'react';
+import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
+import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
 
 function WorkPage() {
   const primaryPanelClasses = classNames(
@@ -13,6 +16,20 @@ function WorkPage() {
     styles['panel-container'],
     styles['panel-container--secondary']
   );
+  const { activeBanner } = useActiveWorkBanner();
+
+  useEffect(() => {
+    if (!activeBanner) {
+      window.location.href = ROUTE_PATH_PATTERNS.WORK.replace(
+        ':title',
+        WorkPageTitle.Blibli
+      );
+    }
+  }, []);
+
+  if (!activeBanner) {
+    return null;
+  }
 
   return (
     <div className="work-list">
@@ -24,7 +41,7 @@ function WorkPage() {
       </div>
 
       <div className={secondaryPanelClasses}>
-        <Outlet />
+        {activeBanner !== undefined && <Outlet />}
       </div>
     </div>
   );
