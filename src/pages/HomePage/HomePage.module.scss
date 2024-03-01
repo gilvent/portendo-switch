@@ -47,8 +47,6 @@
     display: block;
     max-width: 20vw;
     max-height: 20vw;
-    width: 75px;
-    height: 75px;
     border-radius: 4px;
     background-color: #fff;
     padding: 12px;
@@ -61,9 +59,11 @@
       height: auto;
     }
 
-    &.linkedin {
+    &.gmail {
       transform: rotate(10deg);
-      bottom: -125px;
+      bottom: -75px;
+      width: 55px;
+      height: 55px;
       @include animation.floating(
         $id: linkedin-btn,
         $maxDistance: 10,
@@ -72,6 +72,8 @@
       );
 
       @include responsive.tablets {
+        width: 75px;
+        height: 75px;
         bottom: -100px;
         left: 105px;
       }
@@ -81,10 +83,12 @@
       }
     }
 
-    &.github {
+    &.linkedin {
       transform: rotate(-5deg);
-      bottom: -150px;
-      left: 145px;
+      bottom: -130px;
+      left: 125px;
+      width: 65px;
+      height: 65px;
       @include animation.floating(
         $id: github-btn,
         $maxDistance: 7,
@@ -94,21 +98,24 @@
 
       @include responsive.tablets {
         left: 275px;
+        bottom: -175px;
+        width: 105px;
+        height: 105px;
       }
 
       @include responsive.desktop {
         bottom: -180px;
         left: 185px;
-
-        width: 105px;
-        height: 105px;
       }
     }
 
     &.twitter {
       transform: rotate(20deg);
-      bottom: -250px;
-      right: 75px;
+      bottom: -195px;
+      right: 105px;
+
+      width: 55px;
+      height: 55px;
       @include animation.floating(
         $id: twitter-btn,
         $maxDistance: 10,
@@ -119,6 +126,9 @@
       @include responsive.tablets {
         bottom: -185px;
         right: 225px;
+
+        width: 75px;
+        height: 75px;
       }
 
       @include responsive.desktop {
@@ -127,10 +137,10 @@
       }
     }
 
-    &.gmail {
+    &.github {
       transform: rotate(-25deg);
-      bottom: -125px;
-      right: 25px;
+      bottom: -85px;
+      right: 35px;
       @include animation.floating(
         $id: gmail-btn,
         $maxDistance: 4,
@@ -141,13 +151,13 @@
       @include responsive.tablets {
         bottom: -95px;
         right: 75px;
+
+        width: 95px;
+        height: 95px;
       }
       @include responsive.desktop {
         bottom: -45px;
         right: 105px;
-
-        width: 95px;
-        height: 95px;
       }
     }
   }
