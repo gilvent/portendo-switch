@@ -3,14 +3,20 @@
 
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
-import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
+import {
+  ControllerScreenTitle,
+  ROUTE_PATH_PATTERNS,
+  WorkPageTitle
+} from '@/utils/enums';
 import { useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const WorkIndexDummyPage = () => {
   const params = useParams();
   const { activeBanner } = useActiveWorkBanner();
-  const { setAction, setHelpPanelGuides } = useContext(ControllerButtonContext);
+  const { setAction, setHelpPanelGuides, setActiveGameScreen } = useContext(
+    ControllerButtonContext
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +37,7 @@ const WorkIndexDummyPage = () => {
     });
 
     setAction('onControlAClick', () => {
+      setActiveGameScreen(ControllerScreenTitle.Work);
       navigate(ROUTE_PATH_PATTERNS.HOME);
     });
   }, [params]);
