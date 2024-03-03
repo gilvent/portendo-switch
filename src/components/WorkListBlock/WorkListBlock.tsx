@@ -100,6 +100,7 @@ function WorkListBlock() {
             logo={blibliWhiteLogo}
             titleColor="#0092da"
             renderBgAnimation={active => <GiftsImage active={active} />}
+            url={'https://blibli.com'}
             onClick={() => {}}
           />
         </div>
@@ -127,6 +128,7 @@ function WorkListBlock() {
             active={activeBg === WorkHighlightName.Moperty}
             logo={mopertyLogo}
             titleColor="#3f51b5"
+            url={'https://moperty.id'}
             onClick={() => {}}
           />
         </div>

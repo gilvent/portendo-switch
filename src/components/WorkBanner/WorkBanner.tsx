@@ -1,6 +1,7 @@
 import { MouseEventHandler, useRef } from 'react';
 import classNames from 'classnames';
 import styles from './WorkBanner.module.scss';
+import OpenWebsiteIcon from './OpenWebsiteIcon';
 
 type WorkBannerProps = {
   id: string;
@@ -9,18 +10,15 @@ type WorkBannerProps = {
   role: string;
   active: boolean;
   logo: string;
-  onClick: MouseEventHandler<HTMLDivElement>;
-  background?: string;
   titleColor: string;
+  onClick: MouseEventHandler<HTMLDivElement>;
+  url?: string;
+  background?: string;
   renderSummaryText: () => any;
   renderBgAnimation?: (active: boolean) => any;
 };
 
 function WorkBanner(props: WorkBannerProps) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLImageElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
   const cssVars = {
     '--background': 'transparent', //props.background,
     '--title-color': props.titleColor
@@ -35,13 +33,18 @@ function WorkBanner(props: WorkBannerProps) {
     styles['pointer-ball-placeholder']
   );
   const titleClass = classNames('invisible', styles.title);
+  const openWebsiteIcon = props.url ? (
+    <OpenWebsiteIcon
+      fill={'#fff'}
+      forwardedClass={styles['icon-open-marker']}
+    ></OpenWebsiteIcon>
+  ) : null;
 
   return (
     <div
       id={props.id}
       className={styles.card}
       style={cssVars}
-      ref={cardRef}
       onClick={props.onClick}
     >
       <p data-anim-target="summary" className={summaryClass}>
@@ -49,19 +52,30 @@ function WorkBanner(props: WorkBannerProps) {
       </p>
 
       <div className={styles.content}>
-        <img src={props.logo} ref={logoRef} className={styles.logo} />
+        <img src={props.logo} className={styles.logo} />
 
         <div className={styles.cover}>
           <h4 data-anim-target="cover-role" className={coverRoleClass}>
             {props.role}
           </h4>
-          <h2
-            data-anim-target="cover-title"
-            ref={headingRef}
-            className={coverTitleClass}
+          <a
+            className={styles['cover-title-link']}
+            href={props.url}
+            target="_blank"
           >
-            {props.title}
-          </h2>
+            <h2 data-anim-target="cover-title" className={coverTitleClass}>
+              <span>
+                {props.title}
+                {props.url && (
+                  <OpenWebsiteIcon
+                    fill={props.titleColor}
+                    forwardedClass={styles['icon-open-marker']}
+                  ></OpenWebsiteIcon>
+                )}
+              </span>
+            </h2>
+          </a>
+
           <p
             data-anim-target="cover-description"
             className={coverDescriptionClass}
@@ -71,15 +85,22 @@ function WorkBanner(props: WorkBannerProps) {
         </div>
 
         <div data-anim-target="work-title" className={titleClass}>
-          <button className={styles['btn-title']}>
-            <h1 className={styles.text}>{props.title}</h1>
-          </button>
+          <a className={styles['btn-title']} href={props.url} target="_blank">
+            <h1 className={styles.text}>
+              <span>{props.title}</span>
+              {props.url && (
+                <OpenWebsiteIcon
+                  fill={'#fff'}
+                  forwardedClass={styles['icon-open-marker']}
+                ></OpenWebsiteIcon>
+              )}
+            </h1>
+          </a>
         </div>
 
         <div
           data-anim-target="ball-placeholder"
           className={ballPlaceholderClass}
-          ref={bgRef}
         ></div>
       </div>
 
