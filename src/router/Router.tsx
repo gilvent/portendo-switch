@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import RouteTransition from '@/components/RouteTransition';
 import HomePage from '@/pages/HomePage';
@@ -43,6 +43,8 @@ const Router = () => {
           }
         ></Route>
       </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

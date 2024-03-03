@@ -175,6 +175,9 @@ export function workSummaryEnter({
   const sliderBg = document.querySelector(
     '[data-anim-target="work-slider-bg"]'
   );
+  const workPageHeading = document.querySelector(
+    '[data-anim-target="work-page-heading"]'
+  );
 
   return gsap
     .timeline()
@@ -192,13 +195,20 @@ export function workSummaryEnter({
       })
     )
     .to(
+      workPageHeading,
+      {
+        autoAlpha: 0
+      },
+      '>-0.3'
+    )
+    .to(
       pointerBall,
       {
         y: BALL_TOP_POS - currentY,
         ease: 'power2.inOut',
         duration: 0.5
       },
-      '>-0.3'
+      '<>-0.3>'
     )
     .add(fadeOut(getBannerCoverEls(targetElSelector)), '<')
     .add(showSliderBg())

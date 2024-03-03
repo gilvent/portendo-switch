@@ -54,7 +54,24 @@
   position: absolute;
   text-align: center;
 
+  .cover-title-link {
+    text-decoration: none;
+  }
+
+  .icon-open-marker {
+    position: absolute;
+    top: -12px;
+    right: -20px;
+    transform: scale(0.6);
+
+    @include responsive.tablets {
+      transform: scale(0.8);
+      right: -24px;
+    }
+  }
+
   .heading {
+    position: relative;
     font-size: 32px;
     margin: 18px;
     color: var(--title-color);
@@ -67,6 +84,10 @@
 
     @include responsive.desktop {
       font-size: 2.65rem;
+    }
+
+    span {
+      position: relative;
     }
   }
 
@@ -172,12 +193,27 @@
 
   .btn-title {
     text-transform: uppercase;
+    text-decoration: none;
     border: none;
     background-color: transparent;
 
     .text {
+      position: relative;
       @include font.title-outline;
       color: #fff;
+
+      .icon-open-marker {
+        position: absolute;
+        top: -2px;
+        right: -20px;
+        transform: scale(0.75);
+
+        @include responsive.tablets {
+          right: -24px;
+          top: 6px;
+          transform: scale(0.8);
+        }
+      }
     }
   }
 }

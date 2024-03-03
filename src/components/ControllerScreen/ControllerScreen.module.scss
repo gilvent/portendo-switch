@@ -42,6 +42,8 @@
   }
 
   .guide {
+    display: flex;
+    justify-content: center;
     position: relative;
     @include font.text-sm;
 
@@ -49,7 +51,7 @@
       top: 30%;
       position: absolute;
       height: 12px;
-      width: 100%;
+      width: 80%;
       background-color: transparent;
       border: 1px solid #fff;
       overflow: hidden;
