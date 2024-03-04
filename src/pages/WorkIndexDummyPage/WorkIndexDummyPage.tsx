@@ -6,7 +6,7 @@ import ControllerButtonContext from '@/context/ControllerButtonContext';
 import {
   ControllerScreenTitle,
   ROUTE_PATH_PATTERNS,
-  WorkPageTitle
+  WorkHighlightId
 } from '@/utils/enums';
 import { useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -31,7 +31,7 @@ const WorkIndexDummyPage = () => {
     setAction('onControlBClick', () => {
       const nextUrl = ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT.replace(
         ':title',
-        params.title ?? WorkPageTitle.Blibli
+        params.title ?? WorkHighlightId.Blibli
       );
       navigate(nextUrl);
     });

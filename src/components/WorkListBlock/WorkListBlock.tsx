@@ -5,7 +5,7 @@ import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
 import radjastoneProduct from 'assets/img/brand/rj-limestone-white.svg';
 import GiftsImage from '@/components/GiftsImage';
 import { useEffect, useRef, useState } from 'react';
-import { WorkHighlightName } from '@/utils/enums';
+import { WorkHighlightId } from '@/utils/enums';
 import { useGSAP } from '@gsap/react';
 import useActiveWorkBanner from './useActiveWorkBanner.hook';
 import {
@@ -19,7 +19,7 @@ import classNames from 'classnames';
 function WorkListBlock() {
   const nodeRef = useRef(null);
   const { activeBanner, bannersByTitle, prevBanner } = useActiveWorkBanner();
-  const [activeBg, setActiveBg] = useState<WorkHighlightName | null>(null);
+  const [activeBg, setActiveBg] = useState<WorkHighlightId | null>(null);
   const {
     addListener: addShowBgListener,
     removeListener: removeShowBgListener
@@ -31,7 +31,7 @@ function WorkListBlock() {
 
   useGSAP(() => {
     setupBallAndSlider({
-      firstElSelector: bannersByTitle[WorkHighlightName.Blibli].selector,
+      firstElSelector: bannersByTitle[WorkHighlightId.Blibli].selector,
       targetElSelector: activeBanner.selector,
       ballColor: activeBanner.background
     });
@@ -79,7 +79,7 @@ function WorkListBlock() {
         <div
           id="blibli-banner-container"
           className={classNames(styles['banner-container'], {
-            [styles.active]: activeBanner.title === WorkHighlightName.Blibli
+            [styles.active]: activeBanner.title === WorkHighlightId.Blibli
           })}
         >
           <WorkBannerBlock
@@ -97,7 +97,7 @@ function WorkListBlock() {
                 application.
               </>
             )}
-            active={activeBg === WorkHighlightName.Blibli}
+            active={activeBg === WorkHighlightId.Blibli}
             renderCoverLogo={() => (
               <img
                 src={blibliWhiteLogo}
@@ -112,7 +112,7 @@ function WorkListBlock() {
         <div
           id="moperty-banner-container"
           className={classNames(styles['banner-container'], {
-            [styles.active]: activeBanner.title === WorkHighlightName.Moperty
+            [styles.active]: activeBanner.title === WorkHighlightId.Moperty
           })}
         >
           <WorkBannerBlock
@@ -130,7 +130,7 @@ function WorkListBlock() {
                 <br />
               </>
             )}
-            active={activeBg === WorkHighlightName.Moperty}
+            active={activeBg === WorkHighlightId.Moperty}
             renderCoverLogo={() => (
               <img
                 src={mopertyLogo}
@@ -144,7 +144,7 @@ function WorkListBlock() {
         <div
           id="radjastone-banner-container"
           className={classNames(styles['banner-container'], {
-            [styles.active]: activeBanner.title === WorkHighlightName.Radjastone
+            [styles.active]: activeBanner.title === WorkHighlightId.Radjastone
           })}
         >
           <WorkBannerBlock
@@ -162,7 +162,7 @@ function WorkListBlock() {
                 <br />
               </>
             )}
-            active={activeBg === WorkHighlightName.Radjastone}
+            active={activeBg === WorkHighlightId.Radjastone}
             renderCoverLogo={() => (
               <img
                 src={radjastoneProduct}

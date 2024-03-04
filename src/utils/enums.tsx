@@ -4,19 +4,13 @@ export enum ROUTE_PATH_PATTERNS {
   WORK_HIGHLIGHT = '/work/:title/highlight'
 }
 
-export enum WorkPageTitle {
-  Blibli = 'blibli',
-  Moperty = 'moperty',
-  Radjastone = 'radjastone'
-}
-
 export enum MediaQueryScreen {
   Tablet = '(min-width: 768px)',
   Desktop = '(min-width: 992px)',
   LargeDesktop = '(min-width: 1200px)'
 }
 
-export enum WorkHighlightName {
+export enum WorkHighlightId {
   Blibli = 'blibli',
   Moperty = 'moperty',
   Radjastone = 'radjastone'
