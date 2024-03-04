@@ -16,10 +16,13 @@ function BlibliPDPRevampStoryBlock() {
   });
 
   return (
-    <article ref={blockRef} className={`story-block ${styles['pdp-revamp']}`}>
+    <article
+      ref={blockRef}
+      className={`story-block ${styles['story-block-pdp']}`}
+    >
       <h2>
         <div className="invisible">Worked on:</div>
-        <div className="invisible">Product Detail Revamp</div>
+        <div className="invisible">Product Detail</div>
       </h2>
 
       <p className="overview invisible">
