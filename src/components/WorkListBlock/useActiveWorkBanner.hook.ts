@@ -27,7 +27,16 @@ const bannersByTitle: Record<WorkHighlightName, Banner> = {
     background: 'linear-gradient(132.36deg, #503FB5 43%, #3F51B5 112%)',
     title: WorkHighlightName.Moperty,
     prevBannerTitle: WorkHighlightName.Blibli,
-    nextBannerTitle: WorkHighlightName.Moperty
+    nextBannerTitle: WorkHighlightName.Radjastone
+  },
+  [WorkHighlightName.Radjastone]: {
+    url: '/work/radjastone',
+    selector: '#radjastone-banner',
+    background:
+      'linear-gradient(132.36deg, rgb(154 136 63) 43%, rgb(137 115 25) 112%)',
+    title: WorkHighlightName.Radjastone,
+    prevBannerTitle: WorkHighlightName.Moperty,
+    nextBannerTitle: WorkHighlightName.Radjastone
   }
 };
 

@@ -80,3 +80,69 @@
   top: 80%;
   background-color: colors.$dark;
 }
+
+.moperty-logo,
+.blibli-logo {
+  position: absolute;
+  align-self: center;
+  width: 100px;
+  height: 140px;
+  z-index: 4;
+  filter: drop-shadow(0px 0px 2px rgb(71, 71, 71));
+
+  @include responsive.tablets {
+    width: 125px;
+    height: 175px;
+  }
+
+  @include responsive.desktop {
+    width: 100px;
+    height: 140px;
+  }
+}
+
+.logo {
+  position: absolute;
+  align-self: center;
+  z-index: 4;
+  filter: drop-shadow(0px 0px 2px rgb(71, 71, 71));
+
+  &-blibli {
+    width: auto;
+    height: 140px;
+
+    @include responsive.tablets {
+      height: 165px;
+    }
+
+    @include responsive.desktop {
+      height: 140px;
+    }
+  }
+
+  &-moperty {
+    width: 100px;
+    height: auto;
+
+    @include responsive.tablets {
+      width: 125px;
+    }
+
+    @include responsive.desktop {
+      width: 100px;
+    }
+  }
+
+  &-radjastone {
+    height: 80px;
+    width: auto;
+
+    @include responsive.tablets {
+      height: 95px;
+    }
+
+    @include responsive.desktop {
+      height: 80px;
+    }
+  }
+}

@@ -2,6 +2,7 @@ import styles from './WorkListBlock.module.scss';
 import WorkBannerBlock from '@/components/WorkBanner';
 import mopertyLogo from 'assets/img/brand/moperty-white.svg';
 import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
+import radjastoneProduct from 'assets/img/brand/rj-limestone-white.svg';
 import GiftsImage from '@/components/GiftsImage';
 import { useEffect, useRef, useState } from 'react';
 import { WorkHighlightName } from '@/utils/enums';
@@ -97,11 +98,15 @@ function WorkListBlock() {
               </>
             )}
             active={activeBg === WorkHighlightName.Blibli}
-            logo={blibliWhiteLogo}
+            renderCoverLogo={() => (
+              <img
+                src={blibliWhiteLogo}
+                className={classNames(styles.logo, styles['logo-blibli'])}
+              />
+            )}
             titleColor="#0092da"
             renderBgAnimation={active => <GiftsImage active={active} />}
             url={'https://blibli.com'}
-            onClick={() => {}}
           />
         </div>
         <div
@@ -126,10 +131,46 @@ function WorkListBlock() {
               </>
             )}
             active={activeBg === WorkHighlightName.Moperty}
-            logo={mopertyLogo}
+            renderCoverLogo={() => (
+              <img
+                src={mopertyLogo}
+                className={classNames(styles.logo, styles['logo-moperty'])}
+              />
+            )}
             titleColor="#3f51b5"
-            url={'https://moperty.id'}
-            onClick={() => {}}
+            url="https://moperty.id"
+          />
+        </div>
+        <div
+          id="radjastone-banner-container"
+          className={classNames(styles['banner-container'], {
+            [styles.active]: activeBanner.title === WorkHighlightName.Radjastone
+          })}
+        >
+          <WorkBannerBlock
+            id="radjastone-banner"
+            title="Radjastone"
+            description="A simple and interactive company website."
+            role="Design and develop"
+            renderSummaryText={() => (
+              <>
+                This is a <strong>"build the whole thing"</strong> project for
+                me. I <strong>design</strong> the user interfaces,{' '}
+                <strong>code</strong> frontends and backends, implement{' '}
+                <strong>SEO</strong> techniques while also learning some{' '}
+                <strong>real estate broker knowledge</strong>.
+                <br />
+              </>
+            )}
+            active={activeBg === WorkHighlightName.Radjastone}
+            renderCoverLogo={() => (
+              <img
+                src={radjastoneProduct}
+                className={classNames(styles.logo, styles['logo-radjastone'])}
+              />
+            )}
+            titleColor="#9a883f"
+            url={'https://radjastone.com'}
           />
         </div>
 

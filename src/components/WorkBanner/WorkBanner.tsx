@@ -1,4 +1,4 @@
-import { MouseEventHandler, useRef } from 'react';
+import { ReactNode } from 'react';
 import classNames from 'classnames';
 import styles from './WorkBanner.module.scss';
 import OpenWebsiteIcon from './OpenWebsiteIcon';
@@ -9,18 +9,15 @@ type WorkBannerProps = {
   description: string;
   role: string;
   active: boolean;
-  logo: string;
   titleColor: string;
-  onClick: MouseEventHandler<HTMLDivElement>;
   url?: string;
-  background?: string;
-  renderSummaryText: () => any;
-  renderBgAnimation?: (active: boolean) => any;
+  renderSummaryText: () => ReactNode;
+  renderBgAnimation?: (active: boolean) => ReactNode;
+  renderCoverLogo: () => ReactNode;
 };
 
 function WorkBanner(props: WorkBannerProps) {
   const cssVars = {
-    '--background': 'transparent', //props.background,
     '--title-color': props.titleColor
   } as React.CSSProperties;
 
@@ -33,27 +30,14 @@ function WorkBanner(props: WorkBannerProps) {
     styles['pointer-ball-placeholder']
   );
   const titleClass = classNames('invisible', styles.title);
-  const openWebsiteIcon = props.url ? (
-    <OpenWebsiteIcon
-      fill={'#fff'}
-      forwardedClass={styles['icon-open-marker']}
-    ></OpenWebsiteIcon>
-  ) : null;
 
   return (
-    <div
-      id={props.id}
-      className={styles.card}
-      style={cssVars}
-      onClick={props.onClick}
-    >
+    <div id={props.id} className={styles.card} style={cssVars}>
       <p data-anim-target="summary" className={summaryClass}>
         {props.renderSummaryText()}
       </p>
 
       <div className={styles.content}>
-        <img src={props.logo} className={styles.logo} />
-
         <div className={styles.cover}>
           <h4 data-anim-target="cover-role" className={coverRoleClass}>
             {props.role}
@@ -98,10 +82,13 @@ function WorkBanner(props: WorkBannerProps) {
           </a>
         </div>
 
-        <div
-          data-anim-target="ball-placeholder"
-          className={ballPlaceholderClass}
-        ></div>
+        <div className={styles['ball-wrapper']}>
+          <div
+            data-anim-target="ball-placeholder"
+            className={ballPlaceholderClass}
+          ></div>
+          {props.renderCoverLogo()}
+        </div>
       </div>
 
       {props.renderBgAnimation?.(props.active)}

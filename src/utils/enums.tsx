@@ -6,7 +6,8 @@ export enum ROUTE_PATH_PATTERNS {
 
 export enum WorkPageTitle {
   Blibli = 'blibli',
-  Moperty = 'moperty'
+  Moperty = 'moperty',
+  Radjastone = 'radjastone'
 }
 
 export enum MediaQueryScreen {
@@ -17,7 +18,8 @@ export enum MediaQueryScreen {
 
 export enum WorkHighlightName {
   Blibli = 'blibli',
-  Moperty = 'moperty'
+  Moperty = 'moperty',
+  Radjastone = 'radjastone'
 }
 
 export enum ControllerScreenTitle {
