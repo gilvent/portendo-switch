@@ -150,16 +150,14 @@ function WorkListBlock() {
           <WorkBannerBlock
             id="radjastone-banner"
             title="Radjastone"
-            description="A simple and interactive company website."
-            role="Design and develop"
+            description="An Indonesian company providing services related to architecture / interior / exterior design made with natural stones."
+            role="Design and develop for"
             renderSummaryText={() => (
               <>
-                This is a <strong>"build the whole thing"</strong> project for
-                me. I <strong>design</strong> the user interfaces,{' '}
-                <strong>code</strong> frontends and backends, implement{' '}
-                <strong>SEO</strong> techniques while also learning some{' '}
-                <strong>real estate broker knowledge</strong>.
-                <br />
+                I build <strong>Radjastone's</strong> company website from
+                scratch. Starting with UI / UX design, to web app development
+                using <strong>GSAP</strong> animation library and{' '}
+                <strong>Strapi CMS</strong>.
               </>
             )}
             active={activeBg === WorkHighlightId.Radjastone}

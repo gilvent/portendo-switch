@@ -12,11 +12,13 @@ import ControllerButtonContext from '@/context/ControllerButtonContext';
 
 const BlibliHighlights = lazy(() => import('./BlibliHighlights'));
 const MopertyHighlight = lazy(() => import('./MopertyHighlights'));
+const RadjastoneHighlight = lazy(() => import('./RadjastoneHighlights'));
 
 function WorkHighlight() {
   const detailComponentByParams: Record<string, FunctionComponent> = {
     [WorkHighlightId.Blibli]: BlibliHighlights,
-    [WorkHighlightId.Moperty]: MopertyHighlight
+    [WorkHighlightId.Moperty]: MopertyHighlight,
+    [WorkHighlightId.Radjastone]: RadjastoneHighlight
   };
   const { pathname } = useLocation();
   const params = useParams();

@@ -7,7 +7,10 @@ export enum TECH {
   PLAYWRIGHT = 'PLAYWRIGHT',
   LARAVEL = 'LARAVEL',
   POSTGRES = 'POSTGRES',
-  GCLOUD = 'GCLOUD'
+  GCLOUD = 'GCLOUD',
+  GSAP = 'GSAP',
+  REACT = 'REACT',
+  STRAPI = 'STRAPI'
 }
 
 export type BoxRefs = {

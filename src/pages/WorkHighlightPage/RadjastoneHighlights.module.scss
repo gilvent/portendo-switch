@@ -1,0 +1,31 @@
+@use 'assets/scss/mixins/responsive';
+@use 'assets/scss/mixins/font';
+@use 'assets/scss/variables/colors';
+
+.work-page {
+  display: grid;
+  grid-template-columns: minmax(100%, 100%);
+  grid-template-areas:
+    'page-gap'
+    'tech';
+  text-align: center;
+
+  @include responsive.desktop {
+    grid-template-columns: 50vw 50vw;
+    grid-template-areas: 'page-gap tech';
+    text-align: left;
+  }
+}
+
+section.tech {
+  grid-area: tech;
+}
+
+section.page-gap {
+  grid-area: page-gap;
+  height: 80vh;
+  background: #fff;
+  @include responsive.desktop {
+    height: 100vh;
+  }
+}
