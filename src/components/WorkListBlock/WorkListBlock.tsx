@@ -2,9 +2,10 @@ import styles from './WorkListBlock.module.scss';
 import WorkBannerBlock from '@/components/WorkBanner';
 import mopertyLogo from 'assets/img/brand/moperty-white.svg';
 import blibliWhiteLogo from 'assets/img/brand/blibli-white.svg';
+import radjastoneProduct from 'assets/img/brand/rj-limestone-white.svg';
 import GiftsImage from '@/components/GiftsImage';
 import { useEffect, useRef, useState } from 'react';
-import { WorkHighlightName } from '@/utils/enums';
+import { WorkHighlightId } from '@/utils/enums';
 import { useGSAP } from '@gsap/react';
 import useActiveWorkBanner from './useActiveWorkBanner.hook';
 import {
@@ -18,7 +19,7 @@ import classNames from 'classnames';
 function WorkListBlock() {
   const nodeRef = useRef(null);
   const { activeBanner, bannersByTitle, prevBanner } = useActiveWorkBanner();
-  const [activeBg, setActiveBg] = useState<WorkHighlightName | null>(null);
+  const [activeBg, setActiveBg] = useState<WorkHighlightId | null>(null);
   const {
     addListener: addShowBgListener,
     removeListener: removeShowBgListener
@@ -30,7 +31,7 @@ function WorkListBlock() {
 
   useGSAP(() => {
     setupBallAndSlider({
-      firstElSelector: bannersByTitle[WorkHighlightName.Blibli].selector,
+      firstElSelector: bannersByTitle[WorkHighlightId.Blibli].selector,
       targetElSelector: activeBanner.selector,
       ballColor: activeBanner.background
     });
@@ -78,7 +79,7 @@ function WorkListBlock() {
         <div
           id="blibli-banner-container"
           className={classNames(styles['banner-container'], {
-            [styles.active]: activeBanner.title === WorkHighlightName.Blibli
+            [styles.active]: activeBanner.title === WorkHighlightId.Blibli
           })}
         >
           <WorkBannerBlock
@@ -89,47 +90,84 @@ function WorkListBlock() {
             role="Front-end Developer @"
             renderSummaryText={() => (
               <>
-                Being a <strong>front end developer</strong>, I worked in <br />
-                <strong>Product Detail Squad</strong> on developing UI
-                components, layouts and interactions for product detail and
-                product review features in <strong>Blibli.com’s</strong> web
-                application.
+                Being a <strong>front end developer</strong>, I worked on <br />
+                the marketplace's <strong>Customer Experience</strong>.
+                Developed UI components, layouts and interactions for product
+                detail and product review features in{' '}
+                <strong>Blibli.com’s</strong> web application.
               </>
             )}
-            active={activeBg === WorkHighlightName.Blibli}
-            logo={blibliWhiteLogo}
+            active={activeBg === WorkHighlightId.Blibli}
+            renderCoverLogo={() => (
+              <img
+                src={blibliWhiteLogo}
+                className={classNames(styles.logo, styles['logo-blibli'])}
+              />
+            )}
             titleColor="#0092da"
             renderBgAnimation={active => <GiftsImage active={active} />}
             url={'https://blibli.com'}
-            onClick={() => {}}
           />
         </div>
         <div
           id="moperty-banner-container"
           className={classNames(styles['banner-container'], {
-            [styles.active]: activeBanner.title === WorkHighlightName.Moperty
+            [styles.active]: activeBanner.title === WorkHighlightId.Moperty
           })}
         >
           <WorkBannerBlock
             id="moperty-banner"
             title="Moperty"
             description="A progressive web app to browse available real estate in local area around my hometown."
-            role="Use My Free Time Building"
+            role="In My Free Time Developing"
             renderSummaryText={() => (
               <>
-                This is a <strong>"build the whole thing"</strong> project for
-                me. I <strong>design</strong> the user interfaces,{' '}
-                <strong>code</strong> frontends and backends, implement{' '}
-                <strong>SEO</strong> techniques while also learning some{' '}
-                <strong>real estate broker knowledge</strong>.
-                <br />
+                To boost confidence in web development, I feel the need to{' '}
+                <strong>build and run a whole product</strong>. So I came up
+                with <strong>Moperty</strong>: I <strong>design</strong> the
+                UIs, <strong>code</strong> frontends and backends, and also{' '}
+                <strong>implement SEO</strong> techniques.
               </>
             )}
-            active={activeBg === WorkHighlightName.Moperty}
-            logo={mopertyLogo}
+            active={activeBg === WorkHighlightId.Moperty}
+            renderCoverLogo={() => (
+              <img
+                src={mopertyLogo}
+                className={classNames(styles.logo, styles['logo-moperty'])}
+              />
+            )}
             titleColor="#3f51b5"
-            url={'https://moperty.id'}
-            onClick={() => {}}
+            url="https://moperty.id"
+          />
+        </div>
+        <div
+          id="radjastone-banner-container"
+          className={classNames(styles['banner-container'], {
+            [styles.active]: activeBanner.title === WorkHighlightId.Radjastone
+          })}
+        >
+          <WorkBannerBlock
+            id="radjastone-banner"
+            title="Radjastone"
+            description="An Indonesian company providing services related to architecture / interior / exterior design made with natural stones."
+            role="Build A Website For"
+            renderSummaryText={() => (
+              <>
+                I build <strong>Radjastone's</strong> company website from
+                scratch. Starting with UI / UX design, to web app development
+                using <strong>GSAP</strong> animation library and{' '}
+                <strong>Strapi CMS</strong>.
+              </>
+            )}
+            active={activeBg === WorkHighlightId.Radjastone}
+            renderCoverLogo={() => (
+              <img
+                src={radjastoneProduct}
+                className={classNames(styles.logo, styles['logo-radjastone'])}
+              />
+            )}
+            titleColor="#9a883f"
+            url={'https://radjastone.com'}
           />
         </div>
 

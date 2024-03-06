@@ -39,7 +39,7 @@ function BlibliReviewProjectStoryBlock() {
         </li>
       </ul>
       <ul className="key-points invisible">
-        <strong>Some of what I learnt...</strong>
+        <strong>A few learnings...</strong>
         <li>
           Try our best to test on real device :). This time is my first
           encounter with an issue that uploaded image is rotated when uploaded

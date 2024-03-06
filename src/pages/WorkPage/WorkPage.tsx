@@ -5,7 +5,7 @@ import { Outlet } from 'react-router-dom';
 import 'assets/scss/_work-blocks.scss';
 import { useEffect } from 'react';
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
-import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
+import { ROUTE_PATH_PATTERNS, WorkHighlightId } from '@/utils/enums';
 
 function WorkPage() {
   const primaryPanelClasses = classNames(
@@ -22,7 +22,7 @@ function WorkPage() {
     if (!activeBanner) {
       window.location.href = ROUTE_PATH_PATTERNS.WORK.replace(
         ':title',
-        WorkPageTitle.Blibli
+        WorkHighlightId.Blibli
       );
     }
   }, []);

@@ -5,6 +5,8 @@ type BoxProps = {
   logoFileName: string;
   text: string;
   color: string;
+  imgWidth?: string | number;
+  imgHeight?: string | number;
 };
 
 function Box(props: BoxProps) {
@@ -24,7 +26,12 @@ function Box(props: BoxProps) {
   return (
     <div data-anim-target="box" ref={boxRef} className={styles.box}>
       <div className={styles.fg}>
-        <img src={imgSrc} alt="" />
+        <img
+          src={imgSrc}
+          alt=""
+          {...(props.imgWidth !== undefined && { width: props.imgWidth })}
+          {...(props.imgHeight !== undefined && { width: props.imgHeight })}
+        />
       </div>
       <div data-anim-target="overlay" className={styles.overlay}></div>
       <div data-anim-target="text" className={styles.text}>

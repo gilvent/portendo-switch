@@ -7,16 +7,18 @@ import {
   useState
 } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ROUTE_PATH_PATTERNS, WorkPageTitle } from '@/utils/enums';
+import { ROUTE_PATH_PATTERNS, WorkHighlightId } from '@/utils/enums';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 
 const BlibliHighlights = lazy(() => import('./BlibliHighlights'));
 const MopertyHighlight = lazy(() => import('./MopertyHighlights'));
+const RadjastoneHighlight = lazy(() => import('./RadjastoneHighlights'));
 
 function WorkHighlight() {
   const detailComponentByParams: Record<string, FunctionComponent> = {
-    [WorkPageTitle.Blibli]: BlibliHighlights,
-    [WorkPageTitle.Moperty]: MopertyHighlight
+    [WorkHighlightId.Blibli]: BlibliHighlights,
+    [WorkHighlightId.Moperty]: MopertyHighlight,
+    [WorkHighlightId.Radjastone]: RadjastoneHighlight
   };
   const { pathname } = useLocation();
   const params = useParams();
@@ -43,7 +45,7 @@ function WorkHighlight() {
     setAction('onControlAClick', () => {
       const url = ROUTE_PATH_PATTERNS.WORK.replace(
         ':title',
-        params.title ?? WorkPageTitle.Blibli
+        params.title ?? WorkHighlightId.Blibli
       );
       navigate(url);
     });

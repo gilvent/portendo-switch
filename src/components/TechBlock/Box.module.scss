@@ -37,9 +37,11 @@
 .fg {
   @extend %layer;
   background-color: #fff;
+  padding: 8px;
 
   img {
-    height: 65px;
+    max-height: 65px;
+    max-width: 80%;
   }
 }
 

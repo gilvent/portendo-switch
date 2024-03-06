@@ -7,7 +7,8 @@ const boxPropsByTech = {
   [TECH.PLAYWRIGHT]: {
     logoFileName: 'playwright.svg',
     text: 'PLAYWRIGHT',
-    color: '#d65348'
+    color: '#d65348',
+    imgHeight: 65
   },
   [TECH.SASS]: {
     logoFileName: 'sass.svg',
@@ -17,7 +18,8 @@ const boxPropsByTech = {
   [TECH.VUE]: {
     logoFileName: 'vue.svg',
     text: 'VUE',
-    color: '#42b884'
+    color: '#42b884',
+    imgHeight: 55
   },
   [TECH.NGINX]: {
     logoFileName: 'nginx.svg',
@@ -38,6 +40,21 @@ const boxPropsByTech = {
     logoFileName: 'gcloud.png',
     text: 'GOOGLE CLOUD',
     color: '#fbbd05'
+  },
+  [TECH.GSAP]: {
+    logoFileName: 'gsap.svg',
+    text: 'GSAP',
+    color: '#0ae448'
+  },
+  [TECH.REACT]: {
+    logoFileName: 'react.svg',
+    text: 'REACT',
+    color: '#61D9FA'
+  },
+  [TECH.STRAPI]: {
+    logoFileName: 'strapi.svg',
+    text: 'STRAPI CMS',
+    color: '#4945ff'
   }
 };
 

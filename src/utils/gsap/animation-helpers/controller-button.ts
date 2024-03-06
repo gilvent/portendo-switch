@@ -165,7 +165,12 @@ export function dockToScreenMode(): gsap.core.Timeline {
     .addLabel('dock-visible')
     .to(dockScreenWrapper, {
       delay: 2,
-      translateY: '155%',
+      translateY: valueForScreen(
+        {
+          desktop: '30vh'
+        },
+        '25vh'
+      ),
       ease: 'back.in'
     })
     .to(leftCon, {

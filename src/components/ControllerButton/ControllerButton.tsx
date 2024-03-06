@@ -3,6 +3,7 @@ import styles from './ControllerButton.module.scss';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 import debounced from '@/utils/debounced';
 import ControllerScreen from '@/components/ControllerScreen';
+import avLogo from 'assets/img/av-logo-black.svg';
 
 function ControllerButton() {
   const { actions, setVisibleHelpPanel, joyconColors } = useContext(
@@ -71,6 +72,7 @@ function ControllerButton() {
             data-anim-target="dock-front"
             className={`${styles['dock-front']} invisible`}
           >
+            <img src={avLogo} className={styles['av-logo']} alt="" />
             <div data-anim-target="led" className={styles.led}></div>
           </div>
           <div data-anim-target="screen" className={styles.screen}>
