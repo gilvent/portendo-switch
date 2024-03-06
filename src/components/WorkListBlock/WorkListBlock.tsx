@@ -119,15 +119,14 @@ function WorkListBlock() {
             id="moperty-banner"
             title="Moperty"
             description="A progressive web app to browse available real estate in local area around my hometown."
-            role="Use My Free Time Building"
+            role="In My Free Time Developing"
             renderSummaryText={() => (
               <>
-                This is a <strong>"build the whole thing"</strong> project for
-                me. I <strong>design</strong> the user interfaces,{' '}
-                <strong>code</strong> frontends and backends, implement{' '}
-                <strong>SEO</strong> techniques while also learning some{' '}
-                <strong>real estate broker knowledge</strong>.
-                <br />
+                To boost confidence in web development, I feel the need to{' '}
+                <strong>build and run a whole product</strong>. So I came up
+                with <strong>Moperty</strong>: I <strong>design</strong> the
+                UIs, <strong>code</strong> frontends and backends, and also{' '}
+                <strong>implement SEO</strong> techniques.
               </>
             )}
             active={activeBg === WorkHighlightId.Moperty}
@@ -151,7 +150,7 @@ function WorkListBlock() {
             id="radjastone-banner"
             title="Radjastone"
             description="An Indonesian company providing services related to architecture / interior / exterior design made with natural stones."
-            role="Design and develop for"
+            role="Build A Website For"
             renderSummaryText={() => (
               <>
                 I build <strong>Radjastone's</strong> company website from
