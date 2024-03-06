@@ -50,7 +50,7 @@ function BlibliReviewProjectInteractiveBlock() {
     <div ref={blockRef} className={styles.block}>
       <h2 data-anim-target="heading" className={styles.heading}>
         <div className="invisible">Worked on:</div>
-        <div className="invisible">Review Revamp</div>
+        <div className="invisible">Product Review</div>
       </h2>
       <div className={styles.flashlight} ref={flashlightRef}></div>
       <div className={styles['interactive-area']}>

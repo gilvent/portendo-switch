@@ -90,11 +90,11 @@ function WorkListBlock() {
             role="Front-end Developer @"
             renderSummaryText={() => (
               <>
-                Being a <strong>front end developer</strong>, I worked in <br />
-                <strong>Product Detail Squad</strong> on developing UI
-                components, layouts and interactions for product detail and
-                product review features in <strong>Blibli.com’s</strong> web
-                application.
+                Being a <strong>front end developer</strong>, I worked on <br />
+                the marketplace's <strong>Customer Experience</strong>.
+                Developed UI components, layouts and interactions for product
+                detail and product review features in{' '}
+                <strong>Blibli.com’s</strong> web application.
               </>
             )}
             active={activeBg === WorkHighlightId.Blibli}

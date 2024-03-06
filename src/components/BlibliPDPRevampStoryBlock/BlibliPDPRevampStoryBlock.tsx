@@ -26,38 +26,40 @@ function BlibliPDPRevampStoryBlock() {
       </h2>
 
       <p className="overview invisible">
-        This is a full page redesign project which is part of major theme update
-        across Blibli. Besides theme revamp, this project also introduces user
-        experience improvements such as secondary pages and sticky navigation
-        for mobile web.
+        I spent most of my time in Blibli working on Product Detail Page.
+        Product Detail is the entry point of customer's journey. Thus, I get to
+        develop features of various product teams: <strong>promotions</strong>,{' '}
+        <strong>recommendations</strong>, and many more!
       </p>
 
       <ul className={`key-points invisible`}>
-        <strong>Key changes...</strong>
-        <li>New and newer UI components</li>
-        <li>Rewrite the codebase to accomodate new flow</li>
+        <strong>A project spotlight...</strong>
         <li>
-          Performance improvement: New APIs that focuses on{' '}
-          <strong>above the fold</strong>, lazy loaded many things!
+          Product Detail Revamp. A full page redesign project which was part of
+          major theme update across Blibli. Introducing new user experiences
+          with secondary pages for mobile screen and simpler add to cart flow.
         </li>
       </ul>
 
       <ul className={`key-points invisible`}>
-        <strong>Lessons I learnt while doing this project...</strong>
+        <strong>Lessons learnt while working on Product Detail...</strong>
         <li>
           Software development principles. One that stick to mind is{' '}
           <strong>
             Incremental release &gt; <i>Big bang</i> release
-          </strong>{' '}
-          with feature flag
+          </strong>
         </li>
         <li>
-          Explore CSS techniques to building cool UI components: layouts,
-          animation, expand / hide interaction and more
+          Explore CSS techniques to building cool UI components: layouts, css
+          animations, and more
         </li>
         <li>
           Get work on more JS and browser APIs: Lazy load techniques, datalayer,
           service worker, intersection observer, etc...
+        </li>
+        <li>
+          High volume of traffic puts continuous attention to this page's
+          performance, pushing me to learn many web optimization techniques
         </li>
       </ul>
     </article>
