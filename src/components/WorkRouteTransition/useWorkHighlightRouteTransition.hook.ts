@@ -22,6 +22,7 @@ import {
   startSingleConMode
 } from '@/utils/gsap/animation-helpers/controller-button';
 import valueForScreen from '@/utils/window';
+import devLog from '@/utils/dev-logger';
 
 function useWorkHighlightRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
@@ -61,7 +62,7 @@ function useWorkHighlightRouteTransition() {
       });
 
     if (isFromPath(ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT)) {
-      console.log('[work detail route] direct enter');
+      devLog('[work highlight route] direct enter');
       enterTransition
         .call(() => {
           bounceEnter(activeBanner.selector).seek('work-list-done');
@@ -82,7 +83,7 @@ function useWorkHighlightRouteTransition() {
         .add(startSingleConMode(), '<+1')
         .play(0);
     } else if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
-      console.log('[work detail route] enter from work');
+      devLog('[work highlight route] enter from work');
       enterTransition
         .add(screenModeToSingleCon())
         .add(showWorkSummary())
@@ -105,12 +106,12 @@ function useWorkHighlightRouteTransition() {
   }
 
   function onEntered() {
-    console.log('[work detail route] entered work detail');
+    devLog('[work highlight route] entered work detail');
     enableController();
   }
 
   const onExit = () => {
-    console.log('[work detail route] exit');
+    devLog('[work highlight route] exit');
 
     let exitTransition = gsap
       .timeline({ paused: true })
@@ -121,7 +122,7 @@ function useWorkHighlightRouteTransition() {
     if (isToPath(ROUTE_PATH_PATTERNS.WORK)) {
       exitTransition
         .eventCallback('onStart', () => {
-          console.log('starting exit animation');
+          devLog('starting exit animation');
           disableController();
           lockScroll();
           window.scrollTo({
@@ -139,7 +140,7 @@ function useWorkHighlightRouteTransition() {
   };
 
   function onExited() {
-    console.log('[work route] exited work detail');
+    devLog('[work route] exited work detail');
     enableController();
     disableScrollLock();
   }
@@ -150,7 +151,7 @@ function useWorkHighlightRouteTransition() {
     onExit,
     onExited,
     addEndListener: (done: any) => {
-      console.log('[work detail route] adding end listener');
+      devLog('[work highlight route] adding end listener');
       addEndListener(done);
     }
   };

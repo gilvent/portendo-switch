@@ -7,6 +7,7 @@ import {
   screenModeToDock,
   startScreenMode
 } from '@/utils/gsap/animation-helpers/controller-button';
+import devLog from '@/utils/dev-logger';
 
 function useWorkRouteTransition(previousPath: string) {
   const enterAnimations = [
@@ -28,12 +29,12 @@ function useWorkRouteTransition(previousPath: string) {
   }
 
   function exitToHomePage(): gsap.core.Timeline {
-    console.log('exiting to home page');
+    devLog('[work route transition] exiting to home page');
     return gsap.timeline({ paused: true }).add(screenModeToDock()).duration(2);
   }
 
   function onEnter(): gsap.core.Timeline {
-    console.log('enter work', previousPath);
+    devLog('[work route transition] enter work', previousPath);
     const enter =
       enterAnimations.find(i => matchPath(i.path, previousPath))?.fn() ??
       gsap.timeline({ paused: true });
@@ -49,7 +50,7 @@ function useWorkRouteTransition(previousPath: string) {
   }
 
   function onExit(): gsap.core.Timeline {
-    console.log('exit work');
+    devLog('[work route transition] exit work');
     const exit =
       exitAnimationsByTargetPath
         .find(i => matchPath(i.path, window.location.pathname))
