@@ -31,7 +31,12 @@ function BlibliReviewProjectInteractiveBlock() {
         '[data-anim-target="heading"] > div',
         '[data-anim-target="camera"]'
       ];
-      return gsap.timeline().add(slideFadeIn(selectors.join(', ')));
+      return gsap
+        .timeline()
+        .add(slideFadeIn(selectors.join(', ')))
+        .eventCallback('onComplete', () => {
+          swapToMonitor.current?.play(0);
+        });
     }
   });
 
