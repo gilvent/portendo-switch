@@ -90,10 +90,9 @@ function WorkListBlock() {
             role="Front-end Developer @"
             renderSummaryText={() => (
               <>
-                Being a <strong>front end developer</strong>, I worked on <br />
-                the marketplace's <strong>Customer Experience</strong>.
-                Developed UI components, layouts and interactions for product
-                detail and product review features in{' '}
+                Being a <strong>front end developer</strong>, I worked in{' '}
+                <strong>Customer Experience</strong> team. Developed any client
+                side features related to product detail and product review in{' '}
                 <strong>Blibli.com’s</strong> web application.
               </>
             )}

@@ -8,6 +8,7 @@ import {
   handheldToDocked,
   startHandheldMode
 } from '@/utils/gsap/animation-helpers/controller-button';
+import devLog from '@/utils/dev-logger';
 
 function useHomeRouteAnimation(previousPath: string) {
   const enterAnimationsByPrevPath = [
@@ -33,7 +34,7 @@ function useHomeRouteAnimation(previousPath: string) {
   }
 
   function onEnter(): gsap.core.Timeline {
-    console.log('enter home from', previousPath);
+    devLog('[home route transition] enter home from', previousPath);
     const enter =
       enterAnimationsByPrevPath
         .find(i => matchPath(i.path, previousPath))

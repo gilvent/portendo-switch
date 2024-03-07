@@ -5,6 +5,7 @@ import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import usePreviousState from '@/hooks/usePreviousState.hook';
 import useHomeRouteAnimation from './useHomeRouteTransition.hook';
 import useWorkRouteTransition from './useWorkRouteTransition.hook';
+import devLog from '@/utils/dev-logger';
 // import TransitionContext from '../context/TransitionContext';
 
 const RouteTransition = ({ children }: { children: any }) => {
@@ -20,11 +21,11 @@ const RouteTransition = ({ children }: { children: any }) => {
   const defaultConfig = {
     onEnter: () => {},
     onEntered: () => {
-      console.log('entered');
+      devLog('[route transition] entered - no handling');
     },
     onExit: () => {},
     onExited: () => {
-      console.log('exited');
+      devLog('[route transition] exited - no handling');
     },
     appear: true,
     unmountOnExit: true
@@ -34,11 +35,11 @@ const RouteTransition = ({ children }: { children: any }) => {
     [ROUTE_PATH_PATTERNS.HOME]: {
       onEnter: doneAfterCall(homeRouteTransition.onEnter),
       onEntered: () => {
-        console.log('entered home');
+        devLog('[route transition] entered home');
       },
       onExit: doneAfterCall(homeRouteTransition.onExit),
       onExited: () => {
-        console.log('exited home');
+        devLog('[route transition] exited home');
       },
       appear: homeRouteTransition.appear,
       timeout: homeRouteTransition.timeout,
@@ -47,11 +48,11 @@ const RouteTransition = ({ children }: { children: any }) => {
     [ROUTE_PATH_PATTERNS.WORK]: {
       onEnter: doneAfterCall(workRouteTransition.onEnter),
       onEntered: () => {
-        console.log('entered work');
+        devLog('[route transition] entered work');
       },
       onExit: doneAfterCall(workRouteTransition.onExit),
       onExited: () => {
-        console.log('exited work');
+        devLog('[route transition] exited work');
       },
       appear: workRouteTransition.appear,
       timeout: workRouteTransition.timeout,

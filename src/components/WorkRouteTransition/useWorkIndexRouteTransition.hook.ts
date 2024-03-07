@@ -4,6 +4,7 @@ import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import { bounceEnter } from '@/utils/gsap/animation-helpers/work-list-block';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
+import devLog from '@/utils/dev-logger';
 
 function useWorkIndexRouteTransition() {
   const { isFromPath } = useRouteTransitionHelper();
@@ -12,7 +13,7 @@ function useWorkIndexRouteTransition() {
   const { activeBanner } = useActiveWorkBanner();
 
   function onEnter() {
-    console.log('[work index route] enter');
+    devLog('[work index route] enter');
 
     if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
       const enterAnim = gsap
@@ -29,16 +30,16 @@ function useWorkIndexRouteTransition() {
   }
 
   function onEntered() {
-    console.log('[work index route] entered work list');
+    devLog('[work index route] entered work list');
   }
 
   function onExit() {
-    console.log('[work index route] exit work list');
+    devLog('[work index route] exit work list');
     doneWithoutTransition();
   }
 
   function onExited() {
-    console.log('[work index route] exited work list');
+    devLog('[work index route] exited work list');
   }
   return {
     onEnter,
