@@ -1,9 +1,8 @@
 import classNames from 'classnames';
 import styles from './WorkPage.module.scss';
 import WorkListBlock from '@/components/WorkListBlock';
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import 'assets/scss/_work-blocks.scss';
-import { useEffect } from 'react';
 import useActiveWorkBanner from '@/components/WorkListBlock/useActiveWorkBanner.hook';
 import { ROUTE_PATH_PATTERNS, WorkHighlightId } from '@/utils/enums';
 
@@ -18,17 +17,13 @@ function WorkPage() {
   );
   const { activeBanner } = useActiveWorkBanner();
 
-  useEffect(() => {
-    if (!activeBanner) {
-      window.location.href = ROUTE_PATH_PATTERNS.WORK.replace(
-        ':title',
-        WorkHighlightId.Blibli
-      );
-    }
-  }, []);
-
   if (!activeBanner) {
-    return null;
+    return (
+      <Navigate
+        to={ROUTE_PATH_PATTERNS.WORK.replace(':title', WorkHighlightId.Blibli)}
+        replace
+      />
+    );
   }
 
   return (
