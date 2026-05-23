@@ -2,21 +2,25 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import { useEffect, useRef } from 'react';
 
 function useScrollTrigger() {
-  const instance = useRef<ScrollTrigger>();
+  const instances = useRef<ScrollTrigger[]>([]);
 
   useEffect(() => {
+    const list = instances.current;
     return () => {
-      instance.current?.kill();
+      list.forEach(instance => instance.kill());
+      list.length = 0;
     };
   }, []);
 
   function create(vars: ScrollTrigger.StaticVars) {
-    instance.current = ScrollTrigger.create(vars);
+    const instance = ScrollTrigger.create(vars);
+    instances.current.push(instance);
+    return instance;
   }
 
   return {
     create,
-    instance: instance.current
+    instances: instances.current
   };
 }
 
