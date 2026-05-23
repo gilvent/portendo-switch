@@ -84,7 +84,8 @@ function HomePage() {
       });
     } else {
       setAction('onControlBClick', () => {
-        navigate(CONTROLLER_SCREEN_NAVIGATION[activeScreen].url);
+        const url = CONTROLLER_SCREEN_NAVIGATION[activeScreen].url;
+        if (url) navigate(url);
       });
     }
   }, [activeScreen]);
