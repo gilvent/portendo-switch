@@ -45,10 +45,7 @@ function HomePage() {
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
   const isTablet = useMediaQuery(MediaQueryScreen.Tablet);
-  const clouds = useMemo(
-    () => createClouds(isTablet ? 6 : 3),
-    [isTablet]
-  );
+  const clouds = useMemo(() => createClouds(isTablet ? 6 : 3), [isTablet]);
 
   useEffect(() => {
     setHelpPanelGuides([
