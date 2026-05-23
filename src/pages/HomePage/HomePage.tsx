@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
 import styles from './HomePage.module.scss';
@@ -8,6 +8,29 @@ import gmail from 'assets/img/brand/gmail.png';
 import twitter from 'assets/img/brand/twitter.png';
 import useMediaQuery from '@/hooks/useMediaQuery.hook';
 import { ControllerScreenTitle, MediaQueryScreen } from '@/utils/enums';
+
+const CONTROLLER_SCREEN_NAVIGATION = {
+  [ControllerScreenTitle.Home]: {
+    prev: ControllerScreenTitle.Work,
+    next: ControllerScreenTitle.Work,
+    url: undefined as string | undefined
+  },
+  [ControllerScreenTitle.Work]: {
+    prev: ControllerScreenTitle.Home,
+    next: ControllerScreenTitle.Home,
+    url: '/work/blibli' as string | undefined
+  }
+};
+
+function createClouds(num: number) {
+  return [...new Array(num)].map((_, idx) => (
+    <div
+      data-anim-target="cloud"
+      key={idx + 'cloud'}
+      className={styles.cloud}
+    ></div>
+  ));
+}
 
 function HomePage() {
   const {
@@ -20,20 +43,9 @@ function HomePage() {
     changeJoyconColor
   } = useContext(ControllerButtonContext);
   const navigate = useNavigate();
-  const ref = useRef<any>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const isTablet = useMediaQuery(MediaQueryScreen.Tablet);
-  const clouds = isTablet ? createClouds(6) : createClouds(3);
-  const controllerScreensNavigation = {
-    [ControllerScreenTitle.Home]: {
-      prev: ControllerScreenTitle.Work,
-      next: ControllerScreenTitle.Work
-    },
-    [ControllerScreenTitle.Work]: {
-      prev: ControllerScreenTitle.Home,
-      next: ControllerScreenTitle.Home,
-      url: '/work/blibli'
-    }
-  };
+  const clouds = useMemo(() => createClouds(isTablet ? 6 : 3), [isTablet]);
 
   useEffect(() => {
     setHelpPanelGuides([
@@ -54,11 +66,11 @@ function HomePage() {
   useEffect(() => {
     setAction('onControlXClick', () => {
       changeScreenDirection.current = 'up';
-      setActiveGameScreen(controllerScreensNavigation[activeScreen].prev);
+      setActiveGameScreen(CONTROLLER_SCREEN_NAVIGATION[activeScreen].prev);
     });
     setAction('onControlYClick', () => {
       changeScreenDirection.current = 'down';
-      setActiveGameScreen(controllerScreensNavigation[activeScreen].next);
+      setActiveGameScreen(CONTROLLER_SCREEN_NAVIGATION[activeScreen].next);
     });
   }, [activeScreen]);
 
@@ -69,20 +81,11 @@ function HomePage() {
       });
     } else {
       setAction('onControlBClick', () => {
-        navigate(controllerScreensNavigation[activeScreen].url);
+        const url = CONTROLLER_SCREEN_NAVIGATION[activeScreen].url;
+        if (url) navigate(url);
       });
     }
   }, [activeScreen]);
-
-  function createClouds(num: number) {
-    return [...new Array(num)].map((_, idx) => (
-      <div
-        data-anim-target="cloud"
-        key={idx + 'cloud'}
-        className={styles.cloud}
-      ></div>
-    ));
-  }
 
   return (
     <div data-anim-target="home-page" ref={ref} className={styles.page}>

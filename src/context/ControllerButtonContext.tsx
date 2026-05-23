@@ -3,9 +3,17 @@ import {
   MutableRefObject,
   RefObject,
   createContext,
+  useCallback,
+  useMemo,
   useRef,
   useState
 } from 'react';
+
+const JOYCON_COLOR_SETS = [
+  { left: '#828282', right: '#828282' },
+  { left: '#ff3c28', right: '#0ab9e6' },
+  { left: '#C88C32', right: '#FFDC00' }
+];
 
 type ControlActions =
   | 'onControlYClick'
@@ -34,14 +42,6 @@ const ControllerButtonContext = createContext<ControllerButtonProviderValue>(
 );
 
 function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
-  const joyconColorSets = [
-    { left: '#828282', right: '#828282' },
-    {
-      left: '#ff3c28',
-      right: '#0ab9e6'
-    },
-    { left: '#C88C32', right: '#FFDC00' }
-  ];
   const actions = useRef<Record<ControlActions, () => void | undefined | null>>(
     {
       onControlYClick: () => {},
@@ -59,35 +59,45 @@ function ControllerButtonProvider({ children }: { children: React.ReactNode }) {
   const [joyconColors, setJoyconColors] = useState<{
     left: string;
     right: string;
-  }>({ left: '#828282', right: '#828282' });
+  }>(JOYCON_COLOR_SETS[0]);
 
   const joyconColorIndex = useRef<number>(0);
 
-  function setAction(control: ControlActions, fn: () => void) {
+  const setAction = useCallback((control: ControlActions, fn: () => void) => {
     actions.current[control] = fn;
-  }
+  }, []);
 
-  function changeJoyconColor() {
+  const changeJoyconColor = useCallback(() => {
     joyconColorIndex.current =
-      joyconColorIndex.current === joyconColorSets.length - 1
+      joyconColorIndex.current === JOYCON_COLOR_SETS.length - 1
         ? 0
         : joyconColorIndex.current + 1;
-    setJoyconColors(joyconColorSets[joyconColorIndex.current]);
-  }
+    setJoyconColors(JOYCON_COLOR_SETS[joyconColorIndex.current]);
+  }, []);
 
-  const providerValue = {
-    setAction,
-    actions,
-    visibleHelpPanel,
-    setVisibleHelpPanel,
-    helpPanelGuides,
-    setHelpPanelGuides,
-    activeScreen,
-    setActiveGameScreen,
-    changeScreenDirection,
-    joyconColors,
-    changeJoyconColor
-  };
+  const providerValue = useMemo(
+    () => ({
+      setAction,
+      actions,
+      visibleHelpPanel,
+      setVisibleHelpPanel,
+      helpPanelGuides,
+      setHelpPanelGuides,
+      activeScreen,
+      setActiveGameScreen,
+      changeScreenDirection,
+      joyconColors,
+      changeJoyconColor
+    }),
+    [
+      setAction,
+      visibleHelpPanel,
+      helpPanelGuides,
+      activeScreen,
+      joyconColors,
+      changeJoyconColor
+    ]
+  );
 
   return (
     <ControllerButtonContext.Provider value={providerValue}>

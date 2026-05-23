@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { createRef, useContext } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { Transition, TransitionGroup } from 'react-transition-group';
 import { ControllerScreenTitle } from '@/utils/enums';
 import ControllerButtonContext from '@/context/ControllerButtonContext';
@@ -61,15 +61,34 @@ function ControllerScreen() {
   const { activeScreen, changeScreenDirection } = useContext(
     ControllerButtonContext
   );
+  const homeScreenRef = useRef<HTMLDivElement>(null);
+  const workScreenRef = useRef<HTMLDivElement>(null);
+  const activeTweens = useRef<Set<gsap.core.Tween>>(new Set());
+
+  useEffect(() => {
+    const tweens = activeTweens.current;
+    return () => {
+      tweens.forEach(tween => tween.kill());
+      tweens.clear();
+    };
+  }, []);
+
+  function trackTween(tween: gsap.core.Tween) {
+    activeTweens.current.add(tween);
+    tween.eventCallback('onComplete', () => {
+      activeTweens.current.delete(tween);
+    });
+  }
+
   const screens = [
     {
       key: ControllerScreenTitle.Home,
-      nodeRef: createRef<HTMLDivElement>(),
+      nodeRef: homeScreenRef,
       component: <HomeLandingScreen />
     },
     {
       key: ControllerScreenTitle.Work,
-      nodeRef: createRef<HTMLDivElement>(),
+      nodeRef: workScreenRef,
       component: <WorkLandingScreen />
     }
   ];
@@ -82,35 +101,28 @@ function ControllerScreen() {
           nodeRef={screen.nodeRef}
           key={screen.key}
           onEntering={() => {
-            const byDirection = {
-              up: '-100%',
-              down: '100%'
-            };
-            gsap.fromTo(
-              screen.nodeRef.current,
-              {
-                translateY: byDirection[changeScreenDirection.current]
-              },
-              {
-                translateY: 0
-              }
+            const byDirection = { up: '-100%', down: '100%' };
+            trackTween(
+              gsap.fromTo(
+                screen.nodeRef.current,
+                {
+                  translateY: byDirection[changeScreenDirection.current]
+                },
+                { translateY: 0 }
+              )
             );
           }}
           onExiting={() => {
-            const byDirection = {
-              up: '100%',
-              down: '-100%'
-            };
-            gsap.to(screen.nodeRef.current, {
-              translateY: byDirection[changeScreenDirection.current]
-            });
+            const byDirection = { up: '100%', down: '-100%' };
+            trackTween(
+              gsap.to(screen.nodeRef.current, {
+                translateY: byDirection[changeScreenDirection.current]
+              })
+            );
           }}
           timeout={500}
         >
-          <div
-            style={{ position: 'absolute', width: '100%', height: '100%' }}
-            ref={screen.nodeRef}
-          >
+          <div className={styles['screen-slot']} ref={screen.nodeRef}>
             {screen.component}
           </div>
         </Transition>

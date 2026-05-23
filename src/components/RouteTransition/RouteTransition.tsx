@@ -1,4 +1,4 @@
-import { createRef, useRef } from 'react';
+import { useRef } from 'react';
 import { SwitchTransition, Transition } from 'react-transition-group';
 import { matchPath, useLocation } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
@@ -9,7 +9,7 @@ import devLog from '@/utils/dev-logger';
 // import TransitionContext from '../context/TransitionContext';
 
 const RouteTransition = ({ children }: { children: any }) => {
-  const nodeRef = createRef<any>();
+  const nodeRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const prevLocation = usePreviousState(location);
   const transitionDone = useRef<Function | null>(null);

@@ -1,10 +1,13 @@
-export default function debounced(fn: Function, ms: number) {
-  let timeoutId: string | number | NodeJS.Timeout | undefined;
+export default function debounced<TArgs extends unknown[]>(
+  fn: (...args: TArgs) => void,
+  ms: number
+) {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-  return (...args: any) => {
+  return (...args: TArgs) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
-      fn(args);
+      fn(...args);
     }, ms);
   };
 }

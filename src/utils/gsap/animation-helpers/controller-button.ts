@@ -10,8 +10,8 @@ function reset(): gsap.core.Timeline {
   const guideText = q('[data-anim-target="guide-text"]');
   const loadingBar = q('[data-anim-target="loading-bar"]');
   const loadingProgress = q('[data-anim-target="loading-progress"]');
-  const dockFront = q('[data-anim-target="dock-front"');
-  const dockBack = q('[data-anim-target="dock-back"');
+  const dockFront = q('[data-anim-target="dock-front"]');
+  const dockBack = q('[data-anim-target="dock-back"]');
   const shutDownOverlay = q('[data-anim-target="shut-down-overlay"]');
 
   return gsap
