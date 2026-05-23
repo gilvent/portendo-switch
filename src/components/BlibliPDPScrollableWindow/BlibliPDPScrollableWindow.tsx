@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import pdpPageImg from 'assets/img/blibli/pdp-full-page.png';
+import pdpPageImg from 'assets/img/blibli/pdp-full-page.jpg';
 import styles from './BlibliPDPScrollableWindow.module.scss';
 
 function BlibliPDPScrollableWindow({
@@ -22,7 +22,12 @@ function BlibliPDPScrollableWindow({
       className={styles['preview']}
       ref={previewRef}
     >
-      <img src={pdpPageImg} alt="Blibli product detail" />
+      <img
+        src={pdpPageImg}
+        alt="Blibli product detail"
+        loading="lazy"
+        decoding="async"
+      />
       <div className={styles['overlay']}>
         <div className={styles.window} ref={transparentLayerRef}>
           <div className={styles.frame}></div>
