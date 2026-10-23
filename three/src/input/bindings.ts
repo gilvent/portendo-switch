@@ -36,7 +36,6 @@ export const clickBindings: { [S in ConsoleState]: Partial<Record<ClickTarget, U
     switchScreen: { type: 'command', command: 'pickUp' },
   },
   pickedUp: {
-    switch: { type: 'command', command: 'focus' },
     switchScreen: { type: 'command', command: 'focus' },
     dock: { type: 'command', command: 'dock' },
   },
@@ -53,3 +52,12 @@ export const clickBindings: { [S in ConsoleState]: Partial<Record<ClickTarget, U
     dock: { type: 'command', command: 'undock' },
   },
 };
+
+export function clickInput(state: ConsoleState, targets: readonly ClickTarget[]): UserInput | undefined {
+  const bound = clickBindings[state];
+  for (const target of targets) {
+    const input = bound[target];
+    if (input !== undefined) return input;
+  }
+  return undefined;
+}

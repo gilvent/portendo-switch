@@ -32,13 +32,6 @@ export type UserInput =
 
 export type ConsoleEvent = UserInput | { type: 'transitionDone'; edge: Edge };
 
-export const look = {
-  onDesk: 'free',
-  pickedUp: 'free',
-  focused: 'locked',
-  docked: 'free',
-} as const satisfies Record<ConsoleState, 'free' | 'locked'>;
-
 export const initialModel: ConsoleModel = {
   phase: { kind: 'settled', state: 'onDesk' },
   menu: 'home',

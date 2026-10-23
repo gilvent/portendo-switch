@@ -1,6 +1,7 @@
 import { useConsole } from '../console/ConsoleProvider';
-import { available, look, type Command, type ConsoleState, type UserInput } from '../console/model';
+import { available, type Command, type ConsoleState, type UserInput } from '../console/model';
 import type { BoundKey } from '../input/bindings';
+import { lookMode } from '../rig/poses';
 
 export type Hint = { label: string; inputs: [UserInput, ...UserInput[]] };
 
@@ -49,7 +50,7 @@ export function useHints(): { hints: Hint[]; lookFree: boolean; dimmed: boolean 
   const shown = { ...model, phase: { kind: 'settled', state: shownState } } as const;
   return {
     hints: hintsFor(available(shown)),
-    lookFree: look[shownState] === 'free',
+    lookFree: lookMode(shownState) === 'free',
     dimmed: phase.kind === 'transitioning',
   };
 }

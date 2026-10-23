@@ -1,33 +1,38 @@
 import { Canvas } from '@react-three/fiber';
+import { CameraRig } from './camera/CameraRig';
 import { ConsoleProvider } from './console/ConsoleProvider';
+import { Interaction } from './input/Interaction';
 import { useKeyboard } from './input/useKeyboard';
 import { useTransitionDirector } from './motion/useTransitionDirector';
-import { palette } from './theme/palette';
+import { RigProvider } from './rig/RigProvider';
+import { Scene } from './scene/Scene';
 import { HintStrip } from './ui/HintStrip';
 import { TouchButtonBar } from './ui/TouchButtonBar';
 
-function Scene() {
+function Director() {
   useTransitionDirector();
-  return <color attach="background" args={[palette.wall]} />;
+  return null;
 }
 
-function Shell() {
+function Keyboard() {
   useKeyboard();
-  return (
-    <>
-      <Canvas style={{ position: 'fixed', inset: 0, touchAction: 'none' }}>
-        <Scene />
-      </Canvas>
-      <HintStrip />
-      <TouchButtonBar />
-    </>
-  );
+  return null;
 }
 
 export function App() {
   return (
     <ConsoleProvider>
-      <Shell />
+      <Keyboard />
+      <Canvas shadows dpr={[1, 2]} style={{ position: 'fixed', inset: 0, touchAction: 'none' }}>
+        <RigProvider>
+          <CameraRig />
+          <Scene />
+          <Interaction />
+          <Director />
+        </RigProvider>
+      </Canvas>
+      <HintStrip />
+      <TouchButtonBar />
     </ConsoleProvider>
   );
 }

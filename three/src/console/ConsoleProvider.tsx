@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, type ReactNode } from 'react';
+import { exposeDevHandle } from '../dev/devHandle';
 import { available, initialModel, reduce, type ConsoleModel, type Edge, type UserInput } from './model';
 
 type ConsoleContextValue = {
@@ -6,12 +7,6 @@ type ConsoleContextValue = {
   send: (input: UserInput) => void;
   available: UserInput[];
 };
-
-declare global {
-  interface Window {
-    __portendo?: { model(): ConsoleModel };
-  }
-}
 
 const ConsoleContext = createContext<ConsoleContextValue | null>(null);
 const FinishTransitionContext = createContext<((edge: Edge) => void) | null>(null);
@@ -23,10 +18,7 @@ export function ConsoleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
-    window.__portendo = { model: () => model };
-    return () => {
-      delete window.__portendo;
-    };
+    return exposeDevHandle({ model: () => model });
   }, [model]);
 
   return (
