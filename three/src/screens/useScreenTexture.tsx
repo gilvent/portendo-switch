@@ -1,13 +1,13 @@
 import { createPortal, useFrame, useThree } from '@react-three/fiber';
-import { createContext, Suspense, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, Suspense, useContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { LinearMipmapLinearFilter, OrthographicCamera, Scene, SRGBColorSpace, WebGLRenderTarget, type Texture } from 'three';
 import { exposeDevHandle } from '../dev/devHandle';
+import { createPresentationGate, type ScreenGate } from './presentationGate';
 
 export type ScreenSize = readonly [width: number, height: number];
 
-type ScreenGate = { block(isBlocking: () => boolean): () => void; invalidate(): void };
-
 const longestSideTexels = 2048;
+const presentationBoundMs = 10_000;
 
 const renderCounts: Record<string, number> = {};
 const liveLabels = new Set<string>();
@@ -23,7 +23,7 @@ export function useScreenGate(): ScreenGate {
 
 function BlockWhileSuspended() {
   const { block } = useScreenGate();
-  useLayoutEffect(() => block(() => true), [block]);
+  useLayoutEffect(() => block('suspended content', () => true), [block]);
   return null;
 }
 
@@ -57,37 +57,21 @@ export function useScreenTexture(content: ReactNode, size: ScreenSize, label: st
     };
   }, [label]);
 
-  const dirty = useRef(true);
-  const [blockers] = useState(() => new Set<() => boolean>());
-  const [gate] = useState<ScreenGate>(() => ({
-    block: (isBlocking) => {
-      blockers.add(isBlocking);
-      return () => {
-        blockers.delete(isBlocking);
-        dirty.current = true;
-      };
-    },
-    invalidate: () => {
-      dirty.current = true;
-    },
-  }));
-  useLayoutEffect(() => {
-    dirty.current = true;
-  }, [content, target]);
+  const [gate] = useState(() => createPresentationGate(label, presentationBoundMs));
+  const [stuck, setStuck] = useState<Error | null>(null);
+  useLayoutEffect(() => gate.invalidate(), [gate, content, target]);
 
   useEffect(() => {
     const canvas = gl.domElement;
-    const redraw = () => {
-      dirty.current = true;
-    };
+    const redraw = () => gate.invalidate();
     canvas.addEventListener('webglcontextrestored', redraw);
     return () => canvas.removeEventListener('webglcontextrestored', redraw);
-  }, [gl]);
+  }, [gl, gate]);
 
   useFrame(({ gl: renderer }) => {
-    if (!dirty.current) return;
-    for (const isBlocking of blockers) if (isBlocking()) return;
-    dirty.current = false;
+    const presentation = gate.next(performance.now());
+    if (presentation.kind === 'stuck') setStuck(presentation.error);
+    if (presentation.kind !== 'present') return;
     const previous = renderer.getRenderTarget();
     renderer.setRenderTarget(target);
     // The effect composer turns renderer.autoClear off, so stale depth would hide the redraw.
@@ -107,5 +91,6 @@ export function useScreenTexture(content: ReactNode, size: ScreenSize, label: st
       ),
     [gate, content, scene],
   );
+  if (stuck !== null) throw stuck;
   return { texture: target.texture, portal };
 }
