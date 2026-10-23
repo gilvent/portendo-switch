@@ -28,9 +28,13 @@ body {
 .hint-strip,
 .touch-bar {
   position: fixed;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: calc(24px + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
+  margin-inline: auto;
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -91,8 +95,6 @@ body {
 .touch-bar {
   display: none;
   gap: 8px;
-  max-width: calc(100vw - 32px);
-  box-sizing: border-box;
   flex-wrap: wrap;
   justify-content: center;
   border-radius: 28px;
@@ -116,13 +118,13 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 0 18px;
+  min-height: 44px;
+  padding: 0 16px;
   border-radius: 999px;
   background: var(--button);
   color: #fff;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .touch-pill:has(.touch-round) {
@@ -143,8 +145,8 @@ body {
 }
 
 .touch-pill .touch-round {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   background: #fff;
   color: var(--button);
   box-shadow: none;

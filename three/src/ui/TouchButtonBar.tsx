@@ -13,7 +13,11 @@ export function TouchButtonBar() {
           const glyph = buttonGlyph(input);
           return (
             <button className="touch-pill" key={label} disabled={dimmed} onClick={() => send(input)}>
-              {glyph !== null && <span className="touch-round">{glyph}</span>}
+              {glyph !== null && (
+                <span className="touch-round" aria-hidden="true">
+                  {glyph}
+                </span>
+              )}
               {label}
             </button>
           );
