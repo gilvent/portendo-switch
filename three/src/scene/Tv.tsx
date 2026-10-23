@@ -1,11 +1,10 @@
 import { RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import type { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
+import { useMemo } from 'react';
 import { useConsole } from '../console/ConsoleProvider';
 import { useRig } from '../rig/RigProvider';
-import { DisplayMaterial } from '../screens/DisplayMaterial';
 import { ConsoleScreen, consoleScreenSize } from '../screens/ConsoleScreen';
+import { useDisplayMaterial } from '../screens/display';
 import { HomeScreen } from '../screens/HomeScreen';
 import { referenceSize } from '../screens/homeLayout';
 import { useScreenTexture } from '../screens/useScreenTexture';
@@ -20,21 +19,18 @@ const neckHeight = shellCentreY - shell.height / 2 - layout.deskTop;
 const footGeometry = roundedDisc(0.13, 0.014, 0.006, 48);
 const screenAspect = screen.width / screen.height;
 const homeSize = [referenceSize[1] * screenAspect, referenceSize[1]] as const;
-const consoleSize = consoleScreenSize(screenAspect);
+const tvConsoleContentSize = consoleScreenSize(screenAspect);
 const homeContent = <HomeScreen size={homeSize} />;
 
 export function Tv() {
   const rig = useRig();
   const { model } = useConsole();
   const home = useScreenTexture(homeContent, homeSize, 'tvHome');
-  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={consoleSize} />, [model.menu]);
-  const menu = useScreenTexture(menuContent, consoleSize, 'tvConsole');
-  const consolePlane = useRef<Mesh<PlaneGeometry, MeshBasicMaterial>>(null);
+  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={tvConsoleContentSize} />, [model.menu]);
+  const menu = useScreenTexture(menuContent, tvConsoleContentSize, 'tvConsole');
+  const display = useDisplayMaterial(home.texture, menu.texture);
   useFrame(() => {
-    const plane = consolePlane.current;
-    if (plane === null) throw new Error('Tv: console plane is not mounted');
-    plane.material.opacity = rig.tvInput.mix;
-    plane.visible = rig.tvInput.mix > 0;
+    display.uniforms.inputMix.value = rig.tvInput.mix;
   });
   const [x, , z] = layout.tvScreenCentre;
   const shellFront = z - 0.002;
@@ -49,13 +45,8 @@ export function Tv() {
       </RoundedBox>
       {home.portal}
       {menu.portal}
-      <mesh position={[0, layout.tvScreenCentre[1], shellFront + 0.0026]}>
+      <mesh position={[0, layout.tvScreenCentre[1], shellFront + 0.0026]} material={display.material}>
         <planeGeometry args={[screen.width, screen.height]} />
-        <DisplayMaterial map={home.texture} />
-      </mesh>
-      <mesh ref={consolePlane} position={[0, layout.tvScreenCentre[1], shellFront + 0.0027]}>
-        <planeGeometry args={[screen.width, screen.height]} />
-        <DisplayMaterial map={menu.texture} transparent />
       </mesh>
       <mesh position={[0.31, shellCentreY - shell.height / 2 + 0.022, shellFront + 0.0005]}>
         <circleGeometry args={[0.005, 20]} />
