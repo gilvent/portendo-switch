@@ -15,7 +15,6 @@ export function verticalFov(aspect: number): number {
 
 const consoleWidth = consoleSize.body.width + 2 * consoleSize.joycon.width;
 
-// Camera-space anchors sit at fractions of the view, so held parts keep their framing on any screen shape.
 export function cameraAnchors(aspect: number): Record<CameraAnchorId, Vec3> {
   const tanV = Math.tan(MathUtils.degToRad(verticalFov(aspect)) / 2);
   const tanH = tanV * aspect;

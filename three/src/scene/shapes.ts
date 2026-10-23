@@ -20,7 +20,6 @@ export function roundedRect(width: number, height: number, corners: Corners | nu
   return shape;
 }
 
-// Bevels grow the outline, so the shape is shrunk by the bevel to keep the requested outer size.
 export function beveledSlab(width: number, height: number, depth: number, corners: Corners | number, bevel: number): BufferGeometry {
   const inset = (radius: number) => Math.max(radius - bevel, 0.0005);
   const r = typeof corners === 'number' ? { topLeft: corners, topRight: corners, bottomRight: corners, bottomLeft: corners } : corners;

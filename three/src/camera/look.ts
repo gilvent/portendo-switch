@@ -13,7 +13,6 @@ export function clampLook(look: Look): Look {
   };
 }
 
-// Dragging grabs the world: moving the pointer right turns the view left (positive yaw), down turns it up.
 export function dragLook(look: Look, dx: number, dy: number, radiansPerPixel: number): Look {
   return clampLook({ yaw: look.yaw + dx * radiansPerPixel, pitch: look.pitch + dy * radiansPerPixel });
 }
