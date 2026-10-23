@@ -8,6 +8,7 @@ import {
   startScreenMode
 } from '@/utils/gsap/animation-helpers/controller-button';
 import devLog from '@/utils/dev-logger';
+import { createTransitionMeasure } from '@/utils/perf';
 
 function useWorkRouteTransition(previousPath: string) {
   const enterAnimations = [
@@ -35,33 +36,44 @@ function useWorkRouteTransition(previousPath: string) {
 
   function onEnter(): gsap.core.Timeline {
     devLog('[work route transition] enter work', previousPath);
-    const enter =
-      enterAnimations.find(i => matchPath(i.path, previousPath))?.fn() ??
-      gsap.timeline({ paused: true });
+    const enterAnimation = enterAnimations.find(i =>
+      matchPath(i.path, previousPath)
+    );
+    const enter = enterAnimation?.fn() ?? gsap.timeline({ paused: true });
+    const measure = createTransitionMeasure(
+      `work enter from ${enterAnimation?.path}`
+    );
 
     enter
       .eventCallback('onStart', () => {
         disableController();
+        measure.start();
       })
       .eventCallback('onComplete', () => {
         enableController();
+        measure.end();
       });
     return enter;
   }
 
   function onExit(): gsap.core.Timeline {
     devLog('[work route transition] exit work');
-    const exit =
-      exitAnimationsByTargetPath
-        .find(i => matchPath(i.path, window.location.pathname))
-        ?.fn() ?? gsap.timeline({ paused: true });
+    const exitAnimation = exitAnimationsByTargetPath.find(i =>
+      matchPath(i.path, window.location.pathname)
+    );
+    const exit = exitAnimation?.fn() ?? gsap.timeline({ paused: true });
+    const measure = createTransitionMeasure(
+      `work exit to ${exitAnimation?.path}`
+    );
 
     exit
       .eventCallback('onStart', () => {
         disableController();
+        measure.start();
       })
       .eventCallback('onComplete', () => {
         enableController();
+        measure.end();
       });
     return exit;
   }

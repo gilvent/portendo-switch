@@ -23,6 +23,7 @@ import {
 } from '@/utils/gsap/animation-helpers/controller-button';
 import valueForScreen from '@/utils/window';
 import devLog from '@/utils/dev-logger';
+import { createTransitionMeasure } from '@/utils/perf';
 
 function useWorkHighlightRouteTransition() {
   const showWorkSummaryAnimation = useRef<gsap.core.Timeline | null>(null);
@@ -52,13 +53,20 @@ function useWorkHighlightRouteTransition() {
   }
 
   function onEnter() {
+    const measure = createTransitionMeasure(
+      isFromPath(ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT)
+        ? 'highlight enter directly'
+        : 'highlight enter from work list'
+    );
     let enterTransition = gsap
       .timeline({ paused: true })
       .eventCallback('onStart', () => {
         disableController();
+        measure.start();
       })
       .eventCallback('onComplete', () => {
         done();
+        measure.end();
       });
 
     if (isFromPath(ROUTE_PATH_PATTERNS.WORK_HIGHLIGHT)) {
@@ -112,17 +120,20 @@ function useWorkHighlightRouteTransition() {
 
   const onExit = () => {
     devLog('[work highlight route] exit');
+    const measure = createTransitionMeasure('highlight exit to work list');
 
     let exitTransition = gsap
       .timeline({ paused: true })
       .eventCallback('onComplete', () => {
         done();
+        measure.end();
       });
 
     if (isToPath(ROUTE_PATH_PATTERNS.WORK)) {
       exitTransition
         .eventCallback('onStart', () => {
           devLog('starting exit animation');
+          measure.start();
           disableController();
           lockScroll();
           window.scrollTo({

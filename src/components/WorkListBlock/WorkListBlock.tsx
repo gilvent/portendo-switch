@@ -15,6 +15,7 @@ import {
 import useCustomEvent from '@/hooks/useCustomEvent.hook';
 import { disableController, enableController } from '@/utils/document';
 import classNames from 'classnames';
+import { createTransitionMeasure } from '@/utils/perf';
 
 function WorkListBlock() {
   const nodeRef = useRef(null);
@@ -39,6 +40,7 @@ function WorkListBlock() {
 
   useGSAP(() => {
     if (prevBanner.url !== activeBanner.url) {
+      const measure = createTransitionMeasure('work list slide');
       sceneSlideTo({
         targetElSelector: activeBanner.selector,
         currentElSelector: prevBanner.selector,
@@ -46,9 +48,11 @@ function WorkListBlock() {
       })
         .eventCallback('onStart', () => {
           disableController();
+          measure.start();
         })
         .eventCallback('onComplete', () => {
           enableController();
+          measure.end();
         })
         .play(0);
     }

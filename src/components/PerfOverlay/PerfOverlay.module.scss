@@ -1,0 +1,55 @@
+.overlay {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 9999;
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.toggle {
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reports {
+  margin: 0;
+  padding: 0 8px 8px;
+  list-style: none;
+}
+
+.report {
+  padding: 6px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.janky .name {
+  color: #ffb74d;
+}
+
+.name {
+  color: #b2fc7d;
+  font-weight: 700;
+}
+
+.overlap {
+  color: #ffb74d;
+}
+
+.script {
+  color: rgba(255, 255, 255, 0.6);
+  word-break: break-all;
+}

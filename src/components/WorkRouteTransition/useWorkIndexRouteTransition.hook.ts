@@ -5,6 +5,7 @@ import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import { bounceEnter } from '@/utils/gsap/animation-helpers/work-list-block';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import devLog from '@/utils/dev-logger';
+import { createTransitionMeasure } from '@/utils/perf';
 
 function useWorkIndexRouteTransition() {
   const { isFromPath } = useRouteTransitionHelper();
@@ -16,10 +17,15 @@ function useWorkIndexRouteTransition() {
     devLog('[work index route] enter');
 
     if (isFromPath(ROUTE_PATH_PATTERNS.WORK)) {
+      const measure = createTransitionMeasure('work list bounce enter');
       const enterAnim = gsap
         .timeline({ paused: true })
+        .eventCallback('onStart', () => {
+          measure.start();
+        })
         .eventCallback('onComplete', () => {
           done();
+          measure.end();
         });
       enterAnim.add(bounceEnter(activeBanner.selector).paused(false));
       enterAnim.play(0);

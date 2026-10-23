@@ -9,6 +9,7 @@ import {
   startHandheldMode
 } from '@/utils/gsap/animation-helpers/controller-button';
 import devLog from '@/utils/dev-logger';
+import { createTransitionMeasure } from '@/utils/perf';
 
 function useHomeRouteAnimation(previousPath: string) {
   const enterAnimationsByPrevPath = [
@@ -35,17 +36,22 @@ function useHomeRouteAnimation(previousPath: string) {
 
   function onEnter(): gsap.core.Timeline {
     devLog('[home route transition] enter home from', previousPath);
-    const enter =
-      enterAnimationsByPrevPath
-        .find(i => matchPath(i.path, previousPath))
-        ?.fn() ?? gsap.timeline();
+    const enterAnimation = enterAnimationsByPrevPath.find(i =>
+      matchPath(i.path, previousPath)
+    );
+    const enter = enterAnimation?.fn() ?? gsap.timeline();
+    const measure = createTransitionMeasure(
+      `home enter from ${enterAnimation?.path}`
+    );
 
     enter
       .eventCallback('onStart', () => {
         disableController();
+        measure.start();
       })
       .eventCallback('onComplete', () => {
         enableController();
+        measure.end();
       });
 
     return enter;
@@ -56,17 +62,22 @@ function useHomeRouteAnimation(previousPath: string) {
   }
 
   function onExit(): gsap.core.Timeline {
-    const exit =
-      exitAnimationsByTargetPath
-        .find(i => matchPath(i.path, window.location.pathname))
-        ?.fn() ?? gsap.timeline();
+    const exitAnimation = exitAnimationsByTargetPath.find(i =>
+      matchPath(i.path, window.location.pathname)
+    );
+    const exit = exitAnimation?.fn() ?? gsap.timeline();
+    const measure = createTransitionMeasure(
+      `home exit to ${exitAnimation?.path}`
+    );
 
     exit
       .eventCallback('onStart', () => {
         disableController();
+        measure.start();
       })
       .eventCallback('onComplete', () => {
         enableController();
+        measure.end();
       });
 
     return exit;

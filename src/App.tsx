@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import './App.scss';
 import ControllerButton from './components/ControllerButton';
 import ControllerHelpPanel from './components/ControllerHelpPanel';
+import PerfOverlay from './components/PerfOverlay';
 import { ControllerButtonProvider } from './context/ControllerButtonContext';
 import useMediaQuery from './hooks/useMediaQuery.hook';
 import Router from './router/Router';
@@ -41,6 +42,7 @@ function App() {
         <Router key={routerKey} />
         <ControllerButton key={controllerKey} />
         <ControllerHelpPanel />
+        {process.env.NODE_ENV === 'development' && <PerfOverlay />}
       </div>
     </ControllerButtonProvider>
   );
