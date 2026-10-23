@@ -13,10 +13,10 @@ export const idleGesture: Gesture = { kind: 'idle' };
 
 export function stepGesture(gesture: Gesture, sample: PointerSample): { gesture: Gesture; effect?: GestureEffect } {
   const { type, pointerId, x, y } = sample;
-  if (gesture.kind === 'idle') {
-    return type === 'down' ? { gesture: { kind: 'pressed', pointerId, startX: x, startY: y } } : { gesture };
-  }
-  if (pointerId !== gesture.pointerId) return { gesture };
+  const press: Gesture = { kind: 'pressed', pointerId, startX: x, startY: y };
+  if (gesture.kind === 'idle') return type === 'down' ? { gesture: press } : { gesture };
+  if (pointerId !== gesture.pointerId) return type === 'down' ? { gesture: idleGesture } : { gesture };
+  if (type === 'down') return { gesture: press };
   if (type === 'cancel') return { gesture: idleGesture };
 
   if (gesture.kind === 'pressed') {

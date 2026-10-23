@@ -27,10 +27,14 @@ export function usePointerIntent(element: HTMLElement, handlers: PointerIntentHa
       ['pointermove', feed('move')],
       ['pointerup', feed('up')],
       ['pointercancel', feed('cancel')],
+      ['lostpointercapture', feed('cancel')],
     ] as const;
+    const preventMenu = (event: MouseEvent) => event.preventDefault();
     for (const [name, listener] of listeners) element.addEventListener(name, listener);
+    element.addEventListener('contextmenu', preventMenu);
     return () => {
       for (const [name, listener] of listeners) element.removeEventListener(name, listener);
+      element.removeEventListener('contextmenu', preventMenu);
     };
   }, [element]);
 }

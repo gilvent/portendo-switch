@@ -15,6 +15,7 @@ const run = (samples: PointerSample[]) => {
 const down = (x: number, y: number, pointerId = 1): PointerSample => ({ type: 'down', pointerId, x, y });
 const move = (x: number, y: number, pointerId = 1): PointerSample => ({ type: 'move', pointerId, x, y });
 const up = (x: number, y: number, pointerId = 1): PointerSample => ({ type: 'up', pointerId, x, y });
+const cancel = (pointerId: number): PointerSample => ({ type: 'cancel', pointerId, x: 0, y: 0 });
 
 describe('stepGesture', () => {
   it('turns a press that never moves into a click at the release point', () => {
@@ -39,10 +40,33 @@ describe('stepGesture', () => {
     ]);
   });
 
-  it('ignores a second finger and a cancel ends the gesture without a click', () => {
-    expect(run([down(100, 100, 1), down(300, 300, 2), move(310, 300, 2), up(300, 300, 2), up(100, 100, 1)]).effects).toEqual([
-      { type: 'click', x: 100, y: 100 },
-    ]);
-    expect(run([down(100, 100), { type: 'cancel', pointerId: 1, x: 100, y: 100 }, up(100, 100)]).effects).toEqual([]);
+  it('cancels without a click when the press is cancelled', () => {
+    expect(run([down(100, 100), cancel(1), up(100, 100)])).toEqual({ gesture: idleGesture, effects: [] });
+  });
+
+  it('cancels the gesture when a second finger goes down, so a pinch never looks or clicks', () => {
+    expect(run([down(100, 100, 1), down(300, 300, 2), move(140, 100, 1), move(340, 300, 2), up(140, 100, 1), up(340, 300, 2)])).toEqual({
+      gesture: idleGesture,
+      effects: [],
+    });
+    expect(run([down(100, 100, 1), move(120, 100, 1), down(300, 300, 2), move(160, 100, 1), up(160, 100, 1)])).toEqual({
+      gesture: idleGesture,
+      effects: [{ type: 'look', dx: 20, dy: 0 }],
+    });
+  });
+
+  it('starts a fresh press when the owning pointer goes down again after a lost release', () => {
+    expect(run([down(100, 100), move(200, 100), move(250, 100), down(600, 400), up(600, 400)])).toEqual({
+      gesture: idleGesture,
+      effects: [
+        { type: 'look', dx: 100, dy: 0 },
+        { type: 'look', dx: 50, dy: 0 },
+        { type: 'click', x: 600, y: 400 },
+      ],
+    });
+  });
+
+  it('recovers when a touch release is lost and the next touch has a new id', () => {
+    expect(run([down(100, 100, 7), cancel(7), down(200, 200, 8), up(200, 200, 8)]).effects).toEqual([{ type: 'click', x: 200, y: 200 }]);
   });
 });
