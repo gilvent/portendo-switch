@@ -53,7 +53,6 @@ const offeredMenuButtons = ['up', 'down', 'a'] as const satisfies readonly MenuB
 function edgeFrom(state: ConsoleState, command: Command): Edge | undefined {
   const targets: Partial<Record<Command, ConsoleState>> = edges[state];
   const to = targets[command];
-  // Edge is derived from the edges table, so any (state, command, to) read from it is a member.
   return to === undefined ? undefined : ({ from: state, via: command, to } as Edge);
 }
 

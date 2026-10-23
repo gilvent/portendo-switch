@@ -23,7 +23,7 @@ export function keysFor(input: UserInput): BoundKey[] {
   return (Object.keys(keyBindings) as BoundKey[]).filter((key) => sameInput(keyBindings[key], input));
 }
 
-export function sameInput(a: UserInput, b: UserInput): boolean {
+function sameInput(a: UserInput, b: UserInput): boolean {
   if (a.type === 'command') return b.type === 'command' && a.command === b.command;
   return b.type === 'menu' && a.button === b.button;
 }
