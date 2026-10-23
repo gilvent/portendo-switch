@@ -23,11 +23,11 @@ export function cameraAnchors(aspect: number): Record<CameraAnchorId, Vec3> {
     Math.max(consoleWidth / (2 * widthFraction * tanH), consoleSize.body.height / (2 * heightFraction * tanV));
 
   const centre = depthToFill(0.5, 0.42);
-  const hand = Math.max(0.4, depthToFill(0.62, 0.4));
+  const hand = Math.max(0.4, depthToFill(0.5, 0.4));
   const hands = 0.42;
   return {
     viewCentre: [0, 0, -centre],
-    hand: [0.5 * hand * tanH, -0.52 * hand * tanV, -hand],
+    hand: [0.9 * hand * tanH - 0.55 * consoleWidth, -0.52 * hand * tanV, -hand],
     leftHand: [-0.72 * hands * tanH, -0.42 * hands * tanV, -hands],
     rightHand: [0.72 * hands * tanH, -0.42 * hands * tanV, -hands],
   };
