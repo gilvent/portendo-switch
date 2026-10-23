@@ -24,7 +24,7 @@ function watchSyncs(text: TroikaText, invalidate: () => void): { count: number }
   return syncs;
 }
 
-export function ScreenText({ font, children, ...props }: Omit<ComponentProps<typeof Text>, 'font' | 'children'> & { font: FontId; children: string }) {
+export function ScreenText({ font, children, ...props }: Omit<ComponentProps<typeof Text>, 'ref' | 'font' | 'children'> & { font: FontId; children: string }) {
   const fontUrl = use(screenAssets()).fonts[font];
   const { block, invalidate } = useScreenGate();
   const blockWhileSyncing = useCallback(
