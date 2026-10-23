@@ -48,6 +48,8 @@ function LampLight() {
   );
 }
 
+const shadowScale: [number, number] = [desk.width, desk.depth];
+
 export function Lighting() {
   const deskCentreZ = desk.back + desk.depth / 2;
   return (
@@ -67,7 +69,7 @@ export function Lighting() {
       <Unpickable>
         <ContactShadows
           position={[0, layout.deskTop + 0.0008, deskCentreZ]}
-          scale={[desk.width, desk.depth]}
+          scale={shadowScale}
           resolution={512}
           far={0.3}
           blur={2.2}

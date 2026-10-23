@@ -14,10 +14,15 @@ function Director() {
   return null;
 }
 
-function Shell() {
+function Keyboard() {
   useKeyboard();
+  return null;
+}
+
+export function App() {
   return (
-    <>
+    <ConsoleProvider>
+      <Keyboard />
       <Canvas shadows dpr={[1, 2]} style={{ position: 'fixed', inset: 0, touchAction: 'none' }}>
         <RigProvider>
           <CameraRig />
@@ -28,14 +33,6 @@ function Shell() {
       </Canvas>
       <HintStrip />
       <TouchButtonBar />
-    </>
-  );
-}
-
-export function App() {
-  return (
-    <ConsoleProvider>
-      <Shell />
     </ConsoleProvider>
   );
 }
