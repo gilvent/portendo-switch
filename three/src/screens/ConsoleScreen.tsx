@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import type { Group } from 'three';
 import type { MenuPage } from '../console/model';
 import { palette } from '../theme/palette';
+import { consoleScreenText } from './consoleText';
 import { ScreenImage, ScreenText } from './primitives';
 import type { ScreenSize } from './useScreenTexture';
 
@@ -70,7 +71,7 @@ function GetStarted() {
         <meshBasicMaterial color={palette.screenWhite} toneMapped={false} />
       </mesh>
       <ScreenText font="fredoka500" fontSize={guide.badgeFontSize} color={palette.badgeInk} anchorX="center" anchorY="middle" position={[guide.badgeRadius, 0, 1]}>
-        B
+        {consoleScreenText.homeBadge}
       </ScreenText>
       <ScreenText
         font="fredoka500"
@@ -81,7 +82,7 @@ function GetStarted() {
         position={[badgeWidth + guide.gap, 0, 1]}
         onSync={centreRow}
       >
-        Get started
+        {consoleScreenText.homeGuide}
       </ScreenText>
     </group>
   );
@@ -91,10 +92,10 @@ function WorkPage() {
   return (
     <>
       <ScreenText font="gaban" fontSize={work.title.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle" position={[0, fromTop(work.title.y), 0]}>
-        WORK
+        {consoleScreenText.workTitle}
       </ScreenText>
       <ScreenText font="fredoka500" fontSize={work.guide.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle" position={[0, fromTop(work.guide.y), 0]}>
-        Press B to start
+        {consoleScreenText.workGuide}
       </ScreenText>
     </>
   );

@@ -7,6 +7,7 @@ import type { MenuButton } from '../console/model';
 import { tag } from '../input/picking';
 import { consoleSize } from '../rig/dimensions';
 import { useRig } from '../rig/RigProvider';
+import { joyconLetters } from '../screens/consoleText';
 import { screenAssets } from '../screens/screenAssets';
 import { joyconSets, palette } from '../theme/palette';
 import { beveledSlab, roundedDisc } from './shapes';
@@ -47,8 +48,8 @@ const buttons: Record<Side, readonly ButtonSpec[]> = {
     { id: 'down', y: -buttonOffsetY, glyph: { kind: 'arrow', direction: 'down' } },
   ],
   right: [
-    { id: 'a', y: buttonOffsetY, glyph: { kind: 'letter', text: 'A' } },
-    { id: 'b', y: -buttonOffsetY, glyph: { kind: 'letter', text: 'B' } },
+    { id: 'a', y: buttonOffsetY, glyph: { kind: 'letter', text: joyconLetters.a } },
+    { id: 'b', y: -buttonOffsetY, glyph: { kind: 'letter', text: joyconLetters.b } },
   ],
 };
 
