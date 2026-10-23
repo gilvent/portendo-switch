@@ -66,7 +66,14 @@ describe('stepGesture', () => {
     });
   });
 
-  it('recovers when a touch release is lost and the next touch has a new id', () => {
+  it('clicks on the next touch after a delivered cancel', () => {
     expect(run([down(100, 100, 7), cancel(7), down(200, 200, 8), up(200, 200, 8)]).effects).toEqual([{ type: 'click', x: 200, y: 200 }]);
+  });
+
+  it('swallows the first tap after a lost touch release and clicks on the second', () => {
+    expect(run([down(100, 100, 7), down(200, 200, 8), up(200, 200, 8)])).toEqual({ gesture: idleGesture, effects: [] });
+    expect(run([down(100, 100, 7), down(200, 200, 8), up(200, 200, 8), down(300, 300, 9), up(300, 300, 9)]).effects).toEqual([
+      { type: 'click', x: 300, y: 300 },
+    ]);
   });
 });
