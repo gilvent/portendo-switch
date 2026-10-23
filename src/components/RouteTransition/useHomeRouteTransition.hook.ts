@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import gsap from 'gsap';
 import { matchPath } from 'react-router-dom';
 import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
@@ -12,6 +13,7 @@ import devLog from '@/utils/dev-logger';
 import { createTransitionMeasure } from '@/utils/perf';
 
 function useHomeRouteAnimation(previousPath: string) {
+  const [homeAnimations] = useState(() => gsap.context(() => {}));
   const enterAnimationsByPrevPath = [
     { path: ROUTE_PATH_PATTERNS.HOME, fn: enterHomePage },
     { path: ROUTE_PATH_PATTERNS.WORK, fn: enterFromWorkPage }
@@ -39,7 +41,11 @@ function useHomeRouteAnimation(previousPath: string) {
     const enterAnimation = enterAnimationsByPrevPath.find(i =>
       matchPath(i.path, previousPath)
     );
-    const enter = enterAnimation?.fn() ?? gsap.timeline();
+    let enter: gsap.core.Timeline | undefined;
+    homeAnimations.add(() => {
+      enter = enterAnimation?.fn();
+    });
+    enter ??= gsap.timeline();
     const measure = createTransitionMeasure(
       `home enter from ${enterAnimation?.path}`
     );
@@ -76,6 +82,7 @@ function useHomeRouteAnimation(previousPath: string) {
         measure.start();
       })
       .eventCallback('onComplete', () => {
+        homeAnimations.kill();
         enableController();
         measure.end();
       });
