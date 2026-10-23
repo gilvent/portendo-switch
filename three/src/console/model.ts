@@ -30,7 +30,7 @@ export type UserInput =
   | { type: 'command'; command: Command }
   | { type: 'menu'; button: MenuButton };
 
-export type ConsoleEvent = UserInput | { type: 'transitionDone' };
+export type ConsoleEvent = UserInput | { type: 'transitionDone'; edge: Edge };
 
 export const look = {
   onDesk: 'free',
@@ -80,7 +80,7 @@ export function reduce(model: ConsoleModel, event: ConsoleEvent): ConsoleModel {
       if (phase.kind !== 'settled' || phase.state !== 'focused') return model;
       return pressMenu(model, event.button);
     case 'transitionDone':
-      if (phase.kind !== 'transitioning') return model;
+      if (phase.kind !== 'transitioning' || phase.edge !== event.edge) return model;
       return { ...model, phase: { kind: 'settled', state: phase.edge.to } };
   }
 }

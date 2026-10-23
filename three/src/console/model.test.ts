@@ -7,7 +7,13 @@ const settled = (state: 'onDesk' | 'pickedUp' | 'focused' | 'docked'): ConsoleMo
   joycons: 'grey',
 });
 
-const run = (model: ConsoleModel, ...events: ConsoleEvent[]) => events.reduce(reduce, model);
+const finish = (model: ConsoleModel): ConsoleModel => {
+  if (model.phase.kind !== 'transitioning') throw new Error('finish: model is not transitioning');
+  return reduce(model, { type: 'transitionDone', edge: model.phase.edge });
+};
+
+const run = (model: ConsoleModel, ...steps: (ConsoleEvent | 'done')[]) =>
+  steps.reduce((current, step) => (step === 'done' ? finish(current) : reduce(current, step)), model);
 
 describe('reduce: commands', () => {
   it('starts settled on the desk, home menu, grey Joy-Cons', () => {
@@ -32,7 +38,7 @@ describe('reduce: commands', () => {
       menu: 'home',
       joycons: 'grey',
     });
-    expect(reduce(moving, { type: 'transitionDone' })).toEqual(settled(to));
+    expect(finish(moving)).toEqual(settled(to));
   });
 
   it.each([
@@ -59,16 +65,42 @@ describe('reduce: commands', () => {
     for (const event of ignored) {
       expect(reduce(moving, event)).toBe(moving);
     }
-    expect(run(moving, ...ignored, { type: 'transitionDone' })).toEqual(settled('focused'));
+    expect(run(moving, ...ignored, 'done')).toEqual(settled('focused'));
   });
 
   it('ignores transitionDone when already settled', () => {
     const model = settled('docked');
-    expect(reduce(model, { type: 'transitionDone' })).toBe(model);
+    expect(reduce(model, { type: 'transitionDone', edge: { from: 'pickedUp', via: 'dock', to: 'docked' } })).toBe(model);
+  });
+
+  it('ignores a duplicate completion once the edge has settled', () => {
+    const moving = reduce(settled('pickedUp'), { type: 'command', command: 'dock' });
+    if (moving.phase.kind !== 'transitioning') throw new Error('expected a transition');
+    const done: ConsoleEvent = { type: 'transitionDone', edge: moving.phase.edge };
+    const once = reduce(moving, done);
+    expect(once).toEqual(settled('docked'));
+    expect(reduce(once, done)).toBe(once);
+  });
+
+  it('ignores a stale completion from a different edge and stays transitioning', () => {
+    const moving = reduce(settled('focused'), { type: 'command', command: 'unfocus' });
+    const stale: ConsoleEvent = { type: 'transitionDone', edge: { from: 'pickedUp', via: 'focus', to: 'focused' } };
+    expect(reduce(moving, stale)).toBe(moving);
+    expect(moving.phase).toEqual({ kind: 'transitioning', edge: { from: 'focused', via: 'unfocus', to: 'pickedUp' } });
+  });
+
+  it('ignores a stale completion from an earlier run of the same edge', () => {
+    const first = reduce(settled('pickedUp'), { type: 'command', command: 'focus' });
+    if (first.phase.kind !== 'transitioning') throw new Error('expected a transition');
+    const staleDone: ConsoleEvent = { type: 'transitionDone', edge: first.phase.edge };
+    const again = run(first, 'done', { type: 'command', command: 'unfocus' }, 'done', { type: 'command', command: 'focus' });
+    expect(again.phase).toEqual({ kind: 'transitioning', edge: { from: 'pickedUp', via: 'focus', to: 'focused' } });
+    expect(reduce(again, staleDone)).toBe(again);
+    expect(finish(again)).toEqual(settled('focused'));
   });
 
   it('walks the full tour from the desk to the dock and back', () => {
-    const done: ConsoleEvent = { type: 'transitionDone' };
+    const done = 'done';
     const end = run(
       initialModel,
       { type: 'command', command: 'pickUp' },
@@ -122,7 +154,7 @@ describe('reduce: menu', () => {
 
   it('keeps menu page and Joy-Con set across a dock and undock', () => {
     const a: ConsoleEvent = { type: 'menu', button: 'a' };
-    const done: ConsoleEvent = { type: 'transitionDone' };
+    const done = 'done';
     const end = run(
       settled('focused'),
       a,
@@ -164,7 +196,7 @@ describe('available', () => {
   it('offers nothing while transitioning and pickUp again once back on the desk', () => {
     const moving = reduce(settled('docked'), { type: 'command', command: 'undock' });
     expect(available(moving)).toEqual([]);
-    expect(available(reduce(moving, { type: 'transitionDone' }))).toEqual([
+    expect(available(finish(moving))).toEqual([
       { type: 'command', command: 'pickUp' },
     ]);
   });
