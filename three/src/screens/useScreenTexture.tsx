@@ -68,8 +68,8 @@ export function useScreenTexture(content: ReactNode, size: ScreenSize, label: st
     return () => canvas.removeEventListener('webglcontextrestored', redraw);
   }, [gl, gate]);
 
-  useFrame(({ gl: renderer }) => {
-    const presentation = gate.next(performance.now());
+  useFrame(({ gl: renderer }, delta) => {
+    const presentation = gate.next(delta * 1000);
     if (presentation.kind === 'stuck') setStuck(presentation.error);
     if (presentation.kind !== 'present') return;
     const previous = renderer.getRenderTarget();
