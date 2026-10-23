@@ -44,10 +44,8 @@ function createPass() {
   };
   const horizontal = { tDiffuse: { value: depthTarget.texture }, h: { value: 0 } };
   const vertical = { tDiffuse: { value: blurTarget.texture }, v: { value: 0 } };
-  const { vertexShader: hVertex, fragmentShader: hFragment } = HorizontalBlurShader;
-  const { vertexShader: vVertex, fragmentShader: vFragment } = VerticalBlurShader;
-  const horizontalBlur = new ShaderMaterial({ vertexShader: hVertex, fragmentShader: hFragment, uniforms: horizontal, depthTest: false });
-  const verticalBlur = new ShaderMaterial({ vertexShader: vVertex, fragmentShader: vFragment, uniforms: vertical, depthTest: false });
+  const horizontalBlur = new ShaderMaterial({ ...HorizontalBlurShader, uniforms: horizontal, depthTest: false });
+  const verticalBlur = new ShaderMaterial({ ...VerticalBlurShader, uniforms: vertical, depthTest: false });
   return { depthTarget, blurTarget, plane, blurPlane, depthMaterial, horizontal, vertical, horizontalBlur, verticalBlur };
 }
 
@@ -64,7 +62,7 @@ export function DeskShadows() {
 
   useLayoutEffect(() => {
     needsRender.current = true;
-  }, [phase, size]);
+  }, [pass, phase, size]);
 
   useEffect(
     () => () => {
