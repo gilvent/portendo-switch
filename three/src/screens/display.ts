@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { BlendFunction, Effect } from 'postprocessing';
-import { ShaderMaterial, type IUniform, type Texture } from 'three';
+import { FloatType, HalfFloatType, ShaderMaterial, type IUniform, type Texture, type TextureDataType, type WebGLRenderer } from 'three';
 
 const sceneAlphaCeiling = 1;
 const displayMarkerAlpha = 2;
@@ -39,6 +39,13 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
 export class NeutralToneMappingExceptDisplays extends Effect {
   constructor() {
     super('NeutralToneMappingExceptDisplays', neutralToneMappingExceptDisplaysShader, { blendFunction: BlendFunction.SRC });
+  }
+
+  override initialize(renderer: WebGLRenderer, alpha: boolean, frameBufferType: TextureDataType): void {
+    if (frameBufferType !== HalfFloatType && frameBufferType !== FloatType) {
+      throw new Error(`NeutralToneMappingExceptDisplays: the composer buffer must be HalfFloat or Float to carry the display alpha marker ${displayMarkerAlpha}`);
+    }
+    super.initialize(renderer, alpha, frameBufferType);
   }
 }
 
