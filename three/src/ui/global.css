@@ -109,8 +109,8 @@ body {
   transition: transform 120ms ease;
 }
 
-.touch-pill:active:not(:disabled),
-.touch-round:active:not(:disabled) {
+.touch-pill:active:not([aria-disabled='true']),
+.touch-round:active:not([aria-disabled='true']) {
   transform: scale(0.94);
 }
 

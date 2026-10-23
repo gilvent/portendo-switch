@@ -5,7 +5,7 @@ export function HintStrip() {
   const { hints, lookFree, dimmed } = useHints();
 
   return (
-    <div className="hint-strip" data-dimmed={dimmed} aria-label="Controls">
+    <div className="hint-strip" data-dimmed={dimmed} role="group" aria-label="Controls">
       {hints.map((hint) => (
         <span className="hint" key={hint.label}>
           {hint.inputs.flatMap(keysFor).map((key) => (
