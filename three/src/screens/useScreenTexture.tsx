@@ -5,23 +5,25 @@ import { exposeDevHandle } from '../dev/devHandle';
 
 export type ScreenSize = readonly [width: number, height: number];
 
+type ScreenGate = { block(isBlocking: () => boolean): () => void; invalidate(): void };
+
 const longestSideTexels = 2048;
 
 const renderCounts: Record<string, number> = {};
 const liveLabels = new Set<string>();
 if (import.meta.env.DEV) exposeDevHandle({ screenRenders: () => ({ ...renderCounts }) });
 
-const InvalidateContext = createContext<(() => void) | null>(null);
+const GateContext = createContext<ScreenGate | null>(null);
 
-export function useScreenInvalidate(): () => void {
-  const invalidate = useContext(InvalidateContext);
-  if (invalidate === null) throw new Error('useScreenInvalidate: called outside a useScreenTexture portal');
-  return invalidate;
+export function useScreenGate(): ScreenGate {
+  const gate = useContext(GateContext);
+  if (gate === null) throw new Error('useScreenGate: called outside a useScreenTexture portal');
+  return gate;
 }
 
-function InvalidateOnReveal() {
-  const invalidate = useScreenInvalidate();
-  useLayoutEffect(invalidate);
+function BlockWhileSuspended() {
+  const { block } = useScreenGate();
+  useLayoutEffect(() => block(() => true), [block]);
   return null;
 }
 
@@ -56,15 +58,35 @@ export function useScreenTexture(content: ReactNode, size: ScreenSize, label: st
   }, [label]);
 
   const dirty = useRef(true);
-  const [invalidate] = useState(() => () => {
-    dirty.current = true;
-  });
+  const [blockers] = useState(() => new Set<() => boolean>());
+  const [gate] = useState<ScreenGate>(() => ({
+    block: (isBlocking) => {
+      blockers.add(isBlocking);
+      return () => {
+        blockers.delete(isBlocking);
+        dirty.current = true;
+      };
+    },
+    invalidate: () => {
+      dirty.current = true;
+    },
+  }));
   useLayoutEffect(() => {
     dirty.current = true;
-  });
+  }, [content, target]);
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const redraw = () => {
+      dirty.current = true;
+    };
+    canvas.addEventListener('webglcontextrestored', redraw);
+    return () => canvas.removeEventListener('webglcontextrestored', redraw);
+  }, [gl]);
 
   useFrame(({ gl: renderer }) => {
     if (!dirty.current) return;
+    for (const isBlocking of blockers) if (isBlocking()) return;
     dirty.current = false;
     const previous = renderer.getRenderTarget();
     renderer.setRenderTarget(target);
@@ -75,14 +97,15 @@ export function useScreenTexture(content: ReactNode, size: ScreenSize, label: st
     renderCounts[label] = (renderCounts[label] ?? 0) + 1;
   });
 
-  const portal = createPortal(
-    <InvalidateContext.Provider value={invalidate}>
-      <Suspense fallback={null}>
-        <InvalidateOnReveal />
-        {content}
-      </Suspense>
-    </InvalidateContext.Provider>,
-    scene,
+  const portal = useMemo(
+    () =>
+      createPortal(
+        <GateContext.Provider value={gate}>
+          <Suspense fallback={<BlockWhileSuspended />}>{content}</Suspense>
+        </GateContext.Provider>,
+        scene,
+      ),
+    [gate, content, scene],
   );
   return { texture: target.texture, portal };
 }

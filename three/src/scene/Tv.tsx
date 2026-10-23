@@ -1,6 +1,6 @@
 import { RoundedBox } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
 import { useConsole } from '../console/ConsoleProvider';
 import { useRig } from '../rig/RigProvider';
@@ -21,12 +21,14 @@ const footGeometry = roundedDisc(0.13, 0.014, 0.006, 48);
 const screenAspect = screen.width / screen.height;
 const homeSize = [referenceSize[1] * screenAspect, referenceSize[1]] as const;
 const consoleSize = consoleScreenSize(screenAspect);
+const homeContent = <HomeScreen size={homeSize} />;
 
 export function Tv() {
   const rig = useRig();
   const { model } = useConsole();
-  const home = useScreenTexture(<HomeScreen size={homeSize} />, homeSize, 'tvHome');
-  const menu = useScreenTexture(<ConsoleScreen page={model.menu} size={consoleSize} />, consoleSize, 'tvConsole');
+  const home = useScreenTexture(homeContent, homeSize, 'tvHome');
+  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={consoleSize} />, [model.menu]);
+  const menu = useScreenTexture(menuContent, consoleSize, 'tvConsole');
   const consolePlane = useRef<Mesh<PlaneGeometry, MeshBasicMaterial>>(null);
   useFrame(() => {
     const plane = consolePlane.current;

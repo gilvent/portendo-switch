@@ -1,6 +1,6 @@
 import { RoundedBox } from '@react-three/drei';
 import { createPortal, useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { MeshBasicMaterial } from 'three';
 import { useConsole } from '../console/ConsoleProvider';
 import { tag } from '../input/picking';
@@ -18,7 +18,8 @@ const contentSize = consoleScreenSize(screenSize.width / screenSize.height);
 export function SwitchConsole() {
   const rig = useRig();
   const { model } = useConsole();
-  const menu = useScreenTexture(<ConsoleScreen page={model.menu} size={contentSize} />, contentSize, 'switch');
+  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={contentSize} />, [model.menu]);
+  const menu = useScreenTexture(menuContent, contentSize, 'switch');
   const screenMaterial = useRef<MeshBasicMaterial>(null);
   useFrame(() => {
     if (screenMaterial.current === null) throw new Error('SwitchConsole: screen material is not mounted');
