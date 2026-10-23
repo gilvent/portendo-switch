@@ -1,4 +1,4 @@
-import { use, useLayoutEffect, useState } from 'react';
+import { use, useLayoutEffect, useRef, useState } from 'react';
 import { Text } from 'troika-three-text';
 import type { FontId } from './fonts';
 import { screenAssets, type ImageId } from './screenAssets';
@@ -18,6 +18,7 @@ type ScreenTextProps = {
 export function ScreenText({ font, children, fontSize, color, anchorX, anchorY, position = [0, 0, 0], onSync }: ScreenTextProps) {
   const fontUrl = use(screenAssets()).fonts[font];
   const { block, invalidate } = useScreenGate();
+  const mounted = useRef(false);
   const [{ text, syncs }] = useState(() => {
     const troikaText = new Text();
     const inFlight = { count: 0 };
@@ -33,9 +34,17 @@ export function ScreenText({ font, children, fontSize, color, anchorX, anchorY, 
   useLayoutEffect(() => block(`text "${children}" in ${font}`, () => syncs.count > 0), [block, syncs, children, font]);
   useLayoutEffect(() => {
     Object.assign(text, { text: children, font: fontUrl, fontSize, color, anchorX, anchorY });
-    text.sync(() => onSync?.(text));
+    text.sync(() => {
+      if (mounted.current) onSync?.(text);
+    });
   });
-  useLayoutEffect(() => () => text.dispose(), [text]);
+  useLayoutEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      text.dispose();
+    };
+  }, [text]);
   return <primitive object={text} position={position} />;
 }
 
