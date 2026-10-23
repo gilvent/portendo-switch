@@ -158,7 +158,6 @@ function WallBands() {
   const rail = { height: 0.03, depth: 0.02 };
   const runs = [
     { key: 'back', along: 'x', at: back, inward: 1, from: left, to: right },
-    { key: 'front', along: 'x', at: front, inward: -1, from: left, to: right },
     { key: 'left', along: 'z', at: left, inward: 1, from: back, to: front },
     { key: 'right', along: 'z', at: right, inward: -1, from: back, to: front },
   ] as const;
@@ -289,8 +288,6 @@ function Bunting() {
 export function Room() {
   const floorTexture = useMemo(plankTexture, []);
   const leftWall = useMemo(leftWallGeometry, []);
-  const rugGeometry = useMemo(() => roundedDisc(1, 0.012, 0.005, 64), []);
-  const lampGeometry = useMemo(() => roundedDisc(0.2, 0.04, 0.015, 48).rotateX(Math.PI), []);
   return (
     <group>
       <mesh position={[centreX, -0.02, centreZ]} receiveShadow>
@@ -302,10 +299,6 @@ export function Room() {
         <meshStandardMaterial color={palette.ceiling} roughness={0.7} />
       </mesh>
       <mesh position={[centreX, ceiling / 2, back - wallThickness / 2]} receiveShadow>
-        <boxGeometry args={[width + 2 * wallThickness, ceiling, wallThickness]} />
-        <meshStandardMaterial color={palette.wall} roughness={0.7} />
-      </mesh>
-      <mesh position={[centreX, ceiling / 2, front + wallThickness / 2]}>
         <boxGeometry args={[width + 2 * wallThickness, ceiling, wallThickness]} />
         <meshStandardMaterial color={palette.wall} roughness={0.7} />
       </mesh>
@@ -322,17 +315,6 @@ export function Room() {
       <WallPrint />
       <WallClock />
       <Bunting />
-      <group position={[0, 0.001, 0.95]} scale={[0.95, 1, 0.7]}>
-        <mesh geometry={rugGeometry} receiveShadow>
-          <meshStandardMaterial color={palette.rugEdge} roughness={0.7} />
-        </mesh>
-        <mesh geometry={rugGeometry} position={[0, 0.002, 0]} scale={[0.86, 1, 0.86]} receiveShadow>
-          <meshStandardMaterial color={palette.rug} roughness={0.7} />
-        </mesh>
-      </group>
-      <mesh geometry={lampGeometry} position={[0, ceiling, 0.35]}>
-        <meshStandardMaterial color={palette.bulb} emissive={palette.bulb} emissiveIntensity={4} roughness={0.5} />
-      </mesh>
     </group>
   );
 }

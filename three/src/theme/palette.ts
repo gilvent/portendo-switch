@@ -14,8 +14,6 @@ export const palette = {
   ceiling: '#fdfaf5',
   floor: '#c99a6c',
   floorDark: '#b7875b',
-  rug: '#a9c1e8',
-  rugEdge: '#8faad6',
   desk: '#e8cba3',
   deskLeg: '#cfa271',
   consoleBody: '#0d0d0d',
