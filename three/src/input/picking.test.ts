@@ -1,7 +1,10 @@
 import { BoxGeometry, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, Vector2, type Object3D } from 'three';
 import { describe, expect, it } from 'vitest';
+import type { ConsoleState } from '../console/model';
 import type { ClickTarget } from './bindings';
 import { findTagged, pickInput, tag } from './picking';
+
+const centre = new Vector2(0, 0);
 
 const box = (z: number, target?: ClickTarget) => {
   const mesh = new Mesh(new BoxGeometry(0.1, 0.1, 0.01), new MeshBasicMaterial());
@@ -16,6 +19,7 @@ const world = () => {
   switchGroup.userData = tag('switch');
   switchGroup.add(box(-1, 'button:a'));
   scene.add(switchGroup);
+  const parts = { console: switchGroup, leftJoycon: new Group(), rightJoycon: new Group() };
   const camera = new PerspectiveCamera(50, 1, 0.01, 10);
   scene.add(camera);
   const add = (parent: Object3D, object: Object3D) => {
@@ -23,55 +27,85 @@ const world = () => {
     scene.updateMatrixWorld(true);
   };
   scene.updateMatrixWorld(true);
-  return { scene, camera, switchGroup, add };
+  const pick = (state: ConsoleState, ndc = centre) => pickInput(state, scene, camera, ndc, parts);
+  return { scene, camera, switchGroup, parts, add, pick };
 };
 
-const centre = new Vector2(0, 0);
+const holdConsole = () => {
+  const w = world();
+  w.add(w.camera, w.switchGroup);
+  w.switchGroup.position.z = 0.7;
+  w.add(w.scene, box(-0.8, 'dock'));
+  w.switchGroup.clear();
+  return w;
+};
 
 describe('pickInput', () => {
   it('acts on the nearest target the state binds, walking out from the hit mesh', () => {
-    const { scene, camera } = world();
-    expect(pickInput('focused', scene, camera, centre)).toEqual({ type: 'menu', button: 'a' });
-    expect(pickInput('onDesk', scene, camera, centre)).toEqual({ type: 'command', command: 'pickUp' });
+    const { pick } = world();
+    expect(pick('focused')).toEqual({ type: 'menu', button: 'a' });
+    expect(pick('onDesk')).toEqual({ type: 'command', command: 'pickUp' });
   });
 
   it('lets untagged scenery in front block the click', () => {
-    const { scene, camera, add } = world();
+    const { scene, add, pick } = world();
     add(scene, box(-0.5));
-    expect(pickInput('onDesk', scene, camera, centre)).toBeUndefined();
+    expect(pick('onDesk')).toBeUndefined();
   });
 
   it('lets a scene object the state does not bind block the click', () => {
-    const { scene, camera, add } = world();
+    const { scene, add, pick } = world();
     add(scene, box(-0.5, 'dock'));
-    expect(pickInput('onDesk', scene, camera, centre)).toBeUndefined();
+    expect(pick('onDesk')).toBeUndefined();
   });
 
-  it('passes a click through a camera-held part the state binds nothing on', () => {
-    const { scene, camera, add } = world();
-    const heldJoycon = box(-0.3, 'button:up');
-    add(camera, heldJoycon);
+  it('passes a click through a docked Joy-Con to the dock behind it', () => {
+    const { scene, camera, parts, add, pick } = world();
+    parts.leftJoycon.add(box(-0.3, 'button:up'));
+    add(camera, parts.leftJoycon);
     add(scene, box(-0.8, 'dock'));
-    expect(pickInput('docked', scene, camera, centre)).toEqual({ type: 'command', command: 'undock' });
+    expect(pick('docked')).toEqual({ type: 'command', command: 'undock' });
   });
 
-  it('passes a click through an untagged camera-held part', () => {
-    const { scene, camera, add } = world();
+  it('lets the held console block the dock behind it', () => {
+    const { switchGroup, add, pick } = holdConsole();
+    add(switchGroup, box(-1));
+    expect(pick('pickedUp')).toBeUndefined();
+    expect(pick('focused')).toBeUndefined();
+  });
+
+  it('lets the held console screen block the dock behind it', () => {
+    const { switchGroup, add, pick } = holdConsole();
+    add(switchGroup, box(-1, 'switchScreen'));
+    expect(pick('pickedUp')).toEqual({ type: 'command', command: 'focus' });
+    expect(pick('focused')).toBeUndefined();
+  });
+
+  it('lets a Joy-Con attached to the held console block the dock behind it', () => {
+    const { switchGroup, parts, add, pick } = holdConsole();
+    parts.leftJoycon.add(box(-1, 'button:up'));
+    add(switchGroup, parts.leftJoycon);
+    expect(pick('pickedUp')).toBeUndefined();
+    expect(pick('focused')).toEqual({ type: 'menu', button: 'up' });
+  });
+
+  it('lets an untagged camera-held object block the click', () => {
+    const { scene, camera, add, pick } = world();
     add(camera, box(-0.3));
     add(scene, box(-0.8, 'dock'));
-    expect(pickInput('pickedUp', scene, camera, centre)).toEqual({ type: 'command', command: 'dock' });
+    expect(pick('pickedUp')).toBeUndefined();
   });
 
   it('acts on a camera-held part when the state binds it', () => {
-    const { scene, camera, add } = world();
+    const { scene, camera, add, pick } = world();
     add(camera, box(-0.3, 'button:b'));
     add(scene, box(-0.8, 'dock'));
-    expect(pickInput('focused', scene, camera, centre)).toEqual({ type: 'menu', button: 'b' });
+    expect(pick('focused')).toEqual({ type: 'menu', button: 'b' });
   });
 
   it('does nothing when the ray misses', () => {
-    const { scene, camera } = world();
-    expect(pickInput('onDesk', scene, camera, new Vector2(0.9, 0.9))).toBeUndefined();
+    const { pick } = world();
+    expect(pick('onDesk', new Vector2(0.9, 0.9))).toBeUndefined();
   });
 });
 

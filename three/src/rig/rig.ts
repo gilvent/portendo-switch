@@ -2,7 +2,7 @@ import { Group, Object3D } from 'three';
 import type { ConsoleState } from '../console/model';
 import { neutralLook, type Look } from '../camera/look';
 import { tag } from '../input/picking';
-import { poses, type AnchorId, type Part, type StatePose } from './poses';
+import { parts, poses, type AnchorId, type StatePose } from './poses';
 
 export type ConsoleRig = {
   console: Group;
@@ -42,8 +42,6 @@ export function createRig(): ConsoleRig {
     look: { target: { ...neutralLook }, current: { ...neutralLook } },
   };
 }
-
-const parts = ['console', 'leftJoycon', 'rightJoycon'] as const satisfies readonly Part[];
 
 export function applyPose(rig: ConsoleRig, state: ConsoleState): void {
   const statePose: StatePose = poses[state];

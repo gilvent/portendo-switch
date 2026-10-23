@@ -1,5 +1,6 @@
 import { Box3, Raycaster, Vector2, Vector3, type Camera, type Object3D } from 'three';
 import type { ConsoleState, UserInput } from '../console/model';
+import { parts, poses, type Part } from '../rig/poses';
 import { clickInput, type ClickTarget } from './bindings';
 
 export function tag(target: ClickTarget): { clickTarget: ClickTarget } {
@@ -21,19 +22,27 @@ function targetsAlong(object: Object3D): ClickTarget[] {
 
 const raycaster = new Raycaster();
 
-function heldBy(camera: Camera, object: Object3D): boolean {
+function partOf(object: Object3D, rigParts: Readonly<Record<Part, Object3D>>): Part | undefined {
   for (let current: Object3D | null = object; current !== null; current = current.parent) {
-    if (current === camera) return true;
+    const part = parts.find((id) => rigParts[id] === current);
+    if (part !== undefined) return part;
   }
-  return false;
+  return undefined;
 }
 
-export function pickInput(state: ConsoleState, scene: Object3D, camera: Camera, ndc: Vector2): UserInput | undefined {
+export function pickInput(
+  state: ConsoleState,
+  scene: Object3D,
+  camera: Camera,
+  ndc: Vector2,
+  rigParts: Readonly<Record<Part, Object3D>>,
+): UserInput | undefined {
   raycaster.setFromCamera(ndc, camera);
   for (const hit of raycaster.intersectObject(scene, true)) {
     const input = clickInput(state, targetsAlong(hit.object));
     if (input !== undefined) return input;
-    if (!heldBy(camera, hit.object)) return undefined;
+    const part = partOf(hit.object, rigParts);
+    if (part === undefined || !poses[state][part].clickThrough) return undefined;
   }
   return undefined;
 }

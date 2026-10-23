@@ -30,7 +30,7 @@ export function Interaction() {
         ((clientX - bounds.left) / bounds.width) * 2 - 1,
         -((clientY - bounds.top) / bounds.height) * 2 + 1,
       );
-      const input = pickInput(settledState, scene, camera, ndc);
+      const input = pickInput(settledState, scene, camera, ndc, rig);
       if (input !== undefined) send(input);
     },
   });
