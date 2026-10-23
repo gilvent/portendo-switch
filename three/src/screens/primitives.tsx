@@ -1,45 +1,42 @@
-import { Text } from '@react-three/drei';
-import { use, useCallback, type ComponentProps } from 'react';
-import type { EventDispatcher } from 'three';
+import { use, useLayoutEffect, useState } from 'react';
+import { Text } from 'troika-three-text';
 import type { FontId } from './fonts';
 import { screenAssets, type ImageId } from './screenAssets';
 import { useScreenGate } from './useScreenTexture';
 
-type TroikaText = EventDispatcher<{ syncstart: object; synccomplete: object }>;
+type ScreenTextProps = {
+  font: FontId;
+  children: string;
+  fontSize: number;
+  color: string;
+  anchorX: 'left' | 'center' | 'right';
+  anchorY: 'top' | 'middle' | 'bottom';
+  position?: readonly [x: number, y: number, z: number];
+  onSync?: (text: Text) => void;
+};
 
-const syncsInFlight = new WeakMap<TroikaText, { count: number }>();
-
-function watchSyncs(text: TroikaText, invalidate: () => void): { count: number } {
-  const known = syncsInFlight.get(text);
-  if (known !== undefined) return known;
-  const syncs = { count: 0 };
-  text.addEventListener('syncstart', () => {
-    syncs.count += 1;
-  });
-  text.addEventListener('synccomplete', () => {
-    syncs.count -= 1;
-    invalidate();
-  });
-  syncsInFlight.set(text, syncs);
-  return syncs;
-}
-
-export function ScreenText({ font, children, ...props }: Omit<ComponentProps<typeof Text>, 'ref' | 'font' | 'children'> & { font: FontId; children: string }) {
+export function ScreenText({ font, children, fontSize, color, anchorX, anchorY, position = [0, 0, 0], onSync }: ScreenTextProps) {
   const fontUrl = use(screenAssets()).fonts[font];
   const { block, invalidate } = useScreenGate();
-  const blockWhileSyncing = useCallback(
-    (text: TroikaText | null) => {
-      if (text === null) return;
-      const syncs = watchSyncs(text, invalidate);
-      return block(`text "${children}" in ${font}`, () => syncs.count > 0);
-    },
-    [block, invalidate, children, font],
-  );
-  return (
-    <Text ref={blockWhileSyncing} font={fontUrl} {...props}>
-      {children}
-    </Text>
-  );
+  const [{ text, syncs }] = useState(() => {
+    const troikaText = new Text();
+    const inFlight = { count: 0 };
+    troikaText.addEventListener('syncstart', () => {
+      inFlight.count += 1;
+    });
+    troikaText.addEventListener('synccomplete', () => {
+      inFlight.count -= 1;
+      invalidate();
+    });
+    return { text: troikaText, syncs: inFlight };
+  });
+  useLayoutEffect(() => block(`text "${children}" in ${font}`, () => syncs.count > 0), [block, syncs, children, font]);
+  useLayoutEffect(() => {
+    Object.assign(text, { text: children, font: fontUrl, fontSize, color, anchorX, anchorY });
+    text.sync(() => onSync?.(text));
+  });
+  useLayoutEffect(() => () => text.dispose(), [text]);
+  return <primitive object={text} position={position} />;
 }
 
 export function ScreenImage({ image, width, z = 0 }: { image: ImageId; width: number; z?: number }) {
