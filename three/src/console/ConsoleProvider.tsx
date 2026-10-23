@@ -21,11 +21,13 @@ export function ConsoleProvider({ children }: { children: ReactNode }) {
   const value = useMemo(() => ({ model, send: dispatch, available: available(model) }), [model]);
   const finishTransition = useCallback((edge: Edge) => dispatch({ type: 'transitionDone', edge }), []);
 
-  if (import.meta.env.DEV) {
-    useEffect(() => {
-      window.__portendo = { model: () => model };
-    }, [model]);
-  }
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    window.__portendo = { model: () => model };
+    return () => {
+      delete window.__portendo;
+    };
+  }, [model]);
 
   return (
     <ConsoleContext.Provider value={value}>
