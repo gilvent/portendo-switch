@@ -15,7 +15,7 @@ function Shell() {
   useKeyboard();
   return (
     <>
-      <Canvas className="stage">
+      <Canvas style={{ position: 'fixed', inset: 0, touchAction: 'none' }}>
         <Scene />
       </Canvas>
       <HintStrip />

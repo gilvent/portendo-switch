@@ -1,4 +1,7 @@
 :root {
+  --wall: #f3ebdf;
+  --ink: #1b1a19;
+  --button: #313131;
   --pill: rgba(255, 255, 255, 0.92);
   --pill-edge: rgba(27, 26, 25, 0.08);
   --shadow: 0 10px 30px rgba(60, 44, 24, 0.14), 0 2px 6px rgba(60, 44, 24, 0.08);
@@ -17,12 +20,6 @@ body {
   font-family: 'Fredoka', system-ui, sans-serif;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
-}
-
-.stage {
-  position: fixed !important;
-  inset: 0;
-  touch-action: none;
 }
 
 .hint-strip,
