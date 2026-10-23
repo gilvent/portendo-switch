@@ -48,7 +48,7 @@ function HomePage() {
           <ringGeometry args={[icon.radius - icon.ring, icon.radius, 96]} />
           <meshBasicMaterial color={palette.screenWhite} toneMapped={false} />
         </mesh>
-        <ScreenImage url="/icons/ic-home.webp" width={icon.image} z={1} />
+        <ScreenImage image="home" width={icon.image} z={1} />
       </group>
       <GetStarted />
     </>

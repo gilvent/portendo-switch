@@ -1,4 +1,5 @@
 import { Canvas } from '@react-three/fiber';
+import { use } from 'react';
 import { CameraRig } from './camera/CameraRig';
 import { ConsoleProvider } from './console/ConsoleProvider';
 import { Interaction } from './input/Interaction';
@@ -6,6 +7,7 @@ import { useKeyboard } from './input/useKeyboard';
 import { useTransitionDirector } from './motion/useTransitionDirector';
 import { RigProvider } from './rig/RigProvider';
 import { Scene } from './scene/Scene';
+import { screenAssets } from './screens/screenAssets';
 import { HintStrip } from './ui/HintStrip';
 import { TouchButtonBar } from './ui/TouchButtonBar';
 
@@ -20,6 +22,7 @@ function Keyboard() {
 }
 
 export function App() {
+  use(screenAssets());
   return (
     <ConsoleProvider>
       <Keyboard />

@@ -1,4 +1,5 @@
 import { palette } from '../theme/palette';
+import type { ImageId } from './screenAssets';
 
 export const referenceSize = [1440, 900] as const;
 
@@ -55,16 +56,16 @@ export const cloudLayers = [
   },
 ] as const satisfies readonly CloudLayer[];
 
-export type Sticker = { id: string; image: string; anchor: Anchor; at: ReferencePoint; size: number; counterClockwiseDegrees: number };
+export type Sticker = { id: string; image: ImageId; anchor: Anchor; at: ReferencePoint; size: number; counterClockwiseDegrees: number };
 
 export const stickerPadding = 12;
 export const stickerRadius = 4;
 
 export const stickers = [
-  { id: 'gmail', image: '/brand/gmail.png', anchor: 'left', at: [142, 462], size: 75, counterClockwiseDegrees: -10 },
-  { id: 'linkedin', image: '/brand/linkedin.png', anchor: 'left', at: [238, 580], size: 105, counterClockwiseDegrees: 5 },
-  { id: 'github', image: '/brand/github.png', anchor: 'right', at: [1288, 452], size: 95, counterClockwiseDegrees: 25 },
-  { id: 'x', image: '/brand/twitter.png', anchor: 'right', at: [1177, 568], size: 75, counterClockwiseDegrees: -20 },
+  { id: 'gmail', image: 'gmail', anchor: 'left', at: [142, 462], size: 75, counterClockwiseDegrees: -10 },
+  { id: 'linkedin', image: 'linkedin', anchor: 'left', at: [238, 580], size: 105, counterClockwiseDegrees: 5 },
+  { id: 'github', image: 'github', anchor: 'right', at: [1288, 452], size: 95, counterClockwiseDegrees: 25 },
+  { id: 'x', image: 'twitter', anchor: 'right', at: [1177, 568], size: 75, counterClockwiseDegrees: -20 },
 ] as const satisfies readonly Sticker[];
 
 export const intro = {

@@ -91,7 +91,7 @@ function StickerCard({ sticker, width }: { sticker: Sticker; width: number }) {
       <mesh geometry={card}>
         <meshBasicMaterial color={palette.screenWhite} toneMapped={false} />
       </mesh>
-      <ScreenImage url={sticker.image} width={sticker.size - stickerPadding * 2} z={0.5} />
+      <ScreenImage image={sticker.image} width={sticker.size - stickerPadding * 2} z={0.5} />
     </group>
   );
 }
