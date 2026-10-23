@@ -1,6 +1,7 @@
 import { Group, Object3D } from 'three';
 import type { ConsoleState } from '../console/model';
 import { neutralLook, type Look } from '../camera/look';
+import { tag } from '../input/picking';
 import { poses, type AnchorId, type Part, type StatePose } from './poses';
 
 export type ConsoleRig = {
@@ -26,6 +27,7 @@ const anchorIds = ['desk', 'dockSlot', 'hand', 'viewCentre', 'leftHand', 'rightH
 export function createRig(): ConsoleRig {
   const anchors = Object.fromEntries(anchorIds.map((id) => [id, named(new Object3D(), `anchor:${id}`)])) as Record<AnchorId, Object3D>;
   const consoleGroup = named(new Group(), 'console');
+  consoleGroup.userData = tag('switch');
   consoleGroup.add(anchors.rails);
   return {
     console: consoleGroup,

@@ -1,4 +1,5 @@
 import { Text } from '@react-three/drei';
+import { createPortal } from '@react-three/fiber';
 import fredokaUrl from '@fontsource/fredoka/files/fredoka-latin-500-normal.woff?url';
 import { Suspense, useMemo } from 'react';
 import { Color, Shape, ShapeGeometry } from 'three';
@@ -61,8 +62,8 @@ export function Joycon({ side }: { side: Side }) {
   const buttonX = -inward * railWidth * 0.5;
   const faceZ = joycon.depth / 2;
 
-  return (
-    <primitive object={side === 'left' ? rig.leftJoycon : rig.rightJoycon}>
+  return createPortal(
+    <>
       <mesh geometry={shells[side]} castShadow receiveShadow>
         <meshStandardMaterial color={colour} roughness={0.6} />
       </mesh>
@@ -99,6 +100,7 @@ export function Joycon({ side }: { side: Side }) {
           )}
         </mesh>
       ))}
-    </primitive>
+    </>,
+    side === 'left' ? rig.leftJoycon : rig.rightJoycon,
   );
 }
