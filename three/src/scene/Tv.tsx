@@ -1,4 +1,14 @@
 import { RoundedBox } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
+import type { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three';
+import { useConsole } from '../console/ConsoleProvider';
+import { useRig } from '../rig/RigProvider';
+import { DisplayMaterial } from '../screens/DisplayMaterial';
+import { ConsoleScreen, consoleScreenSize } from '../screens/ConsoleScreen';
+import { HomeScreen } from '../screens/HomeScreen';
+import { referenceSize } from '../screens/homeLayout';
+import { useScreenTexture } from '../screens/useScreenTexture';
 import { palette } from '../theme/palette';
 import { layout } from './layout';
 import { roundedDisc } from './shapes';
@@ -8,8 +18,22 @@ const shell = { width: 0.76, height: 0.47, depth: 0.08 };
 const shellCentreY = layout.tvScreenCentre[1] - 0.012;
 const neckHeight = shellCentreY - shell.height / 2 - layout.deskTop;
 const footGeometry = roundedDisc(0.13, 0.014, 0.006, 48);
+const screenAspect = screen.width / screen.height;
+const homeSize = [referenceSize[1] * screenAspect, referenceSize[1]] as const;
+const consoleSize = consoleScreenSize(screenAspect);
 
 export function Tv() {
+  const rig = useRig();
+  const { model } = useConsole();
+  const home = useScreenTexture(<HomeScreen size={homeSize} />, homeSize, 'tvHome');
+  const menu = useScreenTexture(<ConsoleScreen page={model.menu} size={consoleSize} />, consoleSize, 'tvConsole');
+  const consolePlane = useRef<Mesh<PlaneGeometry, MeshBasicMaterial>>(null);
+  useFrame(() => {
+    const plane = consolePlane.current;
+    if (plane === null) throw new Error('Tv: console plane is not mounted');
+    plane.material.opacity = rig.tvInput.mix;
+    plane.visible = rig.tvInput.mix > 0;
+  });
   const [x, , z] = layout.tvScreenCentre;
   const shellFront = z - 0.002;
   const shellZ = shellFront - shell.depth / 2;
@@ -21,9 +45,15 @@ export function Tv() {
       <RoundedBox args={[screen.width + 0.02, screen.height + 0.02, 0.008]} radius={0.004} smoothness={4} position={[0, layout.tvScreenCentre[1], shellFront - 0.002]}>
         <meshStandardMaterial color={palette.tvTrim} roughness={0.6} />
       </RoundedBox>
+      {home.portal}
+      {menu.portal}
       <mesh position={[0, layout.tvScreenCentre[1], shellFront + 0.0026]}>
         <planeGeometry args={[screen.width, screen.height]} />
-        <meshStandardMaterial color={palette.glass} roughness={0.32} envMapIntensity={0.5} />
+        <DisplayMaterial map={home.texture} />
+      </mesh>
+      <mesh ref={consolePlane} position={[0, layout.tvScreenCentre[1], shellFront + 0.0027]}>
+        <planeGeometry args={[screen.width, screen.height]} />
+        <DisplayMaterial map={menu.texture} transparent />
       </mesh>
       <mesh position={[0.31, shellCentreY - shell.height / 2 + 0.022, shellFront + 0.0005]}>
         <circleGeometry args={[0.005, 20]} />

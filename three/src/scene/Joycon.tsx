@@ -1,6 +1,5 @@
 import { Text } from '@react-three/drei';
 import { createPortal } from '@react-three/fiber';
-import fredokaUrl from '@fontsource/fredoka/files/fredoka-latin-500-normal.woff?url';
 import { Suspense, useMemo } from 'react';
 import { Color, Shape, ShapeGeometry } from 'three';
 import { useConsole } from '../console/ConsoleProvider';
@@ -8,6 +7,7 @@ import type { MenuButton } from '../console/model';
 import { tag } from '../input/picking';
 import { consoleSize } from '../rig/dimensions';
 import { useRig } from '../rig/RigProvider';
+import { fonts } from '../screens/fonts';
 import { joyconSets, palette } from '../theme/palette';
 import { beveledSlab, roundedDisc } from './shapes';
 
@@ -87,7 +87,7 @@ export function Joycon({ side }: { side: Side }) {
           ) : (
             <Suspense fallback={null}>
               <Text
-                font={fredokaUrl}
+                font={fonts.fredoka500}
                 fontSize={0.0115}
                 color={palette.buttonLabel}
                 anchorX="center"
