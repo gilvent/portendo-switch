@@ -21,6 +21,17 @@ describe('poses', () => {
   });
 });
 
+describe('signals', () => {
+  it('keeps the Switch screen on, the LED off and the TV on its home screen until the console docks', () => {
+    expect(Object.fromEntries(Object.entries(poses).map(([state, pose]) => [state, pose.signals]))).toEqual({
+      onDesk: { screenPower: 1, ledPower: 0, tvInput: 'home' },
+      pickedUp: { screenPower: 1, ledPower: 0, tvInput: 'home' },
+      focused: { screenPower: 1, ledPower: 0, tvInput: 'home' },
+      docked: { screenPower: 0, ledPower: 1, tvInput: 'console' },
+    });
+  });
+});
+
 describe('lookMode', () => {
   it('locks the look only while focused', () => {
     expect(lookMode('onDesk')).toBe('free');

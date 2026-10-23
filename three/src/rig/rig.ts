@@ -2,7 +2,7 @@ import { Group, Object3D } from 'three';
 import type { ConsoleState } from '../console/model';
 import { neutralLook, type Look } from '../camera/look';
 import { tag } from '../input/picking';
-import { parts, poses, type AnchorId, type StatePose } from './poses';
+import { parts, poses, tvMix, type AnchorId, type StatePose } from './poses';
 
 export type ConsoleRig = {
   console: Group;
@@ -15,6 +15,9 @@ export type ConsoleRig = {
   led: Group;
   anchors: Record<AnchorId, Object3D>;
   look: { target: Look; current: Look };
+  screenPower: { value: number };
+  ledPower: { value: number };
+  tvInput: { mix: number };
 };
 
 const named = <T extends Object3D>(object: T, name: string): T => {
@@ -40,6 +43,9 @@ export function createRig(): ConsoleRig {
     led: named(new Group(), 'led'),
     anchors,
     look: { target: { ...neutralLook }, current: { ...neutralLook } },
+    screenPower: { value: 0 },
+    ledPower: { value: 0 },
+    tvInput: { mix: 0 },
   };
 }
 
@@ -52,6 +58,10 @@ export function applyPose(rig: ConsoleRig, state: ConsoleState): void {
     object.position.set(...position);
     object.rotation.set(...rotation);
   }
+  const { screenPower, ledPower, tvInput } = statePose.signals;
+  rig.screenPower.value = screenPower;
+  rig.ledPower.value = ledPower;
+  rig.tvInput.mix = tvMix[tvInput];
   if (statePose.camera === 'neutral') {
     Object.assign(rig.look.target, neutralLook);
     Object.assign(rig.look.current, neutralLook);
