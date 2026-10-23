@@ -1,16 +1,14 @@
 import type { ComponentProps } from 'react';
 import type { WebGLProgramParametersWithUniforms } from 'three';
 
-// Screens show display-referred sRGB pixels, but the whole frame then passes through the
-// composer's Neutral tone curve. Feeding the curve its exact inverse makes the curve hand
-// back the authored pixel. Peaks are capped where the inverse stays below the bloom threshold.
-const inverseNeutral = /* glsl */ `
+const bloomSafePeak = 0.96;
+
+const inverseNeutralToneMappingGlsl = /* glsl */ `
 vec3 inverseNeutralToneMapping( vec3 color ) {
   const float startCompression = 0.8 - 0.04;
   const float desaturation = 0.15;
   const float d = 1. - startCompression;
-  const float ceiling = 0.96;
-  color = min( color, vec3( ceiling ) );
+  color = min( color, vec3( ${bloomSafePeak.toFixed(2)} ) );
   float newPeak = max( color.r, max( color.g, color.b ) );
   if ( newPeak >= startCompression ) {
     float peak = d * d / ( 1. - newPeak ) - d + startCompression;
@@ -25,7 +23,7 @@ vec3 inverseNeutralToneMapping( vec3 color ) {
 
 function compensateToneMapping(shader: WebGLProgramParametersWithUniforms) {
   shader.fragmentShader = shader.fragmentShader
-    .replace('void main() {', `${inverseNeutral}\nvoid main() {`)
+    .replace('void main() {', `${inverseNeutralToneMappingGlsl}\nvoid main() {`)
     .replace('#include <opaque_fragment>', 'outgoingLight = inverseNeutralToneMapping( outgoingLight );\n#include <opaque_fragment>');
 }
 
