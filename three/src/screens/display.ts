@@ -42,7 +42,7 @@ export class NeutralToneMappingExceptDisplays extends Effect {
   }
 }
 
-export type DisplayUniforms = {
+type DisplayUniforms = {
   inputA: IUniform<Texture>;
   inputB: IUniform<Texture>;
   inputMix: IUniform<number>;

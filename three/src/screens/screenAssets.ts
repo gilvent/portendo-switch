@@ -10,8 +10,8 @@ import { fonts } from './fonts';
 
 const imageUrls = { home, gmail, linkedin, github, twitter } as const;
 export type ImageId = keyof typeof imageUrls;
-export type ScreenImageAsset = { texture: Texture; aspect: number };
-export type ScreenAssets = { images: Record<ImageId, ScreenImageAsset> };
+type ScreenImageAsset = { texture: Texture; aspect: number };
+type ScreenAssets = { images: Record<ImageId, ScreenImageAsset> };
 
 const fontParseTimeoutMs = 10_000;
 
