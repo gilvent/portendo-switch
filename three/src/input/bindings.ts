@@ -36,7 +36,6 @@ export const clickBindings: { [S in ConsoleState]: Partial<Record<ClickTarget, U
     switchScreen: { type: 'command', command: 'pickUp' },
   },
   pickedUp: {
-    switch: { type: 'command', command: 'focus' },
     switchScreen: { type: 'command', command: 'focus' },
     dock: { type: 'command', command: 'dock' },
   },

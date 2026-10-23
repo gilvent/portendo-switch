@@ -73,7 +73,7 @@ describe('clickBindings', () => {
       'button:b': unbound,
     },
     pickedUp: {
-      switch: moving({ from: 'pickedUp', via: 'focus', to: 'focused' }),
+      switch: unbound,
       switchScreen: moving({ from: 'pickedUp', via: 'focus', to: 'focused' }),
       dock: moving({ from: 'pickedUp', via: 'dock', to: 'docked' }),
       'button:up': unbound,
@@ -121,6 +121,7 @@ describe('clickInput', () => {
 
   it('does nothing when no target on the path is bound, or nothing was hit', () => {
     expect(clickInput('focused', ['switchScreen', 'switch'])).toBeUndefined();
+    expect(clickInput('pickedUp', ['button:a', 'switch'])).toBeUndefined();
     expect(clickInput('onDesk', ['dock'])).toBeUndefined();
     expect(clickInput('docked', [])).toBeUndefined();
   });
