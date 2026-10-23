@@ -2,8 +2,8 @@ import { useEffect, useMemo } from 'react';
 import { BlendFunction, Effect } from 'postprocessing';
 import { ShaderMaterial, type IUniform, type Texture } from 'three';
 
-// Scene pixels carry alpha <= 1; display pixels carry this marker so tone mapping can skip them.
-const displayAlpha = 2;
+const sceneAlphaCeiling = 1;
+const displayMarkerAlpha = 2;
 
 const displayVertexShader = /* glsl */ `
 varying vec2 vUv;
@@ -23,7 +23,7 @@ vec3 encodeSRGB(vec3 c) { return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) 
 vec3 decodeSRGB(vec3 c) { return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c)); }
 void main() {
   vec3 shown = mix(encodeSRGB(texture2D(inputA, vUv).rgb), encodeSRGB(texture2D(inputB, vUv).rgb), inputMix);
-  gl_FragColor = vec4(decodeSRGB(shown) * power, ${displayAlpha.toFixed(1)});
+  gl_FragColor = vec4(decodeSRGB(shown) * power, ${displayMarkerAlpha.toFixed(1)});
 }
 `;
 
@@ -31,7 +31,7 @@ const neutralToneMappingExceptDisplaysShader = /* glsl */ `
 #include <tonemapping_pars_fragment>
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
   vec4 unbloomed = texture2D(inputBuffer, uv);
-  float display = clamp(unbloomed.a - 1.0, 0.0, 1.0);
+  float display = clamp((unbloomed.a - ${sceneAlphaCeiling.toFixed(1)}) / ${(displayMarkerAlpha - sceneAlphaCeiling).toFixed(1)}, 0.0, 1.0);
   outputColor = vec4(mix(NeutralToneMapping(inputColor.rgb), unbloomed.rgb, display), inputColor.a);
 }
 `;
