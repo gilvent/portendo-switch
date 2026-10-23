@@ -1,0 +1,20 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #f3ebdf;
+  color: #1b1a19;
+  font-family: 'Fredoka', system-ui, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: fixed !important;
+  inset: 0;
+  touch-action: none;
+}

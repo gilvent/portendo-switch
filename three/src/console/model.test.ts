@@ -1,0 +1,180 @@
+import { describe, expect, it } from 'vitest';
+import { available, initialModel, reduce, type ConsoleEvent, type ConsoleModel } from './model';
+
+const settled = (state: 'onDesk' | 'pickedUp' | 'focused' | 'docked'): ConsoleModel => ({
+  phase: { kind: 'settled', state },
+  menu: 'home',
+  joycons: 'grey',
+});
+
+const run = (model: ConsoleModel, ...events: ConsoleEvent[]) => events.reduce(reduce, model);
+
+describe('reduce: commands', () => {
+  it('starts settled on the desk, home menu, grey Joy-Cons', () => {
+    expect(initialModel).toEqual({
+      phase: { kind: 'settled', state: 'onDesk' },
+      menu: 'home',
+      joycons: 'grey',
+    });
+  });
+
+  it.each([
+    ['onDesk', 'pickUp', 'pickedUp'],
+    ['pickedUp', 'focus', 'focused'],
+    ['pickedUp', 'dock', 'docked'],
+    ['focused', 'unfocus', 'pickedUp'],
+    ['focused', 'dock', 'docked'],
+    ['docked', 'undock', 'onDesk'],
+  ] as const)('%s --%s--> transitioning, then settles in %s', (from, via, to) => {
+    const moving = reduce(settled(from), { type: 'command', command: via });
+    expect(moving).toEqual({
+      phase: { kind: 'transitioning', edge: { from, via, to } },
+      menu: 'home',
+      joycons: 'grey',
+    });
+    expect(reduce(moving, { type: 'transitionDone' })).toEqual(settled(to));
+  });
+
+  it.each([
+    ['onDesk', ['focus', 'unfocus', 'dock', 'undock']],
+    ['pickedUp', ['pickUp', 'unfocus', 'undock']],
+    ['focused', ['pickUp', 'focus', 'undock']],
+    ['docked', ['pickUp', 'focus', 'unfocus', 'dock']],
+  ] as const)('ignores commands with no edge out of %s', (state, illegal) => {
+    const model = settled(state);
+    for (const command of illegal) {
+      expect(reduce(model, { type: 'command', command })).toBe(model);
+    }
+  });
+
+  it('ignores every command and menu press while transitioning, then settles at the edge target', () => {
+    const moving = reduce(settled('pickedUp'), { type: 'command', command: 'focus' });
+    const ignored: ConsoleEvent[] = [
+      { type: 'command', command: 'unfocus' },
+      { type: 'command', command: 'dock' },
+      { type: 'command', command: 'focus' },
+      { type: 'menu', button: 'a' },
+      { type: 'menu', button: 'down' },
+    ];
+    for (const event of ignored) {
+      expect(reduce(moving, event)).toBe(moving);
+    }
+    expect(run(moving, ...ignored, { type: 'transitionDone' })).toEqual(settled('focused'));
+  });
+
+  it('ignores transitionDone when already settled', () => {
+    const model = settled('docked');
+    expect(reduce(model, { type: 'transitionDone' })).toBe(model);
+  });
+
+  it('walks the full tour from the desk to the dock and back', () => {
+    const done: ConsoleEvent = { type: 'transitionDone' };
+    const end = run(
+      initialModel,
+      { type: 'command', command: 'pickUp' },
+      done,
+      { type: 'command', command: 'focus' },
+      done,
+      { type: 'command', command: 'unfocus' },
+      done,
+      { type: 'command', command: 'focus' },
+      done,
+      { type: 'command', command: 'dock' },
+      done,
+      { type: 'command', command: 'undock' },
+      done,
+    );
+    expect(end).toEqual(settled('onDesk'));
+  });
+});
+
+describe('reduce: menu', () => {
+  it('up and down flip between home and work when focused', () => {
+    const focused = settled('focused');
+    expect(reduce(focused, { type: 'menu', button: 'down' })).toEqual({ ...focused, menu: 'work' });
+    expect(reduce(focused, { type: 'menu', button: 'up' })).toEqual({ ...focused, menu: 'work' });
+    expect(
+      run(focused, { type: 'menu', button: 'down' }, { type: 'menu', button: 'up' }),
+    ).toEqual({ ...focused, menu: 'home' });
+  });
+
+  it('A cycles grey, neon, gold, grey when focused', () => {
+    const a: ConsoleEvent = { type: 'menu', button: 'a' };
+    const focused = settled('focused');
+    expect(run(focused, a)).toEqual({ ...focused, joycons: 'neon' });
+    expect(run(focused, a, a)).toEqual({ ...focused, joycons: 'gold' });
+    expect(run(focused, a, a, a)).toEqual({ ...focused, joycons: 'grey' });
+  });
+
+  it('B does nothing on either page', () => {
+    const home = settled('focused');
+    const work = { ...home, menu: 'work' as const };
+    expect(reduce(home, { type: 'menu', button: 'b' })).toBe(home);
+    expect(reduce(work, { type: 'menu', button: 'b' })).toBe(work);
+  });
+
+  it.each(['onDesk', 'pickedUp', 'docked'] as const)('ignores menu presses when settled in %s', (state) => {
+    const model = settled(state);
+    for (const button of ['up', 'down', 'a', 'b'] as const) {
+      expect(reduce(model, { type: 'menu', button })).toBe(model);
+    }
+  });
+
+  it('keeps menu page and Joy-Con set across a dock and undock', () => {
+    const a: ConsoleEvent = { type: 'menu', button: 'a' };
+    const done: ConsoleEvent = { type: 'transitionDone' };
+    const end = run(
+      settled('focused'),
+      a,
+      { type: 'menu', button: 'down' },
+      { type: 'command', command: 'dock' },
+      done,
+      { type: 'command', command: 'undock' },
+      done,
+    );
+    expect(end).toEqual({ phase: { kind: 'settled', state: 'onDesk' }, menu: 'work', joycons: 'neon' });
+  });
+});
+
+describe('available', () => {
+  it.each([
+    ['onDesk', [{ type: 'command', command: 'pickUp' }]],
+    [
+      'pickedUp',
+      [
+        { type: 'command', command: 'focus' },
+        { type: 'command', command: 'dock' },
+      ],
+    ],
+    [
+      'focused',
+      [
+        { type: 'menu', button: 'up' },
+        { type: 'menu', button: 'down' },
+        { type: 'menu', button: 'a' },
+        { type: 'command', command: 'unfocus' },
+        { type: 'command', command: 'dock' },
+      ],
+    ],
+    ['docked', [{ type: 'command', command: 'undock' }]],
+  ] as const)('offers the inputs that act when settled in %s', (state, expected) => {
+    expect(available(settled(state))).toEqual(expected);
+  });
+
+  it('offers nothing while transitioning and pickUp again once back on the desk', () => {
+    const moving = reduce(settled('docked'), { type: 'command', command: 'undock' });
+    expect(available(moving)).toEqual([]);
+    expect(available(reduce(moving, { type: 'transitionDone' }))).toEqual([
+      { type: 'command', command: 'pickUp' },
+    ]);
+  });
+
+  it('every offered input changes the model it was offered for', () => {
+    for (const state of ['onDesk', 'pickedUp', 'focused', 'docked'] as const) {
+      const model = settled(state);
+      for (const input of available(model)) {
+        expect(reduce(model, input), `${state} ${JSON.stringify(input)}`).not.toEqual(model);
+      }
+    }
+  });
+});
