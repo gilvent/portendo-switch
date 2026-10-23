@@ -1,6 +1,7 @@
 import { Text } from '@react-three/drei';
 import { use, useCallback, type ComponentProps } from 'react';
 import type { EventDispatcher } from 'three';
+import type { FontId } from './fonts';
 import { screenAssets, type ImageId } from './screenAssets';
 import { useScreenGate } from './useScreenTexture';
 
@@ -23,7 +24,8 @@ function watchSyncs(text: TroikaText, invalidate: () => void): { count: number }
   return syncs;
 }
 
-export function ScreenText(props: ComponentProps<typeof Text>) {
+export function ScreenText({ font, ...props }: Omit<ComponentProps<typeof Text>, 'font'> & { font: FontId }) {
+  const fontUrl = use(screenAssets()).fonts[font];
   const { block, invalidate } = useScreenGate();
   const blockWhileSyncing = useCallback(
     (text: TroikaText | null) => {
@@ -33,7 +35,7 @@ export function ScreenText(props: ComponentProps<typeof Text>) {
     },
     [block, invalidate],
   );
-  return <Text ref={blockWhileSyncing} {...props} />;
+  return <Text ref={blockWhileSyncing} font={fontUrl} {...props} />;
 }
 
 export function ScreenImage({ image, width, z = 0 }: { image: ImageId; width: number; z?: number }) {

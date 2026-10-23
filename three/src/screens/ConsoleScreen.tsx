@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import type { Group } from 'three';
 import type { MenuPage } from '../console/model';
 import { palette } from '../theme/palette';
-import { fonts } from './fonts';
 import { ScreenImage, ScreenText } from './primitives';
 import type { ScreenSize } from './useScreenTexture';
 
@@ -70,11 +69,11 @@ function GetStarted() {
         <circleGeometry args={[guide.badgeRadius, 64]} />
         <meshBasicMaterial color={palette.screenWhite} toneMapped={false} />
       </mesh>
-      <ScreenText font={fonts.fredoka500} fontSize={guide.badgeFontSize} color={palette.badgeInk} anchorX="center" anchorY="middle" position={[guide.badgeRadius, 0, 1]}>
+      <ScreenText font="fredoka500" fontSize={guide.badgeFontSize} color={palette.badgeInk} anchorX="center" anchorY="middle" position={[guide.badgeRadius, 0, 1]}>
         B
       </ScreenText>
       <ScreenText
-        font={fonts.fredoka500}
+        font="fredoka500"
         fontSize={guide.fontSize}
         color={palette.screenWhite}
         anchorX="left"
@@ -91,10 +90,10 @@ function GetStarted() {
 function WorkPage() {
   return (
     <>
-      <ScreenText font={fonts.gaban} fontSize={work.title.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle" position={[0, fromTop(work.title.y), 0]}>
+      <ScreenText font="gaban" fontSize={work.title.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle" position={[0, fromTop(work.title.y), 0]}>
         WORK
       </ScreenText>
-      <ScreenText font={fonts.fredoka500} fontSize={work.guide.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle" position={[0, fromTop(work.guide.y), 0]}>
+      <ScreenText font="fredoka500" fontSize={work.guide.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle" position={[0, fromTop(work.guide.y), 0]}>
         Press B to start
       </ScreenText>
     </>

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { CircleGeometry, NotEqualStencilFunc, ReplaceStencilOp, ShapeGeometry } from 'three';
 import { roundedRect } from '../scene/shapes';
 import { palette } from '../theme/palette';
-import { fonts } from './fonts';
 import { cloudLayers, intro, referenceSize, stickerPadding, stickerRadius, stickers, toScreen, type CloudLayer, type Sticker } from './homeLayout';
 import { ScreenImage, ScreenText } from './primitives';
 import type { ScreenSize } from './useScreenTexture';
@@ -69,13 +68,13 @@ function Intro({ width }: { width: number }) {
   return (
     <group position-z={depth.text}>
       <group position={[...toScreen('centre', greeting.at, width), 0]}>
-        <ScreenText font={fonts.fredoka700} fontSize={greeting.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle">
+        <ScreenText font="fredoka700" fontSize={greeting.fontSize} color={palette.screenWhite} anchorX="center" anchorY="middle">
           {greeting.text}
         </ScreenText>
       </group>
       {lines.map((line) => (
         <group key={line.text} position={[...toScreen('centre', line.at, width), 0]}>
-          <ScreenText font={fonts.fredoka600} fontSize={lineFontSize} color={palette.ink} anchorX="center" anchorY="middle">
+          <ScreenText font="fredoka600" fontSize={lineFontSize} color={palette.ink} anchorX="center" anchorY="middle">
             {line.text}
           </ScreenText>
         </group>

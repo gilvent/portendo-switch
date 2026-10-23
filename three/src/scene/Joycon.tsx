@@ -1,13 +1,13 @@
 import { Text } from '@react-three/drei';
 import { createPortal } from '@react-three/fiber';
-import { Suspense, useMemo } from 'react';
+import { Suspense, use, useMemo } from 'react';
 import { Color, Shape, ShapeGeometry } from 'three';
 import { useConsole } from '../console/ConsoleProvider';
 import type { MenuButton } from '../console/model';
 import { tag } from '../input/picking';
 import { consoleSize } from '../rig/dimensions';
 import { useRig } from '../rig/RigProvider';
-import { fonts } from '../screens/fonts';
+import { screenAssets } from '../screens/screenAssets';
 import { joyconSets, palette } from '../theme/palette';
 import { beveledSlab, roundedDisc } from './shapes';
 
@@ -55,6 +55,7 @@ const buttons: Record<Side, readonly ButtonSpec[]> = {
 export function Joycon({ side }: { side: Side }) {
   const rig = useRig();
   const { model } = useConsole();
+  const { fonts } = use(screenAssets());
   const colour = joyconSets[model.joycons][side];
   const railColour = useMemo(() => new Color(colour).multiplyScalar(0.62), [colour]);
   const inward = side === 'left' ? 1 : -1;

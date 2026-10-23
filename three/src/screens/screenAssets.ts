@@ -6,12 +6,12 @@ import linkedin from '../assets/brand/linkedin.png?url';
 import twitter from '../assets/brand/twitter.png?url';
 import home from '../assets/icons/ic-home.webp?url';
 import { verifyAsset, type AssetKind } from './assetSignature';
-import { fonts } from './fonts';
+import { fontSources, type FontId, type FontSource } from './fonts';
 
 const imageUrls = { home, gmail, linkedin, github, twitter } as const;
 export type ImageId = keyof typeof imageUrls;
 type ScreenImageAsset = { texture: Texture; aspect: number };
-type ScreenAssets = { images: Record<ImageId, ScreenImageAsset> };
+type ScreenAssets = { images: Record<ImageId, ScreenImageAsset>; fonts: Record<FontId, string> };
 
 const fontParseTimeoutMs = 10_000;
 
@@ -25,15 +25,16 @@ async function fetchAsset(url: string, kind: AssetKind): Promise<Uint8Array<Arra
   return bytes;
 }
 
-async function loadFont(url: string): Promise<void> {
-  await fetchAsset(url, 'font');
+export async function loadFont({ url, drawnText }: FontSource): Promise<string> {
+  const objectUrl = URL.createObjectURL(new Blob([await fetchAsset(url, 'font')]));
   await new Promise<void>((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error(`screen assets: troika did not parse the font ${url} within ${fontParseTimeoutMs} ms`)), fontParseTimeoutMs);
-    preloadFont({ font: url, characters: [], sdfGlyphSize: 64 }, () => {
+    preloadFont({ font: objectUrl, characters: drawnText, sdfGlyphSize: 64 }, () => {
       clearTimeout(timer);
       resolve();
     });
   });
+  return objectUrl;
 }
 
 async function loadImage(url: string): Promise<ScreenImageAsset> {
@@ -55,12 +56,13 @@ async function loadImage(url: string): Promise<ScreenImageAsset> {
 }
 
 async function load(): Promise<ScreenAssets> {
-  const ids = Object.keys(imageUrls) as ImageId[];
-  const [images] = await Promise.all([
-    Promise.all(ids.map(async (id) => [id, await loadImage(imageUrls[id])] as const)),
-    Promise.all(Object.values(fonts).map(loadFont)),
+  const imageIds = Object.keys(imageUrls) as ImageId[];
+  const fontIds = Object.keys(fontSources) as FontId[];
+  const [images, fonts] = await Promise.all([
+    Promise.all(imageIds.map(async (id) => [id, await loadImage(imageUrls[id])] as const)),
+    Promise.all(fontIds.map(async (id) => [id, await loadFont(fontSources[id])] as const)),
   ]);
-  return { images: Object.fromEntries(images) as Record<ImageId, ScreenImageAsset> };
+  return { images: Object.fromEntries(images) as Record<ImageId, ScreenImageAsset>, fonts: Object.fromEntries(fonts) as Record<FontId, string> };
 }
 
 let pending: Promise<ScreenAssets> | null = null;
