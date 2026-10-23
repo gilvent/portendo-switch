@@ -18,10 +18,16 @@ export function dragLook(look: Look, dx: number, dy: number, radiansPerPixel: nu
 }
 
 const lookDamping = 10;
+const restRadians = 1e-4;
+
+function dampAngle(current: number, target: number, deltaSeconds: number): number {
+  const next = MathUtils.damp(current, target, lookDamping, deltaSeconds);
+  return Math.abs(target - next) < restRadians ? target : next;
+}
 
 export function dampLook(current: Look, target: Look, deltaSeconds: number): Look {
   return {
-    yaw: MathUtils.damp(current.yaw, target.yaw, lookDamping, deltaSeconds),
-    pitch: MathUtils.damp(current.pitch, target.pitch, lookDamping, deltaSeconds),
+    yaw: dampAngle(current.yaw, target.yaw, deltaSeconds),
+    pitch: dampAngle(current.pitch, target.pitch, deltaSeconds),
   };
 }

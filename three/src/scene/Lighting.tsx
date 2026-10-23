@@ -1,6 +1,9 @@
 import { ContactShadows, Environment, Lightformer } from '@react-three/drei';
-import { useLayoutEffect, useRef, type ReactNode } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Object3D, type Group, type SpotLight } from 'three';
+import { useConsole } from '../console/ConsoleProvider';
+import { useRig } from '../rig/RigProvider';
 import { palette } from '../theme/palette';
 import { desk } from './Desk';
 import { layout } from './layout';
@@ -49,9 +52,32 @@ function LampLight() {
 }
 
 const shadowScale: [number, number] = [desk.width, desk.depth];
+const shadowPosition: [number, number, number] = [0, layout.deskTop + 0.0008, desk.back + desk.depth / 2];
+
+function DeskShadows() {
+  const rig = useRig();
+  const { phase } = useConsole().model;
+  const [looking, setLooking] = useState(false);
+  useFrame(() => {
+    const { current, target } = rig.look;
+    const moving = current.yaw !== target.yaw || current.pitch !== target.pitch;
+    if (moving !== looking) setLooking(moving);
+  });
+  return (
+    <ContactShadows
+      position={shadowPosition}
+      scale={shadowScale}
+      resolution={512}
+      far={0.3}
+      blur={2.2}
+      opacity={0.42}
+      color="#5a4330"
+      frames={looking || phase.kind === 'transitioning' ? Infinity : 1}
+    />
+  );
+}
 
 export function Lighting() {
-  const deskCentreZ = desk.back + desk.depth / 2;
   return (
     <>
       <color attach="background" args={[palette.wall]} />
@@ -67,16 +93,7 @@ export function Lighting() {
         <Lightformer form="rect" intensity={0.5} color={palette.wall} position={[4, 1.2, 0]} rotation-y={-Math.PI / 2} scale={[4, 3, 1]} />
       </Environment>
       <Unpickable>
-        <ContactShadows
-          position={[0, layout.deskTop + 0.0008, deskCentreZ]}
-          scale={shadowScale}
-          resolution={512}
-          far={0.3}
-          blur={2.2}
-          opacity={0.42}
-          color="#5a4330"
-          frames={Infinity}
-        />
+        <DeskShadows />
       </Unpickable>
     </>
   );

@@ -25,4 +25,9 @@ describe('look', () => {
     expect(halfway.pitch).toBeCloseTo(-0.393, 3);
     expect(dampLook({ yaw: 0, pitch: 0 }, { yaw: 1, pitch: -1 }, 5)).toEqual({ yaw: 1, pitch: -1 });
   });
+
+  it('snaps onto the target once it is within a ten-thousandth of a radian, so the view comes to rest', () => {
+    expect(dampLook({ yaw: 0.99995, pitch: -0.99995 }, { yaw: 1, pitch: -1 }, 1 / 60)).toEqual({ yaw: 1, pitch: -1 });
+    expect(dampLook({ yaw: 0.999, pitch: 0 }, { yaw: 1, pitch: 0 }, 1 / 60).yaw).toBeCloseTo(0.999154, 6);
+  });
 });
