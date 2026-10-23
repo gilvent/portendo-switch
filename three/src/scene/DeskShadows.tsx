@@ -1,17 +1,6 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import {
-  Color,
-  Mesh,
-  MeshDepthMaterial,
-  PlaneGeometry,
-  ShaderMaterial,
-  WebGLRenderTarget,
-  type Group,
-  type OrthographicCamera,
-} from 'three';
-import { HorizontalBlurShader } from 'three/examples/jsm/shaders/HorizontalBlurShader.js';
-import { VerticalBlurShader } from 'three/examples/jsm/shaders/VerticalBlurShader.js';
+import { Color, MeshDepthMaterial, PlaneGeometry, WebGLRenderTarget, type Group, type OrthographicCamera } from 'three';
 import { useConsole } from '../console/ConsoleProvider';
 import { useRig } from '../rig/RigProvider';
 import { desk } from './Desk';
@@ -21,17 +10,14 @@ const resolution = 512;
 const width = desk.width;
 const height = desk.depth;
 const far = 0.3;
-const blur = 2.2;
 const position: [number, number, number] = [0, layout.deskTop + 0.0008, desk.back + desk.depth / 2];
 
 const depthOutput = 'vec4( vec3( 1.0 - fragCoordZ ), opacity );';
 
 function createPass() {
   const depthTarget = new WebGLRenderTarget(resolution, resolution);
-  const blurTarget = new WebGLRenderTarget(resolution, resolution);
-  depthTarget.texture.generateMipmaps = blurTarget.texture.generateMipmaps = false;
+  depthTarget.texture.generateMipmaps = false;
   const plane = new PlaneGeometry(width, height).rotateX(Math.PI / 2);
-  const blurPlane = new Mesh(plane);
   const depthMaterial = new MeshDepthMaterial({ depthTest: false, depthWrite: false });
   depthMaterial.onBeforeCompile = (shader) => {
     if (!shader.fragmentShader.includes('void main() {') || !shader.fragmentShader.includes(depthOutput)) {
@@ -42,11 +28,7 @@ function createPass() {
       .replace('void main() {', 'uniform vec3 ucolor;\nvoid main() {')
       .replace(depthOutput, 'vec4( ucolor * fragCoordZ * 2.0, 1.0 - fragCoordZ );');
   };
-  const horizontal = { tDiffuse: { value: depthTarget.texture }, h: { value: 0 } };
-  const vertical = { tDiffuse: { value: blurTarget.texture }, v: { value: 0 } };
-  const horizontalBlur = new ShaderMaterial({ ...HorizontalBlurShader, uniforms: horizontal, depthTest: false });
-  const verticalBlur = new ShaderMaterial({ ...VerticalBlurShader, uniforms: vertical, depthTest: false });
-  return { depthTarget, blurTarget, plane, blurPlane, depthMaterial, horizontal, vertical, horizontalBlur, verticalBlur };
+  return { depthTarget, plane, depthMaterial };
 }
 
 export function DeskShadows() {
@@ -66,7 +48,7 @@ export function DeskShadows() {
 
   useEffect(
     () => () => {
-      for (const resource of [pass.depthTarget, pass.blurTarget, pass.plane, pass.depthMaterial, pass.horizontalBlur, pass.verticalBlur]) {
+      for (const resource of [pass.depthTarget, pass.plane, pass.depthMaterial]) {
         resource.dispose();
       }
     },
@@ -79,39 +61,28 @@ export function DeskShadows() {
     if (!looking && !transitioning && !needsRender.current) return;
     needsRender.current = looking || transitioning;
     if (group.current === null || camera.current === null) throw new Error('DeskShadows: shadow plane or camera not mounted');
+    const shadowGroup = group.current;
     const shadowCamera = camera.current;
-
-    const blurOnce = (amount: number) => {
-      pass.blurPlane.visible = true;
-      pass.blurPlane.material = pass.horizontalBlur;
-      pass.horizontal.h.value = amount / 256;
-      gl.setRenderTarget(pass.blurTarget);
-      gl.render(pass.blurPlane, shadowCamera);
-      pass.blurPlane.material = pass.verticalBlur;
-      pass.vertical.v.value = amount / 256;
-      gl.setRenderTarget(pass.depthTarget);
-      gl.render(pass.blurPlane, shadowCamera);
-      pass.blurPlane.visible = false;
-    };
-
     const background = scene.background;
     const overrideMaterial = scene.overrideMaterial;
+    const renderTarget = gl.getRenderTarget();
     gl.getClearColor(clearColor);
     const clearAlpha = gl.getClearAlpha();
-    group.current.visible = false;
-    scene.background = null;
-    scene.overrideMaterial = pass.depthMaterial;
-    gl.setRenderTarget(pass.depthTarget);
-    gl.setClearColor(0x000000, 0);
-    gl.clear();
-    gl.render(scene, shadowCamera);
-    blurOnce(blur);
-    blurOnce(blur * 0.4);
-    gl.setRenderTarget(null);
-    gl.setClearColor(clearColor, clearAlpha);
-    group.current.visible = true;
-    scene.overrideMaterial = overrideMaterial;
-    scene.background = background;
+    try {
+      shadowGroup.visible = false;
+      scene.background = null;
+      scene.overrideMaterial = pass.depthMaterial;
+      gl.setRenderTarget(pass.depthTarget);
+      gl.setClearColor(0x000000, 0);
+      gl.clear();
+      gl.render(scene, shadowCamera);
+    } finally {
+      gl.setRenderTarget(renderTarget);
+      gl.setClearColor(clearColor, clearAlpha);
+      shadowGroup.visible = true;
+      scene.overrideMaterial = overrideMaterial;
+      scene.background = background;
+    }
   });
 
   return (
