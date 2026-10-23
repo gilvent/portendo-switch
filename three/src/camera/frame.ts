@@ -5,7 +5,7 @@ import type { AnchorId, Vec3 } from '../rig/poses';
 export type CameraAnchorId = Extract<AnchorId, 'hand' | 'viewCentre' | 'leftHand' | 'rightHand'>;
 
 const minVerticalFov = 50;
-const maxVerticalFov = 75;
+const maxVerticalFov = 90;
 const minHorizontalFov = 70;
 
 export function verticalFov(aspect: number): number {
