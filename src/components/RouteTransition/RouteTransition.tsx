@@ -6,6 +6,7 @@ import usePreviousState from '@/hooks/usePreviousState.hook';
 import useHomeRouteAnimation from './useHomeRouteTransition.hook';
 import useWorkRouteTransition from './useWorkRouteTransition.hook';
 import devLog from '@/utils/dev-logger';
+import playOnNextTick from '@/utils/gsap/play-on-next-tick';
 // import TransitionContext from '../context/TransitionContext';
 
 const RouteTransition = ({ children }: { children: any }) => {
@@ -33,7 +34,7 @@ const RouteTransition = ({ children }: { children: any }) => {
 
   const transitionConfig: Record<string, any> = {
     [ROUTE_PATH_PATTERNS.HOME]: {
-      onEnter: doneAfterCall(homeRouteTransition.onEnter),
+      onEnter: doneAfterCall(homeRouteTransition.onEnter, playOnNextTick),
       onEntered: () => {
         devLog('[route transition] entered home');
       },
@@ -46,7 +47,7 @@ const RouteTransition = ({ children }: { children: any }) => {
       unmountOnExit: homeRouteTransition.unmountOnExit
     },
     [ROUTE_PATH_PATTERNS.WORK]: {
-      onEnter: doneAfterCall(workRouteTransition.onEnter),
+      onEnter: doneAfterCall(workRouteTransition.onEnter, playOnNextTick),
       onEntered: () => {
         devLog('[route transition] entered work');
       },
@@ -92,13 +93,15 @@ const RouteTransition = ({ children }: { children: any }) => {
     transitionDone.current = done;
   }
 
-  function doneAfterCall(transition: () => gsap.core.Timeline) {
+  function doneAfterCall(
+    transition: () => gsap.core.Timeline,
+    play: (timeline: gsap.core.Timeline) => gsap.core.Timeline = timeline =>
+      timeline.play(0)
+  ) {
     return () => {
-      transition()
-        .play(0)
-        .then(() => {
-          transitionDone.current?.();
-        });
+      play(transition()).then(() => {
+        transitionDone.current?.();
+      });
     };
   }
 

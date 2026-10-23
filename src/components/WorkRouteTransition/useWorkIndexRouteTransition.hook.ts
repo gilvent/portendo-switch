@@ -5,6 +5,7 @@ import { ROUTE_PATH_PATTERNS } from '@/utils/enums';
 import { bounceEnter } from '@/utils/gsap/animation-helpers/work-list-block';
 import useRouteTransitionHelper from './useRouteTransitionHelper.hook';
 import devLog from '@/utils/dev-logger';
+import playOnNextTick from '@/utils/gsap/play-on-next-tick';
 import { createTransitionMeasure } from '@/utils/perf';
 
 function useWorkIndexRouteTransition() {
@@ -28,7 +29,7 @@ function useWorkIndexRouteTransition() {
           measure.end();
         });
       enterAnim.add(bounceEnter(activeBanner.selector).paused(false));
-      enterAnim.play(0);
+      playOnNextTick(enterAnim);
       return;
     } else {
       doneWithoutTransition();
