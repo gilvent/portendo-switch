@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { available, reduce, type ConsoleModel, type ConsoleState, type Edge } from '../console/model';
-import { clickBindings, keyInput, keysFor, type ClickTarget } from './bindings';
+import { clickBindings, clickInput, keyInput, keysFor, type ClickTarget } from './bindings';
 
 const settled = (state: ConsoleState): ConsoleModel => ({
   phase: { kind: 'settled', state },
@@ -109,5 +109,19 @@ describe('clickBindings', () => {
     const input = clickBindings[state][target];
     if (result === unbound) expect(input).toBeUndefined();
     else expect(reduce(settled(state), input!)).toEqual(result);
+  });
+});
+
+describe('clickInput', () => {
+  it('acts on the nearest target the state binds, walking out from the hit mesh', () => {
+    expect(clickInput('onDesk', ['button:a', 'switch'])).toEqual({ type: 'command', command: 'pickUp' });
+    expect(clickInput('focused', ['button:a', 'switch'])).toEqual({ type: 'menu', button: 'a' });
+    expect(clickInput('pickedUp', ['switchScreen', 'switch'])).toEqual({ type: 'command', command: 'focus' });
+  });
+
+  it('does nothing when no target on the path is bound, or nothing was hit', () => {
+    expect(clickInput('focused', ['switchScreen', 'switch'])).toBeUndefined();
+    expect(clickInput('onDesk', ['dock'])).toBeUndefined();
+    expect(clickInput('docked', [])).toBeUndefined();
   });
 });
