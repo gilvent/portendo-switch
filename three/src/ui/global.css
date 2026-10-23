@@ -1,3 +1,9 @@
+:root {
+  --pill: rgba(255, 255, 255, 0.92);
+  --pill-edge: rgba(27, 26, 25, 0.08);
+  --shadow: 0 10px 30px rgba(60, 44, 24, 0.14), 0 2px 6px rgba(60, 44, 24, 0.08);
+}
+
 html,
 body,
 #root {
@@ -6,8 +12,8 @@ body,
 }
 
 body {
-  background: #f3ebdf;
-  color: #1b1a19;
+  background: var(--wall);
+  color: var(--ink);
   font-family: 'Fredoka', system-ui, sans-serif;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
@@ -17,4 +23,153 @@ body {
   position: fixed !important;
   inset: 0;
   touch-action: none;
+}
+
+.hint-strip,
+.touch-bar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 999px;
+  background: var(--pill);
+  border: 1px solid var(--pill-edge);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+  user-select: none;
+  transition: opacity 180ms ease;
+}
+
+.hint-strip[data-dimmed='true'],
+.touch-bar[data-dimmed='true'] {
+  opacity: 0.45;
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 4px;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.hint + .hint {
+  border-left: 1px solid var(--pill-edge);
+  padding-left: 12px;
+}
+
+.key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--button);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.key-drag {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px dashed rgba(27, 26, 25, 0.35);
+  box-shadow: none;
+  font-weight: 500;
+}
+
+.touch-bar {
+  display: none;
+  gap: 8px;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  justify-content: center;
+  border-radius: 28px;
+}
+
+.touch-pill,
+.touch-round {
+  font: inherit;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease;
+}
+
+.touch-pill:active:not(:disabled),
+.touch-round:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.touch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--button);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.touch-pill:has(.touch-round) {
+  padding-left: 6px;
+}
+
+.touch-round {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--button);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.touch-pill .touch-round {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  color: var(--button);
+  box-shadow: none;
+}
+
+.touch-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 6px;
+  font-weight: 500;
+}
+
+.touch-look {
+  padding: 0 10px;
+  font-size: 14px;
+  color: rgba(27, 26, 25, 0.6);
+}
+
+@media (pointer: coarse) {
+  .hint-strip {
+    display: none;
+  }
+
+  .touch-bar {
+    display: flex;
+  }
 }
