@@ -38,13 +38,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
   padding: 8px;
-  border-radius: 999px;
+  border-radius: 28px;
   background: var(--pill);
   border: 1px solid var(--pill-edge);
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
-  white-space: nowrap;
   user-select: none;
   transition: opacity 180ms ease;
 }
@@ -58,6 +59,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
   padding: 4px 12px 4px 4px;
   font-weight: 500;
   font-size: 15px;
@@ -66,6 +68,13 @@ body {
 .hint + .hint {
   border-left: 1px solid var(--pill-edge);
   padding-left: 12px;
+}
+
+@media (max-width: 560px) {
+  .hint + .hint {
+    border-left: none;
+    padding-left: 4px;
+  }
 }
 
 .key {
@@ -95,9 +104,6 @@ body {
 .touch-bar {
   display: none;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-  border-radius: 28px;
 }
 
 .touch-pill,
