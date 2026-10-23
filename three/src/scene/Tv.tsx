@@ -16,7 +16,7 @@ export function Tv() {
   return (
     <group position={[x, 0, 0]}>
       <RoundedBox args={[shell.width, shell.height, shell.depth]} radius={0.04} smoothness={6} position={[0, shellCentreY, shellZ]} castShadow receiveShadow>
-        <meshStandardMaterial color={palette.tvShell} roughness={0.55} />
+        <meshStandardMaterial color={palette.tvShell} roughness={0.8} />
       </RoundedBox>
       <RoundedBox args={[screen.width + 0.02, screen.height + 0.02, 0.008]} radius={0.004} smoothness={4} position={[0, layout.tvScreenCentre[1], shellFront - 0.002]}>
         <meshStandardMaterial color={palette.tvTrim} roughness={0.6} />
