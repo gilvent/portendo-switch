@@ -6,8 +6,7 @@ import { useConsole } from '../console/ConsoleProvider';
 import { exposeDevHandle } from '../dev/devHandle';
 import { lookMode } from '../rig/poses';
 import { useRig } from '../rig/RigProvider';
-import { clickInput } from './bindings';
-import { findTagged, pickTargets, worldCentre } from './picking';
+import { findTagged, pickInput, worldCentre } from './picking';
 import { usePointerIntent } from './usePointerIntent';
 
 export function Interaction() {
@@ -31,7 +30,7 @@ export function Interaction() {
         ((clientX - bounds.left) / bounds.width) * 2 - 1,
         -((clientY - bounds.top) / bounds.height) * 2 + 1,
       );
-      const input = clickInput(settledState, pickTargets(scene, camera, ndc));
+      const input = pickInput(settledState, scene, camera, ndc);
       if (input !== undefined) send(input);
     },
   });

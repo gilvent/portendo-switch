@@ -1,5 +1,6 @@
 import { Box3, Raycaster, Vector2, Vector3, type Camera, type Object3D } from 'three';
-import type { ClickTarget } from './bindings';
+import type { ConsoleState, UserInput } from '../console/model';
+import { clickInput, type ClickTarget } from './bindings';
 
 export function tag(target: ClickTarget): { clickTarget: ClickTarget } {
   return { clickTarget: target };
@@ -9,7 +10,7 @@ function targetOf(object: Object3D): ClickTarget | undefined {
   return (object.userData as { clickTarget?: ClickTarget }).clickTarget;
 }
 
-export function targetsAlong(object: Object3D): ClickTarget[] {
+function targetsAlong(object: Object3D): ClickTarget[] {
   const targets: ClickTarget[] = [];
   for (let current: Object3D | null = object; current !== null; current = current.parent) {
     const target = targetOf(current);
@@ -20,10 +21,21 @@ export function targetsAlong(object: Object3D): ClickTarget[] {
 
 const raycaster = new Raycaster();
 
-export function pickTargets(scene: Object3D, camera: Camera, ndc: Vector2): ClickTarget[] {
+function heldBy(camera: Camera, object: Object3D): boolean {
+  for (let current: Object3D | null = object; current !== null; current = current.parent) {
+    if (current === camera) return true;
+  }
+  return false;
+}
+
+export function pickInput(state: ConsoleState, scene: Object3D, camera: Camera, ndc: Vector2): UserInput | undefined {
   raycaster.setFromCamera(ndc, camera);
-  const [nearest] = raycaster.intersectObject(scene, true);
-  return nearest === undefined ? [] : targetsAlong(nearest.object);
+  for (const hit of raycaster.intersectObject(scene, true)) {
+    const input = clickInput(state, targetsAlong(hit.object));
+    if (input !== undefined) return input;
+    if (!heldBy(camera, hit.object)) return undefined;
+  }
+  return undefined;
 }
 
 export function findTagged(scene: Object3D, target: ClickTarget): Object3D {
