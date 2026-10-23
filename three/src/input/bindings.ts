@@ -53,3 +53,14 @@ export const clickBindings: { [S in ConsoleState]: Partial<Record<ClickTarget, U
     dock: { type: 'command', command: 'undock' },
   },
 };
+
+// A click carries every target from the hit mesh up to the scene root, nearest first, so a press on
+// a Joy-Con button still picks up the Switch in states where the button itself means nothing.
+export function clickInput(state: ConsoleState, targets: readonly ClickTarget[]): UserInput | undefined {
+  const bound = clickBindings[state];
+  for (const target of targets) {
+    const input = bound[target];
+    if (input !== undefined) return input;
+  }
+  return undefined;
+}
