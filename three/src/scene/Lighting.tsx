@@ -1,11 +1,8 @@
-import { ContactShadows, Environment, Lightformer } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import { Mesh, MeshBasicMaterial, Object3D, WebGLRenderTarget, type Group, type SpotLight } from 'three';
-import { useConsole } from '../console/ConsoleProvider';
-import { useRig } from '../rig/RigProvider';
+import { Environment, Lightformer } from '@react-three/drei';
+import { useLayoutEffect, useRef, type ReactNode } from 'react';
+import { Object3D, type Group, type SpotLight } from 'three';
 import { palette } from '../theme/palette';
-import { desk } from './Desk';
+import { DeskShadows } from './DeskShadows';
 import { layout } from './layout';
 
 function Unpickable({ children }: { children: ReactNode }) {
@@ -48,54 +45,6 @@ function LampLight() {
       <object3D ref={target} position={layout.lamp.aim} />
       <pointLight position={layout.lamp.head} color={palette.lampLight} intensity={0.15} distance={1.2} decay={2} />
     </>
-  );
-}
-
-const shadowScale: [number, number] = [desk.width, desk.depth];
-const shadowPosition: [number, number, number] = [0, layout.deskTop + 0.0008, desk.back + desk.depth / 2];
-
-function DeskShadows() {
-  const rig = useRig();
-  const { phase } = useConsole().model;
-  const [looking, setLooking] = useState(false);
-  const gl = useThree((state) => state.gl);
-  const shadows = useRef<Group>(null);
-  const redraw = useRef(true);
-  const continuous = looking || phase.kind === 'transitioning';
-
-  useLayoutEffect(() => {
-    redraw.current = true;
-  });
-
-  useFrame(() => {
-    if (!continuous && !redraw.current) return;
-    redraw.current = false;
-    const plane = shadows.current?.children[0];
-    const target = plane instanceof Mesh && plane.material instanceof MeshBasicMaterial ? plane.material.map?.renderTarget : undefined;
-    if (!(target instanceof WebGLRenderTarget)) throw new Error('DeskShadows: ContactShadows has no shadow plane with a render target');
-    gl.setRenderTarget(target);
-    gl.clear();
-    gl.setRenderTarget(null);
-  }, -1);
-
-  useFrame(() => {
-    const { current, target } = rig.look;
-    const moving = current.yaw !== target.yaw || current.pitch !== target.pitch;
-    if (moving !== looking) setLooking(moving);
-  });
-
-  return (
-    <ContactShadows
-      ref={shadows}
-      position={shadowPosition}
-      scale={shadowScale}
-      resolution={512}
-      far={0.3}
-      blur={2.2}
-      opacity={0.42}
-      color="#5a4330"
-      frames={continuous ? Infinity : 1}
-    />
   );
 }
 
