@@ -169,12 +169,30 @@ describe('available', () => {
     ]);
   });
 
-  it('every offered input changes the model it was offered for', () => {
-    for (const state of ['onDesk', 'pickedUp', 'focused', 'docked'] as const) {
-      const model = settled(state);
-      for (const input of available(model)) {
-        expect(reduce(model, input), `${state} ${JSON.stringify(input)}`).not.toEqual(model);
-      }
-    }
+  it.each([
+    ['onDesk', [{ phase: { kind: 'transitioning', edge: { from: 'onDesk', via: 'pickUp', to: 'pickedUp' } } }]],
+    [
+      'pickedUp',
+      [
+        { phase: { kind: 'transitioning', edge: { from: 'pickedUp', via: 'focus', to: 'focused' } } },
+        { phase: { kind: 'transitioning', edge: { from: 'pickedUp', via: 'dock', to: 'docked' } } },
+      ],
+    ],
+    [
+      'focused',
+      [
+        { menu: 'work' },
+        { menu: 'work' },
+        { joycons: 'neon' },
+        { phase: { kind: 'transitioning', edge: { from: 'focused', via: 'unfocus', to: 'pickedUp' } } },
+        { phase: { kind: 'transitioning', edge: { from: 'focused', via: 'dock', to: 'docked' } } },
+      ],
+    ],
+    ['docked', [{ phase: { kind: 'transitioning', edge: { from: 'docked', via: 'undock', to: 'onDesk' } } }]],
+  ] as const)('each input offered in %s acts there', (state, changes) => {
+    const model = settled(state);
+    expect(available(model).map((input) => reduce(model, input))).toEqual(
+      changes.map((change) => ({ ...model, ...change })),
+    );
   });
 });

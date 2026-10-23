@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { available, reduce, type ConsoleModel, type ConsoleState } from '../console/model';
-import { clickBindings, keyInput, keysFor } from './bindings';
+import { available, reduce, type ConsoleModel, type ConsoleState, type Edge } from '../console/model';
+import { clickBindings, keyInput, keysFor, type ClickTarget } from './bindings';
 
 const settled = (state: ConsoleState): ConsoleModel => ({
   phase: { kind: 'settled', state },
@@ -44,35 +44,70 @@ describe('keysFor', () => {
     expect(keysFor({ type: 'menu', button: 'down' })).toEqual(['ArrowDown']);
   });
 
-  it.each(states)('every input offered in %s has a key', (state) => {
-    for (const input of available(settled(state))) {
-      expect(keysFor(input), JSON.stringify(input)).toHaveLength(1);
-    }
+  it.each([
+    ['onDesk', [['e']]],
+    ['pickedUp', [['f'], ['d']]],
+    ['focused', [['ArrowUp'], ['ArrowDown'], ['a'], ['Escape'], ['d']]],
+    ['docked', [['u']]],
+  ] as const)('gives each input offered in %s exactly one key', (state, keys) => {
+    expect(available(settled(state)).map(keysFor)).toEqual(keys);
   });
 });
 
 describe('clickBindings', () => {
-  it('clicking the Switch on the desk picks it up', () => {
-    expect(reduce(settled('onDesk'), clickBindings.onDesk.switch!).phase).toEqual({
-      kind: 'transitioning',
-      edge: { from: 'onDesk', via: 'pickUp', to: 'pickedUp' },
-    });
+  const unbound = 'unbound' as const;
+  const moving = (edge: Edge): ConsoleModel => ({
+    phase: { kind: 'transitioning', edge },
+    menu: 'home',
+    joycons: 'grey',
   });
 
-  it('clicking the dock while held docks, clicking A while focused cycles colours', () => {
-    expect(reduce(settled('pickedUp'), clickBindings.pickedUp.dock!).phase).toEqual({
-      kind: 'transitioning',
-      edge: { from: 'pickedUp', via: 'dock', to: 'docked' },
-    });
-    expect(reduce(settled('focused'), clickBindings.focused['button:a']!).joycons).toBe('neon');
-  });
+  const expected: { [S in ConsoleState]: Record<ClickTarget, ConsoleModel | typeof unbound> } = {
+    onDesk: {
+      switch: moving({ from: 'onDesk', via: 'pickUp', to: 'pickedUp' }),
+      switchScreen: moving({ from: 'onDesk', via: 'pickUp', to: 'pickedUp' }),
+      dock: unbound,
+      'button:up': unbound,
+      'button:down': unbound,
+      'button:a': unbound,
+      'button:b': unbound,
+    },
+    pickedUp: {
+      switch: moving({ from: 'pickedUp', via: 'focus', to: 'focused' }),
+      switchScreen: moving({ from: 'pickedUp', via: 'focus', to: 'focused' }),
+      dock: moving({ from: 'pickedUp', via: 'dock', to: 'docked' }),
+      'button:up': unbound,
+      'button:down': unbound,
+      'button:a': unbound,
+      'button:b': unbound,
+    },
+    focused: {
+      switch: unbound,
+      switchScreen: unbound,
+      dock: moving({ from: 'focused', via: 'dock', to: 'docked' }),
+      'button:up': { phase: { kind: 'settled', state: 'focused' }, menu: 'work', joycons: 'grey' },
+      'button:down': { phase: { kind: 'settled', state: 'focused' }, menu: 'work', joycons: 'grey' },
+      'button:a': { phase: { kind: 'settled', state: 'focused' }, menu: 'home', joycons: 'neon' },
+      'button:b': { phase: { kind: 'settled', state: 'focused' }, menu: 'home', joycons: 'grey' },
+    },
+    docked: {
+      switch: moving({ from: 'docked', via: 'undock', to: 'onDesk' }),
+      switchScreen: moving({ from: 'docked', via: 'undock', to: 'onDesk' }),
+      dock: moving({ from: 'docked', via: 'undock', to: 'onDesk' }),
+      'button:up': unbound,
+      'button:down': unbound,
+      'button:a': unbound,
+      'button:b': unbound,
+    },
+  };
 
-  it.each(states)('every click bound in %s acts there, except the B button', (state) => {
-    const model = settled(state);
-    for (const [target, input] of Object.entries(clickBindings[state])) {
-      const next = reduce(model, input);
-      if (target === 'button:b') expect(next, target).toBe(model);
-      else expect(next, target).not.toEqual(model);
-    }
+  const rows = states.flatMap((state) =>
+    Object.entries(expected[state]).map(([target, result]) => [state, target as ClickTarget, result] as const),
+  );
+
+  it.each(rows)('in %s, clicking %s gives the expected model', (state, target, result) => {
+    const input = clickBindings[state][target];
+    if (result === unbound) expect(input).toBeUndefined();
+    else expect(reduce(settled(state), input!)).toEqual(result);
   });
 });
