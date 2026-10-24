@@ -8,6 +8,7 @@ declare module 'troika-three-text' {
     font: string;
     fontSize: number;
     color: string;
+    fillOpacity: number;
     anchorX: 'left' | 'center' | 'right';
     anchorY: 'top' | 'middle' | 'bottom';
     readonly textRenderInfo: { blockBounds: [minX: number, minY: number, maxX: number, maxY: number] };
