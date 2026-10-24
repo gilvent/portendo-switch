@@ -1,7 +1,27 @@
 import { useLayoutEffect } from 'react';
 import { useConsole, useFinishTransition } from '../console/ConsoleProvider';
-import { applyPose } from '../rig/rig';
+import type { Edge } from '../console/model';
+import { applyPose, type ConsoleRig } from '../rig/rig';
 import { useRig } from '../rig/RigProvider';
+import { edgeKey, timelines } from './timelines';
+
+export type Playback = {
+  eventCallback(type: 'onComplete', callback: () => void): unknown;
+  play(): unknown;
+  kill(): unknown;
+};
+
+export function startTransition(rig: ConsoleRig, edge: Edge, build: (rig: ConsoleRig) => Playback, finish: (edge: Edge) => void): () => void {
+  const playback = build(rig);
+  playback.eventCallback('onComplete', () => {
+    applyPose(rig, edge.to);
+    finish(edge);
+  });
+  playback.play();
+  return () => {
+    playback.kill();
+  };
+}
 
 export function useTransitionDirector() {
   const { model } = useConsole();
@@ -14,7 +34,6 @@ export function useTransitionDirector() {
       applyPose(rig, phase.state);
       return;
     }
-    applyPose(rig, phase.edge.to);
-    finishTransition(phase.edge);
+    return startTransition(rig, phase.edge, timelines[edgeKey(phase.edge)], finishTransition);
   }, [phase, rig, finishTransition]);
 }

@@ -1,16 +1,11 @@
 import { PerspectiveCamera } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import { Vector3, type PerspectiveCamera as PerspectiveCameraImpl } from 'three';
+import type { PerspectiveCamera as PerspectiveCameraImpl } from 'three';
 import { useRig } from '../rig/RigProvider';
 import { layout } from '../scene/layout';
 import { cameraAnchors, verticalFov } from './frame';
-import { dampLook } from './look';
-
-const seat = new Vector3(...layout.seat);
-const toScreen = new Vector3(...layout.tvScreenCentre).sub(seat);
-const neutralYaw = Math.atan2(-toScreen.x, -toScreen.z);
-const neutralPitch = Math.atan2(toScreen.y, Math.hypot(toScreen.x, toScreen.z));
+import { dampLook, neutralAim } from './look';
 
 export function CameraRig() {
   const rig = useRig();
@@ -22,7 +17,7 @@ export function CameraRig() {
     if (camera.current === null) return;
     const current = dampLook(rig.look.current, rig.look.target, delta);
     Object.assign(rig.look.current, current);
-    camera.current.rotation.set(neutralPitch + current.pitch, neutralYaw + current.yaw, 0, 'YXZ');
+    camera.current.rotation.set(neutralAim.pitch + current.pitch, neutralAim.yaw + current.yaw, 0, 'YXZ');
   });
 
   return (

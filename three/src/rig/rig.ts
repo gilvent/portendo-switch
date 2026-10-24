@@ -18,12 +18,19 @@ export type ConsoleRig = {
   screenPower: { value: number };
   ledPower: { value: number };
   tvInput: { mix: number };
+  loading: Loading;
 };
+
+export type Loading = { guide: number; bar: number; progress: number };
+
+export const loadingRest: Readonly<Loading> = { guide: 1, bar: 0, progress: 0 };
 
 const named = <T extends Object3D>(object: T, name: string): T => {
   object.name = name;
   return object;
 };
+
+export const fixtures = ['body', 'screen', 'dockFront', 'dockBack', 'led'] as const;
 
 const anchorIds = ['desk', 'dockSlot', 'hand', 'viewCentre', 'leftHand', 'rightHand', 'rails'] as const satisfies readonly AnchorId[];
 
@@ -46,6 +53,7 @@ export function createRig(): ConsoleRig {
     screenPower: { value: 0 },
     ledPower: { value: 0 },
     tvInput: { mix: 0 },
+    loading: { ...loadingRest },
   };
 }
 
@@ -57,11 +65,19 @@ export function applyPose(rig: ConsoleRig, state: ConsoleState): void {
     rig.anchors[anchor].add(object);
     object.position.set(...position);
     object.rotation.set(...rotation);
+    object.scale.setScalar(1);
+  }
+  for (const fixture of fixtures) {
+    const object = rig[fixture];
+    object.position.set(0, 0, 0);
+    object.rotation.set(0, 0, 0);
+    object.scale.setScalar(1);
   }
   const { screenPower, ledPower, tvInput } = statePose.signals;
   rig.screenPower.value = screenPower;
   rig.ledPower.value = ledPower;
   rig.tvInput.mix = tvMix[tvInput];
+  Object.assign(rig.loading, loadingRest);
   if (statePose.camera === 'neutral') {
     Object.assign(rig.look.target, neutralLook);
     Object.assign(rig.look.current, neutralLook);

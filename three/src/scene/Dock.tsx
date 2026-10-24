@@ -11,7 +11,7 @@ import { beveledSlab } from './shapes';
 const width = 0.142;
 const wallDepth = 0.03;
 const slotGap = 0.024;
-const baseHeight = 0.04;
+const baseHeight = layout.dock.slotHeight;
 const front = { height: 0.08, z: slotGap / 2 + wallDepth / 2 };
 const back = { height: 0.11, z: -(slotGap / 2 + wallDepth / 2) };
 const frontFaceZ = front.z + wallDepth / 2;
@@ -52,8 +52,8 @@ export function Dock() {
           />
         </Suspense>
       </primitive>
-      <primitive object={rig.led} position={[-width / 2 + 0.014, 0.011, frontFaceZ]}>
-        <RoundedBox args={[0.009, 0.0035, 0.002]} radius={0.0008} smoothness={2}>
+      <primitive object={rig.led}>
+        <RoundedBox args={[0.009, 0.0035, 0.002]} radius={0.0008} smoothness={2} position={[-width / 2 + 0.014, 0.011, frontFaceZ]}>
           <meshStandardMaterial ref={ledMaterial} color={palette.ledOff} emissive={palette.led} emissiveIntensity={0} roughness={0.4} toneMapped={false} />
         </RoundedBox>
       </primitive>

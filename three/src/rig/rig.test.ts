@@ -63,4 +63,46 @@ describe('applyPose', () => {
     applyPose(rig, 'onDesk');
     expect(signals()).toEqual({ screen: 1, led: 0, tvMix: 0 });
   });
+
+  it('snaps every scale, fixture transform, signal and loading value back to the destination after a tween left them anywhere', () => {
+    const rig = createRig();
+    applyPose(rig, 'focused');
+    for (const object of [rig.console, rig.leftJoycon, rig.rightJoycon, rig.body, rig.screen, rig.dockFront, rig.dockBack, rig.led]) {
+      object.position.set(0.3, -0.2, 0.1);
+      object.rotation.set(0.4, 0.5, 0.6);
+      object.scale.set(0.8, 1.3, 0.9);
+    }
+    rig.screenPower.value = 0.37;
+    rig.ledPower.value = 0.61;
+    rig.tvInput.mix = 0.52;
+    Object.assign(rig.loading, { guide: 0.2, bar: 0.7, progress: 0.4 });
+    applyPose(rig, 'docked');
+    const transform = (object: ConsoleRig['body']) => ({
+      position: object.position.toArray().map((n) => Number(n.toFixed(4))),
+      rotation: object.rotation.toArray().slice(0, 3).map((n) => Number((n as number).toFixed(2))),
+      scale: object.scale.toArray(),
+    });
+    const rest = { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] };
+    expect({
+      console: transform(rig.console),
+      leftJoycon: transform(rig.leftJoycon),
+      body: transform(rig.body),
+      screen: transform(rig.screen),
+      dockFront: transform(rig.dockFront),
+      dockBack: transform(rig.dockBack),
+      led: transform(rig.led),
+      signals: { screen: rig.screenPower.value, led: rig.ledPower.value, tvMix: rig.tvInput.mix },
+      loading: rig.loading,
+    }).toEqual({
+      console: { position: [0, 0.0535, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
+      leftJoycon: { position: [0, 0, 0], rotation: [0.2, 0.25, 0.26], scale: [1, 1, 1] },
+      body: rest,
+      screen: rest,
+      dockFront: rest,
+      dockBack: rest,
+      led: rest,
+      signals: { screen: 0, led: 1, tvMix: 1 },
+      loading: { guide: 1, bar: 0, progress: 0 },
+    });
+  });
 });
