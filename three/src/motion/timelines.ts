@@ -25,6 +25,9 @@ export const edgeSeconds = {
 const joycons = ['leftJoycon', 'rightJoycon'] as const satisfies readonly JoyconPart[];
 const dockBeats = { squashY: 0.9, popScale: 1.06 } as const;
 
+const cameraReturn = { dockSeconds: 0.8, undockSeconds: 0.75, settleSeconds: 0.4 } as const;
+const dockSequenceSeconds = edgeSeconds['pickedUp-dock'];
+
 const paused = () => gsap.timeline({ paused: true });
 
 function joyconsTo(timeline: gsap.core.Timeline, rig: ConsoleRig, placements: Record<JoyconPart, Placement>, tween: { duration: number; ease: Ease }, at: number) {
@@ -39,7 +42,6 @@ function dockFrom(timeline: gsap.core.Timeline, rig: ConsoleRig, start: number):
   timeline.to(rig.loading, { bar: 1, duration: 0.5, ease: 'power1.out' }, at(0.5));
   timeline.to(rig.loading, { progress: 1, duration: 0.5, ease: 'power1.out' }, at(1));
   timeline.to(rig.loading, { bar: 0, duration: 0.5, ease: 'power1.out' }, at(1.5));
-  // The console stays in hand while the camera turns, so the loading bar reads at full size before it flies to the dock.
   move(timeline, rig, rig.console, waypoints.dockHover, { duration: 0.9, ease: 'power2.inOut' }, at(1.1));
   joyconsTo(timeline, rig, joyconWaypoints.hop, { duration: 0.25, ease: 'back.out' }, at(2));
   joyconsTo(timeline, rig, joyconWaypoints.swing, { duration: 0.25, ease: 'power2.out' }, at(2.15));
@@ -52,9 +54,8 @@ function dockFrom(timeline: gsap.core.Timeline, rig: ConsoleRig, start: number):
   timeline.to(rig.screenPower, { value: dock.signals.screenPower, duration: 0.5, ease: 'power1.out' }, at(2.9));
   timeline.to(rig.ledPower, { value: dock.signals.ledPower, duration: 0.5, ease: 'power1.out' }, at(2.9));
   timeline.to(rig.tvInput, { mix: tvMix[dock.signals.tvInput], duration: 0.5, ease: 'power1.out' }, at(2.9));
-  // The screen is dark from here, so the guide row comes back unseen and is ready when the console undocks.
   timeline.set(rig.loading, { ...loadingRest }, at(3.4));
-  timeline.to(rig.look.target, { ...neutralLook, duration: 0.8, ease: 'power2.inOut' }, at(3.4));
+  timeline.to(rig.look.target, { ...neutralLook, duration: cameraReturn.dockSeconds, ease: 'power2.inOut' }, at(dockSequenceSeconds - cameraReturn.settleSeconds - cameraReturn.dockSeconds));
   joyconsTo(timeline, rig, dock, { duration: 0.5, ease: 'back.out' }, at(4.1));
   return timeline;
 }
@@ -75,9 +76,7 @@ function undock(rig: ConsoleRig): gsap.core.Timeline {
   joyconsTo(timeline, rig, joyconWaypoints.swing, { duration: 0.3, ease: 'power2.inOut' }, 1.5);
   joyconsTo(timeline, rig, desk, { duration: 0.2, ease: 'power2.out' }, 1.8);
   move(timeline, rig, rig.console, waypoints.dockHover, { duration: 0.75, ease: 'back.out' }, 2);
-  // Ends before the timeline does so the damped camera has caught up when the final snap lands.
-  timeline.to(rig.look.target, { ...neutralLook, duration: 0.75, ease: 'power2.inOut' }, 2.35);
-  // A back.out overshoot here would sink the console through the desk, so it lands without one.
+  timeline.to(rig.look.target, { ...neutralLook, duration: cameraReturn.undockSeconds, ease: 'power2.inOut' }, edgeSeconds['docked-undock'] - cameraReturn.settleSeconds - cameraReturn.undockSeconds);
   move(timeline, rig, rig.console, waypoints.deskLift, { duration: 0.5, ease: 'power2.inOut' }, 2.75);
   move(timeline, rig, rig.console, desk.console, { duration: 0.25, ease: 'power2.out' }, 3.25);
   return timeline;

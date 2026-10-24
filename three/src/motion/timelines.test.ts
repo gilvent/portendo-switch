@@ -161,6 +161,19 @@ describe('timelines', () => {
     expect({ metres: largest.metres < 0.1, degrees: largest.degrees < 16, largest }).toMatchObject({ metres: true, degrees: true });
   });
 
+  it('never lowers the console below its resting height on the desk while undocking', () => {
+    const edge = allEdges.find((candidate) => candidate.from === 'docked')!;
+    const rig = rigAt(edge);
+    const timeline = build(edge, rig);
+    const rest = poses.onDesk.console.position[1];
+    let lowest = Infinity;
+    for (let frame = 0; frame <= Math.ceil(timeline.duration() * 60); frame++) {
+      timeline.time(Math.min(frame / 60, timeline.duration()));
+      if (rig.console.parent === rig.anchors.desk) lowest = Math.min(lowest, rig.console.position.y);
+    }
+    expect(lowest).toBeGreaterThanOrEqual(rest - 1e-4);
+  });
+
   it('builds paused, so the director decides when it plays', () => {
     for (const edge of allEdges) expect(build(edge, rigAt(edge)).paused()).toBe(true);
   });

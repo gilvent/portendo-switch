@@ -32,11 +32,6 @@ export function move(
       onUpdate(this: gsap.core.Tween) {
         // gsap updates at local time 0 without calling onStart, before the start transform is captured.
         if (this.progress() === 0) return;
-        if (this.progress() === 1) {
-          object.position.copy(toPosition);
-          object.rotation.set(...placement.rotation);
-          return;
-        }
         object.position.lerpVectors(fromPosition, toPosition, eased.ratio);
         object.quaternion.slerpQuaternions(fromQuaternion, toQuaternion, eased.ratio);
       },
