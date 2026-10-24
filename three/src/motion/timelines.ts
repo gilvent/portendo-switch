@@ -39,7 +39,8 @@ function dockFrom(timeline: gsap.core.Timeline, rig: ConsoleRig, start: number):
   timeline.to(rig.loading, { bar: 1, duration: 0.5, ease: 'power1.out' }, at(0.5));
   timeline.to(rig.loading, { progress: 1, duration: 0.5, ease: 'power1.out' }, at(1));
   timeline.to(rig.loading, { bar: 0, duration: 0.5, ease: 'power1.out' }, at(1.5));
-  move(timeline, rig, rig.console, waypoints.dockHover, { duration: 1.4, ease: 'power2.inOut' }, at(0.2));
+  // The console stays in hand while the camera turns, so the loading bar reads at full size before it flies to the dock.
+  move(timeline, rig, rig.console, waypoints.dockHover, { duration: 0.9, ease: 'power2.inOut' }, at(1.1));
   joyconsTo(timeline, rig, joyconWaypoints.hop, { duration: 0.25, ease: 'back.out' }, at(2));
   joyconsTo(timeline, rig, joyconWaypoints.swing, { duration: 0.25, ease: 'power2.out' }, at(2.15));
   joyconsTo(timeline, rig, joyconWaypoints.preTilt, { duration: 0.5, ease: 'power2.inOut' }, at(2.4));
