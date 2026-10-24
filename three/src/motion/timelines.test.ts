@@ -1,4 +1,8 @@
+import { Object3D, Quaternion, Vector3 } from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
+import { cameraAnchors } from '../camera/frame';
+import { neutralAim } from '../camera/look';
+import { layout } from '../scene/layout';
 import { edges, type ConsoleState, type Edge } from '../console/model';
 import { poses } from '../rig/poses';
 import { applyPose, createRig, fixtures, type ConsoleRig } from '../rig/rig';
@@ -98,6 +102,63 @@ describe('timelines', () => {
     const ended = read(rig);
     applyPose(rig, edge.to);
     expect(differences(ended, read(rig))).toEqual([]);
+  });
+
+  it.each(allEdges.map((edge) => [edgeKey(edge), edge] as const))('lands %s on the destination when killed halfway and rebuilt from wherever the parts stopped', (_, edge) => {
+    const rig = rigAt(edge);
+    const interrupted = build(edge, rig);
+    interrupted.progress(0.5);
+    interrupted.kill();
+    build(edge, rig).progress(1);
+    const ended = read(rig);
+    applyPose(rig, edge.to);
+    expect(differences(ended, read(rig))).toEqual([]);
+  });
+
+  it.each(allEdges.map((edge) => [edgeKey(edge), edge] as const))('moves every part of %s through the staged room without a jump between frames', (_, edge) => {
+    const rig = rigAt(edge);
+    const room = new Object3D();
+    const camera = new Object3D();
+    camera.position.set(...layout.seat);
+    room.add(camera);
+    const anchorPositions = cameraAnchors(16 / 9);
+    for (const id of ['hand', 'viewCentre', 'leftHand', 'rightHand'] as const) {
+      camera.add(rig.anchors[id]);
+      rig.anchors[id].position.set(...anchorPositions[id]);
+    }
+    rig.anchors.desk.position.set(...layout.switchRest);
+    room.add(rig.anchors.desk);
+    const dock = new Object3D();
+    dock.position.set(...layout.dock.position);
+    dock.rotation.y = layout.dock.yaw;
+    rig.anchors.dockSlot.position.y = layout.dock.slotHeight;
+    dock.add(rig.anchors.dockSlot);
+    room.add(dock);
+    const aimCamera = () => {
+      camera.rotation.set(neutralAim.pitch + rig.look.target.pitch, neutralAim.yaw + rig.look.target.yaw, 0, 'YXZ');
+      room.updateMatrixWorld(true);
+    };
+    aimCamera();
+    applyPose(rig, edge.from);
+    const timeline = build(edge, rig);
+    const parts = [rig.console, rig.leftJoycon, rig.rightJoycon];
+    const world = () => parts.map((part) => ({ position: part.getWorldPosition(new Vector3()), quaternion: part.getWorldQuaternion(new Quaternion()) }));
+    let previous = world();
+    const largest = { metres: 0, metresAt: '', degrees: 0, degreesAt: '' };
+    for (let frame = 1; frame <= Math.ceil(timeline.duration() * 60); frame += 1) {
+      timeline.time(Math.min(frame / 60, timeline.duration()));
+      aimCamera();
+      const current = world();
+      current.forEach((sample, index) => {
+        const before = previous[index]!;
+        const metres = sample.position.distanceTo(before.position);
+        const degrees = (sample.quaternion.angleTo(before.quaternion) * 180) / Math.PI;
+        if (metres > largest.metres) Object.assign(largest, { metres, metresAt: `${parts[index]!.name} ${frame}` });
+        if (degrees > largest.degrees) Object.assign(largest, { degrees, degreesAt: `${parts[index]!.name} ${frame}` });
+      });
+      previous = current;
+    }
+    expect({ metres: largest.metres < 0.1, degrees: largest.degrees < 16, largest }).toMatchObject({ metres: true, degrees: true });
   });
 
   it('builds paused, so the director decides when it plays', () => {
