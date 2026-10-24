@@ -1,4 +1,13 @@
 import { RoundedBox } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useMemo } from 'react';
+import { useConsole } from '../console/ConsoleProvider';
+import { useRig } from '../rig/RigProvider';
+import { ConsoleScreen, consoleScreenSize } from '../screens/ConsoleScreen';
+import { useDisplayMaterial } from '../screens/display';
+import { HomeScreen } from '../screens/HomeScreen';
+import { referenceSize } from '../screens/homeLayout';
+import { useScreenTexture } from '../screens/useScreenTexture';
 import { palette } from '../theme/palette';
 import { layout } from './layout';
 import { roundedDisc } from './shapes';
@@ -8,8 +17,21 @@ const shell = { width: 0.76, height: 0.47, depth: 0.08 };
 const shellCentreY = layout.tvScreenCentre[1] - 0.012;
 const neckHeight = shellCentreY - shell.height / 2 - layout.deskTop;
 const footGeometry = roundedDisc(0.13, 0.014, 0.006, 48);
+const screenAspect = screen.width / screen.height;
+const homeSize = [referenceSize[1] * screenAspect, referenceSize[1]] as const;
+const tvConsoleContentSize = consoleScreenSize(screenAspect);
+const homeContent = <HomeScreen size={homeSize} />;
 
 export function Tv() {
+  const rig = useRig();
+  const { model } = useConsole();
+  const home = useScreenTexture(homeContent, homeSize, 'tvHome');
+  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={tvConsoleContentSize} />, [model.menu]);
+  const menu = useScreenTexture(menuContent, tvConsoleContentSize, 'tvConsole');
+  const display = useDisplayMaterial(home.texture, menu.texture);
+  useFrame(() => {
+    display.uniforms.inputMix.value = rig.tvInput.mix;
+  });
   const [x, , z] = layout.tvScreenCentre;
   const shellFront = z - 0.002;
   const shellZ = shellFront - shell.depth / 2;
@@ -21,9 +43,10 @@ export function Tv() {
       <RoundedBox args={[screen.width + 0.02, screen.height + 0.02, 0.008]} radius={0.004} smoothness={4} position={[0, layout.tvScreenCentre[1], shellFront - 0.002]}>
         <meshStandardMaterial color={palette.tvTrim} roughness={0.6} />
       </RoundedBox>
-      <mesh position={[0, layout.tvScreenCentre[1], shellFront + 0.0026]}>
+      {home.portal}
+      {menu.portal}
+      <mesh position={[0, layout.tvScreenCentre[1], shellFront + 0.0026]} material={display.material}>
         <planeGeometry args={[screen.width, screen.height]} />
-        <meshStandardMaterial color={palette.glass} roughness={0.32} envMapIntensity={0.5} />
       </mesh>
       <mesh position={[0.31, shellCentreY - shell.height / 2 + 0.022, shellFront + 0.0005]}>
         <circleGeometry args={[0.005, 20]} />

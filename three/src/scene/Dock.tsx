@@ -1,5 +1,7 @@
 import { RoundedBox, Svg } from '@react-three/drei';
-import { Suspense } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Suspense, useRef } from 'react';
+import type { MeshStandardMaterial } from 'three';
 import { tag } from '../input/picking';
 import { useRig } from '../rig/RigProvider';
 import { palette } from '../theme/palette';
@@ -15,12 +17,18 @@ const back = { height: 0.11, z: -(slotGap / 2 + wallDepth / 2) };
 const frontFaceZ = front.z + wallDepth / 2;
 const logoSize = 0.028;
 const logoViewBox = 700;
+const ledGlow = 4;
 
 const frontGeometry = beveledSlab(width, front.height, wallDepth, { topLeft: 0.01, topRight: 0.01, bottomLeft: 0.004, bottomRight: 0.004 }, 0.004);
 const backGeometry = beveledSlab(width, back.height, wallDepth, { topLeft: 0.012, topRight: 0.012, bottomLeft: 0.004, bottomRight: 0.004 }, 0.004);
 
 export function Dock() {
   const rig = useRig();
+  const ledMaterial = useRef<MeshStandardMaterial>(null);
+  useFrame(() => {
+    if (ledMaterial.current === null) throw new Error('Dock: LED material is not mounted');
+    ledMaterial.current.emissiveIntensity = rig.ledPower.value * ledGlow;
+  });
   return (
     <group position={layout.dock.position} rotation={[0, layout.dock.yaw, 0]} userData={tag('dock')}>
       <primitive object={rig.dockBack}>
@@ -46,7 +54,7 @@ export function Dock() {
       </primitive>
       <primitive object={rig.led} position={[-width / 2 + 0.014, 0.011, frontFaceZ]}>
         <RoundedBox args={[0.009, 0.0035, 0.002]} radius={0.0008} smoothness={2}>
-          <meshStandardMaterial color={palette.ledOff} roughness={0.4} />
+          <meshStandardMaterial ref={ledMaterial} color={palette.ledOff} emissive={palette.led} emissiveIntensity={0} roughness={0.4} toneMapped={false} />
         </RoundedBox>
       </primitive>
       <primitive object={rig.anchors.dockSlot} position={[0, baseHeight, 0]} />

@@ -1,13 +1,14 @@
 import { Text } from '@react-three/drei';
 import { createPortal } from '@react-three/fiber';
-import fredokaUrl from '@fontsource/fredoka/files/fredoka-latin-500-normal.woff?url';
-import { Suspense, useMemo } from 'react';
+import { Suspense, use, useMemo } from 'react';
 import { Color, Shape, ShapeGeometry } from 'three';
 import { useConsole } from '../console/ConsoleProvider';
 import type { MenuButton } from '../console/model';
 import { tag } from '../input/picking';
 import { consoleSize } from '../rig/dimensions';
 import { useRig } from '../rig/RigProvider';
+import { joyconLetters } from '../screens/consoleText';
+import { screenAssets } from '../screens/screenAssets';
 import { joyconSets, palette } from '../theme/palette';
 import { beveledSlab, roundedDisc } from './shapes';
 
@@ -47,14 +48,15 @@ const buttons: Record<Side, readonly ButtonSpec[]> = {
     { id: 'down', y: -buttonOffsetY, glyph: { kind: 'arrow', direction: 'down' } },
   ],
   right: [
-    { id: 'a', y: buttonOffsetY, glyph: { kind: 'letter', text: 'A' } },
-    { id: 'b', y: -buttonOffsetY, glyph: { kind: 'letter', text: 'B' } },
+    { id: 'a', y: buttonOffsetY, glyph: { kind: 'letter', text: joyconLetters.a } },
+    { id: 'b', y: -buttonOffsetY, glyph: { kind: 'letter', text: joyconLetters.b } },
   ],
 };
 
 export function Joycon({ side }: { side: Side }) {
   const rig = useRig();
   const { model } = useConsole();
+  const { fonts } = use(screenAssets());
   const colour = joyconSets[model.joycons][side];
   const railColour = useMemo(() => new Color(colour).multiplyScalar(0.62), [colour]);
   const inward = side === 'left' ? 1 : -1;
@@ -87,7 +89,7 @@ export function Joycon({ side }: { side: Side }) {
           ) : (
             <Suspense fallback={null}>
               <Text
-                font={fredokaUrl}
+                font={fonts.fredoka500}
                 fontSize={0.0115}
                 color={palette.buttonLabel}
                 anchorX="center"

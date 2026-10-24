@@ -52,4 +52,15 @@ describe('applyPose', () => {
     applyPose(rig, 'docked');
     expect(rig.look).toEqual({ target: { yaw: 0, pitch: 0 }, current: { yaw: 0, pitch: 0 } });
   });
+
+  it('powers the screen down, lights the LED and switches the TV to the console in the dock, and back on undock', () => {
+    const rig = createRig();
+    const signals = () => ({ screen: rig.screenPower.value, led: rig.ledPower.value, tvMix: rig.tvInput.mix });
+    applyPose(rig, 'focused');
+    expect(signals()).toEqual({ screen: 1, led: 0, tvMix: 0 });
+    applyPose(rig, 'docked');
+    expect(signals()).toEqual({ screen: 0, led: 1, tvMix: 1 });
+    applyPose(rig, 'onDesk');
+    expect(signals()).toEqual({ screen: 1, led: 0, tvMix: 0 });
+  });
 });

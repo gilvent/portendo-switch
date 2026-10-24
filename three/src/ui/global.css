@@ -22,6 +22,24 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.app-status {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  padding: 0 24px;
+  box-sizing: border-box;
+  font-weight: 500;
+  font-size: 15px;
+  text-align: center;
+  color: rgba(27, 26, 25, 0.6);
+}
+
+.app-status-error {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
 .hint-strip,
 .touch-bar {
   position: fixed;

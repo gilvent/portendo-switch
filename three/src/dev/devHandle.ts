@@ -5,6 +5,7 @@ export type DevHandle = {
   model(): ConsoleModel;
   screenPoint(target: ClickTarget): { x: number; y: number };
   setLook(yawDegrees: number, pitchDegrees: number): void;
+  screenRenders(): Record<string, number>;
 };
 
 declare global {

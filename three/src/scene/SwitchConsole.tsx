@@ -1,15 +1,28 @@
 import { RoundedBox } from '@react-three/drei';
-import { createPortal } from '@react-three/fiber';
+import { createPortal, useFrame } from '@react-three/fiber';
+import { useMemo } from 'react';
+import { useConsole } from '../console/ConsoleProvider';
 import { tag } from '../input/picking';
 import { consoleSize } from '../rig/dimensions';
 import { useRig } from '../rig/RigProvider';
+import { ConsoleScreen, consoleScreenSize } from '../screens/ConsoleScreen';
+import { useDisplayMaterial } from '../screens/display';
+import { useScreenTexture } from '../screens/useScreenTexture';
 import { palette } from '../theme/palette';
 
 const { body } = consoleSize;
 const screenSize = { width: body.width * 0.76, height: body.height * 0.74 };
+const contentSize = consoleScreenSize(screenSize.width / screenSize.height);
 
 export function SwitchConsole() {
   const rig = useRig();
+  const { model } = useConsole();
+  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={contentSize} />, [model.menu]);
+  const menu = useScreenTexture(menuContent, contentSize, 'switch');
+  const display = useDisplayMaterial(menu.texture, menu.texture);
+  useFrame(() => {
+    display.uniforms.power.value = rig.screenPower.value;
+  });
   return createPortal(
     <>
       <primitive object={rig.body}>
@@ -18,11 +31,11 @@ export function SwitchConsole() {
         </RoundedBox>
       </primitive>
       <primitive object={rig.screen} userData={tag('switchScreen')} position={[0, 0, body.depth / 2 + 0.0004]}>
-        <mesh>
+        <mesh material={display.material}>
           <planeGeometry args={[screenSize.width, screenSize.height]} />
-          <meshStandardMaterial color={palette.glass} roughness={0.35} envMapIntensity={0.35} />
         </mesh>
       </primitive>
+      {menu.portal}
     </>,
     rig.console,
   );
