@@ -17,7 +17,7 @@ const contentSize = consoleScreenSize(screenSize.width / screenSize.height);
 export function SwitchConsole() {
   const rig = useRig();
   const { model } = useConsole();
-  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={contentSize} />, [model.menu]);
+  const menuContent = useMemo(() => <ConsoleScreen page={model.menu} size={contentSize} loading={rig.loading} />, [model.menu, rig.loading]);
   const menu = useScreenTexture(menuContent, contentSize, 'switch');
   const display = useDisplayMaterial(menu.texture, menu.texture);
   useFrame(() => {

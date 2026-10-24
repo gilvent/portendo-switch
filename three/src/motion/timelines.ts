@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { dockLook, neutralLook } from '../camera/look';
 import type { Edge } from '../console/model';
 import { poses, tvMix, type Placement } from '../rig/poses';
-import type { ConsoleRig } from '../rig/rig';
+import { loadingRest, type ConsoleRig } from '../rig/rig';
 import { move, type Ease } from './move';
 import { joyconWaypoints, waypoints, type JoyconPart } from './waypoints';
 
@@ -35,6 +35,10 @@ function dockFrom(timeline: gsap.core.Timeline, rig: ConsoleRig, start: number):
   const at = (seconds: number) => start + seconds;
   const dock = poses.docked;
   timeline.to(rig.look.target, { ...dockLook, duration: 1, ease: 'power2.inOut' }, at(0));
+  timeline.to(rig.loading, { guide: 0, duration: 0.5, ease: 'power1.out' }, at(0));
+  timeline.to(rig.loading, { bar: 1, duration: 0.5, ease: 'power1.out' }, at(0.5));
+  timeline.to(rig.loading, { progress: 1, duration: 0.5, ease: 'power1.out' }, at(1));
+  timeline.to(rig.loading, { bar: 0, duration: 0.5, ease: 'power1.out' }, at(1.5));
   move(timeline, rig, rig.console, waypoints.dockHover, { duration: 1.4, ease: 'power2.inOut' }, at(0.2));
   joyconsTo(timeline, rig, joyconWaypoints.hop, { duration: 0.25, ease: 'back.out' }, at(2));
   joyconsTo(timeline, rig, joyconWaypoints.swing, { duration: 0.25, ease: 'power2.out' }, at(2.15));
@@ -47,6 +51,8 @@ function dockFrom(timeline: gsap.core.Timeline, rig: ConsoleRig, start: number):
   timeline.to(rig.screenPower, { value: dock.signals.screenPower, duration: 0.5, ease: 'power1.out' }, at(2.9));
   timeline.to(rig.ledPower, { value: dock.signals.ledPower, duration: 0.5, ease: 'power1.out' }, at(2.9));
   timeline.to(rig.tvInput, { mix: tvMix[dock.signals.tvInput], duration: 0.5, ease: 'power1.out' }, at(2.9));
+  // The screen is dark from here, so the guide row comes back unseen and is ready when the console undocks.
+  timeline.set(rig.loading, { ...loadingRest }, at(3.4));
   timeline.to(rig.look.target, { ...neutralLook, duration: 0.8, ease: 'power2.inOut' }, at(3.4));
   joyconsTo(timeline, rig, dock, { duration: 0.5, ease: 'back.out' }, at(4.1));
   return timeline;
