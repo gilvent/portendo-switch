@@ -52,8 +52,8 @@ export function Dock() {
           />
         </Suspense>
       </primitive>
-      <primitive object={rig.led} position={[-width / 2 + 0.014, 0.011, frontFaceZ]}>
-        <RoundedBox args={[0.009, 0.0035, 0.002]} radius={0.0008} smoothness={2}>
+      <primitive object={rig.led}>
+        <RoundedBox args={[0.009, 0.0035, 0.002]} radius={0.0008} smoothness={2} position={[-width / 2 + 0.014, 0.011, frontFaceZ]}>
           <meshStandardMaterial ref={ledMaterial} color={palette.ledOff} emissive={palette.led} emissiveIntensity={0} roughness={0.4} toneMapped={false} />
         </RoundedBox>
       </primitive>

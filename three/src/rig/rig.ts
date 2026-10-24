@@ -25,6 +25,8 @@ const named = <T extends Object3D>(object: T, name: string): T => {
   return object;
 };
 
+export const fixtures = ['body', 'screen', 'dockFront', 'dockBack', 'led'] as const;
+
 const anchorIds = ['desk', 'dockSlot', 'hand', 'viewCentre', 'leftHand', 'rightHand', 'rails'] as const satisfies readonly AnchorId[];
 
 export function createRig(): ConsoleRig {
@@ -57,6 +59,13 @@ export function applyPose(rig: ConsoleRig, state: ConsoleState): void {
     rig.anchors[anchor].add(object);
     object.position.set(...position);
     object.rotation.set(...rotation);
+    object.scale.setScalar(1);
+  }
+  for (const fixture of fixtures) {
+    const object = rig[fixture];
+    object.position.set(0, 0, 0);
+    object.rotation.set(0, 0, 0);
+    object.scale.setScalar(1);
   }
   const { screenPower, ledPower, tvInput } = statePose.signals;
   rig.screenPower.value = screenPower;

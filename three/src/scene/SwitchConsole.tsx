@@ -30,8 +30,8 @@ export function SwitchConsole() {
           <meshStandardMaterial color={palette.consoleBody} roughness={0.65} />
         </RoundedBox>
       </primitive>
-      <primitive object={rig.screen} userData={tag('switchScreen')} position={[0, 0, body.depth / 2 + 0.0004]}>
-        <mesh material={display.material}>
+      <primitive object={rig.screen} userData={tag('switchScreen')}>
+        <mesh material={display.material} position-z={body.depth / 2 + 0.0004}>
           <planeGeometry args={[screenSize.width, screenSize.height]} />
         </mesh>
       </primitive>
