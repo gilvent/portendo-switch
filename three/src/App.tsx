@@ -4,6 +4,7 @@ import { CameraRig } from './camera/CameraRig';
 import { ConsoleProvider } from './console/ConsoleProvider';
 import { Interaction } from './input/Interaction';
 import { useKeyboard } from './input/useKeyboard';
+import { useIdles } from './motion/useIdles';
 import { useTransitionDirector } from './motion/useTransitionDirector';
 import { RigProvider } from './rig/RigProvider';
 import { Scene } from './scene/Scene';
@@ -13,6 +14,7 @@ import { TouchButtonBar } from './ui/TouchButtonBar';
 
 function Director() {
   useTransitionDirector();
+  useIdles();
   return null;
 }
 
