@@ -11,7 +11,7 @@ import { beveledSlab } from './shapes';
 const width = 0.142;
 const wallDepth = 0.03;
 const slotGap = 0.024;
-const baseHeight = 0.04;
+const baseHeight = layout.dock.slotHeight;
 const front = { height: 0.08, z: slotGap / 2 + wallDepth / 2 };
 const back = { height: 0.11, z: -(slotGap / 2 + wallDepth / 2) };
 const frontFaceZ = front.z + wallDepth / 2;

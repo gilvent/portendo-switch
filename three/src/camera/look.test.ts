@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { clampLook, dampLook, dragLook } from './look';
+import { layout } from '../scene/layout';
+import { clampLook, dampLook, dockLook, dragLook, lookToward } from './look';
 
 const degrees = (look: { yaw: number; pitch: number }) => ({
   yaw: Math.round((look.yaw * 180) / Math.PI),
@@ -29,5 +30,11 @@ describe('look', () => {
   it('snaps onto the target once it is within a ten-thousandth of a radian, so the view comes to rest', () => {
     expect(dampLook({ yaw: 0.99995, pitch: -0.99995 }, { yaw: 1, pitch: -1 }, 1 / 60)).toEqual({ yaw: 1, pitch: -1 });
     expect(dampLook({ yaw: 0.999, pitch: 0 }, { yaw: 1, pitch: 0 }, 1 / 60).yaw).toBeCloseTo(0.999154, 6);
+  });
+
+  it('aims at the TV from neutral and turns left and down to face the dock', () => {
+    expect(lookToward(layout.tvScreenCentre)).toEqual({ yaw: 0, pitch: 0 });
+    expect(degrees(lookToward([-1, 1.18, 0.7 - 1]))).toEqual({ yaw: 45, pitch: 9 });
+    expect(degrees(dockLook)).toEqual({ yaw: 21, pitch: -9 });
   });
 });
