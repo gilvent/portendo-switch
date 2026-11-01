@@ -1,0 +1,6 @@
+node_modules
+dist
+shots
+docs/refs
+docs/spaces/gate-*
+docs/hero/gate-vs-refs.png
