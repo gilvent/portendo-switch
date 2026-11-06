@@ -298,14 +298,17 @@ export function storeroom(): Scene {
   const fgBoxes = [...carton('fg-a', 470, 210, 0, 100, 96, 70), ...carton('fg-b', 462, 212, 96, 74, 58, 56, CORAL, -6)];
   // Floor clutter, grouped where a real stock room would keep it.
   const pallet = [...box({ id: 'pallet', x: -410, z: -200, w: 124, h: 16, d: 92, stock: 'greyboard', c: '#a07a52', front: `<g fill="#3a2a1c">${[0, 1, 2].map(i => `<rect x="${10 + i * 44}" y="5" width="18" height="11"/>`).join('')}</g>`, top: Array.from({ length: 6 }, (_, i) => `<rect y="${i * 16}" width="124" height="11" fill="#b58b5f"/>`).join(''), right: `<g fill="#3a2a1c"><rect x="8" y="5" width="22" height="11"/><rect x="62" y="5" width="22" height="11"/></g>` }),
-    ...carton('pal-a', -440, -196, 16, 58, 52, 80), ...carton('pal-b', -382, -198, 16, 56, 52, 80, KRAFT, 3), ...carton('pal-c', -420, -200, 68, 76, 44, 70, CORAL, -4)];
+    // pal-a's right face is pressed against pal-b: lit in the bake, never drawn.
+    ...carton('pal-a', -440, -196, 16, 58, 52, 80).map(p => (p.id === 'pal-a-right' ? { ...p, ghost: true } : p)), ...carton('pal-b', -382, -198, 16, 56, 52, 80, KRAFT, 3), ...carton('pal-c', -420, -200, 68, 76, 44, 70, CORAL, -4)];
   const truck = stand('hand-truck', 446, 22, 0, 52, 120, STEEL, { stock: 'greyboard', density: 2, mask: '<path d="M6 0H14V96H46V104H40A12 12 0 1 1 18 104H6Z M18 6H40V12H18Z" fill="#fff"/>', print: `<rect width="52" height="120" fill="${STEEL}"/><circle cx="29" cy="108" r="9" fill="#14171b"/><circle cx="29" cy="108" r="3" fill="#8a929c"/><rect x="18" y="6" width="22" height="6" fill="${CORAL}"/>` }, -24, 10);
   const truckLoad = carton('truck-box', 452, 30, 6, 44, 56, 36, KRAFT, -24);
   const bin = [...box({ id: 'recycle', x: 80, z: 178, w: 56, h: 52, d: 44, stock: 'cover', c: '#2f7d5b', noTop: true, front: `<rect x="8" y="8" width="40" height="5" fill="${CREAM}"/><path d="M20 30L28 20L36 30M23 38H33" stroke="${CREAM}" stroke-width="3" fill="none"/>`, right: `<rect x="6" y="8" width="32" height="5" fill="${CREAM}"/>` }),
     stand('recycle-flats', 84, 172, 30, 50, 48, KRAFT, { stock: 'kraft', print: `${flutes(50, 48)}<rect x="4" y="12" width="42" height="2" fill="#94633a"/>`, mask: '<path d="M0 48V10L20 0L50 6V48Z" fill="#fff"/>' }, 8, 10)];
   const stool = box({ id: 'stool', x: 470, z: -30, w: 44, h: 40, d: 40, stock: 'cover', c: SUN, front: `<path d="M6 40V8H38V40H32V14H12V40Z" fill="#000" fill-opacity=".18"/>`, top: `<rect x="4" y="4" width="36" height="32" rx="4" fill="#000" fill-opacity=".08"/>` });
-  const tapeGun = box({ id: 'tape-gun', x: 300, z: 112, y: 62, w: 30, h: 20, d: 14, rot: 18, stock: 'cover', c: CORAL, front: `<circle cx="10" cy="10" r="7" fill="${TAPE}"/><circle cx="10" cy="10" r="3" fill="${INK}"/>` });
-  const scale = box({ id: 'scale', x: 200, z: 112, y: 62, w: 52, h: 12, d: 44, stock: 'cover', c: '#e9ebee', front: `<rect x="6" y="3" width="20" height="6" fill="#1d2228"/><rect x="8" y="4" width="14" height="4" fill="#9be7c4"/>`, top: `<rect x="5" y="5" width="42" height="34" fill="#c9ccd1"/>` });
+  // Slivers the camera sees edge-on stay in the bake but are not drawn.
+  const sliver = (p: Panel) => (/-left$/.test(p.id) ? { ...p, ghost: true } : p);
+  const tapeGun = box({ id: 'tape-gun', x: 300, z: 112, y: 62, w: 30, h: 20, d: 14, rot: 18, stock: 'cover', c: CORAL, front: `<circle cx="10" cy="10" r="7" fill="${TAPE}"/><circle cx="10" cy="10" r="3" fill="${INK}"/>` }).map(sliver);
+  const scale = box({ id: 'scale', x: 200, z: 112, y: 62, w: 52, h: 12, d: 44, stock: 'cover', c: '#e9ebee', front: `<rect x="6" y="3" width="20" height="6" fill="#1d2228"/><rect x="8" y="4" width="14" height="4" fill="#9be7c4"/>`, top: `<rect x="5" y="5" width="42" height="34" fill="#c9ccd1"/>` }).map(sliver);
   // Under the roof slopes: two high shelves of overflow stock, carved in relief on the back wall.
   const high = (id: string, wx: number, items: { w: number; h: number; c: string; stock: Stock; print?: string }[]): Panel[] => {
     let x = wx - 104;
