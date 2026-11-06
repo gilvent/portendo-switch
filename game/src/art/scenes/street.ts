@@ -10,7 +10,7 @@ let far = 1;
 const fr = (a: number, b: number) => { far = (far * 16807) % 2147483647; return a + (far / 2147483647) * (b - a); };
 // A row of separate blocks printed on one sheet: each its own colour, with windows, and a roof detail on some
 // (water tank, antenna, billboard, stepped top). The sheet is cut along the blocks' outline.
-function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], lit: string, roofs: boolean) {
+export function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], lit: string, roofs: boolean) {
   far = seed;
   let x = -fr(0, minW), mask = '', print = '';
   while (x < w) {
@@ -63,7 +63,7 @@ function houses(w: number, h: number, seed: number) {
   }
   return { mask, print };
 }
-const birds = (pts: [number, number, number][]) => pts.map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#3d4a5a"/>`).join('');
+export const birds = (pts: [number, number, number][]) => pts.map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#3d4a5a"/>`).join('');
 // Open surroundings: the city beyond the street, many flat layers from the far mountains to the nearest rooftops,
 // alternating pale and deep. The whole stack bakes into the CSS backdrop.
 function backdrop(): Panel[] {
@@ -149,7 +149,7 @@ function neighbours(): Panel[] {
     ...shopfront({ id: 'florist', x: 840, z: -176, w: 330, h: 440, rot: -16, c: '#9fc7b4', line: '#7fae99', trim: CREAM, awning: 'stripe', ac: CORAL, icon: flower, goods: shelf([CORAL, SUN, '#e88ab0', CORAL, '#57b36f']), storeys: 2 })
   ];
 }
-function windowBox(id: string, parent: Panel, x: number, y: number, w: number, h: number, goods: string, cols: number, rows: number, gap = 18): Panel[] {
+export function windowBox(id: string, parent: Panel, x: number, y: number, w: number, h: number, goods: string, cols: number, rows: number, gap = 18): Panel[] {
   const inner: Panel = { id: `${id}-room`, stock: 'cover', c: '#f4cf8c', w: w + 10, h: h + 10, o: add(add(add(parent.o, parent.u, x - 5), parent.v, y - 5), [0, 0, -gap]), u: parent.u, v: parent.v, edge: 'fold', emit: .34, print: goods, density: 1.5, decal: parent.id };
   const bar = 5, pw = (w - bar * (cols - 1)) / cols, ph = (h - bar * (rows - 1)) / rows, panes: [number, number, number, number][] = [];
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) panes.push([7 + c * (pw + bar), 7 + r * (ph + bar), pw, ph]);
@@ -190,13 +190,13 @@ function shop(): Panel[] {
   return [front, ...walls, ...windows, doorRoom, leaf('door-l', x - door.w / 2, 'left', 0), leaf('door-r', x, 'right', 0), ...roof('shop-roof-l', -1), ...roof('shop-roof-r', 1), awningTop, awningLip, signBoard, roundel];
 }
 // Main space: freestanding street furniture and passers-by, each a real fold or a stand-up cut card.
-const card = (id: string, x: number, z: number, w: number, h: number, c: string, rest: Partial<Panel> = {}, rot = 0, y = 0): Panel => { const r = yaw(rot); return { id, stock: 'cover', c, w, h, o: add([x, y, z], r([-w / 2, 0, 0])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.4, ...rest }; };
-function streetLamp(id: string, x: number, z: number, h: number, head: string, rot = 0): Panel[] {
+export const card = (id: string, x: number, z: number, w: number, h: number, c: string, rest: Partial<Panel> = {}, rot = 0, y = 0): Panel => { const r = yaw(rot); return { id, stock: 'cover', c, w, h, o: add([x, y, z], r([-w / 2, 0, 0])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.4, ...rest }; };
+export function streetLamp(id: string, x: number, z: number, h: number, head: string, rot = 0): Panel[] {
   return [...box({ id: `${id}-post`, x, z, w: 10, h, d: 10, stock: 'greyboard', c: '#3d444e', noTop: true }),
     card(`${id}-arm`, x + 18, z, 46, 8, '#3d444e', { stock: 'greyboard' }, rot, h - 10),
     card(`${id}-head`, x + 34, z + 1, 34, 30, head, { stock: 'vellum', emit: .6, density: 2, mask: '<path d="M6 0H28L34 30H0Z" fill="#fff"/>', print: `<rect width="34" height="5" fill="#3d444e"/>` }, rot, h - 36)];
 }
-function passerBy(id: string, x: number, z: number, coat: string, bag: string, flip: boolean, kid = false): Panel {
+export function passerBy(id: string, x: number, z: number, coat: string, bag: string, flip: boolean, kid = false): Panel {
   const k = kid ? .72 : 1, w = 74 * k, h = 176 * k;
   const body = `M22 176V120H14V64Q14 44 30 42Q20 36 22 22Q24 4 36 4Q50 4 50 22Q51 36 42 42Q58 44 58 64V100H70V140H50V176H40V128H32V176Z`;
   return card(id, x, z, w, h, coat, { density: 2, mask: `<g transform="scale(${k}) ${flip ? 'translate(74 0) scale(-1 1)' : ''}"><path d="${body}" fill="#fff"/></g>`, print: `<g transform="scale(${k}) ${flip ? 'translate(74 0) scale(-1 1)' : ''}"><rect width="74" height="44" fill="#f3c9a0"/><path d="M20 4Q36 -6 52 8V18Q36 10 20 18Z" fill="#3a2a1a"/><rect y="44" width="74" height="80" fill="${coat}"/><rect x="48" y="100" width="24" height="40" fill="${bag}"/><rect x="22" y="124" width="30" height="52" fill="#3f4a5c"/></g>` });

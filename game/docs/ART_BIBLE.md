@@ -26,6 +26,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | Street | Sky `#8fd3f4`, grass `#7fbf6a`, foliage `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
+| Moperty downtown | Brick `#b0664c`, stone `#e3c9a0`, asphalt `#5d616b` | Moperty indigo `#5b6bdc` with lavender `#a3adf2`, window yellow `#f5b400` | Cream `#fff4e2`, steel `#2f343c` |
 
 Tech colours from `content.ts` appear only as small label bars.
 
@@ -108,6 +109,24 @@ Neither floor carries a written account of the work. Each part of the work is an
 
 Stops carry `focus` and `look`: the camera leans in on the object being used while the courier stands beside it, not in front of it.
 
+### Moperty: the downtown block
+
+The Moperty space (`src/art/scenes/downtown.ts`) is a city block at golden hour, after a layered paper street-diorama reference: tall brick buildings framing the street, one avenue cutting back into a pale skyline, cabs, lit windows and fire escapes. Moperty is a property marketplace, so the whole block is its catalogue: every listing carries a For Sale or For Rent poster with the Moperty mark.
+
+- **The office is the logo.** Two gabled towers in indigo and lavender, the small white house in front as the entrance, each logo window cut through and lit in the logo's yellow. The name sits on a low stone sign at the foot of the indigo tower.
+- **Listings are part of the street.** The west tenement and the corner block have rooms for rent; the brownstone and the new build on the lot are for sale. A van is unloading at the corner block: someone has just moved into a rental.
+- **One building design** (`building`) makes all three neighbours: brick, storeys, columns, a shop or a stoop at street level, and carved sills, cornice, AC units, flower boxes and fire escapes with washing and pot plants.
+
+| Stop | What you do | What it stands for |
+|---|---|---|
+| Listings map | A switches the tab: all, for sale, for rent. Pins on the map and feather flags on the street mark the matching properties | Browsing local real estate |
+| Street kiosk | A goes from the web app in the browser, to the add-to-home-screen sheet, to the installed icon among the phone's apps | A progressive web app |
+| Tower crane | Each A sets the next module on the new block: backend base (Postgres, Laravel), two front-end floors (Vue, Sass), then the lit roof (Nginx, Google Cloud) | Building and running the whole product, front end and back end |
+| Painter | A paints over the pencil wireframe of the listing screen | Designing the UIs |
+| Finger-post | Each A lifts the Moperty arrow one place up the pole, under the magnifier | SEO |
+| Site board | Opens the tech stack | Tech stack |
+| Office door | The doors swing open; A visits moperty.id | The product |
+
 ### Outside and inside match
 
 A room diorama is the building seen from the street, cut open. Every room's outline must match the exterior that holds it.
@@ -120,9 +139,9 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all three spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds all four spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
-1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
+1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
 3. Blender Cycles bakes light only, at half the atlas size (`LIGHT_SCALE`): each surface sees itself as white while bounce rays still take on the colours around it. Light is smooth by nature, so a low sample count is enough once `finish.py` smooths it within each panel.
 4. `finish.py` multiplies the crisp print back over the light, lights the far backdrop evenly (nothing near can shade it), flattens decals and flat relief into their parents along the parent's normal, paints carved relief onto its wall along the game camera's rays (nearest piece wins), culls faces no game camera can see, and writes the atlas, backdrop and manifest. Far layers are packed last and cropped off the shipped atlas, so the backdrop can be cut at high resolution for free.
@@ -145,6 +164,9 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Street | 130 |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
+| Moperty downtown | 145 |
+
+A cut sheet whose holes are all filled by its decals (windows with lit rooms behind) ships as opaque.
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
@@ -160,4 +182,6 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Showcase phone | The chosen swatch chip rises |
 | Recommended shelf | Placeholder cards fold down |
 | Review board | The chosen filter tab rises |
+| Moperty office | Both door leaves swing inward |
+| Listings map | The chosen filter tab rises |
 | Any toy | A piece that appears drops into place in five stepped frames |

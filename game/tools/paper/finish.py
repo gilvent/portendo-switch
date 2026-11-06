@@ -178,6 +178,10 @@ def tiles(q, n):
     return out
 
 
+# A cut sheet whose holes were all filled by its decals (windows with rooms behind) ships opaque, like an uncut one.
+for p in L["panels"]:
+    if not p["solid"] and not p["ghost"] and not p["decal"] and (a[p["y"]:p["y"] + p["ph"], p["x"]:p["x"] + p["pw"]] > .99).all():
+        p["solid"] = True
 quads = [t for p in L["panels"] if not p["ghost"] and not p["decal"] and not p["backdrop"] and seen(p) for t in tiles({k: p.get(k) for k in keys}, p.get("split", 1))]
 for p in L["panels"]:
     if p["backdrop"]:
