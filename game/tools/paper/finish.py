@@ -90,20 +90,69 @@ def height(d):
     return (np.array(d["o"]) - np.array(base["o"])) @ np.array(base["n"])
 
 
-for d in sorted((p for p in L["panels"] if p["decal"]), key=height):
+for d in sorted((p for p in L["panels"] if p["decal"] and not p["view"]), key=height):
     flatten(d)
+
+C = L["camera"]
+reach = 1160 / C["zoom"]
+CAMERAS = [np.array([x, reach * .225, reach * .974]) for x in (C["x0"], C["x1"])]
+EYE = sum(CAMERAS) / len(CAMERAS)
+
+
+def carve(base, parts):
+    # Relief seen from the game camera. Each wall pixel takes the nearest piece its camera ray meets on the way in,
+    # so a box on a wall shelf keeps its end and top instead of collapsing to the face parallel to the wall.
+    bo, bu, bv = frame(base)
+    py, px = np.mgrid[0:base["ph"], 0:base["pw"]]
+    world = bo + (px[..., None] + .5) / base["pw"] * base["w"] * bu + (1 - (py[..., None] + .5) / base["ph"]) * base["h"] * bv
+    ray = world - EYE
+    best = np.full(world.shape[:2], np.inf)
+    over = np.zeros(world.shape[:2])
+    colour = np.zeros(world.shape)
+    for d in parts:
+        do, du, dv = frame(d)
+        dn = np.array(d["n"], dtype=float)
+        centre = do + du * d["w"] / 2 + dv * d["h"] / 2
+        if dn @ (EYE - centre) <= 0:
+            continue
+        denom = ray @ dn
+        with np.errstate(divide="ignore", invalid="ignore"):
+            t = ((do - EYE) @ dn) / denom
+        rel = EYE + t[..., None] * ray - do
+        dx = (rel @ du) / d["w"] * d["pw"]
+        dy = (1 - (rel @ dv) / d["h"]) * d["ph"]
+        inside = (dx >= 0) & (dx < d["pw"]) & (dy >= 0) & (dy < d["ph"]) & (t > 0) & (t < 1.0005)
+        if not inside.any():
+            continue
+        coords = [np.where(inside, dy + d["y"] - .5, 0), np.where(inside, dx + d["x"] - .5, 0)]
+        cover = ndimage.map_coordinates(alpha, coords, order=1) * inside
+        hit = (cover > .02) & (t < best)
+        if not hit.any():
+            continue
+        best[hit] = t[hit]
+        over[hit] = cover[hit]
+        for c in range(3):
+            colour[..., c][hit] = ndimage.map_coordinates(lin[..., c], coords, order=1)[hit]
+    y, x = base["y"], base["x"]
+    region = lin[y:y + base["ph"], x:x + base["pw"]]
+    region[:] = region * (1 - over[..., None]) + colour * over[..., None]
+    held = a[y:y + base["ph"], x:x + base["pw"]]
+    held[:] = held * (1 - over) + over
+
+
+for base_id in dict.fromkeys(p["decal"] for p in L["panels"] if p["decal"] and p["view"]):
+    carve(BY_ID[base_id], [p for p in L["panels"] if p["decal"] == base_id and p["view"] and not p["ghost"]])
 rgb = encode(lin)
 atlas = np.dstack([rgb, a])
 keep = atlas.copy()
 for p in L["panels"]:
     if p["backdrop"] or (p["decal"] and BY_ID[p["decal"]]["backdrop"]):
         keep[p["y"]:p["y"] + p["ph"], p["x"]:p["x"] + p["pw"]] = 0
+# Far layers were packed last: everything below the near panels ships in backdrop.webp, so crop it off the atlas.
+near_h = max((p["y"] + p["ph"] for p in L["panels"] if not (p["backdrop"] or (p["decal"] and BY_ID[p["decal"]]["backdrop"]))), default=keep.shape[0]) + 6
+keep = keep[:near_h]
+L["atlas"]["h"] = keep.shape[0]
 Image.fromarray((keep * 255 + 0.5).astype(np.uint8), "RGBA").save(OUT / "atlas.webp", quality=80, method=6, alpha_quality=85)
-
-C = L["camera"]
-reach = 1160 / C["zoom"]
-CAMERAS = [np.array([x, reach * .225, reach * .974]) for x in (C["x0"], C["x1"])]
-
 
 def seen(p):
     if p["group"] or p["motion"] or p.get("show"):

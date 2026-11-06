@@ -1,8 +1,10 @@
-import { add, box, on, relief, slot, yaw, type Panel, type Scene, type V3 } from '../kit.ts';
-import { BLUE, CORAL, CREAM, DEEP, INK, KRAFT, SUN, bricks, cloud, flutes, planks, reseed, specks, upArrows } from '../recipes.ts';
+import { add, box, carved, on, relief, slot, yaw, type Panel, type Scene, type Stock, type V3 } from '../kit.ts';
+import { BLUE, CORAL, CREAM, DEEP, INK, KRAFT, SUN, TAPE, bricks, cloud, flutes, planks, reseed, specks, upArrows } from '../recipes.ts';
 
 const MINT = '#35b58a', PLUM = '#7c6be0', WOOD = '#a8693a', STEEL = '#3d444e', GLOW = '#ffe9b0', SKY = '#8fd3f4', GREY = '#c9ccd1';
-const W = 1040, D = 500, ROOM_LIGHT = { sun: 1.9, sky: .42, skyColor: [1, .9, .78] as const };
+const W = 1040, D = 500,
+  // The store-room stairwell: a notch in the front-left of the floor, from the landing at z0 to the front edge.
+  WELL = { x0: -482, x1: -292, z0: 90 }, ROOM_LIGHT = { sun: 1.9, sky: .42, skyColor: [1, .9, .78] as const };
 const WARM = [1, .83, .58] as const;
 // The phone's three colours. The showcase, the catalog close-up and the swatch chips all read this list.
 export const VARIANT_COLORS = [BLUE, CORAL, MINT] as const;
@@ -170,12 +172,42 @@ const snapshot = (w: number, h: number, k: number) => {
   return `<rect width="${w}" height="${h}" fill="${sky}"/><circle cx="${w * .72}" cy="${h * .28}" r="${Math.min(w, h) * .14}" fill="${SUN}"/><path d="M0 ${h * .72}L${w * .35} ${h * .46}L${w * .6} ${h * .66}L${w} ${h * .5}V${h}H0Z" fill="${ground}"/>`;
 };
 
+
+// Stock on the store-room racks. `w` is depth off the wall, `d` the width along it; `face` prints the side turned to the room.
+type Good = { w: number; h: number; d: number; stock: Stock; c: string; side?: string; face: string; end?: string; top?: string; noTop?: boolean; rot?: number };
+function stockItems() {
+  const label = (x: number, y: number, w = 22, c = CORAL) => `<rect x="${x}" y="${y}" width="${w}" height="${w * .55}" fill="#fbf7ee"/><rect x="${x}" y="${y}" width="${w}" height="3" fill="${c}"/>`;
+  return {
+    carton: (d: number, h: number, open = false): Good => ({ w: 26, h, d, stock: 'kraft', c: KRAFT, face: `${flutes(d, h)}<rect x="${d / 2 - 5}" width="10" height="${h * .55}" fill="${TAPE}"/>${label(5, h - 18)}${h > 44 ? upArrows(d - 24, 8) : ''}`, end: `${flutes(26, h)}<rect x="5" y="${h * .4}" width="16" height="9" fill="#fbf7ee"/>`, top: open ? `<rect width="26" height="${d}" fill="#5a3a20"/><path d="M0 0L26 ${d * .2}V${d * .45}L0 ${d * .3}Z" fill="${KRAFT}"/>` : `${flutes(26, d)}<rect x="8" width="10" height="${d}" fill="${TAPE}"/>` }),
+    tote: (c: string, d: number): Good => ({ w: 28, h: 34, d, stock: 'cover', c, face: `<rect x="${d / 2 - 11}" y="5" width="22" height="7" rx="3.5" fill="${INK}" fill-opacity=".7"/>${label(5, 17, 18, INK)}<rect y="${34 - 4}" width="${d}" height="4" fill="#000" fill-opacity=".12"/>`, end: `<rect x="9" y="5" width="10" height="6" rx="3" fill="${INK}" fill-opacity=".7"/>`, top: `<rect x="3" y="3" width="22" height="${d - 6}" fill="${INK}" fill-opacity=".55"/><rect x="6" y="${d * .2}" width="14" height="${d * .3}" fill="${KRAFT}"/><rect x="8" y="${d * .58}" width="12" height="${d * .25}" fill="${CREAM}"/>` }),
+    crate: (c: string, d: number): Good => ({ w: 28, h: 30, d, stock: 'cover', c, face: Array.from({ length: 4 }, (_, i) => `<rect x="4" y="${4 + i * 7}" width="${d - 8}" height="3" fill="#000" fill-opacity=".22"/>`).join('') + `<rect x="${d / 2 - 9}" y="4" width="18" height="6" rx="3" fill="${INK}" fill-opacity=".6"/>`, end: Array.from({ length: 4 }, (_, i) => `<rect x="3" y="${4 + i * 7}" width="22" height="3" fill="#000" fill-opacity=".22"/>`).join(''), top: `<rect x="3" y="3" width="22" height="${d - 6}" fill="#000" fill-opacity=".3"/>` }),
+    phones: (c: string, n: number): Good => ({ w: 22, h: 30, d: n * 17, stock: 'cover', c, face: Array.from({ length: n }, (_, i) => `<path d="M${i * 17} 0V30" stroke="#000" stroke-opacity=".25"/><rect x="${i * 17 + 4}" y="5" width="9" height="18" rx="1.5" fill="${INK}"/><rect x="${i * 17 + 5}" y="7" width="7" height="13" fill="#bfe6f8"/>`).join(''), end: `<rect x="4" y="6" width="14" height="4" fill="${CREAM}"/>` }),
+    tapes: (n: number): Good => ({ w: 20, h: 20, d: n * 21, stock: 'vellum', c: '#e9d5a6', face: Array.from({ length: n }, (_, i) => `<circle cx="${i * 21 + 10.5}" cy="10" r="9" fill="${TAPE}"/><circle cx="${i * 21 + 10.5}" cy="10" r="5" fill="${KRAFT}"/>`).join('') }),
+    binders: (n: number): Good => ({ w: 26, h: 54, d: n * 10, stock: 'cover', c: INK, face: Array.from({ length: n }, (_, i) => `<rect x="${i * 10}" width="9.4" height="54" fill="${[BLUE, CORAL, SUN, MINT, PLUM, BLUE][i % 6]}"/><rect x="${i * 10 + 2}" y="10" width="5.4" height="14" fill="#fbf7ee"/><circle cx="${i * 10 + 4.7}" cy="42" r="2.2" fill="${INK}" fill-opacity=".5"/>`).join('') }),
+    wrap: (d: number): Good => ({ w: 28, h: 28, d, stock: 'vellum', c: '#dbeef5', face: Array.from({ length: Math.floor(d / 7) }, (_, i) => Array.from({ length: 4 }, (_, k) => `<circle cx="${4 + i * 7 + (k % 2) * 3.5}" cy="${4 + k * 7}" r="2.3" fill="#fff" fill-opacity=".8"/>`).join('')).join(''), end: `<circle cx="14" cy="14" r="12" fill="#c4e2ec"/><circle cx="14" cy="14" r="4" fill="${KRAFT}"/>` }),
+    flats: (d: number, n: number): Good => ({ w: 28, h: n * 3.4, d, stock: 'kraft', c: KRAFT, face: Array.from({ length: n }, (_, i) => `<rect y="${i * 3.4}" width="${d - (i % 3) * 4}" height="1.4" fill="${i % 2 ? '#94633a' : '#d1a46e'}"/>`).join('') }),
+    labels: (): Good => ({ w: 24, h: 24, d: 48, stock: 'bond', c: '#fbf7ee', face: [0, 1].map(i => `<circle cx="${12 + i * 24}" cy="12" r="10.5" fill="#fff"/><circle cx="${12 + i * 24}" cy="12" r="4" fill="${[SUN, MINT][i]}"/>`).join('') })
+  };
+}
+// The handrail fixed to the left wall, falling with the stairs from the landing to the front of the floor slab.
+function wallRail(): Panel[] {
+  // Drawn from the front end back up the slope so both faces turn toward the room and the light.
+  const z0 = 92, z1 = 248, y0 = 98, y1 = 14, len = Math.hypot(z1 - z0, y1 - y0), u: V3 = [0, (y0 - y1) / len, (z0 - z1) / len];
+  return [
+    { id: 'wall-rail', stock: 'greyboard', c: '#6d4524', w: len, h: 7, o: [-W / 2 + 12, y1 - 7, z1], u, v: [0, (z1 - z0) / len, (y0 - y1) / len], edge: 'fold' },
+    { id: 'wall-rail-top', stock: 'greyboard', c: '#86593a', w: len, h: 8, o: [-W / 2 + 12, y1, z1], u, v: [-1, 0, 0], edge: 'fold' }
+  ];
+}
+
 export function storeroom(): Scene {
   reseed(33);
   const H = 300, PEAK = 200, TOP = H + PEAK, wood = '#8f6f55', plank = (w: number, h: number) => planks(w, h, wood, '#5e4530', 74, 'y');
   const back = backWall(W, TOP, wood, { id: 'wall-back', mask: `<path d="M0 ${TOP}V${PEAK}L${W / 2} 0L${W} ${PEAK}V${TOP}Z" fill="#fff"/>`, print: plank(W, TOP) });
-  const lw = leftWall(H, wood, 'wall-left', plank(D, H)), rw = rightWall(H, wood, 'wall-right', plank(D, H));
-  const fl = floor('floor', '#8b8275', specks(W, D, '#6f675c', 320, 4) + Array.from({ length: 5 }, (_, i) => `<path d="M${(i + 1) * W / 6} 0V${D}" stroke="#6f675c" stroke-width="2"/>`).join('') + `<path d="M0 214H${W}M0 222H${W}" stroke="${SUN}" stroke-width="5" stroke-dasharray="26 18"/>`);
+  const lw = { ...leftWall(H, wood, 'wall-left', plank(D, H)), density: 2 }, rw = { ...rightWall(H, wood, 'wall-right', plank(D, H)), density: 2 };
+  // The stairs go down: the floor is notched at the front left and the cut slab shows the flight dropping to the shop.
+  const fl = floor('floor', '#8b8275', specks(W, D, '#6f675c', 320, 4) + Array.from({ length: 5 }, (_, i) => `<path d="M${(i + 1) * W / 6} 0V${D}" stroke="#6f675c" stroke-width="2"/>`).join('') + `<path d="M0 214H${W}M0 222H${W}" stroke="${SUN}" stroke-width="5" stroke-dasharray="26 18"/><path d="M${WELL.x0 + W / 2 - 4} ${D}V${D / 2 + WELL.z0 - 4}H${WELL.x1 + W / 2 + 4}V${D}" fill="none" stroke="${SUN}" stroke-width="5" stroke-dasharray="14 10"/>`);
+  // The floor's print runs from the back edge (top) to the front edge (bottom), so the notch sits at the bottom.
+  fl.mask = `<path fill-rule="evenodd" d="M0 0H${W}V${D}H0Z M${WELL.x0 + W / 2} ${D}V${D / 2 + WELL.z0}H${WELL.x1 + W / 2}V${D}Z" fill="#fff"/>`;
   const roundWin = on(back, 1.2, W / 2 - 60, 318, 120, 120, { id: 'round-win', stock: 'vellum', c: GLOW, emit: .5, density: 2, mask: '<circle cx="60" cy="60" r="60" fill="#fff"/>', print: streetView(120, 120, 17) });
   const roundFrame = on(back, 3, W / 2 - 68, 310, 136, 136, { id: 'round-frame', stock: 'cover', c: CREAM, density: 2, mask: '<path fill-rule="evenodd" d="M68 0a68 68 0 1 0 .01 0Z M68 8a60 60 0 1 1 -.01 0Z" fill="#fff"/><rect x="65" y="4" width="6" height="128" fill="#fff"/><rect x="4" y="65" width="128" height="6" fill="#fff"/>' });
   const bx = (wx: number) => wx + W / 2;
@@ -221,25 +253,91 @@ export function storeroom(): Scene {
   const pinned: Panel = { ...stand('photo-on', -11, 68.4, 84.5, 40, 44, '#fff', { stock: 'bond', density: 3, print: `<rect width="40" height="44" fill="#fff"/><g transform="translate(4 4)">${snapshot(32, 36, 2)}</g>` }, 0, 14), show: { toy: 'photo', at: [2] } };
   const mug = box({ id: 'mug', x: 50, z: 84, y: 80, w: 22, h: 26, d: 22, stock: 'cover', c: CORAL, front: `<rect y="6" width="22" height="5" fill="${CREAM}"/>` });
 
-  // Side walls: shelving in relief, stacked with returns and packing stock.
-  const rackOn = (wall: Panel, side: 1 | -1, id: string): Panel[] => {
-    const at = (z: number, y: number, out: number): V3 => [side * (W / 2 - out), y, z];
-    return relief(wall, [0, 1, 2].flatMap(r => [
-      { id: `${id}-r${r}`, stock: 'greyboard', c: STEEL, w: 300, h: 8, o: at(side < 0 ? 150 : -150, 70 + r * 72, 34), u: wall.u, v: [0, 1, 0], edge: 'fold' } as Panel,
-      ...[0, 1, 2].map((k): Panel => ({ id: `${id}-b${r}${k}`, stock: 'kraft', c: (r + k) % 3 === 1 ? CORAL : KRAFT, w: [70, 54, 82][k], h: [48, 40, 52][(k + r) % 3], o: at((side < 0 ? 140 : -140) + (side < 0 ? -1 : 1) * (6 + k * 96), 78 + r * 72, 22), u: wall.u, v: [0, 1, 0], edge: 'fold', print: flutes(80, 52) + `<rect x="${[29, 21, 35][k]}" width="12" height="52" fill="#d9b781"/>` }))
-    ]));
+  // Side walls: steel racking carved in relief. Every piece has real depth, so shelf lips, box ends and tops read from the room.
+  const rack = (wall: Panel, side: 1 | -1, id: string, z0: number, z1: number, rows: Good[][]): Panel[] => {
+    const DEPTH = 30, x = side * (W / 2 - DEPTH / 2), span = z1 - z0, levels = [26, 104, 182, 258];
+    const face = (p: string, q?: string) => (side < 0 ? { right: p, front: q } : { left: p, front: q });
+    const posts = [z0 + 3, (z0 + z1) / 2, z1 - 3].flatMap((z, i) => box({ id: `${id}-post${i}`, x, z, w: DEPTH, h: 280, d: 6, stock: 'greyboard', c: '#6b7480', ...face(`<g fill="#2f353d">${Array.from({ length: 22 }, (_, k) => `<rect x="1.6" y="${8 + k * 12}" width="2.8" height="5"/>`).join('')}</g>`, `<path d="M3 0V280M${DEPTH - 3} 0V280" stroke="#4d5560" stroke-width="3"/>${Array.from({ length: 13 }, (_, k) => `<path d="M3 ${10 + k * 21}L${DEPTH - 3} ${20 + k * 21}" stroke="#4d5560" stroke-width="2"/>`).join('')}`) }));
+    const boards = levels.flatMap((y, i) => box({ id: `${id}-shelf${i}`, x, z: (z0 + z1) / 2, y: y - 6, w: DEPTH + 2, h: 6, d: span, stock: 'greyboard', c: '#58606b', ...face(`<rect width="${span}" height="2" fill="#7b838e"/>`), top: `<rect width="${DEPTH + 2}" height="${span}" fill="#6b737e"/>` }));
+    const goods = rows.flatMap((row, r) => {
+      let z = z0 + 8;
+      return row.flatMap((g, k) => {
+        const gap = 6 + ((k * 7 + r * 3) % 4) * 3, at = z + g.d / 2; z += g.d + gap;
+        if (z > z1 - 4) return [];
+        return box({ id: `${id}-g${r}${k}`, x: x + side * (DEPTH - g.w) / 2, z: at, y: levels[r], w: g.w, h: g.h, d: g.d, stock: g.stock, c: g.c, side: g.side, ...face(g.face, g.end), top: g.top, noTop: g.noTop, rot: g.rot });
+      });
+    });
+    return carved(wall, [...posts, ...boards, ...goods]);
   };
+  const plinth = (side: 1 | -1, id: string, z0: number, z1: number): Panel => ({ id, stock: 'greyboard', c: '#2f353d', w: z1 - z0, h: 22, o: side < 0 ? [-W / 2 + 32, 0, z1] : [W / 2 - 32, 0, z0], u: side < 0 ? [0, 0, -1] : [0, 0, 1], v: [0, 1, 0], edge: 'fold' });
+  const STOCK_ITEMS = stockItems();
+  const rackL = rack(lw, -1, 'rack-l', -238, 70, [
+    [STOCK_ITEMS.carton(56, 52), STOCK_ITEMS.tote(CORAL, 62), STOCK_ITEMS.carton(44, 40, true), STOCK_ITEMS.crate(MINT, 58), STOCK_ITEMS.carton(48, 60)],
+    [STOCK_ITEMS.phones(BLUE, 3), STOCK_ITEMS.phones(CORAL, 2), STOCK_ITEMS.phones(MINT, 3), STOCK_ITEMS.tapes(3), STOCK_ITEMS.binders(5)],
+    [STOCK_ITEMS.wrap(96), STOCK_ITEMS.flats(70, 6), STOCK_ITEMS.carton(40, 34, true), STOCK_ITEMS.tote(SUN, 50)],
+    [STOCK_ITEMS.carton(52, 30), STOCK_ITEMS.carton(70, 36, true), STOCK_ITEMS.crate(STEEL, 54), STOCK_ITEMS.carton(40, 26)]
+  ]);
+  const rackR = rack(rw, 1, 'rack-r', -238, 150, [
+    [STOCK_ITEMS.crate(MINT, 60), STOCK_ITEMS.carton(66, 58), STOCK_ITEMS.tote(CORAL, 58), STOCK_ITEMS.carton(50, 44, true), STOCK_ITEMS.carton(58, 62), STOCK_ITEMS.crate(SUN, 52)],
+    [STOCK_ITEMS.binders(6), STOCK_ITEMS.phones(CORAL, 3), STOCK_ITEMS.carton(48, 46), STOCK_ITEMS.phones(BLUE, 2), STOCK_ITEMS.labels(), STOCK_ITEMS.phones(MINT, 2)],
+    [STOCK_ITEMS.flats(80, 8), STOCK_ITEMS.tote(BLUE, 60), STOCK_ITEMS.wrap(84), STOCK_ITEMS.carton(46, 40, true), STOCK_ITEMS.tapes(4)],
+    [STOCK_ITEMS.carton(60, 34), STOCK_ITEMS.crate(STEEL, 56), STOCK_ITEMS.carton(44, 30, true), STOCK_ITEMS.carton(70, 34), STOCK_ITEMS.tote(MINT, 48)]
+  ]);
+  // Over the stairwell the left wall carries the handrail, the extinguisher and a downward arrow.
+  const wallBits = carved(lw, [
+    ...box({ id: 'extinguisher', x: -W / 2 + 12, z: 84, y: 70, w: 22, h: 70, d: 22, stock: 'cover', c: CORAL, right: `<rect y="20" width="22" height="26" fill="${CREAM}"/><rect x="5" y="26" width="12" height="3" fill="${INK}"/><rect x="5" y="33" width="9" height="3" fill="${INK}"/>`, top: `<circle cx="11" cy="11" r="6" fill="${INK}"/>` }),
+    ...box({ id: 'ext-bracket', x: -W / 2 + 4, z: 84, y: 60, w: 8, h: 90, d: 28, stock: 'greyboard', c: STEEL }),
+    ...wallRail(),
+    ...[0, 1, 2].flatMap(i => box({ id: `rail-bracket-${i}`, x: -W / 2 + 4, z: 104 + i * 64, y: 72 - i * 35, w: 8, h: 18, d: 6, stock: 'greyboard', c: STEEL }))
+  ]);
+  const downSign = on(lw, 1.2, 30, 196, 110, 50, { id: 'down-sign', stock: 'cover', c: MINT, mask: '<rect width="110" height="50" rx="8" fill="#fff"/>', print: `<rect x="5" y="5" width="100" height="40" rx="6" fill="none" stroke="${CREAM}" stroke-width="3"/><path d="M30 12V30H20L36 44L52 30H42V12Z" fill="${CREAM}"/><g fill="${CREAM}"><rect x="62" y="26" width="10" height="6"/><rect x="72" y="20" width="10" height="12"/><rect x="82" y="14" width="10" height="18"/></g>` });
+
   const beltBox = (id: string, x: number, z: number, w: number): Panel[] => box({ id, x, z, w, h: 62, d: 70, stock: 'greyboard', c: STEEL, top: Array.from({ length: Math.round(w / 26) }, (_, i) => `<rect x="${i * 26}" width="13" height="70" fill="#5b6470"/>`).join(''), front: Array.from({ length: Math.round(w / 52) }, (_, i) => `<rect x="${14 + i * 52}" y="16" width="26" height="30" fill="${SUN}"/>`).join('') });
   const onBelt = (group: string, c: string, x: number, z: number) => carton(group, x, z, 62, 54, 40, 46, c, 0, group);
-  const stack = [...carton('st-a', -330, 140, 0, 84, 62, 64), ...carton('st-c', -316, 138, 62, 62, 46, 50, KRAFT, 10)];
-  const fgBoxes = [...carton('fg-a', 470, 210, 0, 100, 96, 70), ...carton('fg-b', 462, 212, 96, 74, 58, 56, CORAL, -6), ...carton('fg-c', -470, 214, 0, 80, 60, 56)];
+  const stack = [...carton('st-a', -235, 176, 0, 84, 62, 64), ...carton('st-c', -226, 174, 62, 62, 46, 50, KRAFT, 10)];
+  const fgBoxes = [...carton('fg-a', 470, 210, 0, 100, 96, 70), ...carton('fg-b', 462, 212, 96, 74, 58, 56, CORAL, -6)];
+  // Floor clutter, grouped where a real stock room would keep it.
+  const pallet = [...box({ id: 'pallet', x: -410, z: -200, w: 124, h: 16, d: 92, stock: 'greyboard', c: '#a07a52', front: `<g fill="#3a2a1c">${[0, 1, 2].map(i => `<rect x="${10 + i * 44}" y="5" width="18" height="11"/>`).join('')}</g>`, top: Array.from({ length: 6 }, (_, i) => `<rect y="${i * 16}" width="124" height="11" fill="#b58b5f"/>`).join(''), right: `<g fill="#3a2a1c"><rect x="8" y="5" width="22" height="11"/><rect x="62" y="5" width="22" height="11"/></g>` }),
+    ...carton('pal-a', -440, -196, 16, 58, 52, 80), ...carton('pal-b', -382, -198, 16, 56, 52, 80, KRAFT, 3), ...carton('pal-c', -420, -200, 68, 76, 44, 70, CORAL, -4)];
+  const truck = stand('hand-truck', 446, 22, 0, 52, 120, STEEL, { stock: 'greyboard', density: 2, mask: '<path d="M6 0H14V96H46V104H40A12 12 0 1 1 18 104H6Z M18 6H40V12H18Z" fill="#fff"/>', print: `<rect width="52" height="120" fill="${STEEL}"/><circle cx="29" cy="108" r="9" fill="#14171b"/><circle cx="29" cy="108" r="3" fill="#8a929c"/><rect x="18" y="6" width="22" height="6" fill="${CORAL}"/>` }, -24, 10);
+  const truckLoad = carton('truck-box', 452, 30, 6, 44, 56, 36, KRAFT, -24);
+  const bin = [...box({ id: 'recycle', x: 80, z: 178, w: 56, h: 52, d: 44, stock: 'cover', c: '#2f7d5b', noTop: true, front: `<rect x="8" y="8" width="40" height="5" fill="${CREAM}"/><path d="M20 30L28 20L36 30M23 38H33" stroke="${CREAM}" stroke-width="3" fill="none"/>`, right: `<rect x="6" y="8" width="32" height="5" fill="${CREAM}"/>` }),
+    stand('recycle-flats', 84, 172, 30, 50, 48, KRAFT, { stock: 'kraft', print: `${flutes(50, 48)}<rect x="4" y="12" width="42" height="2" fill="#94633a"/>`, mask: '<path d="M0 48V10L20 0L50 6V48Z" fill="#fff"/>' }, 8, 10)];
+  const stool = box({ id: 'stool', x: 470, z: -30, w: 44, h: 40, d: 40, stock: 'cover', c: SUN, front: `<path d="M6 40V8H38V40H32V14H12V40Z" fill="#000" fill-opacity=".18"/>`, top: `<rect x="4" y="4" width="36" height="32" rx="4" fill="#000" fill-opacity=".08"/>` });
+  const tapeGun = box({ id: 'tape-gun', x: 300, z: 112, y: 62, w: 30, h: 20, d: 14, rot: 18, stock: 'cover', c: CORAL, front: `<circle cx="10" cy="10" r="7" fill="${TAPE}"/><circle cx="10" cy="10" r="3" fill="${INK}"/>` });
+  const scale = box({ id: 'scale', x: 200, z: 112, y: 62, w: 52, h: 12, d: 44, stock: 'cover', c: '#e9ebee', front: `<rect x="6" y="3" width="20" height="6" fill="#1d2228"/><rect x="8" y="4" width="14" height="4" fill="#9be7c4"/>`, top: `<rect x="5" y="5" width="42" height="34" fill="#c9ccd1"/>` });
+  // Under the roof slopes: two high shelves of overflow stock, carved in relief on the back wall.
+  const high = (id: string, wx: number, items: { w: number; h: number; c: string; stock: Stock; print?: string }[]): Panel[] => {
+    let x = wx - 104;
+    return carved(back, [...box({ id: `${id}-board`, x: wx, z: -D / 2 + 15, y: 310, w: 220, h: 6, d: 30, stock: 'greyboard', c: '#58606b' }),
+      ...[-90, 90].flatMap((dx, i) => box({ id: `${id}-arm${i}`, x: wx + dx, z: -D / 2 + 3, y: 284, w: 6, h: 26, d: 6, stock: 'greyboard', c: STEEL })),
+      ...items.flatMap((g, i) => { const cx = x + g.w / 2; x += g.w + 6; return box({ id: `${id}-i${i}`, x: cx, z: -D / 2 + 15, y: 316, w: g.w, h: g.h, d: 24, stock: g.stock, c: g.c, front: g.print }); })]);
+  };
+  const highShelves = [
+    ...high('high-l', -235, [{ w: 46, h: 30, c: KRAFT, stock: 'kraft', print: flutes(46, 30) + `<rect x="18" width="10" height="16" fill="${TAPE}"/>` }, { w: 36, h: 26, c: CORAL, stock: 'cover' }, { w: 54, h: 34, c: KRAFT, stock: 'kraft', print: flutes(54, 34) + `<rect x="6" y="18" width="18" height="10" fill="#fbf7ee"/>` }, { w: 40, h: 22, c: MINT, stock: 'cover' }]),
+    ...high('high-r', 235, [{ w: 40, h: 22, c: SUN, stock: 'cover' }, { w: 56, h: 34, c: KRAFT, stock: 'kraft', print: flutes(56, 34) + `<rect x="23" width="10" height="20" fill="${TAPE}"/>` }, { w: 34, h: 28, c: BLUE, stock: 'cover' }, { w: 50, h: 30, c: KRAFT, stock: 'kraft', print: flutes(50, 30) }])
+  ];
+  // The flight down: four treads and risers inside the notch, a section of the floor slab, and a balustrade on the open side.
+  const SLAB = 92, steps = 4, rise = SLAB / steps, run = (D / 2 - WELL.z0) / steps, ww = WELL.x1 - WELL.x0;
+  const flight = Array.from({ length: steps }, (_, i): Panel[] => [
+    { id: `step-${i}-riser`, stock: 'greyboard', c: '#6d4524', w: ww, h: rise, o: [WELL.x0, -rise * (i + 1), WELL.z0 + run * i], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.4 },
+    { id: `step-${i}-tread`, stock: 'greyboard', c: WOOD, w: ww, h: run, o: [WELL.x0, -rise * (i + 1), WELL.z0 + run * (i + 1)], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.4, print: `<rect width="${ww}" height="5" fill="#c08a58"/><rect y="5" width="${ww}" height="2" fill="#3a2010" fill-opacity=".5"/>` }
+  ]).flat();
+  const wellWall: Panel = { id: 'well-wall', stock: 'greyboard', c: '#5e4530', w: D / 2 - WELL.z0, h: SLAB, o: [WELL.x0, -SLAB, D / 2], u: [0, 0, -1], v: [0, 1, 0], edge: 'fold', density: 1.2, print: planks(D / 2 - WELL.z0, SLAB, '#5e4530', '#3e2c1e', 40, 'y') };
+  const slab: Panel = { id: 'slab', stock: 'greyboard', c: '#4a3424', w: W + 40, h: SLAB, o: [-W / 2 - 20, -SLAB, D / 2], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.2,
+    mask: `<path fill-rule="evenodd" d="M0 0H${W + 40}V${SLAB}H0Z M${WELL.x0 + W / 2 + 20} 0V${SLAB}H${WELL.x1 + W / 2 + 20}V0Z" fill="#fff"/>`,
+    print: `<rect width="${W + 40}" height="8" fill="#8b8275"/><rect y="8" width="${W + 40}" height="4" fill="#2a1d14"/>${Array.from({ length: 14 }, (_, i) => `<rect x="${12 + i * 78}" y="16" width="20" height="${SLAB - 34}" fill="#5e4530"/>`).join('')}<rect y="${SLAB - 18}" width="${W + 40}" height="18" fill="#d9a968"/><rect y="${SLAB - 18}" width="${W + 40}" height="3" fill="#2a1d14" fill-opacity=".5"/>` };
+  const baluster = (n: number) => Array.from({ length: n }, (_, i) => `M${8 + i * ((D / 2 - WELL.z0 - 16) / (n - 1)) - 2} 8V58h4V8Z`).join(' ');
+  const rail: Panel = { id: 'well-rail', stock: 'greyboard', c: '#6d4524', w: D / 2 - WELL.z0, h: 66, o: [WELL.x1 + 2, 0, D / 2], u: [0, 0, -1], v: [0, 1, 0], edge: 'cut', density: 2,
+    mask: `<path d="M0 0H${D / 2 - WELL.z0}V10H0Z M0 0H10V66H0Z M${D / 2 - WELL.z0 - 12} 0H${D / 2 - WELL.z0}V66H${D / 2 - WELL.z0 - 12}Z ${baluster(7)}" fill="#fff"/>`, print: `<rect width="${D / 2 - WELL.z0}" height="4" fill="#86593a"/>` };
   // A packer at the far belt.
   const packer = stand('packer', 400, -150, 0, 70, 168, STEEL, { density: 2, mask: '<path d="M22 168V116H12V62Q12 44 28 42Q20 36 22 22Q24 4 36 4Q50 4 50 22Q51 36 42 42Q58 44 58 62V116H48V168H38V122H32V168Z" fill="#fff"/>', print: `<rect width="70" height="44" fill="#c99a7a"/><path d="M18 14Q36 -8 54 14V20H18Z" fill="${CORAL}"/><rect y="44" width="70" height="76" fill="${MINT}"/><rect x="18" y="56" width="34" height="64" fill="#2f7d5b"/><rect y="120" width="70" height="48" fill="${STEEL}"/>` }, -12);
   const lamps = [[-170, -40], [60, 30], [290, -60]] as const;
-  const panels = [sill('sill', '#4a3424'), fl, back, lw, rw, roundWin, roundFrame, cork, corkFrame, ...tabs, ...reviewCards, oldCard, ...cans, roller,
-    pegboard, ...grid, line, ...list, ...rackOn(lw, -1, 'rack-l'), ...rackOn(rw, 1, 'rack-r'),
+  const panels = [slab, fl, back, lw, rw, roundWin, roundFrame, cork, corkFrame, ...tabs, ...reviewCards, oldCard, ...cans, roller,
+    pegboard, ...grid, line, ...list, ...rackL, ...rackR, plinth(-1, 'plinth-l', -238, 70), plinth(1, 'plinth-r', -238, 150), ...wallBits, downSign, ...highShelves,
+    ...flight, wellWall, rail, ...pallet, truck, ...truckLoad, ...bin, ...stool, ...tapeGun, ...scale,
     packer, ...beltBox('belt-a', 40, -200, 760), ...beltBox('belt-b', 270, 118, 300), ...onBelt('p-a', KRAFT, -300, -200), ...onBelt('p-b', CORAL, 150, 118),
-    ...desk, ...camera, ejected, form, ...ratings, pinned, ...mug, ...stack, ...stairCard('stairs', -395, -1, WOOD),
+    ...desk, ...camera, ejected, form, ...ratings, pinned, ...mug, ...stack,
     ...lamps.flatMap(([x, z], i) => lampSet(`lamp-${i}`, x, z, 300, 480 - Math.abs(x) * .38)), ...fgBoxes];
   return {
     id: 'storeroom', camera: { zoom: .8, x0: -30, x1: 30 }, light: ROOM_LIGHT, lamps: lamps.map(([x, z]) => lamp(x, z, 300)), panels,

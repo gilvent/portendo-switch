@@ -68,9 +68,10 @@ Split each space into the **main space**, where the courier walks and plays, and
 | Part | Build | In the Blibli spaces |
 |---|---|---|
 | Main space | Freestanding folds with real volume: boxes, tubes, ridge folds, slotted pairs, stacked contours. Slim or intricate outlines (people, bikes, scooters) are stand-up cut cards. The ground is flat sheets at slightly different heights. | Mailbox, parcels, bench, sandwich board, bins, lamps; showcase pedestal, tri-fold leaflet, price stand, basket, riser; reviewer's desk, camera, belts |
-| Open surroundings | Many thin flat layers, one behind another, alternating pale and deep. Far detail is tiny flat print. They sit in the CSS backdrop when far enough. | Sky, far hills, two skyline layers, a tree row and rooftops behind the street; the street seen through every window |
-| Enclosed surroundings | Relief fixed to its surface, sticking out toward the main space: half pieces on walls, hanging pieces on ceilings, low edges on floors | Neighbouring shopfronts with recessed windows and folded awnings; pegboard, shelves, clock and frame on the shop walls; racks, cork board and gallery on the store-room walls |
+| Open surroundings | Many thin flat layers, one behind another, alternating pale and deep. Far detail is tiny flat print, and each layer carries its own small stories. They sit in the CSS backdrop when far enough. | Sky with sun, two cloud tones, balloons and birds; snow-capped mountains; hills dotted with trees; a far skyline with a broadcast tower and a crane; two mid-city rows of separately coloured blocks with water tanks, masts and billboards; a viaduct with trains; a mixed tree row; gabled houses. The street is also seen through every window |
+| Enclosed surroundings | Relief fixed to its surface, sticking out toward the main space: half pieces on walls, hanging pieces on ceilings, low edges on floors. Anything with depth is **carved** relief (`carved` in `kit.ts`): real volume, painted onto the wall as the game camera sees it, so shelf lips, box ends and tops all show | Neighbouring shopfronts with recessed windows and folded awnings; pegboard, shelves, clock and frame on the shop walls; steel racking stocked with cartons, totes, crates, binders and rolls on the store-room side walls; high shelves under the roof slopes |
 
+- Layered shadow-box work (flat cards stacked a little apart, flattened along the surface's normal by `relief`) is only for flat objects (posters, boards, frames, cards) and for open distant views. Never use it for objects with depth on a wall indoors, above all on side walls, where the camera sees them edge-on and they collapse into flat strips.
 - One surface can be partly both: enclosure in front, the open view through its gaps. The alleys between the shops show the skyline; the windows show the street.
 - The front edge frames the opening: the kerb, the road and its lamps outside; boxes and a plant indoors.
 - Each kind of object has one design, used flat, in relief or freestanding.
@@ -114,6 +115,7 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 - The Blibli shop is a two-storey building with a gabled roof.
 - The first-floor outlet is a rectangular room with a flat ceiling, because the second floor sits on it.
 - The second-floor store-room is gabled, because it sits directly under that roof.
+- Stairs go the way the floor goes. In the outlet they climb; in the store-room, the top floor, they go **down**: a notch in the front left of the floor, a balustrade on its open side, the wall handrail falling with the flight, and the cut floor slab showing the treads dropping toward the shop.
 - The exterior is about 500 units tall so the whole roof stays in frame on the street camera. Rooms are drawn larger than the exterior scale, like any cutaway model.
 
 ## Pipeline
@@ -123,7 +125,7 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
 3. Blender Cycles bakes light only, at half the atlas size (`LIGHT_SCALE`): each surface sees itself as white while bounce rays still take on the colours around it. Light is smooth by nature, so a low sample count is enough once `finish.py` smooths it within each panel.
-4. `finish.py` multiplies the crisp print back over the light, lights the far backdrop evenly (nothing near can shade it), flattens decals and relief into their parents, culls faces no game camera can see, and writes the atlas, backdrop and manifest.
+4. `finish.py` multiplies the crisp print back over the light, lights the far backdrop evenly (nothing near can shade it), flattens decals and flat relief into their parents along the parent's normal, paints carved relief onto its wall along the game camera's rays (nearest piece wins), culls faces no game camera can see, and writes the atlas, backdrop and manifest. Far layers are packed last and cropped off the shipped atlas, so the backdrop can be cut at high resolution for free.
 5. `PaperScene` in `src/art/fold.tsx` renders the manifest as `matrix3d` quads.
 
 No AI image or 3D tool was used. All geometry is planar and generated from data.
@@ -134,7 +136,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 
 - Textured layers cost far more than flat colour ones. Up to about 120 flat faces ran at 60fps, while 59 textured quads did not.
 - The hard limit on the street is total fill, not quad count alone. Removing any one large layer recovered 60fps, while removing 11 small quads did nothing.
-- Use relief for anything against a wall: real depth in Blender, no quad in the browser.
+- Use relief for anything against a wall: real depth in Blender, no quad in the browser. Carved relief costs nothing extra in the browser either.
 - Mark sheets with no cut-outs as opaque so the browser skips blending them.
 - Anything far away and flat belongs in the CSS backdrop.
 
@@ -142,7 +144,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 |---|---|
 | Street | 130 |
 | First-floor outlet | 75 |
-| Second-floor store-room | 95 |
+| Second-floor store-room | 115 |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 

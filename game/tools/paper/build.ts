@@ -22,12 +22,14 @@ const STOCK: Record<Stock, { core: string; freq: string; octaves: number; amp: n
 };
 
 type Slot = { panel: Panel; x: number; y: number; pw: number; ph: number };
+// The far backdrop and its layers pack last, so finish.py can crop them off the bottom of the shipped atlas.
 function pack(panels: Panel[]) {
-  const sized = panels.map(panel => { const d = panel.density ?? DENSITY; return { panel, pw: Math.ceil(panel.w * d), ph: Math.ceil(panel.h * d) }; }).sort((a, b) => b.ph - a.ph);
+  const far = (p: Panel) => !!(p.backdrop || (p.decal && panels.find(q => q.id === p.decal)?.backdrop));
+  const sized = panels.map(panel => { const d = panel.density ?? DENSITY; return { panel, far: far(panel), pw: Math.ceil(panel.w * d), ph: Math.ceil(panel.h * d) }; }).sort((a, b) => +a.far - +b.far || b.ph - a.ph);
   const slots: Slot[] = []; let x = PAD, y = PAD, row = 0;
-  for (const s of sized) {
+  for (const [i, s] of sized.entries()) {
     if (s.pw + 2 * PAD > ATLAS_W) throw new Error(`panel ${s.panel.id} is wider than the atlas`);
-    if (x + s.pw + PAD > ATLAS_W) { x = PAD; y += row + PAD; row = 0; }
+    if (x + s.pw + PAD > ATLAS_W || (s.far && i && !sized[i - 1].far)) { x = PAD; y += row + PAD; row = 0; }
     slots.push({ ...s, x, y }); x += s.pw + PAD; row = Math.max(row, s.ph);
   }
   return { slots, height: y + row + PAD };
@@ -68,7 +70,7 @@ async function build(scene: Scene, samples: number) {
   await browser.close();
   const layout = {
     id: scene.id, atlas: { w: ATLAS_W, h: height }, sunToLight: SUN_TO_LIGHT, samples, light: scene.light, lamps: scene.lamps ?? [], camera: scene.camera, runs: scene.runs ?? [],
-    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, split: p.split ?? 1, x, y, pw, ph, n: normal(p) }))
+    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, view: !!p.view, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, split: p.split ?? 1, x, y, pw, ph, n: normal(p) }))
   };
   writeFileSync(join(WORK, 'layout.json'), JSON.stringify(layout));
   execFileSync(BLENDER, ['--background', '--factory-startup', '--python-exit-code', '1', '--python', join(HERE, 'bake.py'), '--', WORK], { stdio: 'pipe', maxBuffer: 1 << 28 });

@@ -5,33 +5,100 @@ import { heroPanels } from './_hero.ts';
 const MINT = '#35b58a', PLUM = '#7c6be0', WARM = '#ffe7a8', LEAF = '#57b36f';
 const SHOP = { x: 150, z: -80, w: 720, d: 300, ground: 230, upper: 150, peak: 120 };
 
-// Rooflines cut from one sheet: blocks of varied width and height, some with a water tank, mast or stepped top.
-function skyline(w: number, h: number, seed: number, lo: number, hi: number, minW: number, maxW: number) {
-  reseed(seed);
-  let d = `M0 ${h}`, x = 0;
-  const rnd = (a: number, b: number) => { const t = Math.sin(x * 12.9898 + seed * 78.233) * 43758.5453; return a + (t - Math.floor(t)) * (b - a); };
+// Seeded noise for the far layers, so each rebuild cuts the same city.
+let far = 1;
+const fr = (a: number, b: number) => { far = (far * 16807) % 2147483647; return a + (far / 2147483647) * (b - a); };
+// A row of separate blocks printed on one sheet: each its own colour, with windows, and a roof detail on some
+// (water tank, antenna, billboard, stepped top). The sheet is cut along the blocks' outline.
+function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], lit: string, roofs: boolean) {
+  far = seed;
+  let x = -fr(0, minW), mask = '', print = '';
   while (x < w) {
-    const bw = rnd(minW, maxW), top = h - rnd(lo, hi), kind = Math.floor(rnd(0, 5));
-    d += `V${top.toFixed(0)}`;
-    if (kind === 1) d += `H${(x + bw * .3).toFixed(0)}V${(top - 18).toFixed(0)}H${(x + bw * .42).toFixed(0)}V${top.toFixed(0)}`;
-    if (kind === 2) d += `H${(x + bw * .48).toFixed(0)}V${(top - 46).toFixed(0)}H${(x + bw * .52).toFixed(0)}V${top.toFixed(0)}`;
-    if (kind === 3) d += `H${(x + bw * .2).toFixed(0)}V${(top - 26).toFixed(0)}H${(x + bw * .8).toFixed(0)}V${top.toFixed(0)}`;
-    x += bw; d += `H${Math.min(w, x).toFixed(0)}`;
+    const bw = fr(minW, maxW), bh = fr(lo, hi), top = h - bh, c = cols[Math.floor(fr(0, cols.length))];
+    mask += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="#fff"/>`;
+    print += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="${c}"/><rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${bw.toFixed(0)}" height="6" fill="#000" fill-opacity=".12"/>`;
+    const step = bw > 90 ? 22 : 18;
+    for (let wx = x + 10; wx < x + bw - 14; wx += step) for (let wy = top + 18; wy < h - 16; wy += 26) if (fr(0, 1) > .3) print += `<rect x="${wx.toFixed(0)}" y="${wy.toFixed(0)}" width="8" height="12" fill="${fr(0, 1) > .8 ? '#fff4e2' : lit}"/>`;
+    if (roofs) {
+      const kind = Math.floor(fr(0, 5)), cx = x + bw * fr(.25, .7);
+      if (kind === 0) { mask += `<rect x="${(cx - 14).toFixed(0)}" y="${(top - 30).toFixed(0)}" width="28" height="22" fill="#fff"/><rect x="${(cx - 12).toFixed(0)}" y="${(top - 10).toFixed(0)}" width="3" height="10" fill="#fff"/><rect x="${(cx + 9).toFixed(0)}" y="${(top - 10).toFixed(0)}" width="3" height="10" fill="#fff"/>`; print += `<rect x="${(cx - 14).toFixed(0)}" y="${(top - 30).toFixed(0)}" width="28" height="22" fill="#9b7a5c"/><path d="M${(cx - 14).toFixed(0)} ${(top - 22).toFixed(0)}h28M${(cx - 14).toFixed(0)} ${(top - 15).toFixed(0)}h28" stroke="#7a5c42" stroke-width="2"/><rect x="${(cx - 12).toFixed(0)}" y="${(top - 10).toFixed(0)}" width="24" height="10" fill="#5c4a3c"/>`; }
+      if (kind === 1) { mask += `<rect x="${(cx - 1.5).toFixed(0)}" y="${(top - 54).toFixed(0)}" width="3" height="54" fill="#fff"/><rect x="${(cx - 10).toFixed(0)}" y="${(top - 40).toFixed(0)}" width="20" height="3" fill="#fff"/>`; print += `<rect x="${(cx - 10).toFixed(0)}" y="${(top - 54).toFixed(0)}" width="20" height="54" fill="#5d6670"/><circle cx="${cx.toFixed(0)}" cy="${(top - 54).toFixed(0)}" r="3" fill="${CORAL}"/>`; mask += `<circle cx="${cx.toFixed(0)}" cy="${(top - 54).toFixed(0)}" r="3" fill="#fff"/>`; }
+      if (kind === 2 && bw > 70) { const bwid = Math.min(bw - 16, 70); mask += `<rect x="${(cx - bwid / 2).toFixed(0)}" y="${(top - 40).toFixed(0)}" width="${bwid.toFixed(0)}" height="32" fill="#fff"/><rect x="${(cx - bwid / 2 + 6).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="3" height="8" fill="#fff"/><rect x="${(cx + bwid / 2 - 9).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="3" height="8" fill="#fff"/>`; print += `<rect x="${(cx - bwid / 2).toFixed(0)}" y="${(top - 40).toFixed(0)}" width="${bwid.toFixed(0)}" height="32" fill="${CREAM}"/><rect x="${(cx - bwid / 2 + 4).toFixed(0)}" y="${(top - 36).toFixed(0)}" width="${(bwid - 8).toFixed(0)}" height="24" fill="${[CORAL, BLUE, MINT, SUN][Math.floor(fr(0, 4))]}"/><rect x="${(cx - bwid / 2 + 10).toFixed(0)}" y="${(top - 30).toFixed(0)}" width="${(bwid * .4).toFixed(0)}" height="5" fill="${CREAM}"/><rect x="${(cx - bwid / 2).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="${bwid.toFixed(0)}" height="8" fill="#5d6670"/>`; }
+      if (kind === 3) { mask += `<rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="24" fill="#fff"/>`; print += `<rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="24" fill="${c}"/><rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="5" fill="#000" fill-opacity=".12"/>`; }
+    }
+    x += bw;
   }
-  return `<path d="${d}V${h}Z" fill="#fff"/>`;
+  return { mask, print };
 }
-const windowsGrid = (w: number, h: number, c: string, every: number, top: number) => { let out = ''; for (let x = 18; x < w; x += every) for (let y = top; y < h - 20; y += 34) if ((x * 7 + y * 3) % 5 > 1) out += `<rect x="${x}" y="${y}" width="9" height="13" fill="${c}"/>`; return out; };
-// Open surroundings: the city beyond the street, as flat layers that alternate pale and deep, then far hills.
+// Trees in a row, three silhouettes (round, cone, palm-like burst) in two greens, cut as one strip.
+function treeRow(w: number, h: number, seed: number) {
+  far = seed;
+  let x = 0, mask = `<rect y="${h - 40}" width="${w}" height="40" fill="#fff"/>`, print = `<rect y="${h - 40}" width="${w}" height="40" fill="#4f9c82"/>`;
+  while (x < w) {
+    const kind = Math.floor(fr(0, 3)), th = fr(70, 150), tw = fr(50, 90), c = fr(0, 1) > .5 ? '#4f9c82' : '#3f8a6e', base = h - 30;
+    const trunk = `<rect x="${(x + tw / 2 - 4).toFixed(0)}" y="${(base - th * .35).toFixed(0)}" width="8" height="${(th * .35 + 30).toFixed(0)}" fill="#6d4a33"/>`;
+    const crown = kind === 0 ? `<circle cx="${(x + tw / 2).toFixed(0)}" cy="${(base - th * .6).toFixed(0)}" r="${(tw / 2).toFixed(0)}" FILL/><circle cx="${(x + tw * .3).toFixed(0)}" cy="${(base - th * .42).toFixed(0)}" r="${(tw * .32).toFixed(0)}" FILL/><circle cx="${(x + tw * .72).toFixed(0)}" cy="${(base - th * .45).toFixed(0)}" r="${(tw * .3).toFixed(0)}" FILL/>`
+      : kind === 1 ? `<path d="M${(x + tw / 2).toFixed(0)} ${(base - th).toFixed(0)}L${(x + tw * .9).toFixed(0)} ${(base - th * .28).toFixed(0)}H${(x + tw * .1).toFixed(0)}Z" FILL/>`
+      : `<path d="M${(x + tw / 2).toFixed(0)} ${(base - th).toFixed(0)}l${(-tw * .5).toFixed(0)} 22l${(tw * .3).toFixed(0)} -4l${(-tw * .2).toFixed(0)} 26l${(tw * .4).toFixed(0)} -18l${(tw * .4).toFixed(0)} 18l${(-tw * .2).toFixed(0)} -26l${(tw * .3).toFixed(0)} 4Z" FILL/>`;
+    mask += trunk.replace(/fill="[^"]+"/, 'fill="#fff"') + crown.replaceAll('FILL', 'fill="#fff"');
+    print += trunk + crown.replaceAll('FILL', `fill="${c}"`) + (kind === 0 ? `<circle cx="${(x + tw * .4).toFixed(0)}" cy="${(base - th * .66).toFixed(0)}" r="${(tw * .12).toFixed(0)}" fill="#7fc49a" fill-opacity=".6"/>` : '');
+    x += tw * fr(.6, 1.1);
+  }
+  return { mask, print };
+}
+// Low houses in front of the city: gabled roofs, chimneys, a lit window or two.
+function houses(w: number, h: number, seed: number) {
+  far = seed;
+  let x = -20, mask = '', print = '';
+  const walls = ['#f2cf8a', '#e9a77b', '#f4e3c3', '#c7dcc0', '#e3b9a8'], roofs = ['#c8553d', '#a8442f', '#d77b6a', '#8f5a4a'];
+  while (x < w) {
+    const hw = fr(110, 190), wh = fr(70, 130), rh = fr(36, 60), top = h - wh;
+    const shape = `M${x.toFixed(0)} ${h}V${top.toFixed(0)}L${(x + hw / 2).toFixed(0)} ${(top - rh).toFixed(0)}L${(x + hw).toFixed(0)} ${top.toFixed(0)}V${h}Z`;
+    const chim = fr(0, 1) > .5 ? `<rect x="${(x + hw * .68).toFixed(0)}" y="${(top - rh * .8).toFixed(0)}" width="12" height="${(rh * .6).toFixed(0)}" FILL/>` : '';
+    mask += `<path d="${shape}" fill="#fff"/>` + chim.replace('FILL', 'fill="#fff"');
+    const roof = roofs[Math.floor(fr(0, roofs.length))];
+    print += `<path d="${shape}" fill="${walls[Math.floor(fr(0, walls.length))]}"/><path d="M${(x - 4).toFixed(0)} ${(top + 4).toFixed(0)}L${(x + hw / 2).toFixed(0)} ${(top - rh).toFixed(0)}L${(x + hw + 4).toFixed(0)} ${(top + 4).toFixed(0)}V${(top + 12).toFixed(0)}L${(x + hw / 2).toFixed(0)} ${(top - rh + 10).toFixed(0)}L${(x - 4).toFixed(0)} ${(top + 12).toFixed(0)}Z" fill="${roof}"/>${chim.replace('FILL', `fill="${roof}"`)}`;
+    for (let k = 0; k < 2; k++) print += `<rect x="${(x + hw * (.18 + k * .44)).toFixed(0)}" y="${(top + 22).toFixed(0)}" width="${(hw * .2).toFixed(0)}" height="24" fill="${fr(0, 1) > .5 ? '#fff4e2' : '#5d7f95'}"/><rect x="${(x + hw * (.18 + k * .44)).toFixed(0)}" y="${(top + 33).toFixed(0)}" width="${(hw * .2).toFixed(0)}" height="2" fill="#fff"/>`;
+    x += hw + fr(-10, 16);
+  }
+  return { mask, print };
+}
+const birds = (pts: [number, number, number][]) => pts.map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#3d4a5a"/>`).join('');
+// Open surroundings: the city beyond the street, many flat layers from the far mountains to the nearest rooftops,
+// alternating pale and deep. The whole stack bakes into the CSS backdrop.
 function backdrop(): Panel[] {
   reseed(11);
-  const card = (id: string, z: number, y: number, w: number, h: number, c: string, mask: string, print = ''): Panel => ({ id, stock: 'sugar', c, w, h, o: [-w / 2 + 120, y, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .36, mask, print });
+  const FAR = .72;
+  const card = (id: string, z: number, y: number, w: number, h: number, c: string, mask: string, print = '', stock: Panel['stock'] = 'sugar'): Panel => ({ id, stock, c, w, h, o: [-w / 2 + 120, y, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR, mask, print });
+  const peaks = (w: number, h: number, seed: number, n: number) => { far = seed; let d = `M0 ${h}`, snow = ''; for (let i = 0; i <= n; i++) { const x = i * w / n, top = h - fr(h * .45, h * .95), xm = x + w / n / 2, low = h - fr(h * .2, h * .45); d += `L${x.toFixed(0)} ${top.toFixed(0)}L${xm.toFixed(0)} ${low.toFixed(0)}`; snow += `<path d="M${(x - 34).toFixed(0)} ${(top + 40).toFixed(0)}L${x.toFixed(0)} ${top.toFixed(0)}L${(x + 34).toFixed(0)} ${(top + 40).toFixed(0)}L${(x + 14).toFixed(0)} ${(top + 30).toFixed(0)}L${x.toFixed(0)} ${(top + 44).toFixed(0)}L${(x - 14).toFixed(0)} ${(top + 30).toFixed(0)}Z" fill="#f4f1fb"/>`; } return { mask: `<path d="${d}V${h}Z" fill="#fff"/>`, snow }; };
+  const mtn = peaks(4600, 520, 5, 9);
+  far = 41; const hillDots = Array.from({ length: 140 }, () => `<circle cx="${fr(0, 4400).toFixed(0)}" cy="${fr(240, 400).toFixed(0)}" r="${fr(5, 10).toFixed(0)}" fill="#8fc4b8"/>`).join('');
+  const farCity = blocks(4200, 640, 3, 220, 500, 70, 170, ['#a6cfe0', '#b3d6e5', '#9cc6d9'], '#c6e3ee', false);
+  // A far landmark: a broadcast tower with a pod, and a crane over a new block.
+  const tower = `<rect x="1890" y="70" width="10" height="570" fill="#fff"/><rect x="1868" y="190" width="54" height="36" rx="16" fill="#fff"/><rect x="1880" y="240" width="30" height="10" fill="#fff"/><rect x="1893" y="20" width="4" height="50" fill="#fff"/>`;
+  const towerPrint = `<rect x="1890" y="70" width="10" height="570" fill="#94c0d4"/><rect x="1868" y="190" width="54" height="36" rx="16" fill="#94c0d4"/><rect x="1872" y="202" width="46" height="6" fill="#c6e3ee"/><rect x="1880" y="240" width="30" height="10" fill="#94c0d4"/><rect x="1893" y="20" width="4" height="50" fill="#94c0d4"/><circle cx="1895" cy="20" r="4" fill="${CORAL}"/>`;
+  const crane = `<rect x="2900" y="150" width="10" height="490" fill="#fff"/><rect x="2780" y="150" width="260" height="10" fill="#fff"/><rect x="3000" y="160" width="2" height="90" fill="#fff"/><rect x="2988" y="250" width="26" height="16" fill="#fff"/>`;
+  const cranePrint = `<rect x="2900" y="150" width="10" height="490" fill="${SUN}"/><rect x="2780" y="150" width="260" height="10" fill="${SUN}"/><rect x="2780" y="150" width="30" height="18" fill="#94c0d4"/><rect x="3000" y="160" width="2" height="90" fill="#7a8896"/><rect x="2988" y="250" width="26" height="16" fill="#e9a77b"/>`;
+  const midA = blocks(3900, 540, 7, 200, 420, 90, 200, ['#6fa6bf', '#5d93ad', '#7fb2c4', '#86a9c9'], '#f6dfa0', true);
+  const midB = blocks(3700, 460, 19, 170, 330, 80, 160, ['#e3b98f', '#d9a27a', '#efcf9e', '#c9b8d8'], '#fff4e2', true);
+  // A viaduct crosses between the city and the trees, with a commuter train on it.
+  const arches = `M0 120V22H3700V120${Array.from({ length: 37 }, (_, i) => `H${3700 - i * 100 - 14}V70A36 36 0 0 0 ${3700 - i * 100 - 86} 70V120`).join('')}H0Z`;
+  const train = (x: number) => `<rect x="${x}" y="6" width="560" height="34" rx="10" fill="#fff"/>`;
+  const trainPrint = (x: number) => Array.from({ length: 4 }, (_, i) => `<rect x="${x + i * 142}" y="6" width="134" height="34" rx="${i === 0 ? 14 : 4}" fill="${CREAM}"/><rect x="${x + i * 142}" y="28" width="134" height="7" fill="${CORAL}"/>${Array.from({ length: 5 }, (_, k) => `<rect x="${x + i * 142 + 12 + k * 24}" y="12" width="14" height="11" fill="#5d7f95"/>`).join('')}`).join('');
+  const trees = treeRow(3500, 300, 23), homes = houses(3300, 300, 29);
+  const balloon = (x: number, y: number, k: number) => `<g transform="translate(${x} ${y}) scale(${k})"><path d="M30 0C66 0 66 44 40 70H20C-6 44 -6 0 30 0Z" fill="${CORAL}"/><path d="M30 0C42 0 46 44 36 70H24C14 44 18 0 30 0Z" fill="${CREAM}"/><path d="M22 70L24 84M38 70L36 84" stroke="#6d4a33" stroke-width="2"/><rect x="22" y="84" width="16" height="12" fill="#a8693a"/></g>`;
   return [
-    { id: 'sky', backdrop: true, stock: 'cover', c: '#7cc6ea', w: 5200, h: 1500, o: [-2480, -160, -780], u: [1, 0, 0], v: [0, 1, 0], density: .3, print: `${cloud(1500, 330, 2)}${cloud(2400, 240, 1.5)}${cloud(3200, 340, 2.2)}${cloud(1950, 500, 1)}` },
-    ...[card('hills-far', -700, -30, 4400, 420, '#b9dfe3', scallopTop(4400, 420, 22, 150)),
-    card('city-far', -650, -30, 4200, 640, '#a6cfe0', skyline(4200, 640, 3, 300, 560, 90, 220), windowsGrid(4200, 640, '#c6e3ee', 64, 120)),
-    card('city-mid', -580, -30, 3900, 540, '#6fa6bf', skyline(3900, 540, 7, 240, 460, 120, 260), windowsGrid(3900, 540, '#f6dfa0', 52, 110)),
-    card('trees-row', -520, -10, 3400, 300, '#4f9c82', scallopTop(3400, 300, 34, 70), specks(3400, 300, '#3a7f66', 200, 9)),
-    card('rooftops', -470, -10, 3200, 420, '#e7b48a', skyline(3200, 420, 13, 260, 400, 160, 300), windowsGrid(3200, 420, '#fff4e2', 46, 60))].map(p => ({ ...p, decal: 'sky' }))
+    { id: 'sky', backdrop: true, stock: 'cover', c: '#7cc6ea', w: 5200, h: 1500, o: [-2480, -160, -780], u: [1, 0, 0], v: [0, 1, 0], density: FAR,
+      // Only world heights of about 400 to 780 show above the street (sheet rows 560 to 940), so the sky's stories live there.
+      print: `<circle cx="3760" cy="640" r="70" fill="#ffe7a8"/><circle cx="3760" cy="640" r="52" fill="${SUN}"/>${cloud(700, 640, 1.1, '#d8eef8')}${cloud(2650, 600, 1.2, '#d8eef8')}${cloud(4200, 700, 1, '#d8eef8')}${cloud(1050, 590, 1.6)}${cloud(1900, 660, 1.2)}${cloud(3150, 610, 1.5)}${cloud(2350, 760, .8)}${cloud(4500, 600, 1.1)}${cloud(1500, 780, .7)}${balloon(1350, 680, 1.1)}${balloon(2950, 650, .8)}${balloon(4050, 760, .6)}${birds([[2180, 640, 1.2], [2215, 622, 1], [2245, 650, .9], [3420, 700, 1], [3450, 686, .8], [1650, 720, .9]])}` },
+    ...[card('mountains', -740, 110, 4600, 520, '#c9c3e6', mtn.mask, mtn.snow),
+    card('hills-far', -700, 50, 4400, 420, '#b9dfe3', scallopTop(4400, 420, 22, 150), hillDots),
+    card('city-far', -650, 0, 4200, 640, '#a6cfe0', farCity.mask + tower + crane, farCity.print + towerPrint + cranePrint),
+    card('city-mid', -600, 10, 3900, 540, '#6fa6bf', midA.mask, midA.print),
+    card('city-warm', -570, 20, 3700, 460, '#e3b98f', midB.mask, midB.print),
+    card('viaduct', -545, 230, 3700, 160, '#d8c7a8', `<path transform="translate(0 40)" d="${arches}" fill="#fff"/>${train(700)}${train(2500)}`, `<rect y="40" width="3700" height="10" fill="#b9a585"/>${trainPrint(700)}${trainPrint(2500)}`),
+    card('trees-row', -520, -10, 3500, 300, '#4f9c82', trees.mask, trees.print),
+    card('rooftops', -470, -10, 3300, 300, '#e7b48a', homes.mask, homes.print)].map(p => ({ ...p, decal: 'sky' }))
   ];
 }
 // The street: pavement for walking, a kerb, then the road with its markings, on one die-cut base sheet.

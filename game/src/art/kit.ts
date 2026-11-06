@@ -6,6 +6,8 @@ export type Panel = {
   emit?: number; motion?: Motion; group?: string; backdrop?: boolean; show?: Show;
   // Ship this sheet as `split` side-by-side tiles: browsers stop drawing one very wide plane seen edge-on.
   split?: number;
+  // With `decal`: painted onto the parent as the game camera sees it, not straight along the parent's normal.
+  view?: boolean;
 };
 // A panel with `show` exists only while its toy is in one of the listed states. Such panels are baked as phantoms:
 // lit like everything else, but they cast no shadow, so the variants that share one spot never shade each other.
@@ -71,3 +73,7 @@ export function relief(parent: Panel, panels: Panel[]): Panel[] {
   const n = normal(parent);
   return panels.map(p => (normal(p)[0] * n[0] + normal(p)[1] * n[1] + normal(p)[2] * n[2] > .5 ? { ...p, decal: parent.id } : { ...p, ghost: true }));
 }
+
+// Relief that keeps its volume: every piece is real in the bake (it lights and shades the wall), then each face that turns
+// toward the camera is painted onto the wall where the camera sees it. Boxes keep their ends and tops; no quad is added.
+export const carved = (parent: Panel, panels: Panel[]): Panel[] => panels.map(p => ({ ...p, decal: parent.id, view: true }));

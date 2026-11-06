@@ -1,7 +1,7 @@
 import { chromium } from 'playwright-core'; import { spawn } from 'child_process'; import fs from 'fs';
 const CH = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const srv = spawn('npx', ['vite', 'preview', '--port', '4610', '--strictPort'], { stdio: 'ignore', detached: true }); await new Promise(r => setTimeout(r, 1500));
-const B = 'http://localhost:4610'; const BUDGET = { street: 130, shop: 75, storeroom: 95 }; const id = t => `[data-testid="${t}"]`; fs.mkdirSync('shots', { recursive: true });
+const B = 'http://localhost:4610'; const BUDGET = { street: 130, shop: 75, storeroom: 115 }; const id = t => `[data-testid="${t}"]`; fs.mkdirSync('shots', { recursive: true });
 const browser = await chromium.launch({ executablePath: CH, headless: true, args: process.env.CHROME ? [] : ['--use-angle=metal', '--ignore-gpu-blocklist'] });
 const ok = [], bad = []; const check = async (n, f) => { try { await f(); ok.push(n); console.log('PASS', n); } catch (e) { bad.push(n); console.log('FAIL', n, String(e.message).split('\n')[0]); } };
 const hold = async (p, key, until, ms = 9000) => { await p.keyboard.down(key); try { await p.waitForSelector(until, { timeout: ms }); } catch (e) { console.log('  stuck', key, until, JSON.stringify(await p.evaluate(() => [location.pathname, document.querySelector('[data-testid=courier]')?.style.transform, [...document.querySelectorAll('.sign.near')].map(e => e.dataset.testid)]))); throw e; } finally { await p.keyboard.up(key); } };

@@ -69,10 +69,10 @@ export const content: Content = validateContent({ worlds: {
       { fact: "High volume of traffic puts continuous attention to this page's performance, pushing me to learn many web optimization techniques", at: ['recs', 'street-door'] } ] },
   // Second floor: product reviews, from writing one to browsing everyone's.
   'blibli-storeroom': { id: 'blibli-storeroom', art: 'storeroom', back: { world: 'blibli-shop', stop: 'stairs-up' }, camera: { zoom: .8, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -150, z1: 190 },
-    solid: [{ x0: -360, x1: 420, z0: -235, z1: -165 }, { x0: 120, x1: 420, z0: 83, z1: 153 }, { x0: -190, x1: 70, z0: 15, z1: 105 }, { x0: -372, x1: -288, z0: 108, z1: 172 }, { x0: 370, x1: 430, z0: -165, z1: -138 }],
+    solid: [{ x0: -360, x1: 420, z0: -235, z1: -165 }, { x0: 120, x1: 420, z0: 83, z1: 153 }, { x0: -190, x1: 70, z0: 15, z1: 105 }, { x0: -277, x1: -193, z0: 143, z1: 207 }, { x0: 370, x1: 430, z0: -165, z1: -138 }, { x0: -487, x1: -287, z0: 85, z1: 260 }, { x0: 52, x1: 108, z0: 156, z1: 200 }, { x0: 420, x1: 470, z0: 0, z1: 48 }, { x0: 446, x1: 470, z0: -50, z1: -10 }],
     title: 'Second floor: store-room', path: 'store', color: '#0092da',
     stops: [
-      { id: 'stairs-down', label: 'Downstairs', x: -400, z: -130, reach: 80, action: { kind: 'road', to: 'blibli-shop', stop: 'stairs-up' } },
+      { id: 'stairs-down', label: 'Downstairs', x: -387, z: 58, reach: 80, action: { kind: 'road', to: 'blibli-shop', stop: 'stairs-up' } },
       { id: 'camera', label: 'Instant camera', x: -88, z: -40, focus: 1.8, look: -140, action: { kind: 'toy', toy: 'photo', states: 3 } },
       { id: 'stars', label: 'Review card', x: 112, z: -40, focus: 1.8, look: 15, action: { kind: 'toy', toy: 'rating', states: 5 } },
       { id: 'gallery', label: 'Photo gallery', x: -120, z: -110, focus: 1.6, look: -190, action: { kind: 'toy', toy: 'gallery', states: 2 } },
