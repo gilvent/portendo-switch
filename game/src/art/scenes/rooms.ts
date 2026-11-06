@@ -145,8 +145,13 @@ export function shop(): Scene {
     { id: 'fg-plant', stock: 'sugar', c: '#2f7d48', w: 120, h: 170, o: [400, 0, 214], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.6, mask: '<path d="M60 170Q40 120 10 96Q40 92 54 112Q30 50 44 10Q66 40 66 104Q84 62 112 50Q106 104 72 134L66 170Z" fill="#fff"/>' },
     { id: 'fg-pot', stock: 'cover', c: CORAL, w: 62, h: 44, o: [428, 0, 216], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', mask: '<path d="M0 0H62L52 44H10Z" fill="#fff"/>' }
   ];
+  // Bunting strung across the room at ceiling height: the overhead layer that closes the box from above.
+  const sag = (x: number) => 30 + 26 * Math.sin(Math.PI * x / W) ** 1;
+  const flags = Array.from({ length: 22 }, (_, i) => { const x = 24 + i * 46, y = sag(x); return `<path d="M${x - 15} ${y.toFixed(1)}L${x + 15} ${(y + 1.5).toFixed(1)}L${x} ${(y + 34).toFixed(1)}Z" fill="#fff"/>`; }).join('');
+  const string = `<path d="M0 30${Array.from({ length: 41 }, (_, i) => `L${(i + 1) * W / 41} ${sag((i + 1) * W / 41).toFixed(1)}`).join('')}" stroke="#fff" stroke-width="3" fill="none"/>`;
+  const bunting: Panel = { id: 'bunting', stock: 'cover', c: CREAM, w: W, h: 96, o: [-W / 2, H - 100, 120], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.4, mask: string + flags, print: `${Array.from({ length: 22 }, (_, i) => `<rect x="${i * 46 + 9}" width="30" height="96" fill="${[CORAL, SUN, BLUE, MINT][i % 4]}"/>`).join('')}` };
   const lamps = [[-175, -60], [0, -90], [175, -60]] as const;
-  const panels = [sill('sill', '#6d4524'), fl, rug, mat, back, lw, rw, peg, ...accessories, ...wallDeco, ...win('win-a', 150, 4), ...win('win-b', 760, 9),
+  const panels = [sill('sill', '#6d4524'), bunting, fl, rug, mat, back, lw, rw, peg, ...accessories, ...wallDeco, ...win('win-a', 150, 4), ...win('win-b', 760, 9),
     pennant('tag-promo', 120, 352, CORAL, percent), pennant('tag-phones', 800, 352, BLUE, phoneIcon), poster, ...shelves,
     ...ped, ...phones, ...chips, ...catStand, ...leaflet, ...promoStand, pole, ...tags, burst, coupon(0), coupon(1),
     ...basket, handle, ...inCart, ...riser, ...recs, shopper, ...stairCard('stairs', 395, 1, WOOD),
@@ -228,10 +233,12 @@ export function storeroom(): Scene {
   const onBelt = (group: string, c: string, x: number, z: number) => carton(group, x, z, 62, 54, 40, 46, c, 0, group);
   const stack = [...carton('st-a', -330, 140, 0, 84, 62, 64), ...carton('st-c', -316, 138, 62, 62, 46, 50, KRAFT, 10)];
   const fgBoxes = [...carton('fg-a', 470, 210, 0, 100, 96, 70), ...carton('fg-b', 462, 212, 96, 74, 58, 56, CORAL, -6), ...carton('fg-c', -470, 214, 0, 80, 60, 56)];
+  // A packer at the far belt.
+  const packer = stand('packer', 400, -150, 0, 70, 168, STEEL, { density: 2, mask: '<path d="M22 168V116H12V62Q12 44 28 42Q20 36 22 22Q24 4 36 4Q50 4 50 22Q51 36 42 42Q58 44 58 62V116H48V168H38V122H32V168Z" fill="#fff"/>', print: `<rect width="70" height="44" fill="#c99a7a"/><path d="M18 14Q36 -8 54 14V20H18Z" fill="${CORAL}"/><rect y="44" width="70" height="76" fill="${MINT}"/><rect x="18" y="56" width="34" height="64" fill="#2f7d5b"/><rect y="120" width="70" height="48" fill="${STEEL}"/>` }, -12);
   const lamps = [[-170, -40], [60, 30], [290, -60]] as const;
   const panels = [sill('sill', '#4a3424'), fl, back, lw, rw, roundWin, roundFrame, cork, corkFrame, ...tabs, ...reviewCards, oldCard, ...cans, roller,
     pegboard, ...grid, line, ...list, ...rackOn(lw, -1, 'rack-l'), ...rackOn(rw, 1, 'rack-r'),
-    ...beltBox('belt-a', 40, -200, 760), ...beltBox('belt-b', 270, 118, 300), ...onBelt('p-a', KRAFT, -300, -200), ...onBelt('p-b', CORAL, 150, 118),
+    packer, ...beltBox('belt-a', 40, -200, 760), ...beltBox('belt-b', 270, 118, 300), ...onBelt('p-a', KRAFT, -300, -200), ...onBelt('p-b', CORAL, 150, 118),
     ...desk, ...camera, ejected, form, ...ratings, pinned, ...mug, ...stack, ...stairCard('stairs', -395, -1, WOOD),
     ...lamps.flatMap(([x, z], i) => lampSet(`lamp-${i}`, x, z, 300, 480 - Math.abs(x) * .38)), ...fgBoxes];
   return {

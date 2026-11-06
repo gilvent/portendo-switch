@@ -122,7 +122,8 @@ def tiles(q, n):
     u = u / np.linalg.norm(u)
     out = []
     for k in range(n):
-        x0, x1 = round(q["pw"] * k / n), round(q["pw"] * (k + 1) / n)
+        # Neighbouring tiles overlap by two pixels so no seam opens between them.
+        x0, x1 = max(0, round(q["pw"] * k / n) - 1), min(q["pw"], round(q["pw"] * (k + 1) / n) + 1)
         o = (np.array(q["o"], dtype=float) + u * q["w"] * x0 / q["pw"]).round(3).tolist()
         out.append({**q, "id": f'{q["id"]}-{k}', "o": o, "w": q["w"] * (x1 - x0) / q["pw"], "x": q["x"] + x0, "pw": x1 - x0})
     return out
