@@ -26,12 +26,15 @@ scene = bpy.context.scene
 for stale in list(bpy.data.objects):
     bpy.data.objects.remove(stale)
 scene.render.engine = "CYCLES"
-scene.cycles.device = "GPU"
 prefs = bpy.context.preferences.addons["cycles"].preferences
-prefs.compute_device_type = "METAL"
-prefs.get_devices()
-for d in prefs.devices:
-    d.use = True
+try:
+    prefs.compute_device_type = os.environ.get("CYCLES_DEVICE", "METAL")
+    prefs.get_devices()
+    for d in prefs.devices:
+        d.use = True
+    scene.cycles.device = "GPU" if any(d.type != "CPU" for d in prefs.devices) else "CPU"
+except TypeError:
+    scene.cycles.device = "CPU"
 scene.cycles.samples = L["samples"]
 scene.cycles.use_denoising = False
 scene.cycles.max_bounces = 6
@@ -42,7 +45,9 @@ scene.view_settings.view_transform = "Standard"
 
 albedo = bpy.data.images.load(os.path.join(WORK, "albedo.png"))
 albedo.alpha_mode = "STRAIGHT"
-target = bpy.data.images.new("bake", AW, AH, alpha=False, float_buffer=True)
+LS = float(os.environ.get("LIGHT_SCALE", "0.5"))
+BW, BH = max(1, round(AW * LS)), max(1, round(AH * LS))
+target = bpy.data.images.new("bake", BW, BH, alpha=False, float_buffer=True)
 target.colorspace_settings.name = "Linear Rec.709"
 
 
@@ -65,18 +70,32 @@ def material(name, transl, emit):
     bump.inputs["Strength"].default_value = 0.22
     bump.inputs["Distance"].default_value = 0.002
     k.new(noise.outputs[0], bump.inputs["Height"])
+    # The baked surface sees itself as white (light only); bounce rays still pick up its printed colour.
+    path = n.new("ShaderNodeLightPath")
+    own = n.new("ShaderNodeMix")
+    own.data_type = "RGBA"
+    k.new(path.outputs["Is Camera Ray"], own.inputs["Factor"])
+    k.new(tex.outputs["Color"], own.inputs["A"])
+    own.inputs["B"].default_value = (1, 1, 1, 1)
     diff = n.new("ShaderNodeBsdfDiffuse")
-    k.new(tex.outputs["Color"], diff.inputs["Color"])
+    k.new(own.outputs["Result"], diff.inputs["Color"])
     k.new(bump.outputs[0], diff.inputs["Normal"])
     tr = n.new("ShaderNodeBsdfTranslucent")
-    k.new(tex.outputs["Color"], tr.inputs["Color"])
+    k.new(own.outputs["Result"], tr.inputs["Color"])
     paper = n.new("ShaderNodeMixShader")
     paper.inputs[0].default_value = transl
     k.new(diff.outputs[0], paper.inputs[1])
     k.new(tr.outputs[0], paper.inputs[2])
     glow = n.new("ShaderNodeEmission")
     k.new(tex.outputs["Color"], glow.inputs["Color"])
-    glow.inputs["Strength"].default_value = emit
+    dim = n.new("ShaderNodeMath")
+    dim.operation = "MULTIPLY"
+    k.new(path.outputs["Is Camera Ray"], dim.inputs[0])
+    dim.inputs[1].default_value = -emit
+    lift = n.new("ShaderNodeMath")
+    k.new(dim.outputs[0], lift.inputs[0])
+    lift.inputs[1].default_value = emit
+    k.new(lift.outputs[0], glow.inputs["Strength"])
     lit = n.new("ShaderNodeAddShader")
     k.new(paper.outputs[0], lit.inputs[0])
     k.new(glow.outputs[0], lit.inputs[1])
@@ -93,45 +112,58 @@ def material(name, transl, emit):
 
 
 mats = {}
-verts, faces, uvs, mat_ids, mat_list = [], [], [], [], []
+mat_list = []
 
 
-def quad(pts, rect, transl, emit):
+def mat_index(transl, emit):
     key = (round(transl, 3), round(emit, 3))
     if key not in mats:
         mats[key] = len(mat_list)
         mat_list.append(material(f"paper-{key}", transl, emit))
-    i = len(verts)
-    verts.extend(pts)
-    faces.append((i, i + 1, i + 2, i + 3))
-    x, y, w, h = rect
-    uvs.extend([(x / AW, 1 - (y + h) / AH), ((x + w) / AW, 1 - (y + h) / AH), ((x + w) / AW, 1 - y / AH), (x / AW, 1 - y / AH)])
-    mat_ids.append(mats[key])
+    return mats[key]
 
 
-for p in L["panels"]:
-    o, u, v = (Vector(p[k]) for k in "ouv")
-    u, v = u.normalized(), v.normalized()
-    a = o
-    b = o + u * p["w"]
-    c = b + v * p["h"]
-    d = o + v * p["h"]
-    quad([to_blender(q) for q in (a, b, c, d)], (p["x"], p["y"], p["pw"], p["ph"]), p["transl"], p["emit"])
+def build(name, panels, phantom):
+    verts, faces, uvs, mat_ids = [], [], [], []
+    for p in panels:
+        o, u, v = (Vector(p[k]) for k in "ouv")
+        u, v = u.normalized(), v.normalized()
+        pts = [o, o + u * p["w"], o + u * p["w"] + v * p["h"], o + v * p["h"]]
+        i = len(verts)
+        verts.extend(to_blender(q) for q in pts)
+        faces.append((i, i + 1, i + 2, i + 3))
+        x, y, w, h = p["x"], p["y"], p["pw"], p["ph"]
+        uvs.extend([(x / AW, 1 - (y + h) / AH), ((x + w) / AW, 1 - (y + h) / AH), ((x + w) / AW, 1 - y / AH), (x / AW, 1 - y / AH)])
+        mat_ids.append(mat_index(p["transl"], p["emit"]))
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    for m in mat_list:
+        mesh.materials.append(m)
+    layer = mesh.uv_layers.new(name="UV")
+    for li, uv in enumerate(uvs):
+        layer.data[li].uv = uv
+    for poly, mid in zip(mesh.polygons, mat_ids):
+        poly.material_index = mid
+    obj = bpy.data.objects.new(name, mesh)
+    if phantom:
+        obj.visible_shadow = False
+        obj.visible_diffuse = False
+        obj.visible_transmission = False
+    scene.collection.objects.link(obj)
+    return obj
 
-mesh = bpy.data.meshes.new("hero")
-mesh.from_pydata(verts, [], faces)
-mesh.update()
-for m in mat_list:
-    mesh.materials.append(m)
-layer = mesh.uv_layers.new(name="UV")
-for li, uv in enumerate(uvs):
-    layer.data[li].uv = uv
-for poly, mid in zip(mesh.polygons, mat_ids):
-    poly.material_index = mid
-obj = bpy.data.objects.new("hero", mesh)
-scene.collection.objects.link(obj)
-bpy.context.view_layer.objects.active = obj
-obj.select_set(True)
+
+# Panels that swap or ride a belt are lit but cast no shadow: their rest pose is not where they usually are.
+is_phantom = lambda p: bool(p.get("show") or p.get("group"))
+solid_panels = [p for p in L["panels"] if not is_phantom(p)]
+phantom_panels = [p for p in L["panels"] if is_phantom(p)]
+objs = [build("paper", solid_panels, False)]
+if phantom_panels:
+    objs.append(build("phantom", phantom_panels, True))
+for o in objs:
+    o.select_set(True)
+bpy.context.view_layer.objects.active = objs[0]
 
 sx, sy, sz = L["sunToLight"]
 sun = bpy.data.objects.new("sun", bpy.data.lights.new("sun", "SUN"))
@@ -160,15 +192,15 @@ scene.render.bake.use_pass_indirect = True
 scene.render.bake.use_pass_color = True
 scene.render.bake.use_pass_diffuse = True
 scene.render.bake.use_pass_transmission = True
-scene.render.bake.use_pass_emit = True
+scene.render.bake.use_pass_emit = False
 scene.render.bake.use_pass_glossy = False
-bpy.ops.object.bake(type="COMBINED", pass_filter={"DIRECT", "INDIRECT", "COLOR", "DIFFUSE", "TRANSMISSION", "EMIT"})
+bpy.ops.object.bake(type="COMBINED", pass_filter={"DIRECT", "INDIRECT", "COLOR", "DIFFUSE", "TRANSMISSION"})
 target.filepath_raw = os.path.join(WORK, "baked.exr")
 target.file_format = "OPEN_EXR"
 target.save()
 
 import numpy as np
 
-px = np.array(target.pixels[:], dtype=np.float32).reshape(AH, AW, 4)[::-1, :, :3]
-np.save(os.path.join(WORK, "baked.npy"), px)
+px = np.array(target.pixels[:], dtype=np.float32).reshape(BH, BW, 4)[::-1, :, :3]
+np.save(os.path.join(WORK, "light.npy"), px)
 

@@ -8,7 +8,7 @@ import { SCENES } from '../../src/art/scenes/index.ts';
 import { SUN_TO_LIGHT } from '../../src/light.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url)), GAME = join(HERE, '../..');
-const BLENDER = '/Applications/Blender.app/Contents/MacOS/Blender', CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const BLENDER = process.env.BLENDER ?? '/Applications/Blender.app/Contents/MacOS/Blender', CHROME = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 for (const bin of [BLENDER, CHROME]) if (!existsSync(bin)) throw new Error(`missing required tool: ${bin}`);
 
 const DENSITY = 3, PAD = 6, ATLAS_W = 4096;
@@ -68,7 +68,7 @@ async function build(scene: Scene, samples: number) {
   await browser.close();
   const layout = {
     id: scene.id, atlas: { w: ATLAS_W, h: height }, sunToLight: SUN_TO_LIGHT, samples, light: scene.light, lamps: scene.lamps ?? [], camera: scene.camera, runs: scene.runs ?? [],
-    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, motion: p.motion ?? null, group: p.group ?? null, x, y, pw, ph, n: normal(p) }))
+    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, split: p.split ?? 1, x, y, pw, ph, n: normal(p) }))
   };
   writeFileSync(join(WORK, 'layout.json'), JSON.stringify(layout));
   execFileSync(BLENDER, ['--background', '--factory-startup', '--python-exit-code', '1', '--python', join(HERE, 'bake.py'), '--', WORK], { stdio: 'pipe', maxBuffer: 1 << 28 });

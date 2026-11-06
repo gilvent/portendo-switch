@@ -17,9 +17,9 @@ function scenery(w: World): Card[] {
   });
 }
 
-type Props = { world: World; nearStop: string | null; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; onStop: (s: Stop) => void };
+type Props = { world: World; nearStop: string | null; toys: Record<string, number>; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; onStop: (s: Stop) => void };
 
-export default function Scene({ world, nearStop, stageRef, courierRef, flipRef, onStop }: Props) {
+export default function Scene({ world, nearStop, toys, stageRef, courierRef, flipRef, onStop }: Props) {
   const drawn = world.art !== 'blockout';
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
@@ -38,7 +38,7 @@ export default function Scene({ world, nearStop, stageRef, courierRef, flipRef, 
       <div className="stage" ref={stageRef}>
         {!drawn && <div className="floor" style={{ width: b.x1 - b.x0 + 2400, height: 3000, left: b.x0 - 1200, top: -1500, transform: `translateZ(${b.z0 + 1300}px) rotateX(90deg)` }} />}
         {cards.map((c, i) => <div key={i} className="prop" style={at(c.x, c.z)}><div className="card" style={{ width: c.w, height: c.h, marginLeft: -c.w / 2, background: `rgb(${c.g},${c.g + 3},${c.g + 8})` }} /></div>)}
-        {Art && <Art near={nearStop} />}
+        {Art && <Art near={nearStop} toys={toys} />}
         {!drawn && world.solid.map((r, i) => <div key={i} className="prop" style={at((r.x0 + r.x1) / 2, r.z0)}><div className="card" style={{ width: r.x1 - r.x0, height: 150, marginLeft: -(r.x1 - r.x0) / 2, background: '#7f8792' }} /></div>)}
         {world.stops.map(s => (
           <div key={s.id} className="prop" style={at(s.x, s.z)}>

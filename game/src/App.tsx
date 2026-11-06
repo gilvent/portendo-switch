@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { content } from './content.ts';
-import { pathOf, parsePath, reduce, start, stopOf, type Action, type Game, type Spot } from './game.ts';
+import { pathOf, parsePath, reduce, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
 import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
 import { reducedMotion } from './light.ts';
@@ -59,7 +59,7 @@ export default function App() {
   const rig = useRef({ x: 0, y: 0 });
   const letterRef = useRef<HTMLElement>(null);
   const lastNear = useRef<string | null>(null);
-  const cam = useRef({ x: 0, z: 0, scale: 1, lift: 150 });
+  const cam = useRef({ x: 0, z: 0, scale: 1, lift: 150, focus: 1 });
   const facing = useRef(1);
   const phase = useRef(0);
   const wasWalking = useRef(false);
@@ -148,12 +148,16 @@ export default function App() {
         return;
       }
       const c = cam.current, k = calm ? 1 : 1 - Math.exp(-4.5 * dt);
-      const frame = w.camera, want = n.x + n.vx * .22;
-      c.x += ((frame ? Math.min(frame.x1, Math.max(frame.x0, want)) : want) - c.x) * k; c.z += ((frame ? n.z * .4 : n.z) - c.z) * k;
+      // A stop with `focus` pulls the camera in on itself while the courier stands there.
+      const spotted = p.near ? stopOf(content, p.world, p.stop) : undefined, zoomIn = spotted?.focus ?? 1;
+      const frame = w.camera, want = spotted && zoomIn !== 1 ? (spotted.look ?? spotted.x) * .8 + n.x * .2 : n.x + n.vx * .22;
+      c.x += ((frame && zoomIn === 1 ? Math.min(frame.x1, Math.max(frame.x0, want)) : want) - c.x) * k; c.z += ((frame ? n.z * .4 : n.z) - c.z) * k;
+      c.focus += (zoomIn - c.focus) * (calm ? 1 : 1 - Math.exp(-3 * dt));
       const walking = speed > .08;
       if (walking !== wasWalking.current) { wasWalking.current = walking; courierRef.current?.toggleAttribute('data-walking', walking); }
       if (courierRef.current) courierRef.current.style.transform = `translate3d(${n.x}px,${-bob}px,${n.z}px) rotateZ(${lean}deg)`;
-      if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${c.lift * c.scale}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${c.scale * (w.camera?.zoom ?? 1)},${c.scale * (w.camera?.zoom ?? 1)},${c.scale * (w.camera?.zoom ?? 1)}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
+      const zs = (c.scale * (w.camera?.zoom ?? 1) * c.focus).toFixed(4);
+      if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${(c.lift * c.scale * (1 + (c.focus - 1) * 1.6)).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
     };
     gsap.ticker.add(tick);
     return () => gsap.ticker.remove(tick);
@@ -196,14 +200,14 @@ export default function App() {
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {world && <Scene key={world} world={content.worlds[world]} nearStop={nearStop} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} onStop={onStop} />}
+      {world && <Scene key={world} world={content.worlds[world]} nearStop={nearStop} toys={toysOf(game, world)} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} atDock={spot.k === 'walk' && spot.world === 'intro' && spot.near} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       <div className="corner">
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
         <button data-testid="toggle-controller" aria-pressed={!game.controller.visible} onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'toggleController' }); }}>{game.controller.visible ? 'Hide controller' : 'Show controller'}</button>
       </div>
       {game.stamps.length > 0 && <div className="stamps" key={game.stamps.length} data-testid="stamps">{game.stamps.length} {game.stamps.length === 1 ? 'stamp' : 'stamps'}</div>}
-      {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
+      {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Return to sender</h1><p>Nothing is delivered to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Go to the crossroads</button></section>}
     </div>

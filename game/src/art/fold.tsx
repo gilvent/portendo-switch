@@ -1,9 +1,12 @@
 import { memo, useEffect, type CSSProperties } from 'react';
-import type { Motion, Run, V3 } from './kit.ts';
+import type { Motion, Run, Show, V3 } from './kit.ts';
 
 export const at = (x: number, z: number, y = 0, rot = 0) => ({ transform: `translate3d(${x}px,${-y}px,${z}px)${rot ? ` rotateY(${rot}deg)` : ''}` });
 
-export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null };
+export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null; show?: Show | null };
+export type Toys = Record<string, number>;
+const shown = (q: Quad, toys: Toys) => !q.show || q.show.at.includes(toys[q.show.toy] ?? 0);
+const playing = (m: Motion, near: string | null, toys: Toys) => (m.when !== undefined && near === m.when) || (m.toy !== undefined && (m.at ?? [1]).includes(toys[m.toy] ?? 0));
 export type Manifest = { atlas: { w: number; h: number }; runs: Run[]; quads: Quad[] };
 
 const css = ([x, y, z]: readonly number[]): V3 => [x, -y, z];
@@ -31,7 +34,7 @@ function quadStyle(q: Quad, url: string, atlas: Manifest['atlas'], origin?: numb
 }
 
 const StaticQuads = memo(function StaticQuads({ m, url }: { m: Manifest; url: string }) {
-  return <>{m.quads.filter(q => !q.motion && !q.group).map(q => <i key={q.id} className="pp" style={quadStyle(q, url, m.atlas)} />)}</>;
+  return <>{m.quads.filter(q => !q.motion && !q.group && !q.show).map(q => <i key={q.id} className="pp" style={quadStyle(q, url, m.atlas)} />)}</>;
 });
 const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
   return <>{m.runs.flatMap(r => {
@@ -44,12 +47,13 @@ const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
   })}</>;
 });
 
-export function PaperScene({ manifest, url, near }: { manifest: Manifest; url: string; near: string | null }) {
+export function PaperScene({ manifest, url, near, toys }: { manifest: Manifest; url: string; near: string | null; toys: Toys }) {
   useEffect(() => { const i = new Image(); i.src = url; }, [url]);
   return (
     <div className="prop" data-testid="paper-scene">
       <StaticQuads m={manifest} url={url} />
-      {manifest.quads.filter(q => q.motion).map(q => <i key={q.id} className={`pp moves${near === q.motion!.when ? ' on' : ''}`} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
+      {manifest.quads.filter(q => !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" style={quadStyle(q, url, manifest.atlas)} data-testid={`show-${q.id}`} />)}
+      {manifest.quads.filter(q => q.motion && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
       <Runs m={manifest} url={url} />
     </div>
   );

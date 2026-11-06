@@ -154,3 +154,25 @@ button { font:inherit; cursor:pointer; }
 .pp.moves.on { transform:var(--on); }
 .art-street { background:#6f5a44 no-repeat 50% calc(42vh - 562px) / 2400px auto; }
 @media (prefers-reduced-motion:reduce) { .pp.moves { transition:none; } }
+/* catalog leaflet: a printed, folded paper close-up of the sheet beside the showcased phone */
+.letter.surface-catalog { background:#fbf7ee; border:0; border-radius:2px; box-shadow:var(--shadow-lg, 0 14px 30px rgba(0,0,0,.4)); background-image:linear-gradient(90deg,transparent calc(50% - 1px),rgba(90,60,30,.18) 50%,transparent calc(50% + 1px)); }
+.letter.surface-catalog h2 { color:#0a6aa8; }
+.leaflet .tabs { flex-wrap:wrap; }
+.leaflet .tabs button { min-height:38px; border-radius:18px 18px 4px 4px; border-color:#0a6aa8; color:#0a6aa8; background:#fff; }
+.leaf { min-height:220px; padding:14px; background:#fff; border:2px solid #e3d9c6; animation:leaf .42s steps(5,end); transform-origin:0 50%; }
+@keyframes leaf { from { transform:perspective(600px) rotateY(-70deg); } }
+@media (prefers-reduced-motion:reduce) { .leaf { animation:none; } }
+.leaf-specs { display:grid; grid-template-columns:auto 1fr; gap:10px 22px; align-items:center; }
+.leaf-specs dl { display:grid; grid-template-columns:auto 1fr; gap:4px 14px; margin:0; } .leaf-specs dt { color:#8b929c; } .leaf-specs dd { margin:0; font-weight:600; display:flex; align-items:center; gap:6px; }
+.dot { width:14px; height:14px; border-radius:50%; display:inline-block; }
+.swatches { grid-column:1 / -1; display:flex; gap:8px; } .swatches i { width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 2px #e3d9c6; } .swatches i.on { box-shadow:0 0 0 3px #23272d; }
+.bars { display:grid; gap:7px; flex:1; } .bars i { display:block; height:9px; border-radius:5px; background:#d8dde3; }
+.leaf-promo { display:grid; gap:12px; } .price { font-size:22px; font-weight:600; display:flex; gap:12px; align-items:baseline; } .price s { text-decoration:none; } .price.cut s { text-decoration:line-through; color:#8b929c; font-size:16px; } .price b { color:#e8552d; }
+.coupon { display:flex; gap:12px; align-items:center; padding:10px; border:2px dashed #e8552d; background:#fff4e2; } .coupon span { width:40px; height:40px; display:grid; place-items:center; background:#e8552d; color:#fff; border-radius:50%; font-weight:700; } .coupon[data-torn="true"] { opacity:.45; transform:rotate(-3deg) translateY(4px); }
+.leaf-ship { display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .route { flex:1; min-width:60px; border-top:3px dashed #0092da; }
+.leaf-talk { display:grid; gap:10px; } .bubble { width:70%; padding:12px; border-radius:14px 14px 14px 2px; background:#eef6fb; display:flex; } .bubble.me { justify-self:end; border-radius:14px 14px 2px 14px; background:#fff4e2; }
+.leaf-desc { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; }
+/* A piece a toy brings in drops into place in five stepped frames, like the hinges. */
+.pp.pop { animation:pop .42s steps(5,end) both; }
+@keyframes pop { from { translate:0 -18px; } }
+@media (prefers-reduced-motion:reduce) { .pp.pop { animation:none; } }

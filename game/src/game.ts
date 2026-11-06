@@ -6,7 +6,8 @@ export type Spot =
   | { k: 'lost'; path: string };
 export type Place = Spot | { k: 'routeSheet'; back: Spot };
 export type ControllerMode = 'handheld' | 'docking' | 'docked';
-export type Game = { place: Place; controller: { mode: ControllerMode; visible: boolean }; stamps: string[] };
+// toys: the state of every in-scene interactive piece, keyed `${world}/${toy}`. Missing means state 0.
+export type Game = { place: Place; controller: { mode: ControllerMode; visible: boolean }; stamps: string[]; toys: Record<string, number> };
 export type Action =
   | { a: 'arrive'; stop: string | null } | { a: 'confirm' } | { a: 'back' } | { a: 'map' }
   | { a: 'toggleController' } | { a: 'dockDone' } | { a: 'goto'; place: Spot };
@@ -14,6 +15,7 @@ export type Effect = { open: string } | null;
 
 const INTRO: Spot = { k: 'walk', world: 'intro', stop: 'road-end', near: false };
 const HOME: Spot = { k: 'walk', world: 'crossroads', stop: 'crossing', near: true };
+export const toysOf = (g: Game, w: WorldId): Record<string, number> => Object.fromEntries(Object.entries(g.toys).filter(([k]) => k.startsWith(`${w}/`)).map(([k, v]) => [k.slice(w.length + 1), v]));
 export const stopOf = (c: Content, w: WorldId, id: string): Stop | undefined => c.worlds[w].stops.find(s => s.id === id);
 
 export function pathOf(p: Place): string {
@@ -44,7 +46,7 @@ export function parsePath(c: Content, path: string): Place {
 }
 export const start = (c: Content, path: string, visible = true): Game => {
   const place = parsePath(c, path);
-  return { place, controller: { mode: place === INTRO ? 'handheld' : 'docked', visible }, stamps: [] };
+  return { place, controller: { mode: place === INTRO ? 'handheld' : 'docked', visible }, stamps: [], toys: {} };
 };
 const docked = (g: Game, place: Place): Game => ({ ...g, place, controller: { ...g.controller, mode: 'docked' } });
 
@@ -78,6 +80,10 @@ export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
       if (act.kind === 'letter') return [{ ...g, place: { k: 'letter', world: p.world, stop: p.stop } }, null];
       if (act.kind === 'dock') return [{ ...g, controller: { ...g.controller, mode: 'docking' } }, null];
       if (act.kind === 'link') return [g, { open: act.href }];
+      if (act.kind === 'toy') {
+        const key = `${p.world}/${act.toy}`, id = `${p.world}/${p.stop}`;
+        return [{ ...g, toys: { ...g.toys, [key]: ((g.toys[key] ?? 0) + 1) % act.states }, stamps: g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];
+      }
       return [g, null];
     }
     case 'letter': {

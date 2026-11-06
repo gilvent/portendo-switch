@@ -3,9 +3,15 @@ export type Stock = 'cover' | 'kraft' | 'greyboard' | 'bond' | 'vellum' | 'sugar
 export type Panel = {
   id: string; stock: Stock; c: string; o: V3; u: V3; v: V3; w: number; h: number;
   mask?: string; print?: string; edge?: 'cut' | 'fold'; ghost?: boolean; density?: number; decal?: string;
-  emit?: number; motion?: Motion; group?: string; backdrop?: boolean;
+  emit?: number; motion?: Motion; group?: string; backdrop?: boolean; show?: Show;
+  // Ship this sheet as `split` side-by-side tiles: browsers stop drawing one very wide plane seen edge-on.
+  split?: number;
 };
-export type Motion = { when: string; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3 };
+// A panel with `show` exists only while its toy is in one of the listed states. Such panels are baked as phantoms:
+// lit like everything else, but they cast no shadow, so the variants that share one spot never shade each other.
+export type Show = { toy: string; at: number[] };
+// A motion plays while the courier stands at stop `when`, or while toy `toy` is in one of the states `at`.
+export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3 };
 export type Lamp = { at: V3; color: readonly [number, number, number]; energy: number };
 export type Run = { group: string; from: V3; to: V3; count: number; seconds: number };
 export type Scene = {

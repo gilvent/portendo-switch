@@ -8,10 +8,25 @@ from scipy import ndimage
 
 WORK, OUT = Path(sys.argv[1]), Path(sys.argv[2])
 L = json.loads((WORK / "layout.json").read_text())
-baked = np.load(WORK / "baked.npy")
-alpha = np.asarray(Image.open(WORK / "albedo.png").convert("RGBA"))[:, :, 3].astype(np.float32) / 255
-if baked.max() == 0:
+light = np.load(WORK / "light.npy")
+rgba = np.asarray(Image.open(WORK / "albedo.png").convert("RGBA")).astype(np.float32) / 255
+alpha = rgba[:, :, 3]
+if light.max() == 0:
     raise SystemExit("bake is empty")
+
+
+def decode(c):
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+
+
+# Light is baked at reduced resolution without the print, so it is smooth by nature: lift it to atlas size,
+# smooth away sampling noise inside each panel (never across panels), then multiply the crisp print back in.
+AH0, AW0 = alpha.shape
+light = ndimage.zoom(light, (AH0 / light.shape[0], AW0 / light.shape[1], 1), order=1)[:AH0, :AW0]
+albedo = decode(rgba[:, :, :3])
+baked = np.zeros_like(albedo)
+BY_ID = {p["id"]: p for p in L["panels"]}
+SIGMA = float(__import__("os").environ.get("LIGHT_SMOOTH", "2.2"))
 
 
 def encode(lin):
@@ -19,11 +34,27 @@ def encode(lin):
     return np.where(lin <= 0.0031308, lin * 12.92, 1.055 * lin ** (1 / 2.4) - 0.055)
 
 
+for p in L["panels"]:
+    y, x, h, w = p["y"], p["x"], p["ph"], p["pw"]
+    m = (alpha[y:y + h, x:x + w] > 0.5).astype(np.float32)
+    if not m.any():
+        continue
+    part = light[y:y + h, x:x + w]
+    far = p["backdrop"] or (p["decal"] and BY_ID[p["decal"]]["backdrop"])
+    if far:
+        # The open view is far off: nothing in the near scene can shade it, so it takes the sky's unshaded light.
+        lit = part[m > 0.5]
+        even = np.percentile(lit, 92, axis=0)
+        baked[y:y + h, x:x + w] = albedo[y:y + h, x:x + w] * (even + p["emit"])
+        continue
+    k = max(.6, SIGMA * min(1, min(h, w) / 24))
+    wsum = ndimage.gaussian_filter(m, k, mode="nearest") + 1e-6
+    smooth = np.dstack([ndimage.gaussian_filter(part[..., c] * m, k, mode="nearest") / wsum for c in range(3)])
+    baked[y:y + h, x:x + w] = albedo[y:y + h, x:x + w] * (smooth + p["emit"])
 solid = alpha > 0.5
 idx = ndimage.distance_transform_edt(~solid, return_distances=False, return_indices=True)
 lin = baked[idx[0], idx[1]]
 a = alpha.copy()
-BY_ID = {p["id"]: p for p in L["panels"]}
 
 
 def frame(p):
@@ -75,7 +106,7 @@ CAMERAS = [np.array([x, reach * .225, reach * .974]) for x in (C["x0"], C["x1"])
 
 
 def seen(p):
-    if p["group"] or p["motion"]:
+    if p["group"] or p["motion"] or p.get("show"):
         return True
     u, v = (np.array(p[k], dtype=float) for k in "uv")
     u, v = u / np.linalg.norm(u), v / np.linalg.norm(v)
@@ -83,8 +114,21 @@ def seen(p):
     return any(np.dot(np.array(p["n"]), cam - c) > 0 for cam in CAMERAS for c in corners)
 
 
-keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group")
-quads = [{k: p[k] for k in keys} for p in L["panels"] if not p["ghost"] and not p["decal"] and not p["backdrop"] and seen(p)]
+keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group", "show")
+def tiles(q, n):
+    if n <= 1:
+        return [q]
+    u = np.array(q["u"], dtype=float)
+    u = u / np.linalg.norm(u)
+    out = []
+    for k in range(n):
+        x0, x1 = round(q["pw"] * k / n), round(q["pw"] * (k + 1) / n)
+        o = (np.array(q["o"], dtype=float) + u * q["w"] * x0 / q["pw"]).round(3).tolist()
+        out.append({**q, "id": f'{q["id"]}-{k}', "o": o, "w": q["w"] * (x1 - x0) / q["pw"], "x": q["x"] + x0, "pw": x1 - x0})
+    return out
+
+
+quads = [t for p in L["panels"] if not p["ghost"] and not p["decal"] and not p["backdrop"] and seen(p) for t in tiles({k: p.get(k) for k in keys}, p.get("split", 1))]
 for p in L["panels"]:
     if p["backdrop"]:
         crop = rgb[p["y"]:p["y"] + p["ph"], p["x"]:p["x"] + p["pw"]]

@@ -59,30 +59,53 @@ Sun colour is warm (1, .96, .9) with a 8° soft edge. Sky fill is cool, at stren
 
 ## Composition
 
-Detail follows where the courier can walk. References are in `refs/`, for depth, density and composition only. They are never traced, and `docs/` is never shipped.
+Every space follows one scene standard. It is not limited to shoeboxes: a space can be a room box, a street on a curved ring, or any other diorama shape the game needs.
 
-### Outdoors: walkable detail, flat background
+### 1. Technique by role and distance
 
-| Tier | Where | Build | Detail |
-|---|---|---|---|
-| Walkable | Objects on or beside the path | Full folded forms: thickness, hinges, layers | Highest: the hero's level |
-| Near edge | Plants and fences at the path border | Standing die-cut cards with a tab | Medium: printed, with a cut silhouette |
-| Background | Behind the walkable strip | Flat cards stacked in overlapping rows | Low: one flat print per card, with no folds |
-| Sky | Behind everything | One printed sheet | Lowest |
+Split each space into the **main space**, where the courier walks and plays, and the **surroundings** that frame it. Judge each part of the surroundings from inside the main space: it is **open** if the eye travels far into it, and **enclosed** if something tall and close hems the space in. Which surface it sits on does not matter.
 
-- The walkable ground is a sheet with a die-cut edge. It does not run off as an endless plane.
-- Background rows get lighter and bluer with distance, using print colour rather than a fog effect.
-- Background cards stay single quads, which leaves the quad budget for the walkable tier.
+| Part | Build | In the Blibli spaces |
+|---|---|---|
+| Main space | Freestanding folds with real volume: boxes, tubes, ridge folds, slotted pairs, stacked contours. Slim or intricate outlines (people, bikes, scooters) are stand-up cut cards. The ground is flat sheets at slightly different heights. | Mailbox, parcels, bench, sandwich board, bins, lamps; showcase pedestal, tri-fold leaflet, price stand, basket, riser; reviewer's desk, camera, belts |
+| Open surroundings | Many thin flat layers, one behind another, alternating pale and deep. Far detail is tiny flat print. They sit in the CSS backdrop when far enough. | Sky, far hills, two skyline layers, a tree row and rooftops behind the street; the street seen through every window |
+| Enclosed surroundings | Relief fixed to its surface, sticking out toward the main space: half pieces on walls, hanging pieces on ceilings, low edges on floors | Neighbouring shopfronts with recessed windows and folded awnings; pegboard, shelves, clock and frame on the shop walls; racks, cork board and gallery on the store-room walls |
 
-### Indoors: the diorama is the room
+- One surface can be partly both: enclosure in front, the open view through its gaps. The alleys between the shops show the skyline; the windows show the street.
+- The front edge frames the opening: the kerb, the road and its lamps outside; boxes and a plant indoors.
+- Each kind of object has one design, used flat, in relief or freestanding.
 
-- The room is the object: floor, three walls and a ceiling that matches the building outside, with the near wall removed. Its cut outline sits against a black void.
-- The floor stays mostly open and walkable. Props hug the walls and corners, with one or two pieces standing out on the floor.
-- Density goes on the walls: shelves, hanging items, windows and stacked goods.
-- Wall and floor surfaces are printed brick and plank, with depth from the room's fold lines.
-- Windows are vellum panels that glow. Their light pools softly on the floor, and lamps add warm pools. The room's edges fall off into dark.
+### 2. Variants
 
-Indoor light keeps the `light.ts` sun as the key, entering through the removed near wall. Window and lamp light are secondary sources baked in Blender, so they never change the direction of object shadows.
+- One base design per object type, varied by size, proportion, repeated parts (storeys, tiers), pose and small add-ons. The street's three neighbours are one `shopfront` recipe; the passers-by are one figure, flipped, recoloured and scaled to a child.
+- Colours come from a narrow family per type. Phones use the three variant colours wherever they appear.
+- Group in small clusters (a bench with a bike, a family of shoppers), not on an even grid, except where the subject is regular (shelves, belts), and then break it a little.
+
+### 3. Realism
+
+- Arrange it like a real place: everything rests on something, bases are hidden or anchored, and things sit where they would really be (hydrant at the kerb, scooter on the road, the clock on the wall).
+- Show life and small stories: shoppers with bags, a delivery parked outside, a card on the review board still in the old theme with the paint cans beside it.
+- Build from big to small: surroundings and ground, then main subjects, then props, then details that fill gaps.
+- Make it obviously paper: grain, cut edges, creases; never photographic.
+
+### The projects are played, not read
+
+Neither floor carries a written account of the work. Each part of the work is an object you use. `encoded` in `content.ts` lists which stop acts out each fact.
+
+| Stop | What you do | What it stands for |
+|---|---|---|
+| Showcase phone | A turns the phone through its three colours; the matching swatch chip pops up | Product detail: variant selection |
+| Catalog paper | Opens the tri-fold leaflet: Specs, Promo, Shipping, Discussion and Description leaves, showing the colour you chose | Secondary pages for the mobile page |
+| Price tag | A sticks the deal on: the price is struck through, a burst appears, the coupon is torn off | Promotions |
+| Basket | Each A drops one boxed phone in; the fourth empties it | The simpler one-step add to cart |
+| Recommended shelf | Grey placeholders fold away as you arrive; A turns to the next set | Recommendations, lazy loading |
+| Instant camera | A prints the photo sideways; A again sets it upright on the review card | Photo upload, and the EXIF rotation bug |
+| Review card | Each A adds a star | Writing a review as a reviewer |
+| Photo gallery | A switches between a grid of square crops and a list of photos at their own shapes | Gallery with grid and list views; photos vary in ratio |
+| Review board | Paper tabs filter it: all, with photo, five stars | Filter by photo or rating |
+| Old-theme card and paint cans | Dressing | The redesign rolled out piece by piece |
+
+Stops carry `focus` and `look`: the camera leans in on the object being used while the courier stands beside it, not in front of it.
 
 ### Outside and inside match
 
@@ -95,12 +118,12 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all three spaces. `npm run paper -- street 64` rebuilds one quickly at low samples.
+`npm run paper` rebuilds all three spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
 1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
-3. Blender Cycles bakes direct light, bounce, translucency, lamps and window glow.
-4. `finish.py` flattens decals and relief into their parents, culls faces no game camera can see, and writes the atlas, backdrop and manifest.
+3. Blender Cycles bakes light only, at half the atlas size (`LIGHT_SCALE`): each surface sees itself as white while bounce rays still take on the colours around it. Light is smooth by nature, so a low sample count is enough once `finish.py` smooths it within each panel.
+4. `finish.py` multiplies the crisp print back over the light, lights the far backdrop evenly (nothing near can shade it), flattens decals and relief into their parents, culls faces no game camera can see, and writes the atlas, backdrop and manifest.
 5. `PaperScene` in `src/art/fold.tsx` renders the manifest as `matrix3d` quads.
 
 No AI image or 3D tool was used. All geometry is planar and generated from data.
@@ -115,11 +138,13 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 - Mark sheets with no cut-outs as opaque so the browser skips blending them.
 - Anything far away and flat belongs in the CSS backdrop.
 
-| Space | Quad limit, enforced by the journey test | Current |
-|---|---|---|
-| Street | 95 | 66 |
-| First-floor outlet | 40 | 27 |
-| Second-floor store-room | 75 | 49 |
+| Space | Quad limit, enforced by the journey test |
+|---|---|
+| Street | 130 |
+| First-floor outlet | 75 |
+| Second-floor store-room | 95 |
+
+Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
 ## Motion
 
@@ -130,5 +155,7 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Mailbox | Slot flap lifts, letter slides out, flag tips |
 | Delivery boxes | Top parcel flap opens |
 | Enter the store | Both door leaves swing inward |
-| Product catalog | Tablet tilts up |
-| Computer desk | Monitor tilts up |
+| Showcase phone | The chosen swatch chip rises |
+| Recommended shelf | Placeholder cards fold down |
+| Review board | The chosen filter tab rises |
+| Any toy | A piece that appears drops into place in five stepped frames |
