@@ -22,29 +22,35 @@ const eye = (cx: number, cy: number, k: 1 | -1, out: 1 | -1) => <g transform={`t
   <path d={`M${cx - 3.8} ${cy + 7.1}Q${cx} ${cy + 8.3} ${cx + 3.8} ${cy + 7.1}`} fill="none" stroke={INK} strokeWidth="1.2" strokeLinecap="round" />
   <path d={`M${cx - 4.2} ${cy + 9.8}Q${cx} ${cy + 11.2} ${cx + 4.2} ${cy + 9.8}`} fill="none" stroke={SKIN_DARK} strokeWidth="1.6" strokeLinecap="round" />
 </g>;
+// He is average build: the suit is drawn at the short build and stretched down from the shoulders by the same amount
+// as an average passer-by (BUILDS in promenade.ts); his hands and briefcase ride down with it, keeping their shape.
+const BODY = 6, LEG = 7, TORSO = `translate(40 78) scale(1 ${(29 + BODY) / 29}) translate(-40 -78)`, RIDE = `translate(0 ${23 * BODY / 29})`, HEIGHT = 124 + BODY + LEG;
 const silhouette = <>
-  <path d={armL} /><circle cx="17" cy="101" r="4.6" /><path d={armR} /><path d={body} /><path d={caseBody} /><path d={caseHandle} fill="none" /><circle cx="63" cy="101" r="5" />
+  <g transform={TORSO}><path d={armL} /><path d={armR} /><path d={body} /></g>
+  <g transform={RIDE}><circle cx="17" cy="101" r="4.6" /><path d={caseBody} /><path d={caseHandle} fill="none" /><circle cx="63" cy="101" r="5" /></g>
   <ellipse cx="18" cy="57" rx="4.4" ry="6" /><ellipse cx="62" cy="57" rx="4.4" ry="6" /><path d={face} /><path d={hair} />
 </>;
 export default function Salaryman() {
   return (
     <>
     <i className="leg leg-b" /><i className="leg leg-f" />
-    <svg className="courier-art" viewBox="0 0 80 124" width="80" height="124" overflow="visible" aria-hidden="true"><g filter="url(#paper-sm)">
+    <svg className="courier-art" viewBox={`0 0 80 ${HEIGHT}`} width="80" height={HEIGHT} overflow="visible" aria-hidden="true"><g filter="url(#paper-sm)">
       {/* The cut sheet: every part's outline, grown so its white core rims the figure. */}
       <g fill="#fff" stroke="#fff" strokeWidth="7" strokeLinejoin="round" strokeLinecap="round">{silhouette}</g>
       {/* Slumped suit: arms hanging, the tie pulled loose and crooked. */}
-      <path d={armL} fill={SUIT_DARK} /><path d="M15.4 97Q17 99.5 20.6 99L20 101Q16 102 15 98Z" fill="#d9d5cb" /><circle cx="17" cy="101.5" r="4.6" fill={SKIN_DARK} />
-      <path d={body} fill={SUIT} /><path d="M20 90Q20 82 25 79V106H23Q20 106 20 103Z" fill={SUIT_DARK} />
+      <g transform={TORSO}><path d={armL} fill={SUIT_DARK} /><path d="M15.4 97Q17 99.5 20.6 99L20 101Q16 102 15 98Z" fill="#d9d5cb" /></g><circle cx="17" cy="101.5" r="4.6" fill={SKIN_DARK} transform={RIDE} />
       <rect x="35" y="72" width="10" height="9" fill={SKIN_DARK} />
+      <g transform={TORSO}>
+      <path d={body} fill={SUIT} /><path d="M20 90Q20 82 25 79V106H23Q20 106 20 103Z" fill={SUIT_DARK} />
       <path d="M33 78H47L40 95Z" fill={SHIRT} /><path d="M36 78L40 83L37 79Z" fill="#dcd8ce" />
       <path d="M32 78L40 96L35.5 79Z M48 78L40 96L44.5 79Z" fill={SUIT_LIGHT} />
       <path d="M39.6 81.5H43.2L44 84.5L46.6 98L42.6 102L39.4 98.4L40.6 84.5Z" fill="#b8312c" /><path d="M39.6 81.5H43.2L42.9 84H40Z" fill="#8f2420" />
       <circle cx="40" cy="100" r="1.4" fill={SUIT_DARK} />
-      <path d={caseHandle} fill="none" stroke="#3a2414" strokeWidth="2.6" />
-      <path d={caseBody} fill="#6b4428" /><path d="M53 106Q53 104 55 104H76Q78 104 78 106V108H53Z" fill="#87583a" /><rect x="63" y="108" width="5" height="4" rx="1" fill="#d9a441" />
-      <path d={armR} fill={SUIT_LIGHT} /><path d="M58.6 84Q62.6 90 62 99" fill="none" stroke={SUIT} strokeWidth="1.4" strokeLinecap="round" /><path d="M56.4 97.4Q60 100 64.8 98.2L65 97Q64 101 60 101Z" fill={SHIRT} />
-      <circle cx="63" cy="101" r="5" fill={SKIN} />
+      </g>
+      <g transform={RIDE}><path d={caseHandle} fill="none" stroke="#3a2414" strokeWidth="2.6" />
+      <path d={caseBody} fill="#6b4428" /><path d="M53 106Q53 104 55 104H76Q78 104 78 106V108H53Z" fill="#87583a" /><rect x="63" y="108" width="5" height="4" rx="1" fill="#d9a441" /></g>
+      <g transform={TORSO}><path d={armR} fill={SUIT_LIGHT} /><path d="M58.6 84Q62.6 90 62 99" fill="none" stroke={SUIT} strokeWidth="1.4" strokeLinecap="round" /><path d="M56.4 97.4Q60 100 64.8 98.2L65 97Q64 101 60 101Z" fill={SHIRT} /></g>
+      <circle cx="63" cy="101" r="5" fill={SKIN} transform={RIDE} />
       {/* Head: ears, face, the anime eyes under heavy lids, a flat mouth, and the neat glossy hair. */}
       <ellipse cx="18" cy="57" rx="4.4" ry="6" fill={SKIN} /><ellipse cx="62" cy="57" rx="4.4" ry="6" fill={SKIN} />
       <path d="M19 54Q16.5 57 19 60M61 54Q63.5 57 61 60" fill="none" stroke={SKIN_DARK} strokeWidth="1.3" strokeLinecap="round" />

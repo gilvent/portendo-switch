@@ -200,10 +200,10 @@ function surroundings(): Panel[] {
     ...planter('front-bed-a', -380, 286, 80, 34), ...bush('front-bush-a', -380, 280, 92, 56, 30),
     // Shoppers in small groups: a woman in a sun hat with a bag, a father and child, a backpacker, a couple at the café.
     ...shopper('shopper-a', -60, 150, { coat: PLUM, legs: '#22324a', skin: '#f3c9a0', hair: '#4a2c1a', carry: BLUE, style: 'dress', hat: '#f4e3c3' }),
-    ...shopper('shopper-b', 420, 150, { coat: SUN, legs: '#3d444e', skin: '#c99a7a', hair: '#2b2622', carry: '#2bb5b8' }, true),
+    ...shopper('shopper-b', 420, 150, { coat: SUN, legs: '#3d444e', skin: '#c99a7a', hair: '#2b2622', carry: '#2bb5b8', build: 'big' }, true),
     ...shopper('shopper-c', 462, 140, { coat: '#57b36f', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'shorts', hat: CORAL }, true, .7, 0, false),
-    ...shopper('shopper-d', 860, 110, { coat: '#e88ab0', legs: '#f4f1ea', skin: '#f3c9a0', hair: '#8a5a3a', style: 'dress' }, false, 1, -20, false),
-    ...shopper('shopper-e', -180, 40, { coat: '#2bb5b8', legs: '#c8915a', skin: '#a8714f', hair: '#1d1a17', style: 'shorts', pack: CORAL, hat: '#f4f1ea' }, true, .95, 0, false)];
+    ...shopper('shopper-d', 860, 110, { coat: '#e88ab0', legs: '#f4f1ea', skin: '#f3c9a0', hair: '#8a5a3a', style: 'dress', build: 'average' }, false, 1, -20, false),
+    ...shopper('shopper-e', -180, 40, { coat: '#2bb5b8', legs: '#c8915a', skin: '#a8714f', hair: '#1d1a17', style: 'shorts', pack: CORAL, hat: '#f4f1ea' , build: 'average'}, true, .95, 0, false)];
 }
 const unitV = (a: V3): V3 => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2] / l]; };
 export function street(): Scene {

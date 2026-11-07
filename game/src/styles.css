@@ -16,11 +16,12 @@ button { font:inherit; cursor:pointer; }
 .sign.road { background:#5a626d; color:#fff; }
 .sign.near { background:#fff; }
 .prompt { position:absolute; left:50%; top:-44px; margin-left:-18px; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; background:var(--signal); color:#fff; font-size:18px; animation:pulse 1.1s ease-in-out infinite; }
-.flip { position:absolute; left:-40px; bottom:-2px; width:80px; height:124px; transform-style:preserve-3d; }
+.flip { position:absolute; left:-40px; bottom:-2px; width:80px; height:137px; transform-style:preserve-3d; }
 .courier-art { position:absolute; left:0; top:0; display:block; }
 .defs { position:absolute; }
 /* Stubby suit legs with rounded shoes; only the shoes stand clear of the jacket, so only they carry the white rim. */
-.leg { position:absolute; top:102px; width:11px; height:15px; border-radius:2px; background:#263350; transform-origin:50% 0; }
+/* The player is average build (Salaryman.tsx): legs start 6 lower and run 7 longer than the short build's. */
+.leg { position:absolute; top:108px; width:11px; height:22px; border-radius:2px; background:#263350; transform-origin:50% 0; }
 .leg::after { content:''; position:absolute; left:-4px; bottom:-6px; width:15px; height:7px; border:2.5px solid #fff; border-radius:8px 8px 5px 5px; background:#1d1f24; box-shadow:inset 0 2px 0 #3a3e46; }
 .leg-b { left:29px; } .leg-f { left:41px; background:#2f3e5c; }
 [data-walking] .leg-f { animation:stride .32s ease-in-out infinite alternate; }

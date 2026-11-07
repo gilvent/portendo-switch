@@ -269,13 +269,24 @@ export function flagPole(id: string, x: number, z: number, h: number, flag: stri
 export const bin = (id: string, x: number, z: number) => box({ id, x, z, w: 36, h: 58, d: 36, stock: 'greyboard', c: '#6b7480', front: Array.from({ length: 6 }, (_, i) => `<rect x="${2 + i * 6}" width="3" height="58" fill="#4d5560"/>`).join('') + '<rect width="36" height="6" fill="#3d444e"/>', top: '<rect x="5" y="5" width="26" height="26" fill="#2b2f36"/>' });
 // A person cut from card in two layers: the figure, and an arm with whatever it carries standing a little proud of it.
 // One design, varied by build (trousers, shorts, dress, child), hat, backpack and colours.
-export type Look = { coat: string; legs: string; skin: string; hair: string; carry?: string; style?: 'trousers' | 'shorts' | 'dress'; hat?: string; pack?: string; shoes?: string; eyes?: string };
+export type Look = { coat: string; legs: string; skin: string; hair: string; carry?: string; style?: 'trousers' | 'shorts' | 'dress'; hat?: string; pack?: string; shoes?: string; eyes?: string; build?: keyof typeof BUILDS; lift?: number };
+// Three builds share one design. Short is the base; average lengthens the body and legs a little (the player is
+// average); big is taller again and broader, for large, energetic people. The head stays the same size.
+export const BUILDS = { short: { body: 0, leg: 0, wide: 1 }, average: { body: 6, leg: 7, wide: 1 }, big: { body: 10, leg: 9, wide: 1.14 } } as const;
 export function shopper(id: string, x: number, z: number, look: Look, flip = false, k = 1, rot = 0, arm = true): Panel[] {
   // Every person is cut the way the player is: one sheet, an anime avatar face on a big round head, a short body and
   // stubby legs, the sheet cut wider than the print so its white core rims the whole figure. Seen nearly front on.
-  // Unlike the bored player, passers-by look bright: open eyes, a small smile. 80 x 112 before scaling by k.
-  const { coat, legs, skin, hair, carry, style = 'trousers', hat, pack, shoes = '#2b2622', eyes = '#4a3426' } = look;
-  const W = 80, H = 112, w = W * k, h = H * k, R = yaw(rot), fl = flip ? `translate(${W} 0) scale(-1 1)` : '';
+  // Unlike the bored player, passers-by look bright: open eyes, a small smile. Drawn in an 80 x 112 short figure, then
+  // stretched to its build: the torso grows down from the shoulders, the legs lengthen, the feet move down.
+  const { coat, legs, skin, hair, carry, style = 'trousers', hat, pack, shoes = '#2b2622', eyes = '#4a3426', build = 'short', lift = 0 } = look;
+  const B = BUILDS[build], sy = (29 + B.body) / 29, sl = (14 + B.leg) / 14, drop = B.body + B.leg;
+  const W = 80, H = 112 + drop, w = W * k, h = H * k, R = yaw(rot), fl = flip ? `translate(${W} 0) scale(-1 1)` : '';
+  const mx = (v: number) => 40 + (v - 40) * B.wide, my = (v: number) => 66 + (v - 66) * sy;
+  const torso = (svg: string) => `<g transform="translate(40 66) scale(${B.wide} ${sy}) translate(-40 -66)">${svg}</g>`;
+  const legPart = (svg: string) => `<g transform="translate(40 ${92 + B.body}) scale(${B.wide} ${sl}) translate(-40 -92)">${svg}</g>`;
+  const foot = (svg: string) => `<g transform="translate(40 ${drop}) scale(${B.wide} 1) translate(-40 0)">${svg}</g>`;
+  // Hands and bags ride with the torso but keep their shape.
+  const ride = (cx: number, cy: number, svg: string) => `<g transform="translate(${mx(cx) - cx} ${my(cy) - cy})">${svg}</g>`;
   const faceD = 'M19 40Q19 22 40 22Q61 22 61 40Q61 54 52 61Q46 65 40 65Q34 65 28 61Q19 54 19 40Z';
   const hairD = style === 'dress' ? 'M15 58Q11 17 40 15Q69 17 65 58H58Q60 36 56 30Q47 34 33 28Q28 36 23 36Q21 44 22 58Z' : 'M16 43Q13 17 40 15Q67 17 64 43H61Q61 33 57 29Q47 33 33 28Q29 34 21 35L20 43Z';
   const bodyD = style === 'dress' ? 'M24 77Q24 67 31 66H49Q56 67 56 77L62 98H18Z' : 'M20 77Q20 67 30 66H50Q60 67 60 77V92Q60 95 57 95H23Q20 95 20 92Z';
@@ -287,7 +298,7 @@ export function shopper(id: string, x: number, z: number, look: Look, flip = fal
   const ownArm = !(arm && carry);
   // The rim is the cut edge, so the sheet takes the plain edge treatment: the edge pass would otherwise outline every
   // overlapping part inside the figure.
-  const shapes = `<g fill="#fff" stroke="#fff" stroke-width="6" stroke-linejoin="round">${packShape}<path d="${armL}"/><circle cx="17" cy="89.5" r="4.5"/>${ownArm ? `<path d="${armR}"/><circle cx="63" cy="89" r="5"/>` : ''}<path d="${legsD}"/>${feet}<path d="${bodyD}"/><ellipse cx="18" cy="45" rx="4.4" ry="6"/><ellipse cx="62" cy="45" rx="4.4" ry="6"/><path d="${faceD}"/><path d="${hairD}"/>${hatShape}</g>`;
+  const shapes = `<g fill="#fff" stroke="#fff" stroke-width="6" stroke-linejoin="round">${torso(`${packShape}<path d="${armL}"/>${ownArm ? `<path d="${armR}"/>` : ''}<path d="${bodyD}"/>`)}${ride(17, 89.5, '<circle cx="17" cy="89.5" r="4.5"/>')}${ownArm ? ride(63, 89, '<circle cx="63" cy="89" r="5"/>') : ''}${legPart(`<path d="${legsD}"/>`)}${foot(feet)}<rect x="35" y="60" width="10" height="9"/><ellipse cx="18" cy="45" rx="4.4" ry="6"/><ellipse cx="62" cy="45" rx="4.4" ry="6"/><path d="${faceD}"/><path d="${hairD}"/>${hatShape}</g>`;
   const g = (inner: string) => `<g transform="scale(${k}) ${fl}">${inner}</g>`;
   // An avatar eye: white, a tall iris looking a little right, the upper lid line with a flick at the outer corner.
   const eye = (cx: number, out: number) => `<g transform="translate(${cx} 44) scale(.72) translate(${-cx} -44)"><ellipse cx="${cx}" cy="44" rx="6" ry="6.6" fill="#fff"/><ellipse cx="${cx + .6}" cy="45" rx="4" ry="5.3" fill="${eyes}"/><ellipse cx="${cx + .6}" cy="46" rx="2.1" ry="3" fill="${tone(eyes, -.55)}"/>` +
@@ -296,15 +307,13 @@ export function shopper(id: string, x: number, z: number, look: Look, flip = fal
     `<path d="M${cx - 3.6} 51Q${cx} 52.2 ${cx + 3.6} 51" stroke="${INK}" stroke-width="1.2" fill="none" stroke-linecap="round"/></g>`;
   const lowerLegs = style === 'trousers' ? legs : skin;
   const print = `<rect width="${W}" height="${H}" fill="#fff"/>` +
-    (pack ? `<rect x="13" y="68" width="54" height="24" rx="6" fill="${pack}"/>` : '') +
-    `<path d="${armL}" fill="${tone(coat, -.18)}"/><circle cx="17" cy="89.5" r="4.5" fill="${tone(skin, -.1)}"/>` +
-    (ownArm ? `<path d="${armR}" fill="${tone(coat, -.06)}"/><circle cx="63" cy="89" r="5" fill="${skin}"/>` : '') +
-    `<path d="${legsD}" fill="${lowerLegs}"/>` + (style === 'shorts' ? `<path d="M29 92H39.5V97H29Z M40.5 92H51V97H40.5Z" fill="${legs}"/>` : '') +
-    `<g fill="${shoes}">${feet}</g>` +
+    torso((pack ? `<rect x="13" y="68" width="54" height="24" rx="6" fill="${pack}"/>` : '') + `<path d="${armL}" fill="${tone(coat, -.18)}"/>`) + ride(17, 89.5, `<circle cx="17" cy="89.5" r="4.5" fill="${tone(skin, -.1)}"/>`) +
+    (ownArm ? torso(`<path d="${armR}" fill="${tone(coat, -.06)}"/>`) + ride(63, 89, `<circle cx="63" cy="89" r="5" fill="${skin}"/>`) : '') +
+    legPart(`<path d="${legsD}" fill="${lowerLegs}"/>` + (style === 'shorts' ? `<path d="M29 92H39.5V97H29Z M40.5 92H51V97H40.5Z" fill="${legs}"/>` : '')) +
+    foot(`<g fill="${shoes}">${feet}</g>`) +
     `<rect x="35" y="60" width="10" height="9" fill="${tone(skin, -.1)}"/>` +
-    `<path d="${bodyD}" fill="${coat}"/>` + (style === 'dress' ? '' : `<rect x="20" y="89" width="40" height="6" fill="${legs}"/>`) +
-    `<path d="M34.5 66H45.5L40 73Z" fill="${tone(coat, .55)}"/>` +
-    (pack ? `<path d="M27 67V86M53 67V86" stroke="${tone(pack, -.2)}" stroke-width="3.4"/>` : '') +
+    torso(`<path d="${bodyD}" fill="${coat}"/>` + (style === 'dress' ? '' : `<rect x="20" y="89" width="40" height="6" fill="${legs}"/>`) + `<path d="M34.5 66H45.5L40 73Z" fill="${tone(coat, .55)}"/>` +
+      (pack ? `<path d="M27 67V86M53 67V86" stroke="${tone(pack, -.2)}" stroke-width="3.4"/>` : '')) +
     `<ellipse cx="18" cy="45" rx="4.4" ry="6" fill="${skin}"/><ellipse cx="62" cy="45" rx="4.4" ry="6" fill="${skin}"/>` +
     `<path d="M19 42Q16.5 45 19 48M61 42Q63.5 45 61 48" stroke="${tone(skin, -.12)}" stroke-width="1.3" fill="none" stroke-linecap="round"/>` +
     `<path d="${faceD}" fill="${skin}"/>` + eye(31, -1) + eye(50, 1) +
@@ -313,34 +322,41 @@ export function shopper(id: string, x: number, z: number, look: Look, flip = fal
     `<path d="M36.5 57Q41 60.4 45.5 57" stroke="#8c4a38" stroke-width="1.6" fill="none" stroke-linecap="round"/>` +
     `<path d="${hairD}" fill="${hair}"/>` +
     (hat ? `<g fill="${hat}">${hatShape}</g><path d="M27 18H53V21.5H27Z" fill="${tone(hat, -.2)}"/>` : '');
-  const base = (cid: string, ww: number, hh: number, dx: number, dz: number): Panel => ({ id: cid, stock: 'cover', c: coat, w: ww, h: hh, o: add([x, 0, z], R([-w / 2 + dx, 0, dz])), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'fold', density: 2.1 });
+  const base = (cid: string, ww: number, hh: number, dx: number, dz: number): Panel => ({ id: cid, stock: 'cover', c: coat, w: ww, h: hh, o: add([x, lift, z], R([-w / 2 + dx, 0, dz])), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'fold', density: 2.1 });
   const fig: Panel = { ...base(id, w, h, 0, 0), mask: g(shapes), print: g(print) };
   // Detail cut from lighter and darker tones of the figure's own colours and glued on: the shaded side of the top, the
-  // hair's shine, both cheeks' blush, toe caps, and a hem or dots on a dress. Measured in the 80 x 112 sheet.
-  const glue = (k2: string, x0: number, top: number, ww: number, hh: number, c: string, shape: string): Panel =>
-    on(fig, .7, (flip ? W - x0 - ww : x0) * k, (H - top - hh) * k, ww * k, hh * k, { id: `${id}-${k2}`, stock: 'sugar', c, density: 2.1, mask: `<g transform="scale(${k}) ${flip ? `translate(${ww} 0) scale(-1 1)` : ''}">${shape}</g>` });
+  // hair's shine, both cheeks' blush, toe caps, and a hem or dots on a dress. Placed in the short figure's coordinates and
+  // carried to the build with the part it sits on.
+  type Part = 'head' | 'torso' | 'foot';
+  const glue = (k2: string, part: Part, x0: number, top: number, ww: number, hh: number, c: string, shape: string): Panel => {
+    const sx = part === 'head' ? 1 : B.wide, syy = part === 'torso' ? sy : 1;
+    const X = part === 'head' ? x0 : mx(x0), Y = part === 'torso' ? my(top) : part === 'foot' ? top + drop : top, WW = ww * sx, HH = hh * syy;
+    return on(fig, .7, (flip ? W - X - WW : X) * k, (H - Y - HH) * k, WW * k, HH * k, { id: `${id}-${k2}`, stock: 'sugar', c, density: 2.1, mask: `<g transform="scale(${k}) ${flip ? `translate(${WW} 0) scale(-1 1)` : ''} scale(${sx} ${syy})">${shape}</g>` });
+  };
   const tall = style === 'dress' ? 30 : 26;
   const parts: Panel[] = [fig,
-    (style === 'dress' ? glue('shade', 18, 68, 9, tall, tone(coat, -.15), `<path d="M7 0Q4 14 0 ${tall}H5Q7 14 9 1Z" fill="#fff"/>`) : glue('shade', 20, 68, 6, tall, tone(coat, -.15), `<path d="M0 4Q0 0 6 -1V${tall}H0Z" fill="#fff"/>`)),
-    ...(hat ? [] : [glue('hairlight', 22, 17, 34, 12, tone(hair, .25), '<path d="M0 8Q15 0 34 5Q18 4.5 3 11.5Z" fill="#fff"/>')]),
-    glue('blush-l', 24, 51, 8, 4, '#f2a98c', '<ellipse cx="4" cy="2" rx="4" ry="2" fill="#fff"/>'),
-    glue('blush-r', 48, 51, 8, 4, '#f2a98c', '<ellipse cx="4" cy="2" rx="4" ry="2" fill="#fff"/>'),
-    glue('toe-l', 28, 104, 6, 3, tone(shoes, .3), '<rect width="6" height="3" rx="1.5" fill="#fff"/>'),
-    glue('toe-r', 46, 104, 6, 3, tone(shoes, .3), '<rect width="6" height="3" rx="1.5" fill="#fff"/>'),
-    ...(style === 'dress' ? [glue('hem', 18, 91, 44, 7, tone(coat, -.14), '<path d="M1.4 0H42.6L44 7H0Z" fill="#fff"/>'), ...[0, 1, 2].map(i => glue(`dot${i}`, 31 + i * 8, 74 + (i % 2) * 8, 5, 5, tone(coat, .3), '<circle cx="2.5" cy="2.5" r="2.5" fill="#fff"/>'))] : [])];
+    (style === 'dress' ? glue('shade', 'torso', 18, 68, 9, tall, tone(coat, -.15), `<path d="M7 0Q4 14 0 ${tall}H5Q7 14 9 1Z" fill="#fff"/>`) : glue('shade', 'torso', 20, 68, 6, tall, tone(coat, -.15), `<path d="M0 4Q0 0 6 -1V${tall}H0Z" fill="#fff"/>`)),
+    ...(hat ? [] : [glue('hairlight', 'head', 22, 17, 34, 12, tone(hair, .25), '<path d="M0 8Q15 0 34 5Q18 4.5 3 11.5Z" fill="#fff"/>')]),
+    glue('blush-l', 'head', 24, 51, 8, 4, '#f2a98c', '<ellipse cx="4" cy="2" rx="4" ry="2" fill="#fff"/>'),
+    glue('blush-r', 'head', 48, 51, 8, 4, '#f2a98c', '<ellipse cx="4" cy="2" rx="4" ry="2" fill="#fff"/>'),
+    glue('toe-l', 'foot', 28, 104, 6, 3, tone(shoes, .3), '<rect width="6" height="3" rx="1.5" fill="#fff"/>'),
+    glue('toe-r', 'foot', 46, 104, 6, 3, tone(shoes, .3), '<rect width="6" height="3" rx="1.5" fill="#fff"/>'),
+    ...(style === 'dress' ? [glue('hem', 'torso', 18, 91, 44, 7, tone(coat, -.14), '<path d="M1.4 0H42.6L44 7H0Z" fill="#fff"/>'), ...[0, 1, 2].map(i => glue(`dot${i}`, 'torso', 31 + i * 8, 74 + (i % 2) * 8, 5, 5, tone(coat, .3), '<circle cx="2.5" cy="2.5" r="2.5" fill="#fff"/>'))] : [])];
   // The carrying arm and its bag are a second sheet standing a little proud of the figure.
   if (!ownArm) {
-    const ax = 52, ay = 66, aw = 26, ah = H - ay, bag = '<rect x="55" y="91" width="18" height="14" rx="3"/>', handle = '<path d="M59 92V88Q59 86 61 86H67Q69 86 69 88V92" fill="none"/>';
+    const bag = '<rect x="55" y="91" width="18" height="14" rx="3"/>', handle = '<path d="M59 92V88Q59 86 61 86H67Q69 86 69 88V92" fill="none"/>';
+    const ax = mx(50), ay = 66, aw = mx(77) - ax, ah = H - ay;
     const local = (inner: string) => `<g transform="scale(${k}) ${flip ? `translate(${aw} 0) scale(-1 1)` : ''} translate(${-ax} ${-ay})">${inner}</g>`;
-    const mask = `<g fill="#fff" stroke="#fff" stroke-width="6" stroke-linejoin="round">${bag}<path d="${armR}"/><circle cx="63" cy="89" r="5"/></g>`;
-    const art = `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}" fill="#fff"/><g stroke="${tone(carry!, -.35)}" stroke-width="2.2">${handle}</g><g fill="${carry}">${bag}</g><rect x="55" y="91" width="18" height="4" rx="2" fill="${tone(carry!, .25)}"/><path d="${armR}" fill="${tone(coat, -.06)}"/><circle cx="63" cy="89" r="5" fill="${skin}"/>`;
+    const mask = `<g fill="#fff" stroke="#fff" stroke-width="6" stroke-linejoin="round">${torso(`<path d="${armR}"/>`)}${ride(63, 89, `<circle cx="63" cy="89" r="5"/>${bag}`)}</g>`;
+    const art = `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}" fill="#fff"/>${torso(`<path d="${armR}" fill="${tone(coat, -.06)}"/>`)}` +
+      ride(63, 89, `<g stroke="${tone(carry!, -.35)}" stroke-width="2.2">${handle}</g><g fill="${carry}">${bag}</g><rect x="55" y="91" width="18" height="4" rx="2" fill="${tone(carry!, .25)}"/><circle cx="63" cy="89" r="5" fill="${skin}"/>`);
     parts.push({ ...base(`${id}-arm`, aw * k, ah * k, (flip ? W - ax - aw : ax) * k, 5), mask: local(mask), print: local(art) });
   }
   return parts;
 }
 
 /* ---------- stalls ---------- */
-// A boat-tour ticket kiosk: slatted counter, dark frame, flat roof, a poster wall of boats and a seller behind.
+// A boat-tour ticket kiosk: slatted counter, dark frame, flat roof, a poster wall of boats, and a big, loud hawker standing on a step behind the counter so he shows over it.
 export function ticketKiosk(id: string, x: number, z: number, rot: number): Panel[] {
   const R = yaw(rot), at = (lx: number, ly: number, lz: number): V3 => add([x, ly, z], R([lx, 0, lz]));
   const slats = (w: number) => `<rect width="${w}" height="76" fill="#f4f1ea"/>${Array.from({ length: Math.floor(w / 46) }, (_, i) => `<rect x="${8 + i * 46}" y="16" width="40" height="52" fill="#c8915a"/><path d="M${8 + i * 46} ${30}h40M${8 + i * 46} 44h40M${8 + i * 46} 58h40" stroke="#a8693a" stroke-width="1.6"/>`).join('')}<rect width="${w}" height="8" fill="#fff"/>`;
@@ -349,7 +365,7 @@ export function ticketKiosk(id: string, x: number, z: number, rot: number): Pane
   const roof = box({ id: `${id}-roof`, x, z: z, y: 226, w: 230, h: 14, d: 104, rot, stock: 'greyboard', c: '#2b2f36', density: 1, front: '<rect y="9" width="230" height="5" fill="#f4f1ea"/>', top: '<rect width="230" height="104" fill="#3d444e"/>' });
   const poster: Panel = { id: `${id}-poster`, stock: 'bond', c: BLUE, w: 170, h: 140, o: at(-85, 80, -30), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.3,
     print: `<rect width="170" height="140" fill="${DEEP}"/><rect x="8" y="8" width="72" height="56" fill="#8fd3f4"/><path d="M14 46h56l-6 10h-44Z" fill="${CORAL}"/><rect x="24" y="34" width="34" height="12" fill="${CREAM}"/><rect x="88" y="8" width="74" height="56" fill="#8fd3f4"/><path d="M96 50h58l-6 8h-46Z" fill="#d8322f"/><rect x="104" y="38" width="22" height="12" fill="${CREAM}"/><rect x="8" y="72" width="154" height="60" fill="#8fd3f4"/><path d="M8 110Q60 90 100 112T162 104V132H8Z" fill="#4fa9d6"/><path d="M40 84h20v16h-20Z M110 90h16v10h-16Z" fill="${CREAM}"/>` };
-  const sc = at(-24, 0, -12), seller = shopper(`${id}-seller`, sc[0], sc[2], { coat: '#22324a', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', hat: '#22324a' }, false, .9, rot, false);
+  const sc = at(-58, 0, -12), seller = shopper(`${id}-seller`, sc[0], sc[2], { coat: '#22324a', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', hat: '#22324a', build: 'big', lift: 34 }, false, 1, rot, false);
   const rack: Panel = { id: `${id}-brochures`, stock: 'bond', c: '#fff', w: 50, h: 34, o: at(40, 76, 20), u: R([1, 0, 0]), v: unit([0, 1, .35]), edge: 'cut', density: 2.2, print: `<rect width="50" height="34" fill="#fff"/>${[0, 1, 2].map(i => `<rect x="${3 + i * 16}" y="4" width="13" height="26" fill="${[CORAL, BLUE, SUN][i]}"/>`).join('')}` };
   const sign: Panel = { id: `${id}-sign`, stock: 'cover', c: SUN, w: 70, h: 52, o: at(-110, 170, 52), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 2.2, mask: '<circle cx="35" cy="26" r="26" fill="#fff"/>', print: `<circle cx="35" cy="26" r="20" fill="${CREAM}"/><path d="M20 30h30l-4 7h-22Z" fill="${BLUE}"/><path d="M30 20h10v10h-10Z" fill="${CORAL}"/>` };
   return [...counter, posts, ...roof, poster, ...seller, sign];
