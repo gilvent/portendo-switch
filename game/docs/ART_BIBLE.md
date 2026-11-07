@@ -27,6 +27,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
 | MRT car (home) | Shell `#e9edf1`, floor `#9aa3ad` | Seat blue `#2f6f9f`, livery coral `#e8552d` | Sun `#f6b73c` for safety yellow, steel `#3d444e` |
+| Underground station | Concrete `#a8a39a`, granite `#d3ccbf` | Line teal `#2a8d6a`, sun `#f6b73c` | Steel `#5d6670`, stainless `#c9d0d6` |
 
 Tech colours from `content.ts` appear only as small label bars.
 
@@ -96,18 +97,23 @@ Split each space into the **main space**, where the courier walks and plays, and
 
 ![Doors open at the station](spaces/mrt-doors.png)
 
-The player is a salaryman: white shirt, coral tie, navy suit, blue lanyard with an ID card, glasses and a briefcase, cut as one card with white core edges. Home is not a crossroads but one MRT car on an elevated line, cut open along its near side like a cutaway model.
+The player is a salaryman: white shirt, coral tie, navy suit, blue lanyard with an ID card, glasses and a briefcase, cut as one card with white core edges. Home is not a crossroads but one MRT car standing at an underground station, cut open along its near side like a cutaway model. It is the last car of its train: a neighbouring car past the left gangway, its own driving cab past the right end wall. The camera keeps the car's framing; the station (`src/art/scenes/station.ts`) is kept simple: one side platform behind the car, closed by a concrete wall, and the station's end wall with the tunnel mouth past the cab. It shows over the roof, through every window and through the open doors. The car sits lower in the frame than other spaces (`camera.lift`, `liftTall` for portrait), so the frame ends just under the wheels; the camera pans a little further right than left, to show the cab and the tunnel.
 
-| Part | Build in the MRT car |
+| Part | Build in the MRT car and the station |
 |---|---|
-| Main space | Freestanding seated and standing passengers (one figure design: seated, standing with an arm up to a strap or pole, kneeling), grab poles, the overhead rail with hand straps, glass draft screens, a buggy, a suitcase, a shopping bag, a coffee cup |
-| Enclosed surroundings | The car's own walls. Benches and the intercom are carved relief on the back wall; the extinguisher on the end wall. Window and door frames, ads, the line map and the next-stop display are flat, on the wall or on the cove |
-| Open surroundings | The far view (flat sky bands, two cloud tones, birds, snow-capped mountains, two city rows) is one sheet painted as the page backdrop: at train speed it barely moves. Everything nearer scrolls past: the town beside the line (warm blocks, a tree row and gabled houses printed onto one cut sheet), the far parapet with a catenary mast every 800, the double track bed, the near parapet and beam with the street far below between its piers, and the contact wire the pantograph rides. They are DOM layers rendered from data by `tools/paper/outside.ts`, not baked quads, so they can scroll |
-| Framing | The cut floor slab and underframe across the front, with the bogies on the rail; the roof cut and roof top with air-con housings and the pantograph above; the neighbouring cars past each gangway |
+| Main space | Freestanding seated and standing passengers (one figure design in `people.ts`: seated, standing with an arm up to a strap or pole, kneeling), grab poles, the overhead rail with hand straps, glass draft screens, a buggy, a suitcase, a shopping bag, a coffee cup |
+| Enclosed surroundings, the car | The car's own walls, all relief. Benches, the intercom, window sills, lips and jambs, door jambs and headers are carved on the back wall; the gangway and cab door frames and leaves, the emergency handles, the wheelchair plates and the extinguisher on the end walls; CCTV domes and speaker grilles on the cove. Ads, the line map and the next-stop display are flat, in frames |
+| Enclosed surroundings, the station | The screen doors right behind the car (glass panes in a steel frame; their leaves slide with the car's doors). The concrete back wall (board marks, tie holes, a teal band with the station's name boards) carries carved relief: a drinks machine with a layered front and a coffee machine, a bench with a bin, the station map, an AED, a fire hose cabinet, a staff door, a top-up machine, lightboxes, a vent, wall lights, CCTV and the cable tray. The station's end wall with the tunnel mouth, the tunnel's dark lining with its lamps, the gate closing the platform. The overhead conductor rail the pantograph presses on; the trackbed and near rail under the wheels; the undercar equipment between the bogies |
+| On the platform | Commuters at the screen doors, two on the bench, a student at the drinks machine, a traveller with a suitcase, a cleaner with her trolley at the platform's end; hanging signs (station name, way out, next train) |
+| Framing | The cut floor slab and underframe across the front, with the bogies on the rail; the roof cut and roof top with air-con housings and the pantograph; the neighbouring car past the left gangway and the cab past the right end wall as real shells (cut windows onto their interior: the next car's riders, the driver at his desk) |
 
-Small stories: a commuter behind a newspaper, a student asleep on a backpack, a grandmother knitting, a mother with a child in a cap and a buggy, a schoolkid kneeling on the bench to watch the city, a laptop worker with his coffee on the floor, a reader with a book by the far gangway, a rider with headphones holding the pole.
+The back wall, its relief and the station's end are drawn in the 3D context behind the stage (`behind`): they are the backmost things, and sorted with the near quads the browser would split and drop them.
 
-The work scenes are stations. The line map on the cove picks one; the next-stop display over each door shows it. At the doors, A brakes the train into that station: the outside slows to a stand, the straps swing forward, the platform slides in behind the windows with its name boards, the doors open and the salaryman walks out. He arrives at the destination's MRT entrance (a stair flight under a steel canopy and a station totem on Blibli street) and walks to its first stop. The way back boards the train at that station: doors open, then close, and the train pulls away.
+Small stories: a commuter behind a newspaper, a student asleep on a backpack, a grandmother knitting, a mother with a child in a cap and a buggy, a schoolkid kneeling on the bench to look out, a laptop worker with his coffee on the floor, a reader with a book by the far gangway, a rider with headphones holding the pole. On the platform: a family waiting at the exit door, a student choosing a drink, an old man reading on the bench, a traveller with her suitcase, a cleaner at the end of the platform, the driver at his desk.
+
+Everything seen agrees: the windows show the screen doors and the platform wall exactly where they stand, the neighbouring car's windows show its own riders, the train ends at the cab with the track running on into the tunnel, and the station's name on the hanging sign and the wall's band follows the line map.
+
+The work scenes are stations. The line map on the cove picks one; the next-stop display over each door, the hanging name sign and the wall's name band show it. At the doors, A opens the car's doors and the screen doors together and the salaryman walks out onto the platform. He arrives at the destination's MRT entrance (a stair flight under a steel canopy and a station totem on Blibli street) and walks to its first stop. The way back boards the train at that station: the doors open, then close.
 
 ### The projects are played, not read
 
@@ -140,7 +146,7 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all four spaces; `node tools/paper/outside.ts` re-renders the train's outside strips. `npm run paper -- street 64` rebuilds one quickly at low samples. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds all four spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
 1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
@@ -160,7 +166,8 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 - Mark sheets with no cut-outs as opaque so the browser skips blending them.
 - Anything far away and flat belongs in the CSS backdrop.
 - Moving layers are paid for by area, every frame, even when they stand still. Merge flat layers that move together onto one sheet; print a thin thing (a mast) as small repeated pieces, never as a mostly transparent full-width sheet; never clip a moving print inside its sheet, slide a carrier of plain sheets instead.
-- Keep its own 3D context for the train's outside, behind the stage. Sorting long strips against the diorama's quads makes the browser drop pieces.
+- Far, wide sheets go in the 3D context behind the stage (`behind` on the panel). Sorted against the near quads, the planes of x-facing faces (end walls, machine sides) split them and the browser drops pieces.
+- Keep tall sheets close to the top of the frame; and give wide floor sheets near the camera narrow tiles (the car floor uses 8), or portrait drops the tiles standing figures meet.
 - Sheets that meet edge to edge (a floor on its front section, the track bed on the beam) need a hair of gap, and wide sheets near the camera need narrow tiles (400 for the track bed and beam): otherwise the browser drops pieces in portrait.
 
 | Space | Quad limit, enforced by the journey test |
@@ -168,9 +175,9 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Street | 130 |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
-| MRT car | 110 (plus the outside: about 70 DOM sheets) |
+| MRT car and station | 160 (the moving outside, about 70 DOM sheets, is gone) |
 
-Measured in the cloud container (software GPU, 4x CPU throttle, DPR 2.625), which runs slower than the reference machine: the street at 27 fps landscape and 44 portrait, the MRT car with its moving outside at 16 and 27, and the car alone at 31.
+Measured in the cloud container (software GPU, 4x CPU throttle, DPR 2.625), which runs slower than the reference machine: the street at 27 fps landscape and 44 portrait, and the MRT car with its old moving outside at 16 and 27 (the station replaced that outside; see the budget above).
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
@@ -188,7 +195,6 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Review board | The chosen filter tab rises |
 | Any toy | A piece that appears drops into place in five stepped frames |
 | Line map | The chosen station's lamp and the next-stop display switch |
-| MRT doors | Both leaves of the exit door slide into the wall pockets when the train stands |
-| Braking | Hand straps swing forward, each by its own angle, and settle when the train stops |
+| MRT doors | Both leaves of the exit door slide into the wall pockets, and the screen doors behind them slide open with them |
 
-The outside of the train is the one thing that moves smoothly: it is the world going past, not paper being handled. The train cruises, brakes to a stand over 2.8s and pulls away over 3.2s. Under reduced motion the outside stands still and the station is simply there.
+The train stands in the station; nothing in the MRT space moves smoothly.

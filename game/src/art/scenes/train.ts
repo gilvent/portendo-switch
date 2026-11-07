@@ -219,10 +219,44 @@ export function train(): Scene {
     ]);
     const roof: Panel = { id: `${id}-roof`, stock: 'cover', c: '#dfe4e8', w: NW, h: D, o: [x0, NH, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: .9,
       print: `<rect width="${NW}" height="${D}" fill="#dfe4e8"/>${Array.from({ length: 5 }, (_, i) => `<path d="M${(i + 1) * NW / 6} 0V${D}" stroke="#c3cad1" stroke-width="1.4"/>`).join('')}<rect x="${lx(160) - 90}" y="${D / 2 - 40}" width="180" height="80" fill="#c9d0d6"/>` };
+    // The end facing our car: the neighbour's own end wall with its gangway, closed behind the bellows.
+    const ex = side < 0 ? x0 + NW : x0;
+    const end: Panel = { id: `${id}-end`, stock: 'cover', c: SHELL_DARK, w: D, h: NH + NU, o: side < 0 ? [ex, -NU, FRONT] : [ex, -NU, BACK], u: side < 0 ? [0, 0, -1] : [0, 0, 1], v: [0, 1, 0], edge: 'fold', density: .8,
+      print: `<rect width="${D}" height="${NH + NU}" fill="${SHELL_DARK}"/><rect x="${D / 2 - 60}" y="${NH - 240}" width="120" height="240" fill="#2b3037"/>${Array.from({ length: 8 }, (_, i) => `<rect x="${D / 2 - 56 + i * 15}" y="${NH - 236}" width="6" height="236" fill="#4a5059"/>`).join('')}<rect y="${NH}" width="${D}" height="${NU}" fill="#2f353d"/>` };
     void inner;
-    return [shell, ...frames, floor, fw, ...riders, roof];
+    return [shell, ...frames, floor, fw, ...riders, roof, end];
   };
-  const neighbours = [bellows('bellows-l', -W / 2 - 30), bellows('bellows-r', W / 2), ...nextCar(-1), ...nextCar(1)];
+  // This is the last car of its train: past the right end wall is its own driving cab, seen from outside. A short
+  // shell with a sloping nose, a cab window onto the desk and the driver, the windscreen sloping down to the
+  // headlight and the red tail lamp.
+  const cab = (): Panel[] => {
+    const x0 = W / 2 + 4, CW = 230, NOSE = 120, id = 'cab';
+    const outline = `M0 ${NH + NU}V0H${CW - NOSE}Q${CW - NOSE + 30} 0 ${CW - 40} ${NH - 150}Q${CW} ${NH - 120} ${CW} ${NH - 60}V${NH + NU}Z`;
+    const win = `M30 ${NH - CAR.WIN[1]}h${CW - NOSE - 50}v${CAR.WIN[1] - CAR.WIN[0]}h${-(CW - NOSE - 50)}Z`;
+    const shell: Panel = { id: `${id}-shell`, stock: 'cover', c: SHELL, w: CW, h: NH + NU, o: [x0, -NU, FRONT], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.2,
+      mask: `<path fill-rule="evenodd" d="${outline} ${win}" fill="#fff"/>`,
+      print: `<rect width="${CW}" height="${NH + NU}" fill="${SHELL}"/><rect width="${CW}" height="26" fill="#d4dbe1"/><rect y="${NH - 70}" width="${CW}" height="8" fill="${LIVERY}"/><rect y="${NH - 62}" width="${CW}" height="3" fill="${DEEP}"/>`
+        + `<path d="M${CW - NOSE} 2Q${CW - NOSE + 30} 2 ${CW - 42} ${NH - 152}L${CW - 64} ${NH - 160}Q${CW - NOSE + 14} 30 ${CW - NOSE - 6} 30Z" fill="#33404d"/>`
+        + `<rect x="${CW - 34}" y="${NH - 112}" width="26" height="14" rx="5" fill="#fff6d8"/><rect x="${CW - 34}" y="${NH - 92}" width="26" height="12" rx="5" fill="#d8352a"/>`
+        + `<rect x="${CW - NOSE - 2}" y="${NH - 214}" width="4" height="214" fill="#9aa4ae"/><rect y="${NH}" width="${CW}" height="${NU}" fill="#2f353d"/><rect y="${NH}" width="${CW}" height="7" fill="#7e8893"/><rect x="40" y="${NH + 30}" width="140" height="18" rx="4" fill="#3a4049"/><circle cx="70" cy="${NH + NU - 18}" r="15" fill="#23272d"/><circle cx="150" cy="${NH + NU - 18}" r="15" fill="#23272d"/><circle cx="70" cy="${NH + NU - 18}" r="5" fill="#aab2bb"/><circle cx="150" cy="${NH + NU - 18}" r="5" fill="#aab2bb"/><rect x="${CW - 20}" y="${NH + 6}" width="20" height="40" fill="#5b636d"/>` };
+    const frame = on(shell, 1.2, 26, NU + CAR.WIN[0] - 4, CW - NOSE - 42, CAR.WIN[1] - CAR.WIN[0] + 8, { id: `${id}-wf`, stock: 'cover', c: '#aeb8c2', density: 1.4,
+      mask: `<path fill-rule="evenodd" d="M0 0H${CW - NOSE - 42}V${CAR.WIN[1] - CAR.WIN[0] + 8}H0Z M6 6H${CW - NOSE - 48}V${CAR.WIN[1] - CAR.WIN[0] + 2}H6Z" fill="#fff"/>` });
+    // Inside the cab, seen through its window: the far wall with the driver's desk and seat as relief, the driver.
+    const inner: Panel = { id: `${id}-far`, stock: 'cover', c: '#d6dde3', w: CW - 30, h: H, o: [x0, 0, BACK + 4], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1, print: `<rect width="${CW - 30}" height="${H}" fill="#d6dde3"/><rect y="${H - 34}" width="${CW - 30}" height="34" fill="${SHELL_DARK}"/>` };
+    const desk = carved(inner, [
+      ...box({ id: `${id}-desk`, x: x0 + 140, z: BACK + 40, w: 110, h: 100, d: 70, stock: 'cover', c: STEEL, front: `<rect width="110" height="100" fill="${STEEL}"/><rect x="10" y="10" width="40" height="26" rx="3" fill="#14171b"/><rect x="14" y="14" width="32" height="18" fill="#5ec3a6"/><rect x="60" y="14" width="40" height="8" rx="3" fill="${SUN}"/><circle cx="70" cy="34" r="5" fill="${CORAL}"/>`, top: `<rect width="110" height="70" fill="#4a5059"/><rect x="20" y="20" width="16" height="30" rx="4" fill="${INK}"/>` }),
+      ...box({ id: `${id}-seat`, x: x0 + 60, z: BACK + 50, w: 50, h: 70, d: 46, stock: 'cover', c: SEAT, front: `<rect width="50" height="70" fill="${SEAT}"/>` }),
+      standing(`${id}-driver`, x0 + 80, BACK + 80, { skin: SKIN[2], hair: INK, top: '#2b3a55', legs: '#2b3a55', hairStyle: 'cap', capC: '#2b3a55' }, { print: `<rect x="20" y="96" width="24" height="5" fill="${SUN}"/>` })
+    ]);
+    const floor: Panel = { id: `${id}-floor`, stock: 'greyboard', c: FLOOR, w: CW - 40, h: D - 4, o: [x0, 0, FRONT - 2], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: .9 };
+    const roof: Panel = { id: `${id}-roof`, stock: 'cover', c: '#dfe4e8', w: CW - NOSE, h: D, o: [x0, NH, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: .9, print: `<rect width="${CW - NOSE}" height="${D}" fill="#dfe4e8"/><rect x="20" y="${D / 2 - 30}" width="60" height="60" rx="6" fill="#c9d0d6"/>` };
+    // The sloping windscreen, from the roof edge down the nose: dark glass with a wiper.
+    const dx = NOSE - 40, dy = 150, len = Math.hypot(dx, dy);
+    const screenTop: Panel = { id: `${id}-windscreen`, stock: 'cover', c: '#33404d', w: len, h: D, o: [x0 + CW - NOSE, NH, FRONT], u: [dx / len, -dy / len, 0], v: [0, 0, -1], edge: 'fold', density: 1,
+      print: `<rect width="${len}" height="${D}" fill="#33404d"/><rect x="8" y="12" width="${len - 16}" height="${D - 24}" rx="10" fill="#4f6578"/><path d="M${len * .6} ${D / 2}L${len * .2} ${D / 2 - 60}" stroke="${INK}" stroke-width="4"/><rect x="${len - 10}" width="10" height="${D}" fill="${SHELL}"/>` };
+    return [shell, frame, inner, ...desk, floor, roof, screenTop];
+  };
+  const neighbours = [bellows('bellows-l', -W / 2 - 30), ...nextCar(-1), ...cab()];
 
   /* ---------- passengers: a morning crowd, each with a small story ---------- */
   const L = (skin: number, hair: string, top: string, legs: string, hairStyle?: Look['hairStyle'], capC?: string): Look => ({ skin: SKIN[skin], hair, top, legs, hairStyle, capC });
@@ -262,7 +296,7 @@ export function train(): Scene {
     ...people, ...suitcase, bag, umbrella, stroller, ...cup];
   const st = buildStation();
   return {
-    id: 'train', camera: { zoom: .96, x0: -150, x1: 150, lift: 250 }, panels: [...panels, ...st.panels],
+    id: 'train', camera: { zoom: .96, x0: -150, x1: 260, lift: 250 }, panels: [...panels, ...st.panels],
     light: { sun: 1.4, sky: .4, skyColor: [1, .97, .92] },
     lamps: [...[-420, -140, 140, 420].map(x => ({ at: [x, CAR.COVE - 12, -70] as V3, color: [1, .98, .92] as const, energy: 48 })), ...st.lamps]
   };

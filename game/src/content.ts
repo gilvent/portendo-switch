@@ -16,7 +16,7 @@ export const content: Content = validateContent({ worlds: {
   intro: { id: 'intro', art: 'blockout', bounds: { x0: -420, x1: 420, z0: 0, z1: 0 }, solid: [], title: 'Handheld', path: 'round', color: '#8d95a0',
     stops: [{ id: 'road-end', label: 'Dock', x: 400, z: 0, reach: 300, action: { kind: 'dock' } }], letters: [] },
   // Home: the morning commute. The line map picks the station; the doors open onto it.
-  mrt: { id: 'mrt', art: 'train', camera: { zoom: .96, x0: -150, x1: 150, lift: 250, liftTall: 220 }, bounds: { x0: -540, x1: 540, z0: -62, z1: 118 }, solid: [], title: 'MRT', path: 'round', color: '#8d95a0',
+  mrt: { id: 'mrt', art: 'train', camera: { zoom: .96, x0: -150, x1: 260, lift: 250, liftTall: 220 }, bounds: { x0: -540, x1: 540, z0: -62, z1: 118 }, solid: [], title: 'MRT', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'intercom', label: 'Intercom', x: -440, z: -50, focus: 1.5, look: -400, action: { kind: 'letter', letter: 'contact' } },
       { id: 'ad', label: 'Ad poster', x: -150, z: -40, action: { kind: 'letter', letter: 'hello' } },
