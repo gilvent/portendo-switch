@@ -192,7 +192,7 @@ function surroundings(): Panel[] {
   const lights = [festoon('lights-a', la, [ra[0], la[1], ra[2]], 70), festoon('lights-b', lb, [rb[0], lb[1], rb[2]], 60), festoon('lights-c', [430, 400, -60], [fat(R, 330, 400, 4)[0], 400, fat(R, 330, 400, 4)[2]], 40)];
   return [lFront, lEnd, ...lRelief, rFront, ...rRelief, bFront, ...bRelief, ...gate, ...palms, ...lights, ...riverView(),
     ...ticketKiosk('ticket', -800, -60, 62), ...clothesStall('clothes', 720, -190),
-    ...parasolTable('cafe-a', 790, 150, '#d8322f'), ...parasolTable('cafe-b', 930, 20, CREAM),
+    ...parasolTable('cafe-a', 790, 150, '#d8322f'), ...parasolTable('cafe-b', 930, 20, CREAM, 1),
     ...shadeTree('tree-l', 1080, 260, 330), ...planter('tree-l-bed', 1080, 260, 110),
     ...flagPole('flag-l', -790, 230, 300, '#8e5bd6'), ...flagPole('flag-r', 690, 240, 300, '#e8752d'),
     ...bin('bin-b', 560, 190), ...bush('bush-a', -330, -170, 140, 64),

@@ -325,7 +325,7 @@ export function clothesStall(id: string, x: number, z: number): Panel[] {
   return [rail, ...tent.map(toCamera), ...legs, ...table];
 }
 // A café table with a square parasol.
-export function parasolTable(id: string, x: number, z: number, c: string): Panel[] {
+export function parasolTable(id: string, x: number, z: number, c: string, seats = 2): Panel[] {
   const y0 = 170, R = 80, apex: V3 = [x, y0 + 46, z];
   const corner = (k: number): V3 => [x + R * Math.cos((45 + 90 * k) * Math.PI / 180), y0, z + R * Math.sin((45 + 90 * k) * Math.PI / 180)];
   const canopy = [0, 1, 2, 3].map((k): Panel => {
@@ -334,8 +334,9 @@ export function parasolTable(id: string, x: number, z: number, c: string): Panel
   });
   const pole: Panel = { id: `${id}-pole`, stock: 'greyboard', c: '#f4f1ea', w: 5, h: y0, o: [x - 2.5, 0, z + 1], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.4 };
   const table = [{ id: `${id}-table`, stock: 'cover', c: '#f4f1ea', w: 70, h: 70, o: [x - 35, 62, z + 35], u: [1, 0, 0], v: [0, 0, -1], edge: 'cut', density: 1.4, mask: '<circle cx="35" cy="35" r="35" fill="#fff"/>', print: '<circle cx="35" cy="35" r="10" fill="#e88ab0"/><rect x="48" y="20" width="10" height="14" fill="#fff"/>' } as Panel];
-  const chair = (dx: number) => `<path transform="translate(${dx} 0)" d="M4 0H36V8H32V40H40V46H36V80H30V52H10V80H4V46H0V40H8V8H4Z" fill="#fff"/>`;
-  const chairs = [{ id: `${id}-chairs`, stock: 'cover', c: '#3d444e', w: 156, h: 80, o: [x - 78, 0, z + 20], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.2, mask: chair(0) + chair(116) } as Panel];
+  // Bistro chairs drawn up in front of the table, their backs to us: each a cut back with its legs, folded into the seat,
+  // with paler slats glued on.
+  const chairs = [[-46, 52, 18], [46, 52, -18]].slice(0, seats).flatMap(([dx, dz, rot], k) => bistro(`${id}-chair${k}`, x + dx, z + dz, rot));
   return [...canopy, pole, ...table, ...chairs];
 }
 
@@ -471,4 +472,17 @@ export function pigeon(id: string, x: number, z: number, rot: number, c: string,
     g('sheen', .8, 17, 9, 9, 8, '#5f9b8a', '<path d="M0 8Q2 0 9 1Q8 7 4 8Z" fill="#fff"/>'),
     g('eye', 1.2, 24, 17, 3, 3, '#e8752d', '<circle cx="1.5" cy="1.5" r="1.5" fill="#fff"/>'),
     g('beak', 1, 28, 16, 5, 3, '#3d444e', '<path d="M0 0L5 1.5L0 3Z" fill="#fff"/>')];
+}
+
+// A bistro chair seen from behind: the back and rear legs cut as one sheet, folded into the seat at the top of the legs.
+// The slats are paler strips glued on; the front legs stand hidden behind the rear ones.
+export function bistro(id: string, x: number, z: number, rot: number): Panel[] {
+  const P = piece(x, z, rot), W = 36, D = 30, S = 44, H = 86, IRON = '#3d444e', SLAT = '#6b7480';
+  const back = P(`${id}-back`, [-W / 2, 0, D / 2], [1, 0, 0], [0, 1, 0], W, H, { stock: 'greyboard', c: IRON, edge: 'fold',
+    mask: bar(4, H, 4, 0, 4) + bar(W - 4, H, W - 4, 0, 4) + bar(2, H - S, W - 2, H - S, 4) + bar(4, 4, W - 4, 4, 5) + bar(4, H - S - 18, W - 4, H - S - 18, 3) });
+  const seat = P(`${id}-seat`, [-W / 2, S, D / 2], [1, 0, 0], [0, 0, -1], W, D, { stock: 'greyboard', c: IRON, edge: 'fold', mask: `<rect width="${W}" height="${D}" rx="4" fill="#fff"/>` });
+  return [back, seat,
+    on(back, .8, 6, S + 8, W - 12, 8, { id: `${id}-slat0`, stock: 'cover', c: SLAT, mask: '<rect width="24" height="8" rx="2" fill="#fff"/>' }),
+    on(back, .8, 6, S + 24, W - 12, 8, { id: `${id}-slat1`, stock: 'cover', c: SLAT, mask: '<rect width="24" height="8" rx="2" fill="#fff"/>' }),
+    ...[0, 1, 2].map(k => on(seat, .8, 4, 4 + k * 8, W - 8, 5, { id: `${id}-seat-slat${k}`, stock: 'cover', c: SLAT }))];
 }
