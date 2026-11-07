@@ -38,7 +38,8 @@ function backdrop(): Panel[] {
   reseed(11);
   const FAR = .72;
   const card = (id: string, z: number, y: number, w: number, h: number, c: string, mask: string, print = ''): Panel => ({ id, stock: 'sugar', c, w, h, o: [-w / 2 + 120, y, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR, mask, print });
-  const farCity = blocks(4200, 640, 3, 200, 520, 70, 170, ['#a6cfe0', '#b3d6e5', '#9cc6d9'], '#c6e3ee', true);
+  const hazeCity = blocks(4400, 700, 13, 270, 430, 60, 130, ['#c4e1ee', '#cbe4ef', '#bedcea'], '#d9edf5', true);
+  const farCity = blocks(4200, 640, 3, 200, 520, 70, 170, ['#9cc6d9', '#a6cfe0', '#94bfd3'], '#c6e3ee', true);
   const midCity = blocks(3900, 520, 7, 160, 380, 90, 200, ['#7fb2c4', '#8fbccc', '#9cb4d4', '#86a9c9'], '#f6dfa0', true);
   return [
     // Only world heights of about 400 to 780 show above the street (sheet rows 560 to 940), so the sky's detail lives there.
@@ -47,8 +48,8 @@ function backdrop(): Panel[] {
     // Clouds are cut sheets stood off the sky, the far pale ones behind the white ones, so each throws a soft shadow.
     ...[['clouds-far', 14, [[700, 640, 1.1], [2650, 600, 1.2], [4200, 700, 1]], '#d8eef8'], ['clouds-near', 34, [[1050, 590, 1.6], [1900, 660, 1.2], [3150, 610, 1.5], [2350, 760, .8], [4500, 600, 1.1], [1500, 780, .7]], '#fffdf6']].map(([id, gap, at, c]) =>
       ({ id, stock: 'sugar', c, w: 5200, h: 1500, o: [-2480, -160, -780 + (gap as number)], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR, decal: 'sky', mask: (at as number[][]).map(([x, y, k]) => cloud(x, y, k, '#fff')).join('') }) as Panel),
-    // The city stands in two cut rows a little off the sky: the pale far towers, then the deeper middle row.
-    ...[card('city-far', -780 + 50, 0, 4200, 640, '#a6cfe0', farCity.mask, farCity.print), card('city-mid', -780 + 110, 0, 3900, 520, '#7fb2c4', midCity.mask, midCity.print)].map(p => ({ ...p, decal: 'sky' }))
+    // The city stands in three cut rows well off the sky, pale, deep, pale again, so each throws a clear shadow.
+    ...[card('city-haze', -780 + 40, 0, 4400, 700, '#c4e1ee', hazeCity.mask, hazeCity.print), card('city-far', -780 + 100, 0, 4200, 640, '#9cc6d9', farCity.mask, farCity.print), card('city-mid', -780 + 170, 0, 3900, 520, '#7fb2c4', midCity.mask, midCity.print)].map(p => ({ ...p, decal: 'sky' }))
   ];
 }
 function windowBox(id: string, parent: Panel, x: number, y: number, w: number, h: number, goods: string, cols: number, rows: number, gap = 18): Panel[] {
