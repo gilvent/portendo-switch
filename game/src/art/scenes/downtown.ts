@@ -1,6 +1,7 @@
 import { add, backOf, box, normal, on, slot, tilted, yaw, type Lamp, type Panel, type Scene, type V3 } from '../kit.ts';
 import { CORAL, CREAM, FOLIAGE, INK, SUN, reseed, rnd, specks } from '../recipes.ts';
 import { card, streetLamp } from './street.ts';
+import { paperDog, paperPigeon, pineCards, planter, tone } from './papercut.ts';
 
 // Moperty: a downtown block at golden hour. The palette is the logo's: indigo, lavender and window yellow, on brick and stone.
 export const INDIGO = '#5b6bdc', LAVENDER = '#a3adf2', GLOW = '#f5b400', WORD = '#7b88ea', INDIGO_DARK = '#3d4aa8';
@@ -33,38 +34,65 @@ function backdrop(): Panel[] {
   reseed(17);
   const FAR = .72;
   const layer = (id: string, z: number, y: number, w: number, h: number, c: string, mask: string, print = ''): Panel => ({ id, stock: 'sugar', c, w, h, o: [-w / 2 + 120, y, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR, mask, print, decal: 'sky' });
-  // A row of towers: slabs with stepped crowns, spires, masts and tanks, each its own tone, windows lit at random.
-  const towers = (w: number, h: number, seed: number, lo: number, hi: number, cols: string[], lit: number, glow: string) => {
-    far = seed; let x = -fr(0, 60), mask = '', print = '';
+  // A row with gaps of open sky between its blocks, so the far layers show through and the city reads as deep, not as a wall.
+  const row = (w: number, h: number, seed: number, lo: number, hi: number, cols: string[], lit: number, glow: string, gap: number, bwLo = 70, bwHi = 170) => {
+    far = seed; let x = fr(0, 80), mask = '', print = '';
     while (x < w) {
-      const bw = fr(70, 170), bh = fr(lo, hi), top = h - bh, c = cols[Math.floor(fr(0, cols.length))], kind = Math.floor(fr(0, 5));
+      const bw = fr(bwLo, bwHi), bh = fr(lo, hi), top = h - bh, c = cols[Math.floor(fr(0, cols.length))], kind = Math.floor(fr(0, 6));
       let crown = '';
-      if (kind === 0) crown = `<rect x="${x + bw * .18}" y="${top - 34}" width="${bw * .64}" height="36" FILL/><rect x="${x + bw * .32}" y="${top - 62}" width="${bw * .36}" height="30" FILL/><rect x="${x + bw * .47}" y="${top - 110}" width="${bw * .06}" height="50" FILL/>`;
-      if (kind === 1) crown = `<path d="M${x + bw * .2} ${top}L${x + bw * .5} ${top - bw * .7}L${x + bw * .8} ${top}Z" FILL/>`;
-      if (kind === 2) crown = `<rect x="${x + bw * .6}" y="${top - 44}" width="26" height="30" FILL/><rect x="${x + bw * .6 + 2}" y="${top - 14}" width="3" height="14" FILL/><rect x="${x + bw * .6 + 21}" y="${top - 14}" width="3" height="14" FILL/>`;
-      if (kind === 3) crown = `<rect x="${x + bw * .3}" y="${top - 70}" width="3" height="70" FILL/><rect x="${x + bw * .3 - 10}" y="${top - 50}" width="23" height="3" FILL/>`;
+      if (kind === 0) crown = `<rect x="${x + bw * .2}" y="${top - 26}" width="${bw * .6}" height="28" FILL/><rect x="${x + bw * .47}" y="${top - 70}" width="${bw * .06}" height="46" FILL/>`;
+      if (kind === 1) crown = `<path d="M${x + bw * .15} ${top}L${x + bw * .5} ${top - bw * .55}L${x + bw * .85} ${top}Z" FILL/>`;
+      if (kind === 2) crown = `<rect x="${x + bw * .6}" y="${top - 40}" width="24" height="28" FILL/><rect x="${x + bw * .6 + 2}" y="${top - 14}" width="3" height="14" FILL/><rect x="${x + bw * .6 + 19}" y="${top - 14}" width="3" height="14" FILL/>`;
+      if (kind === 3) crown = `<rect x="${x + bw * .3}" y="${top - 60}" width="3" height="60" FILL/><rect x="${x + bw * .3 - 9}" y="${top - 44}" width="21" height="3" FILL/>`;
       mask += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="#fff"/>` + crown.replaceAll('FILL', 'fill="#fff"');
-      print += `<rect x="${x.toFixed(0)}" y="${(top - 120).toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${(bh + 120).toFixed(0)}" fill="${c}"/><rect x="${(x + bw * .62).toFixed(0)}" y="${top.toFixed(0)}" width="${(bw * .38).toFixed(0)}" height="${bh.toFixed(0)}" fill="#000" fill-opacity=".08"/>`;
+      print += `<rect x="${x.toFixed(0)}" y="${(top - 80).toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${(bh + 80).toFixed(0)}" fill="${c}"/><rect x="${(x + bw * .62).toFixed(0)}" y="${top.toFixed(0)}" width="${(bw * .38).toFixed(0)}" height="${bh.toFixed(0)}" fill="#000" fill-opacity=".07"/>`;
       for (let wy = top + 16; wy < h - 10; wy += 20) for (let wx = x + 7; wx < x + bw - 9; wx += 12) if (fr(0, 1) < lit) print += `<rect x="${wx.toFixed(0)}" y="${wy.toFixed(0)}" width="5" height="9" fill="${fr(0, 1) > .3 ? glow : '#fff2d6'}"/>`;
-      x += bw + fr(-14, 10);
+      x += bw + (fr(0, 1) < gap ? fr(60, 220) : fr(-12, 4));
     }
     return { mask, print };
   };
-  const far1 = towers(4400, 900, 9, 420, 820, ['#d9c6d6', '#d1c0d9', '#e0cdd6'], .18, '#f7e3c4');
-  const far2 = towers(4100, 760, 21, 320, 680, ['#b4a8c8', '#a99fc2', '#bcaecb'], .3, '#fbd99a');
-  const mid = towers(3900, 620, 33, 240, 560, ['#8b84ae', '#7f7aa6', '#958cb2'], .38, '#ffd27a');
-  const near = towers(3700, 480, 47, 180, 440, ['#625f8a', '#57557f', '#6b6690'], .45, '#ffc861');
+  const white = (svg: string) => svg.replace(/(fill|stroke)="#[0-9a-f]+"/gi, '$1="#fff"');
   const cloudBank = (x: number, y: number, k: number, c: string) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 60Q-8 30 30 30Q36 0 74 8Q100 -14 132 12Q170 2 178 32Q214 30 212 60Z" fill="${c}"/>`;
+  // Farthest: a soft ridge of hills with a radio mast on its crest, its warning light lit.
+  const ridgeW = 5000, ridgeH = 760;
+  let ridge = `M0 ${ridgeH}`; for (let i = 0; i <= 50; i++) { const x = i * ridgeW / 50; ridge += `L${x.toFixed(0)} ${(ridgeH - 610 - 40 * Math.sin(x / 300 + 1) - 26 * Math.sin(x / 117)).toFixed(0)}`; }
+  ridge += `L${ridgeW} ${ridgeH}Z`;
+  const mastX = 3260, mastY = ridgeH - 650;
+  const ridgeMask = `<path d="${ridge}" fill="#fff"/><path d="M${mastX - 12} ${mastY + 10}L${mastX} ${mastY - 190}L${mastX + 12} ${mastY + 10}Z" fill="#fff"/>`;
+  const ridgePrint = `<path d="${ridge}" fill="#e6c7cc"/><path d="M${mastX - 12} ${mastY + 10}L${mastX} ${mastY - 190}L${mastX + 12} ${mastY + 10}" fill="#cfb0c0"/>${Array.from({ length: 6 }, (_, i) => `<path d="M${mastX - 10 + i * 1.6} ${mastY - i * 32}H${mastX + 10 - i * 1.6}" stroke="#e6c7cc" stroke-width="2"/>`).join('')}<circle cx="${mastX}" cy="${mastY - 192}" r="6" fill="${CORAL}"/>`
+    + Array.from({ length: 30 }, (_, i) => { const x = 60 + i * 165 + fr(-40, 40), y = ridgeH - 600 - 40 * Math.sin(x / 300 + 1) - 26 * Math.sin(x / 117) + fr(10, 60); return `<path d="M${x.toFixed(0)} ${(y - 22).toFixed(0)}l9 22h-18Z" fill="#d6b4c0"/>`; }).join('');
+  const farT = row(4600, 900, 9, 480, 640, ['#cbbad3', '#c4b4d0', '#d1c0d6'], .12, '#f7e3c4', .7, 50, 110);
+  // Middle: an elevated railway crosses on arches with a lit commuter train, mid-rise blocks behind it, a billboard with
+  // the Moperty mark, and a crane on a new tower.
+  const midW = 4400, midH = 760, deck = midH - 450;
+  const mid = row(midW, midH, 33, 460, 560, ['#dbc5d3', '#d4bfd2', '#e0cad3'], .3, '#ffd27a', .35);
+  const arches = Array.from({ length: Math.ceil(midW / 150) }, (_, i) => `<rect x="${i * 150}" y="${deck}" width="150" height="${midH - deck}" fill="#fff"/>`).join('');
+  const archHoles = Array.from({ length: Math.ceil(midW / 150) }, (_, i) => `M${i * 150 + 22} ${midH}V${deck + 60}Q${i * 150 + 75} ${deck + 14} ${i * 150 + 128} ${deck + 60}V${midH}Z`).join(' ');
+  const trainX = 1900, train = `<rect x="${trainX}" y="${deck - 34}" width="420" height="34" rx="10" fill="#fff"/>`;
+  const board = { x: 2700, y: midH - 610 };
+  const midMask = `${mid.mask}<path fill-rule="evenodd" d="M0 ${deck}H${midW}V${midH}H0Z ${archHoles}" fill="#fff"/>${train}<rect x="${board.x}" y="${board.y}" width="190" height="96" fill="#fff"/><rect x="${board.x + 30}" y="${board.y + 96}" width="8" height="120" fill="#fff"/><rect x="${board.x + 150}" y="${board.y + 96}" width="8" height="120" fill="#fff"/>`
+    + `<rect x="3600" y="${midH - 720}" width="10" height="260" fill="#fff"/><rect x="3460" y="${midH - 720}" width="260" height="10" fill="#fff"/><rect x="3500" y="${midH - 710}" width="2" height="70" fill="#fff"/><rect x="3480" y="${midH - 642}" width="44" height="20" fill="#fff"/>`;
+  const midPrint = `${mid.print}<path fill-rule="evenodd" d="M0 ${deck}H${midW}V${midH}H0Z ${archHoles}" fill="#b49fbd"/><rect y="${deck}" width="${midW}" height="10" fill="#9c88aa"/>${Array.from({ length: Math.ceil(midW / 150) }, (_, i) => `<rect x="${i * 150 + 4}" y="${deck - 10}" width="3" height="10" fill="#9c88aa"/>`).join('')}<rect y="${deck - 10}" width="${midW}" height="2" fill="#9c88aa"/>`
+    + `<rect x="${trainX}" y="${deck - 34}" width="420" height="34" fill="#f3ede4"/><rect x="${trainX}" y="${deck - 12}" width="420" height="5" fill="${INDIGO}"/>${Array.from({ length: 16 }, (_, i) => `<rect x="${trainX + 14 + i * 25}" y="${deck - 28}" width="16" height="12" fill="#ffd27a"/>`).join('')}`
+    + `<rect x="${board.x}" y="${board.y}" width="190" height="96" fill="#fbf8f1"/><rect x="${board.x}" y="${board.y}" width="190" height="96" fill="none" stroke="#9c88aa" stroke-width="6"/>${mark(board.x + 16, board.y + 18, 60 / 394)}${word(board.x + 84, board.y + 58, 30)}<rect x="${board.x + 30}" y="${board.y + 96}" width="8" height="120" fill="#9c88aa"/><rect x="${board.x + 150}" y="${board.y + 96}" width="8" height="120" fill="#9c88aa"/>`
+    + `<rect x="3600" y="${midH - 720}" width="10" height="260" fill="${SUN}"/><rect x="3460" y="${midH - 720}" width="260" height="10" fill="${SUN}"/><rect x="3480" y="${midH - 642}" width="44" height="20" fill="#8a7a9a"/>`;
+  // Nearest: deep rooftops just over the block, with tanks, aerials and a few dark pines, every other window lit.
+  const near = row(4200, 620, 47, 360, 470, ['#77709c', '#6d6794', '#807aa4'], .45, '#ffc861', .25, 90, 190);
+  const pinesNear = Array.from({ length: 14 }, (_, i) => { const x = 140 + i * 290 + fr(-60, 60), hh = fr(70, 120); return `<path d="M${x.toFixed(0)} ${(620 - 380 - hh).toFixed(0)}l${(hh * .3).toFixed(0)} ${(hh * .55).toFixed(0)}h${(-hh * .12).toFixed(0)}l${(hh * .2).toFixed(0)} ${(hh * .45).toFixed(0)}h${(-hh * .76).toFixed(0)}l${(hh * .2).toFixed(0)} ${(-hh * .45).toFixed(0)}h${(-hh * .12).toFixed(0)}Z" FILL/>`; }).join('');
+  // Above it all: a hot-air balloon in the mark's two colours, a skein of birds and a paper plane on the warm air.
+  const balloon = (x: number, y: number, k: number) => `<g transform="translate(${x} ${y}) scale(${k})"><path d="M0 60Q0 0 50 0Q100 0 100 60Q100 92 62 118H38Q0 92 0 60Z" fill="${INDIGO}"/><path d="M50 0Q30 50 38 118H62Q70 50 50 0Z" fill="${LAVENDER}"/><path d="M0 60Q0 0 50 0Q20 30 26 104Q0 86 0 60Z" fill="#7d8ae8"/><rect x="38" y="118" width="24" height="4" fill="${GLOW}"/><path d="M40 122L42 140M60 122L58 140" stroke="#5a4636" stroke-width="2"/><rect x="40" y="140" width="20" height="16" fill="#9a6a44"/></g>`;
+  const birds = (x: number, y: number) => Array.from({ length: 7 }, (_, i) => { const bx = x + (i < 4 ? i : 7 - i) * 26 + i * 8, by = y + (i < 4 ? i : 7 - i) * 16; return `<path d="M${bx} ${by}q7 -8 14 0q7 -8 14 0" fill="none" stroke="#6b5a78" stroke-width="3"/>`; }).join('');
+  const plane = `<path d="M2900 150L3010 120L2950 175Z" fill="#fff"/><path d="M2950 175L2960 140L3010 120Z" fill="#e6dce8"/>`;
   return [
     { id: 'sky', backdrop: true, stock: 'cover', c: '#c6b3d4', w: 5200, h: 1500, o: [-2480, -160, -780], u: [1, 0, 0], v: [0, 1, 0], density: FAR,
       // Dusk in flat steps, lavender overhead to apricot at the horizon; the low sun sits upper left, where the light comes from.
-      print: `<rect y="560" width="5200" height="120" fill="#d2bdd6"/><rect y="680" width="5200" height="110" fill="#e6c3c8"/><rect y="790" width="5200" height="110" fill="#f3cbb4"/><rect y="900" width="5200" height="600" fill="#f8d6a6"/><circle cx="1260" cy="800" r="80" fill="#fbe2b0"/><circle cx="1260" cy="800" r="58" fill="#f9c873"/>` },
-    layer('clouds-far', -770, 560, 5000, 260, '#efc8bf', [cloudBank(300, 40, 1.4, '#fff'), cloudBank(1700, 10, 1.8, '#fff'), cloudBank(3000, 60, 1.2, '#fff'), cloudBank(3900, 20, 1.6, '#fff')].join(''), ''),
-    layer('clouds-near', -755, 600, 5000, 220, '#f9dccb', [cloudBank(800, 60, 1.1, '#fff'), cloudBank(2300, 30, 1.5, '#fff'), cloudBank(3500, 80, .9, '#fff'), cloudBank(4400, 40, 1.2, '#fff')].join(''), ''),
-    layer('towers-far', -720, 0, 4400, 900, '#d9c6d6', far1.mask, far1.print),
-    layer('towers-far2', -680, 0, 4100, 760, '#b4a8c8', far2.mask, far2.print),
-    layer('towers-mid', -630, 0, 3900, 620, '#8b84ae', mid.mask, mid.print),
-    layer('towers-near', -580, 0, 3700, 480, '#625f8a', near.mask, near.print)
+      print: `<rect y="460" width="5200" height="120" fill="#d2bdd6"/><rect y="580" width="5200" height="110" fill="#e6c3c8"/><rect y="690" width="5200" height="110" fill="#f3cbb4"/><rect y="800" width="5200" height="700" fill="#f8d6a6"/><circle cx="1260" cy="760" r="80" fill="#fbe2b0"/><circle cx="1260" cy="760" r="58" fill="#f9c873"/>${birds(1900, 700)}${birds(2900, 660)}` },
+    layer('clouds-far', -775, 450, 5000, 260, '#efc8bf', [cloudBank(300, 40, 1.4, '#fff'), cloudBank(1700, 10, 1.8, '#fff'), cloudBank(3000, 60, 1.2, '#fff'), cloudBank(3900, 20, 1.6, '#fff')].join(''), ''),
+    layer('clouds-near', -765, 420, 5000, 380, '#f9dccb', [cloudBank(800, 160, 1.1, '#fff'), cloudBank(2300, 130, 1.5, '#fff'), cloudBank(4400, 140, 1.2, '#fff'), white(balloon(3450, 150, .9) + plane)].join(''), `${balloon(3450, 150, .9)}${plane}`),
+    layer('ridge', -755, -60, ridgeW, ridgeH, '#e6c7cc', ridgeMask, ridgePrint),
+    layer('towers-far', -730, 0, 4600, 900, '#cbbad3', farT.mask, farT.print),
+    layer('towers-mid', -680, 0, midW, midH, '#dbc5d3', midMask, midPrint),
+    layer('towers-near', -625, 0, 4200, 620, '#77709c', near.mask + pinesNear.replaceAll('FILL', 'fill="#fff"'), near.print + pinesNear.replaceAll('FILL', 'fill="#4f6a6a"'))
   ];
 }
 
@@ -109,10 +137,10 @@ function avenueView(): Panel[] {
     const t = k / (DEPTHS.length - 1);
     const deep = ['#6b6690', '#78739c', '#8680a8', '#958eb3', '#a59dbd', '#b8aecb', '#cbbfd8'][k], pale = ['#857ea4', '#918ab0', '#9e96ba', '#aca4c3', '#bbb2cc', '#cbc0d6', '#dacfe0'][k];
     for (const side of [-1, 1]) {
-      let mask = '', print = ''; const rowW = 420, h = 1000, x0 = side < 0 ? mid - half - rowW : mid + half;
+      let mask = '', print = ''; const rowW = 300 - k * 22, h = 1000, x0 = side < 0 ? mid - half - rowW : mid + half;
       let x = 0, edgeH = 0;
       while (x < rowW) {
-        const bw = fr(70, 140) * (1 - t * .25), bh = fr(160, 270) + t * fr(380, 640), top = h - bh, c = fr(0, 1) > .5 ? deep : pale;
+        const bw = fr(70, 140) * (1 - t * .25), bh = fr(170, 260) + t * fr(60, 170), top = h - bh, c = fr(0, 1) > .5 ? deep : pale;
         mask += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="#fff"/>`;
         print += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="${c}"/><rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="7" fill="#000" fill-opacity=".14"/>`;
         for (let wy = top + 14; wy < h - 30; wy += 18) for (let wx = x + 6; wx < x + bw - 8; wx += 11) if (fr(0, 1) < .5 - t * .2) print += `<rect x="${wx.toFixed(0)}" y="${wy.toFixed(0)}" width="5" height="9" fill="${fr(0, 1) > .25 ? '#ffd27a' : '#fff1d0'}"/>`;
@@ -143,9 +171,9 @@ function avenueView(): Panel[] {
   // Strung lights across the avenue mouth, a spire closing the view, and paper cranes flying over the road.
   out.push({ id: 'av-lights', stock: 'vellum', c: '#ffe7a8', w: 2 * half, h: 40, o: [mid - half, 300, -220], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.2, emit: .8,
     mask: `<path d="M0 4Q${half} 44 ${2 * half} 4" fill="none" stroke="#fff" stroke-width="1.6"/>${Array.from({ length: 11 }, (_, i) => { const tt = (i + .5) / 11, xx = tt * 2 * half, yy = 4 + 80 * tt * (1 - tt); return `<circle cx="${xx.toFixed(1)}" cy="${(yy + 4).toFixed(1)}" r="3.6" fill="#fff"/>`; }).join('')}` });
-  out.push({ id: 'av-spire', stock: 'sugar', c: '#cbbad4', w: 120, h: 1100, o: [mid - 60, 0, -760], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .6,
-    mask: `<path d="M0 1100V420H14V340H28V250H42V140H54V40L60 0L66 40V140H78V250H92V340H106V420H120V1100Z" fill="#fff"/>`,
-    print: `<rect x="80" width="40" height="1100" fill="#b9a8c6"/>${Array.from({ length: 30 }, (_, i) => `<rect x="10" y="${440 + i * 22}" width="100" height="3" fill="#e3d4df"/>`).join('')}${Array.from({ length: 40 }, (_, i) => (i * 7) % 3 ? '' : `<rect x="${20 + (i % 5) * 18}" y="${450 + Math.floor(i / 5) * 60}" width="6" height="10" fill="#ffd27a"/>`).join('')}` });
+  out.push({ id: 'av-spire', stock: 'sugar', c: '#cbbad4', w: 120, h: 660, o: [mid - 60, 0, -760], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .6, emit: .3,
+    mask: `<g transform="scale(1 .6)"><path d="M0 1100V420H14V340H28V250H42V140H54V40L60 0L66 40V140H78V250H92V340H106V420H120V1100Z" fill="#fff"/></g>`,
+    print: `<g transform="scale(1 .6)"><rect x="80" width="40" height="1100" fill="#b9a8c6"/>${Array.from({ length: 30 }, (_, i) => `<rect x="10" y="${440 + i * 22}" width="100" height="3" fill="#e3d4df"/>`).join('')}${Array.from({ length: 40 }, (_, i) => (i * 7) % 3 ? '' : `<rect x="${20 + (i % 5) * 18}" y="${450 + Math.floor(i / 5) * 60}" width="6" height="10" fill="#ffd27a"/>`).join('')}</g>` });
   const crane = (id: string, x: number, y: number, z: number, k: number, flip: boolean): Panel[] => {
     const dir = flip ? -1 : 1, o: V3 = [x, y, z];
     // Each crane is folded: two wings meeting at the body crease, one lifted, one lowered, and a pointed tail.
@@ -160,25 +188,6 @@ function avenueView(): Panel[] {
 }
 
 // Freestanding recipes in the cut-and-glued manner: folded bodies with separately cut pieces glued on.
-// A street tree: a forked trunk card, and a crown of two scalloped cards slotted at right angles, each printed with
-// clusters in three greens, the sunlit half lighter, plus a small front cluster glued proud of the slot.
-function slotTree(id: string, x: number, z: number, h: number, rot = 0): Panel[] {
-  reseed(id.length * 31 + Math.round(x));
-  const cw = h * .78, ch = h * .62, cy = h - ch;
-  const blobs = Array.from({ length: 11 }, (_, i) => { const a = i / 11 * Math.PI * 2; return [cw / 2 + Math.cos(a) * cw * .3 + rnd(-6, 6), ch * .5 + Math.sin(a) * ch * .3 + rnd(-6, 6), Math.min(cw, ch) * rnd(.17, .24)]; });
-  blobs.push([cw / 2, ch * .5, Math.min(cw, ch) * .36], [cw * .36, ch * .38, Math.min(cw, ch) * .26], [cw * .64, ch * .4, Math.min(cw, ch) * .26]);
-  const crownMask = blobs.map(([bx, by, r]) => `<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${r.toFixed(1)}" fill="#fff"/>`).join('');
-  const crownPrint = (light: boolean) => `<rect width="${cw}" height="${ch}" fill="${FOLIAGE}"/><rect width="${cw / 2}" height="${ch}" fill="${light ? '#4fae6c' : '#469f62'}"/>` + blobs.map(([bx, by, r], i) => `<circle cx="${(bx - r * .2).toFixed(1)}" cy="${(by - r * .25).toFixed(1)}" r="${(r * .62).toFixed(1)}" fill="${['#5cbb76', '#3a8c55', '#6cc482', '#347f4c'][i % 4]}"/><path d="M${(bx - r * .5).toFixed(1)} ${(by + r * .2).toFixed(1)}q${(r * .5).toFixed(1)} ${(r * .3).toFixed(1)} ${r.toFixed(1)} 0" stroke="#2c6e43" stroke-width="2" fill="none"/>`).join('');
-  const r = yaw(rot), trunkW = 36;
-  const trunk: Panel = { id: `${id}-trunk`, stock: 'kraft', c: '#7a5237', w: trunkW * 3, h: cy + ch * .5, o: add([x, 0, z], r([-trunkW * 1.5, 0, 0])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.6,
-    mask: `<path d="M${trunkW * 1.2} ${cy + ch * .5}Q${trunkW * 1.35} ${cy} ${trunkW * 1.25} ${cy * .55}L${trunkW * .4} ${cy * .2}L${trunkW * .55} ${cy * .1}L${trunkW * 1.4} ${cy * .42}L${trunkW * 1.5} ${cy * .1}L${trunkW * 1.68} ${cy * .1}L${trunkW * 1.62} ${cy * .45}L${trunkW * 2.5} ${cy * .15}L${trunkW * 2.62} ${cy * .25}L${trunkW * 1.78} ${cy * .62}Q${trunkW * 1.68} ${cy} ${trunkW * 1.85} ${cy + ch * .5}Z" fill="#fff"/>`,
-    print: `<rect width="${trunkW * 1.5}" height="${cy + ch}" fill="#8a6244"/><path d="M${trunkW * 1.4} ${cy * .7}v${cy * .3}M${trunkW * 1.6} ${cy * .5}v${cy * .4}" stroke="#5e3f29" stroke-width="2"/>` };
-  const crown = (k: 'a' | 'b', d: number): Panel => { const rr = yaw(rot + d * .6); return { id: `${id}-crown-${k}`, stock: 'sugar', c: FOLIAGE, w: cw, h: ch, o: add([x, cy, z], rr([-cw / 2, 0, 0])), u: rr([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.4, mask: crownMask, print: crownPrint(k === 'a') }; };
-  const front: Panel = { id: `${id}-cluster`, stock: 'sugar', c: '#4fae6c', w: cw * .5, h: ch * .4, o: add([x, cy + ch * .12, z], r([-cw * .1, 0, cw * .32])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.6,
-    mask: `<circle cx="${cw * .14}" cy="${ch * .22}" r="${ch * .17}" fill="#fff"/><circle cx="${cw * .3}" cy="${ch * .16}" r="${ch * .15}" fill="#fff"/><circle cx="${cw * .38}" cy="${ch * .26}" r="${ch * .13}" fill="#fff"/>`, print: `<rect width="${cw}" height="${ch}" fill="#5cbb76"/><rect x="${cw * .25}" width="${cw}" height="${ch}" fill="#4fae6c"/>` };
-  const grate: Panel = { id: `${id}-grate`, stock: 'greyboard', c: '#4d4a46', w: 80, h: 60, o: add([x, .8, z], r([-40, 0, 30])), u: r([1, 0, 0]), v: r([0, 0, -1]), edge: 'cut', density: 1.2, decal: 'pavement', print: Array.from({ length: 6 }, (_, i) => `<path d="M${8 + i * 13} 6V54" stroke="#2f2d2b" stroke-width="3"/>`).join('') };
-  return [trunk, crown('a', 40), crown('b', -40), front, grate];
-}
 // A rooftop water tank, folded: a hexagonal drum of timber staves with hoops, a conical cap of three gores and a cut
 // steel stand underneath.
 function foldedTank(id: string, x: number, z: number, y: number): Panel[] {
@@ -429,12 +438,13 @@ function gallery(): Panel[] {
     out.push(s < 0 ? { id: 'gal-house-roof-l', stock: 'cover', c: '#e4ddd0', w: hl, h: hd + 8, o: add(hridge, dn, hl), u: [-dn[0], -dn[1], -dn[2]], v: [0, 0, -1], edge: 'cut', density: 1 }
       : { id: 'gal-house-roof-r', stock: 'cover', c: '#d8d0c2', w: hl, h: hd + 8, o: hridge, u: dn, v: [0, 0, -1], edge: 'cut', density: 1 });
   }
-  // The name on a stone plinth at the indigo house's foot, two topiaries in folded pots by the door.
+  // The name on a stone plinth at the indigo house's foot, two slotted conifers in folded pots by the door, their tier trim
+  // in the lavender of the mark.
   out.push(...box({ id: 'gal-sign', x: x - 150, z: z + 54, w: 190, h: 46, d: 26, stock: 'cover', c: '#fbf8f1', side: '#e4ddd0', front: `${mark(12, 8, 30 / 394)}${word(50, 34, 28)}`, top: '' }).filter(p => !/rear|under|left/.test(p.id)));
   for (const s of [-1, 1]) {
     const px = x + s * 98, pz = hz + 26;
-    out.push(...box({ id: `topi-pot-${s < 0 ? 'l' : 'r'}`, x: px, z: pz, w: 30, h: 26, d: 30, stock: 'cover', c: TONES.l.deep, top: '<rect x="3" y="3" width="24" height="24" fill="#4a3424"/>' }).filter(p => /front|top/.test(p.id)));
-    for (const [k, d2] of [['a', 40], ['b', -40]] as const) { const rr = yaw(d2); out.push({ id: `topi-${s < 0 ? 'l' : 'r'}-${k}`, stock: 'sugar', c: '#3f9a5b', w: 34, h: 58, o: add([px, 26, pz], rr([-17, 0, 0])), u: rr([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 2, mask: '<circle cx="17" cy="17" r="15" fill="#fff"/><circle cx="17" cy="40" r="11" fill="#fff"/><rect x="15" y="40" width="4" height="18" fill="#fff"/>', print: `<rect width="34" height="58" fill="#3f9a5b"/><rect width="17" height="58" fill="#4fae6c"/><rect x="15" y="50" width="4" height="8" fill="#6d4a33"/>` }); }
+    out.push(...box({ id: `topi-pot-${s < 0 ? 'l' : 'r'}`, x: px, z: pz, w: 30, h: 26, d: 30, stock: 'cover', c: TONES.l.deep, top: '<rect x="3" y="3" width="24" height="24" fill="#4a3424"/>' }).filter(p => /-(front|top)$/.test(p.id)));
+    out.push(...pineCards(`topi-${s < 0 ? 'l' : 'r'}`, px, pz, 26, 40, 74, { tiers: 3, dark: '#23704c', light: '#36905f', trim: '#c3caf8', seed: s + 5, density: 2.2 }));
   }
   return out;
 }
@@ -583,34 +593,91 @@ function signpost(): Panel[] {
 const cup = `<rect x="30" y="8" width="18" height="16" rx="3" fill="${CORAL}"/><path d="M48 12Q55 12 55 16Q55 21 48 21" fill="none" stroke="${CORAL}" stroke-width="3"/>`;
 const deli = `<circle cx="24" cy="17" r="9" fill="${CORAL}"/><circle cx="44" cy="17" r="9" fill="${SUN}"/><circle cx="64" cy="17" r="9" fill="#57b36f"/>`;
 const shelves = (cs: string[]) => cs.map((c, i) => `<rect x="${12 + i * 34}" y="${40 - (i % 2) * 12}" width="24" height="${50 + (i % 2) * 12}" fill="${c}"/>`).join('') + `<rect y="88" width="400" height="10" fill="#8a5a3a"/>`;
-// The low block: the tenement on the far corner of the avenue, a café on the near corner, the gallery, a brownstone.
-const WEST = { x: -840, z: -150, w: 330, h: 520, rot: 10 };
+// The low block runs between two corner buildings that turn toward the street and close the box on either side, like the
+// side walls of a shadow box: their facades carry all their depth as carved relief (fire stairs, sills, awnings, signs).
+// Between them: the café on the near corner of the avenue, the gallery and the brownstone.
+const WEST = { x: -975, z: -32, w: 420, h: 520, rot: 60 };
+const EAST = { x: 1017, z: -141, w: 560, h: 540, rot: -75 };
 function neighbours(): Panel[] {
-  const r = yaw(WEST.rot), tankAt = add(add([WEST.x, 0, WEST.z], r([-WEST.w / 2 + 240, 0, -50])), [0, WEST.h - 26, 0]);
+  const wr = yaw(WEST.rot), tankAt = add(add([WEST.x, 0, WEST.z], wr([WEST.w / 2 - 110, 0, -60])), [0, WEST.h - 26, 0]);
+  const er = yaw(EAST.rot), eTank = add(add([EAST.x, 0, EAST.z], er([-EAST.w / 2 + 150, 0, -60])), [0, EAST.h - 26, 0]);
   return [
-    ...building({ ...WEST, id: 'west', c: BRICK, line: BRICK_LINE, trim: STONE, storeys: 4, cols: 4, ground: 'shop', ac: '#2f7d58', icon: cup, goods: shelves(['#8a5a3a', CREAM, '#c98a5f', '#8a5a3a', SUN, CREAM, '#8a5a3a', CORAL]), fire: 1, side: 'right', sideW: 240, seed: 3,
-      sidePrint: `<g transform="translate(40 120)"><rect width="160" height="120" fill="${INDIGO}" opacity=".85"/>${mark(14, 20, 56 / 394, true)}${word(80, 66, 24, '#fff', 'middle')}<rect x="20" y="90" width="120" height="8" fill="${LAVENDER}"/></g>`,
-      listing: { kind: 'rent', at: [184, 300] } }),
+    ...building({ ...WEST, id: 'west', c: BRICK, line: BRICK_LINE, trim: STONE, storeys: 4, cols: 5, ground: 'shop', ac: '#2f7d58', icon: cup, goods: shelves(['#8a5a3a', CREAM, '#c98a5f', '#8a5a3a', SUN, CREAM, '#8a5a3a', CORAL]), fire: 3, side: 'left', sideW: 300, seed: 3,
+      sidePrint: `<g transform="translate(70 150)"><rect width="160" height="120" fill="${CREAM}" opacity=".9"/><rect width="160" height="40" fill="${CORAL}"/><text x="80" y="29" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="22" fill="#fff">FOR RENT</text>${mark(14, 52, 56 / 394)}${word(80, 96, 22, WORD, 'start')}</g>`,
+      listing: { kind: 'rent', at: [300, 300] } }),
     ...foldedTank('west-tank', tankAt[0], tankAt[2], tankAt[1]),
     ...building({ id: 'cafe', x: -305, z: -130, w: 230, h: 360, rot: 0, c: '#d9a968', line: '#b98a4c', trim: CREAM, storeys: 3, cols: 3, ground: 'shop', ac: CORAL, icon: cup, goods: shelves([CORAL, SUN, '#57b36f', CORAL, SUN, CREAM, '#8a5a3a']), seed: 11, listing: { kind: 'rent', at: [120, 250] } }),
-    ...building({ id: 'east', x: 1150, z: -190, w: 330, h: 500, rot: -18, c: '#c98f6c', line: '#a5704f', trim: CREAM, storeys: 4, cols: 4, ground: 'shop', ac: INDIGO, icon: deli, goods: shelves([CORAL, SUN, '#57b36f', CORAL, SUN, '#57b36f', CREAM, CORAL]), fire: 2, seed: 19 }),
+    ...building({ ...EAST, id: 'east', c: '#c98f6c', line: '#a5704f', trim: CREAM, storeys: 4, cols: 6, ground: 'shop', ac: INDIGO, icon: deli, goods: shelves([CORAL, SUN, '#57b36f', CORAL, SUN, '#57b36f', CREAM, CORAL, SUN, '#57b36f', CORAL, SUN]), fire: 1, seed: 19, flowers: true, side: 'right', sideW: 330,
+      sidePrint: `<g transform="translate(50 120)"><rect width="230" height="160" fill="${INDIGO}"/><rect x="8" y="8" width="214" height="144" fill="none" stroke="${LAVENDER}" stroke-width="3"/>${mark(22, 30, 80 / 394, true)}${word(118, 92, 34, '#fff', 'middle')}<rect x="40" y="118" width="150" height="10" fill="${GLOW}"/></g>` }),
+    ...foldedTank('east-tank', eTank[0], eTank[2], eTank[1]),
     ...building({ id: 'brownstone', x: 395, z: -150, w: 190, h: 380, rot: -4, c: '#9a6b55', line: '#7a4f3c', trim: STONE, storeys: 3, cols: 2, ground: 'stoop', seed: 7, lit: .7, flowers: true, chimney: 40 })
   ];
 }
-// The backs of the next street's buildings close the block behind the lot and the gallery: brick, tanks, fire stairs.
-function rearRow(): Panel[] {
-  far = 77; const w = 1800, h = 340; let x = 0, mask = '', print = '';
-  while (x < w) {
-    const bw = fr(110, 190), bh = fr(200, 320), top = h - bh, c = ['#a8705a', '#b98a6c', '#8f6a5e', '#c9a27e'][Math.floor(fr(0, 4))];
-    mask += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="#fff"/>`;
-    print += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="${c}"/><rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="8" fill="#000" fill-opacity=".15"/>`;
-    for (let wy = top + 22; wy < h - 20; wy += 34) for (let wx = x + 12; wx < x + bw - 20; wx += 26) print += `<rect x="${wx.toFixed(0)}" y="${wy.toFixed(0)}" width="12" height="18" fill="${fr(0, 1) > .45 ? '#ffd98a' : '#5a5878'}"/>`;
-    if (fr(0, 1) > .5) { const cx = x + bw * .6; mask += `<rect x="${(cx - 14).toFixed(0)}" y="${(top - 34).toFixed(0)}" width="28" height="26" fill="#fff"/><rect x="${(cx - 12).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="24" height="8" fill="#fff"/>`; print += `<rect x="${(cx - 14).toFixed(0)}" y="${(top - 34).toFixed(0)}" width="28" height="26" fill="#7a5e48"/><path d="M${(cx - 14).toFixed(0)} ${(top - 24).toFixed(0)}h28M${(cx - 14).toFixed(0)} ${(top - 16).toFixed(0)}h28" stroke="#4a382e" stroke-width="2"/><rect x="${(cx - 12).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="24" height="8" fill="${STEEL}"/>`; }
-    if (fr(0, 1) > .5) for (let fy = top + 40; fy < h - 40; fy += 34) print += `<path d="M${(x + 8).toFixed(0)} ${fy}h${(bw * .4).toFixed(0)}M${(x + 10).toFixed(0)} ${fy}l${(bw * .36).toFixed(0)} 30" stroke="#2c2a30" stroke-width="2.4"/>`;
-    x += bw;
-  }
-  return [{ id: 'rear-row', stock: 'sugar', c: '#a8705a', w, h, o: [-140, 0, -520], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .55, mask, print }];
+// The back of the box: the rear of the next street's buildings, a relief wall along the whole block. The wall is one cut
+// sheet; everything with depth on it (water tanks, fire stairs, chimney stacks, aerials, a roof garden, a billboard, AC
+// units, washing) is real in the bake and carved onto it as the camera sees it, so the whole back costs one quad.
+const REAR = { x0: -150, x1: 1400, z: -520 };
+function rearWall(): Panel[] {
+  far = 77; const w = REAR.x1 - REAR.x0, h = 600, wall: Panel = { id: 'rear-wall', stock: 'cover', c: '#a8705a', w, h, o: [REAR.x0, 0, REAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .75, mask: '', print: '' };
+  const segs: { x: number; w: number; top: number; c: string }[] = [];
+  for (let x = 0; x < w;) { const bw = Math.min(w - x, fr(150, 240)); segs.push({ x, w: bw, top: fr(250, 360), c: ['#a8705a', '#b98a6c', '#8f6a5e', '#c9a27e', '#9c7a8a'][segs.length % 5] }); x += bw; }
+  let mask = '', print = '';
+  const carved: Panel[] = [];
+  const at = (lx: number) => REAR.x0 + lx;
+  const lb = (id: string, lx: number, y: number, bw: number, bh: number, d: number, c: string, extra: Partial<Parameters<typeof box>[0]> = {}) => box({ id, x: at(lx), z: REAR.z + d / 2 + .5, y, w: bw, h: bh, d, stock: 'cover', c, ...extra }).filter(p => !/rear|under/.test(p.id));
+  segs.forEach((g, i) => {
+    const top = h - g.top, id = `rear${i}`, deep = '#000';
+    mask += `<rect x="${g.x.toFixed(0)}" y="${top.toFixed(0)}" width="${(g.w + 1).toFixed(0)}" height="${g.top.toFixed(0)}" fill="#fff"/>`;
+    print += `<rect x="${g.x.toFixed(0)}" y="${top.toFixed(0)}" width="${(g.w + 1).toFixed(0)}" height="${g.top.toFixed(0)}" fill="${g.c}"/><rect x="${(g.x + g.w - 10).toFixed(0)}" y="${top.toFixed(0)}" width="10" height="${g.top.toFixed(0)}" fill="${deep}" fill-opacity=".12"/>`;
+    // Courses of brick in the wall's own tone, windows in rows, a drainpipe down one edge.
+    for (let y = top + 12; y < h; y += 12) print += `<path d="M${g.x.toFixed(0)} ${y.toFixed(0)}h${g.w.toFixed(0)}" stroke="${deep}" stroke-opacity=".07" stroke-width="1.2"/>`;
+    const cols = Math.max(2, Math.floor(g.w / 52)), rows = Math.floor((g.top - 50) / 62);
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const wx = g.x + (c + .5) * g.w / cols - 11, wy = top + 34 + r * 62, lit = fr(0, 1) > .45;
+      print += `<rect x="${(wx - 3).toFixed(0)}" y="${(wy - 3).toFixed(0)}" width="28" height="40" fill="#e8d9c0"/><rect x="${wx.toFixed(0)}" y="${wy.toFixed(0)}" width="22" height="34" fill="${lit ? '#ffd98a' : '#5a5878'}"/><path d="M${(wx + 11).toFixed(0)} ${wy.toFixed(0)}v34" stroke="#e8d9c0" stroke-width="2"/>`;
+      if (lit && fr(0, 1) > .6) print += `<rect x="${wx.toFixed(0)}" y="${wy.toFixed(0)}" width="22" height="12" fill="${['#e8552d', '#7fb2c4', '#f6b73c'][r % 3]}" fill-opacity=".8"/>`;
+      if (fr(0, 1) > .7) carved.push(...lb(`${id}-ac${r}${c}`, wx + 11, h - wy - 58, 26, 18, 18, '#d9dbe0', { front: '<path d="M3 4H23M3 8H23M3 12H23" stroke="#9aa0ab" stroke-width="1.4"/>' }));
+      else carved.push(...lb(`${id}-sill${r}${c}`, wx + 11, h - wy - 38, 30, 4, 7, '#e8d9c0'));
+    }
+    print += `<rect x="${(g.x + 6).toFixed(0)}" y="${top.toFixed(0)}" width="5" height="${g.top.toFixed(0)}" fill="#5d616b"/>`;
+    // A coping along every parapet, then each roof gets its own small piece of life.
+    carved.push(...lb(`${id}-coping`, g.x + g.w / 2, g.top - 8, g.w, 8, 10, '#d9cbb4'));
+    const kind = i % 6, cx = g.x + g.w * fr(.3, .7);
+    if (kind === 0 || kind === 3) carved.push(...foldedTank(`${id}-tank`, at(cx), REAR.z + 34, g.top).map(p => ({ ...p, id: p.id })));
+    if (kind === 1) {
+      // A billboard on a steel frame, advertising the listings.
+      carved.push(...lb(`${id}-bb-frame`, cx, g.top, 8, 70, 8, STEEL), ...lb(`${id}-bb-frame2`, cx + 120, g.top, 8, 70, 8, STEEL));
+      carved.push({ id: `${id}-bb`, stock: 'cover', c: '#fffaf0', w: 170, h: 84, o: [at(cx - 25), g.top + 50, REAR.z + 12], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1, print: poster('rent', 170, 84) });
+      carved.push(...lb(`${id}-bb-lamp`, cx + 60, g.top + 136, 120, 4, 14, STEEL));
+    }
+    if (kind === 2 || kind === 5) {
+      // Chimney stacks with pots and a television aerial.
+      carved.push(...lb(`${id}-stack`, cx, g.top, 44, 56, 26, tone(g.c, .85), { top: '<rect width="44" height="26" fill="#3d3530"/>' }));
+      for (const k of [-1, 1]) carved.push(...lb(`${id}-pot${k}`, cx + k * 10, g.top + 56, 12, 16, 12, '#c1673f'));
+      carved.push({ id: `${id}-aerial`, stock: 'greyboard', c: STEEL, w: 60, h: 90, o: [at(cx + 30), g.top, REAR.z + 6], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1, mask: '<path d="M28 90V0H32V90Z M6 14H54V17H6Z M12 30H48V33H12Z M18 46H42V49H18Z" fill="#fff"/>' });
+    }
+    if (kind === 4) {
+      // A roof garden: planters with slotted pines, and a string of lights over a table.
+      for (let k = 0; k < 3; k++) { const px = g.x + 30 + k * (g.w - 60) / 2; carved.push(...planter(`${id}-bed${k}`, at(px), REAR.z + 26, 34, 20, '#8a5a3a'), ...pineCards(`${id}-pine${k}`, at(px), REAR.z + 26, g.top + 20, 40, 64 + k * 8, { tiers: 3, seed: k + i }).map(p => ({ ...p }))); }
+      carved.push({ id: `${id}-lights`, stock: 'vellum', c: '#ffe7a8', w: g.w - 40, h: 30, o: [at(g.x + 20), g.top + 70, REAR.z + 30], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1, emit: .8,
+        mask: `<path d="M0 2Q${(g.w - 40) / 2} 30 ${g.w - 40} 2" fill="none" stroke="#fff" stroke-width="1.4"/>${Array.from({ length: 9 }, (_, q) => { const tt = (q + .5) / 9; return `<circle cx="${(tt * (g.w - 40)).toFixed(1)}" cy="${(2 + 56 * tt * (1 - tt) + 3).toFixed(1)}" r="3" fill="#fff"/>`; }).join('')}` });
+    }
+    // Fire stairs down every other back: landings, rails and a ladder.
+    if (i % 2 === 1 && g.w > 170) {
+      const fx = g.x + g.w * .52, fw = g.w * .4;
+      for (let y = 70; y < g.top - 60; y += 62) {
+        carved.push(...lb(`${id}-land${y}`, fx + fw / 2, y, fw, 3, 26, STEEL));
+        carved.push({ id: `${id}-rail${y}`, stock: 'greyboard', c: STEEL, w: fw, h: 22, o: [at(fx), y, REAR.z + 26], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1, mask: `<path fill-rule="evenodd" d="M0 0H${fw}V22H0Z ${Array.from({ length: Math.floor(fw / 8) }, (_, k) => `M${k * 8 + 3} 3V19H${k * 8 + 8}V3Z`).join(' ')}" fill="#fff"/>` });
+        if (y + 62 < g.top - 60) carved.push({ id: `${id}-stair${y}`, stock: 'greyboard', c: STEEL, w: fw * .7, h: 8, o: [at(fx + fw * .15), y + 28, REAR.z + 14], u: unitV([fw * .7, 58, 0]), v: [0, 1, 0], edge: 'cut', density: 1 });
+      }
+    }
+    if (kind === 3) carved.push({ id: `${id}-washing`, stock: 'bond', c: '#fff', w: g.w - 30, h: 40, o: [at(g.x + 15), g.top - 120, REAR.z + 30], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1,
+      mask: `<path d="M0 0H${g.w - 30}V2H0Z M14 2H36V28H14Z M48 2H62V36H48Z M76 2H108V22H76Z" fill="#fff"/>`, print: `<rect x="14" width="22" height="28" fill="${CORAL}"/><rect x="48" width="14" height="36" fill="#7fb2c4"/><rect x="76" width="32" height="22" fill="${SUN}"/><rect width="${g.w}" height="2" fill="${STEEL}"/>` });
+  });
+  wall.mask = mask; wall.print = print;
+  return [wall, ...carved.map(p => ({ ...p, decal: wall.id, view: true }))];
 }
+const unitV = (a: V3): V3 => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2] / l]; };
 function yardSign(): Panel[] {
   const sx = 340, sz = -46;
   return [card('yard-post', sx, sz, 80, 150, '#fbf8f1', { density: 2, mask: '<path d="M0 0H80V8H12V150H4V8H0Z" fill="#fff"/>' }),
@@ -627,11 +694,13 @@ function foldedVan(id: string, x: number, z: number): Panel[] {
 }
 function dressing(): Panel[] {
   const out: Panel[] = [];
-  out.push(...streetLamp('lamp-a', -380, 176, 260, '#ffe7a8'), ...streetLamp('lamp-b', 300, 176, 250, '#ffe7a8'));
+  // Lamp posts are thin enough that their side faces never read; only the front is kept.
+  out.push(...[...streetLamp('lamp-a', -170, 176, 260, '#ffe7a8'), ...streetLamp('lamp-b', 300, 176, 250, '#ffe7a8')].filter(p => !/-post-(left|right)$/.test(p.id)));
   // Traffic lights on both corners of the avenue, facing the road.
-  for (const [i, sx] of [[0, AVENUE.x0 - 20], [1, AVENUE.x1 + 20]] as const) {
-    out.push(card(`signal-post${i}`, sx, 178, 8, 214, STEEL, { stock: 'greyboard' }));
-    out.push(card(`signal${i}`, sx, 183, 30, 76, STEEL, { stock: 'greyboard', density: 2.4, mask: '<rect width="30" height="76" rx="6" fill="#fff"/>', emit: .15, print: `<rect x="15" width="15" height="76" fill="#23272d"/><circle cx="15" cy="14" r="8" fill="#5a2a22"/><circle cx="15" cy="38" r="8" fill="#5a4a22"/><circle cx="15" cy="62" r="8" fill="#5be08a"/>` }, 0, 200));
+  for (const [i, sx] of [[0, AVENUE.x0 - 20]] as const) {
+    out.push(...box({ id: `signal-post${i}`, x: sx, z: 186, w: 8, h: 196, d: 8, stock: 'greyboard', c: STEEL, noTop: true }).filter(p => /-front$/.test(p.id)));
+    // The signal head is a folded box and its post a folded square tube.
+    out.push(...box({ id: `signal${i}`, x: sx, z: 186, y: 196, w: 30, h: 76, d: 20, stock: 'greyboard', c: STEEL, side: '#23272d', top: '', front: `<rect x="15" width="15" height="76" fill="#23272d"/><circle cx="15" cy="14" r="8" fill="#5a2a22"/><circle cx="15" cy="38" r="8" fill="#5a4a22"/><circle cx="15" cy="62" r="9" fill="#5be08a"/><circle cx="12" cy="59" r="3" fill="#c9f7d8"/>` }).filter(p => !/rear|under/.test(p.id)));
   }
   out.push(...foldedCar('taxi', 590, 282, TAXI, true, true));
   out.push(...foldedVan('van', -880, 236));
@@ -645,14 +714,18 @@ function dressing(): Panel[] {
   out.push(...person('parent', 205, 148, { coat: '#57b36f', legs: '#3f4a5c', bag: SUN, flip: true }), ...person('child', 240, 140, { coat: CORAL, legs: '#3f4a5c', bag: LAVENDER, flip: true, kid: true }));
   out.push(...person('buyer', 288, -6, { coat: '#7c6be0', legs: '#2f3a4a', hair: '#6d4a33', carry: 'case' }));
   out.push(...person('walker', -560, 128, { coat: '#e9a77b', legs: '#3f4a5c', bag: INDIGO }));
-  out.push(card('dog', -500, 140, 64, 40, '#8a6a50', { density: 2.4, mask: '<path d="M8 40V18Q4 14 4 8L14 12H40Q46 4 54 4Q62 6 62 14L58 18H54V40H48V24H18V40Z" fill="#fff"/>', print: `<rect width="64" height="40" fill="#8a6a50"/><rect y="20" width="64" height="20" fill="#74563f"/><rect x="46" y="2" width="16" height="16" fill="#9a7a5e"/><circle cx="56" cy="10" r="1.8" fill="${INK}"/>` }));
-  out.push({ id: 'leash', stock: 'greyboard', c: CORAL, w: 52, h: 60, o: [-552, 30, 136], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 2, mask: '<path d="M0 0Q30 40 52 60L50 60Q28 42 0 3Z" fill="#fff"/>' });
-  out.push(...slotTree('tree-a', -392, -46, 270, 10), ...slotTree('tree-b', 505, -40, 240, -15));
-  out.push(...box({ id: 'hydrant', x: -200, z: 160, w: 22, h: 42, d: 22, stock: 'cover', c: CORAL, front: `<rect y="8" width="22" height="5" fill="${CREAM}"/><rect x="11" width="11" height="42" fill="#000" fill-opacity=".12"/>` }).filter(p => /front|top/.test(p.id)));
+  out.push(...paperDog('dog', -500, 142, -24));
+  out.push({ id: 'leash', stock: 'greyboard', c: CORAL, w: 84, h: 54, o: [-552, 42, 150], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 2, mask: '<path d="M0 0Q44 46 84 54L82 54Q42 44 0 3Z" fill="#fff"/>' });
+  // Street conifers in folded planters: one on the far corner of the avenue by the rent flag, one shading the painter.
+  for (const [id, tx, tz, th, seed] of [['tree-a', -690, -90, 300, 3], ['tree-b', 510, -44, 260, 8]] as const) out.push(...planter(`${id}-pot`, tx, tz, 66, 30, '#8b8275', '#4a3424').filter(p => /-(front|top)$/.test(p.id)), ...pineCards(id, tx, tz, 30, th * .62, th, { tiers: 4, seed, trim: '#ffe3a0' }));
+  out.push(...box({ id: 'hydrant', x: -218, z: 166, w: 22, h: 42, d: 22, stock: 'cover', c: CORAL, front: `<rect y="8" width="22" height="5" fill="${CREAM}"/><rect x="11" width="11" height="42" fill="#000" fill-opacity=".12"/>` }).filter(p => /front|top/.test(p.id)));
   out.push(...box({ id: 'bin', x: 340, z: 150, w: 34, h: 58, d: 34, stock: 'cover', c: '#2f7d58', front: `<rect y="6" width="34" height="5" fill="${CREAM}"/><rect x="17" width="17" height="58" fill="#000" fill-opacity=".1"/>`, top: '<rect x="6" y="6" width="22" height="22" fill="#1d3a28"/>' }).filter(p => /front|top/.test(p.id)));
-  out.push(...box({ id: 'news-a', x: -190, z: -36, w: 40, h: 64, d: 34, stock: 'cover', c: INDIGO, front: `<rect x="5" y="6" width="30" height="22" fill="#fbf8f1"/><rect x="8" y="9" width="24" height="3" fill="${INK}"/><rect x="8" y="15" width="18" height="2" fill="${INK}" fill-opacity=".5"/><rect x="20" y="30" width="20" height="34" fill="#4553c0"/>` }).filter(p => /front|top/.test(p.id)));
   const pigeon = (id: string, x: number, z: number, flip: boolean, c = '#8d96a3'): Panel => card(id, x, z, 30, 22, c, { density: 3, mask: `<g ${flip ? 'transform="translate(30 0) scale(-1 1)"' : ''}><path d="M4 12Q4 4 12 6L16 2Q22 0 24 4L29 6L24 8Q24 16 16 18L18 22H15L13 18Q6 18 4 12Z M0 10L6 9L5 13Z" fill="#fff"/></g>`, print: `<g ${flip ? 'transform="translate(30 0) scale(-1 1)"' : ''}><rect width="30" height="22" fill="${c}"/><rect y="12" width="30" height="10" fill="#6b7480"/><circle cx="21" cy="4.6" r="1.4" fill="${INK}"/></g>` });
-  out.push(pigeon('pigeon-a', 20, 70, false), pigeon('pigeon-b', 52, 82, true, '#a4acb7'));
+  // The corner deli puts its produce out: a folded stand of fruit along the shopfront and the grocer weighing up.
+  const fruit = (w: number, d: number) => `<rect width="${w}" height="${d}" fill="#8a5a3a"/>` + Array.from({ length: Math.floor(w / 13) * Math.floor(d / 13) }, (_, i) => { const cols = Math.floor(w / 13), cx = 7 + (i % cols) * 13, cy = 7 + Math.floor(i / cols) * 13, band = Math.floor((i % cols) / (cols / 3)); return `<circle cx="${cx}" cy="${cy}" r="5.6" fill="${[CORAL, SUN, '#57b36f'][band]}"/>`; }).join('');
+  out.push(...box({ id: 'stand', x: 968, z: -96, w: 120, h: 44, d: 48, rot: -75, stock: 'kraft', c: '#b98450', front: `<rect y="4" width="120" height="6" fill="${INDIGO}"/>`, top: fruit(120, 48) }).filter(p => !/rear|under/.test(p.id)));
+  out.push(...person('grocer', 905, -30, { coat: '#fbf8f1', legs: '#3f4a5c', hair: '#2a1d14', bag: '#57b36f', flip: true }));
+  out.push(...paperPigeon('pigeon-a', 10, 78, -48), ...paperPigeon('pigeon-b', 76, 96, 232, '#a4acb7'));
   out.push({ ...pigeon('ridge-a', 0, 0, false, '#5b6470'), o: [GALLERY.x - GALLERY.tw / 2 - 15, GALLERY.peak + 1, GALLERY.z - 40] }, { ...pigeon('ridge-b', 0, 0, true, '#5b6470'), o: [GALLERY.x + GALLERY.tw / 2 - 15, GALLERY.peak + 1, GALLERY.z - 90] });
   return out;
 }
@@ -660,5 +733,5 @@ function dressing(): Panel[] {
 export function downtown(): Scene {
   const lamps: Lamp[] = [{ at: [-346, 228, 176], color: [1, .83, .58], energy: 60 }, { at: [334, 218, 176], color: [1, .83, .58], energy: 60 }, { at: [GALLERY.x, 90, GALLERY.z + GALLERY.hd + 30], color: [1, .83, .58], energy: 30 }];
   return { id: 'downtown', camera: { zoom: 1, x0: -350, x1: 600 }, light: { sun: 2.1, sky: .55, skyColor: [1, .87, .8] }, lamps,
-    panels: [...backdrop(), ...ground(), ...avenueView(), ...rearRow(), ...neighbours(), ...gallery(), ...site(), ...yardSign(), ...listingsBoard(), ...kiosk(), ...easel(), ...signpost(), ...dressing()] };
+    panels: [...backdrop(), ...ground(), ...avenueView(), ...rearWall(), ...neighbours(), ...gallery(), ...site(), ...yardSign(), ...listingsBoard(), ...kiosk(), ...easel(), ...signpost(), ...dressing()] };
 }
