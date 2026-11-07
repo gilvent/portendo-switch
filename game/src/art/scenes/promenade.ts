@@ -284,12 +284,26 @@ export function shopper(id: string, x: number, z: number, look: Look, flip = fal
   const legsPrint = style === 'dress' ? `<rect y="140" width="74" height="36" fill="${skin}"/>` : style === 'shorts' ? `<rect y="116" width="74" height="14" fill="${legs}"/><rect y="130" width="74" height="40" fill="${skin}"/>` : `<rect y="116" width="74" height="56" fill="${legs}"/>`;
   const print = `<rect width="74" height="176" fill="${coat}"/>${legsPrint}<rect width="74" height="44" fill="${skin}"/><path d="M23 22Q22 4 37 4Q52 4 51 22Q46 11 33 13Q27 15 23 22Z" fill="${hair}"/>` +
     `<circle cx="42" cy="25" r="2" fill="${INK}"/><path d="M40 33q3 2 6 0" stroke="${INK}" stroke-width="1.4" fill="none"/>` +
-    `<path d="M31 43L37 52L43 43" fill="#fff" fill-opacity=".55"/><path d="M17 64V96M57 64V96" stroke="#000" stroke-opacity=".14" stroke-width="3"/>` +
-    (style === 'dress' ? `<path d="M17 100H57" stroke="#000" stroke-opacity=".15" stroke-width="3"/>${[0, 1, 2].map(i => `<circle cx="${26 + i * 11}" cy="${112 + (i % 2) * 12}" r="3" fill="#fff" fill-opacity=".5"/>`).join('')}` : `<rect x="17" y="112" width="40" height="5" fill="#000" fill-opacity=".25"/>`) +
-    `<g fill="${shoes}">${feet}</g>` + (hat ? `<g fill="${hat}">${hatShape}</g><rect x="27" y="7" width="20" height="3" fill="#000" fill-opacity=".2"/>` : '') + (pack ? `<rect x="52" y="52" width="16" height="44" rx="5" fill="${pack}"/><rect x="54" y="72" width="12" height="10" fill="#000" fill-opacity=".15"/>` : '');
+    `<g fill="${shoes}">${feet}</g>` + (hat ? `<g fill="${hat}">${hatShape}</g><rect x="27" y="7" width="20" height="3" fill="${tone(hat, -.18)}"/>` : '') + (pack ? `<rect x="52" y="52" width="16" height="44" rx="5" fill="${pack}"/><rect x="54" y="72" width="12" height="10" fill="${tone(pack, -.18)}"/>` : '');
   const base = (cid: string, ww: number, hh: number, dx: number, dz: number): Panel => ({ id: cid, stock: 'cover', c: coat, w: ww, h: hh, o: add([x, 0, z], R([-w / 2 + dx, 0, dz])), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.7 });
-  const parts: Panel[] = [{ ...base(id, w, h, 0, 0), mask: g(`<path d="${head}" fill="#fff"/><path d="${body}" fill="#fff"/><g fill="#fff">${feet}${hatShape}${packShape}</g>`), print: g(print) }];
-  if (arm && carry) parts.push({ ...base(`${id}-arm`, 34 * k, 96 * k, flip ? 6 * k : 42 * k, 5), mask: `<g transform="scale(${k})"><path d="M10 0H22V52H28V96H4V52H10Z" fill="#fff"/></g>`, print: `<g transform="scale(${k})"><rect width="34" height="52" fill="${coat}"/><rect y="46" width="34" height="6" fill="${skin}"/><rect y="52" width="34" height="44" fill="${carry}"/><rect x="8" y="58" width="16" height="4" fill="#fff" fill-opacity=".5"/><path d="M10 52q6 -10 12 0" stroke="#000" stroke-opacity=".3" stroke-width="2" fill="none"/></g>` });
+  const fig: Panel = { ...base(id, w, h, 0, 0), mask: g(`<path d="${head}" fill="#fff"/><path d="${body}" fill="#fff"/><g fill="#fff">${feet}${hatShape}${packShape}</g>`), print: g(print) };
+  // Detail is cut from lighter and darker tones of the figure's own colours and glued on, never printed as shade:
+  // a collar, the coat's shaded side away from the sun, a belt or hem, a lit trouser leg, a hair highlight, a blush,
+  // and pale toe caps. Pieces are placed in the 74 x 176 figure sheet, measured from its top-left like the print.
+  const glue = (k2: string, x0: number, top: number, ww: number, hh: number, c: string, shape: string): Panel =>
+    on(fig, .7, (flip ? 74 - x0 - ww : x0) * k, (176 - top - hh) * k, ww * k, hh * k, { id: `${id}-${k2}`, stock: 'sugar', c, density: 1.7, mask: `<g transform="scale(${k}) ${flip ? `translate(${ww} 0) scale(-1 1)` : ''}">${shape}</g>` });
+  const lower = style === 'dress' ? 140 : style === 'shorts' ? 116 : 118;
+  const parts: Panel[] = [fig,
+    glue('collar', 29, 43, 16, 10, tone(coat, .22), '<path d="M0 0H16L8 10Z" fill="#fff"/>'),
+    glue('shade', 47, 52, 10, lower - 56, tone(coat, -.16), `<path d="M10 0V${lower - 56}H2Q6 ${(lower - 56) / 2} 0 0Z" fill="#fff"/>`),
+    glue('hairlight', 26, 7, 16, 8, tone(hair, .2), '<path d="M0 8Q4 0 16 1Q8 3 3 8Z" fill="#fff"/>'),
+    glue('blush', 33, 29, 7, 4, tone(skin, -.1), '<ellipse cx="3.5" cy="2" rx="3.5" ry="2" fill="#fff"/>'),
+    glue('toe-l', 22, 168, 6, 3, tone(shoes, .3), '<rect width="6" height="3" rx="1.5" fill="#fff"/>'),
+    glue('toe-r', 39, 168, 6, 3, tone(shoes, .3), '<rect width="6" height="3" rx="1.5" fill="#fff"/>'),
+    ...(style === 'dress'
+      ? [glue('hem', 12, 130, 50, 10, tone(coat, -.14), '<path d="M2 0H48L50 10H0Z" fill="#fff"/>'), ...[0, 1, 2].map(i => glue(`dot${i}`, 23 + i * 11, 109 + (i % 2) * 12, 6, 6, tone(coat, .28), '<circle cx="3" cy="3" r="3" fill="#fff"/>'))]
+      : [glue('belt', 17, 112, 40, 5, tone(legs, -.2), '<rect width="40" height="5" fill="#fff"/>'), glue('leglight', 25, style === 'shorts' ? 118 : 122, 4, style === 'shorts' ? 8 : 46, tone(legs, .16), '<rect width="4" height="100" fill="#fff"/>')])];
+  if (arm && carry) parts.push({ ...base(`${id}-arm`, 34 * k, 96 * k, flip ? 6 * k : 42 * k, 5), mask: `<g transform="scale(${k})"><path d="M10 0H22V52H28V96H4V52H10Z" fill="#fff"/></g>`, print: `<g transform="scale(${k})"><rect width="34" height="52" fill="${coat}"/><rect y="46" width="34" height="6" fill="${skin}"/><rect y="52" width="34" height="44" fill="${carry}"/><rect x="8" y="58" width="16" height="4" fill="${tone(carry, .3)}"/><path d="M10 52q6 -10 12 0" stroke="${tone(carry, -.3)}" stroke-width="2" fill="none"/></g>` });
   return parts;
 }
 
@@ -396,6 +410,8 @@ const piece = (x: number, z: number, rot: number) => {
   return (id: string, o: V3, u: V3, v: V3, w: number, h: number, rest: Partial<Panel> & Pick<Panel, 'stock' | 'c'>): Panel =>
     ({ id, o: add([x, 0, z], R(o)), u: R(u), v: R(v), w, h, edge: 'cut', density: 1.8, ...rest });
 };
+// The same colour cut from a lighter (k > 0) or darker (k < 0) sheet.
+export const tone = (hex: string, k: number) => '#' + [1, 3, 5].map(i => { const c = parseInt(hex.slice(i, i + 2), 16), v = k > 0 ? c + (255 - c) * k : c * (1 + k); return Math.round(v).toString(16).padStart(2, '0'); }).join('');
 const disc = (r: number) => `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>`;
 // A straight strip of card from one point to another, with rounded ends: a tube or a spoke cut as one shape.
 const bar = (x1: number, y1: number, x2: number, y2: number, w: number) => {
