@@ -198,9 +198,8 @@ function surroundings(): Panel[] {
     ...shadeTree('tree-l', 1080, 260, 330), ...planter('tree-l-bed', 1080, 260, 110),
     ...flagPole('flag-l', -790, 230, 300, '#8e5bd6'), ...flagPole('flag-r', 690, 240, 300, '#e8752d'),
     ...bin('bin-b', 560, 190), ...bush('bush-a', -330, -170, 140, 64),
-    // The front edge of the plaza: low planters with bushes, and a bench facing the shops.
+    // The front edge of the plaza: low planters with bushes.
     ...planter('front-bed-a', -380, 286, 80, 34), ...bush('front-bush-a', -380, 280, 92, 56, 30),
-    ...bench('front-bench', -560, 280, 150, 0),
     // Shoppers in small groups: a woman in a sun hat with a bag, a father and child, a backpacker, a couple at the café.
     ...shopper('shopper-a', -60, 150, { coat: PLUM, legs: '#22324a', skin: '#f3c9a0', hair: '#4a2c1a', carry: BLUE, style: 'dress', hat: '#f4e3c3' }),
     ...shopper('shopper-b', 420, 150, { coat: SUN, legs: '#3d444e', skin: '#c99a7a', hair: '#2b2622', carry: '#2bb5b8' }, true),
