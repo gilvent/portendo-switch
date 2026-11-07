@@ -21,6 +21,7 @@ function matrix({ o, u, v, h }: Quad, origin: number[] = [0, 0, 0]) {
 }
 function moved(q: Quad, m: Motion) {
   const k = q.pw / q.w, slide = m.slide ? `translate3d(${(m.slide[0]) * k}px,${(-m.slide[1]) * k}px,${(m.slide[2]) * k}px)` : '';
+  if (m.roll) return `${slide} translate(${q.pw / 2}px,0px) rotate(${m.roll}deg) translate(${-q.pw / 2}px,0px)`;
   if (!m.edge || !m.deg) return slide;
   const px = m.edge === 'right' ? q.pw : 0, py = m.edge === 'bottom' ? q.ph : 0, axis = m.edge === 'top' || m.edge === 'bottom' ? 'rotateX' : 'rotateY';
   return `${slide} translate(${px}px,${py}px) ${axis}(${m.deg}deg) translate(${-px}px,${-py}px)`;

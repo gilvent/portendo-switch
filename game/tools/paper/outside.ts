@@ -24,7 +24,7 @@ for (const [i, st] of all.entries()) {
   const png = join(WORK, `${st.id}.png`);
   await page.screenshot({ path: png, omitBackground: true });
   execFileSync('python3', ['-c', `from PIL import Image; Image.open(${JSON.stringify(png)}).save(${JSON.stringify(join(OUT, `${st.id}.webp`))}, quality=86, method=6)`]);
-  manifest.push({ id: st.id, w: st.w, h: st.h, y: st.y, z: st.z, speed: st.speed, flat: !!st.flat, tile: st.tile !== false });
+  manifest.push({ id: st.id, w: st.w, h: st.h, y: st.y, z: st.z, speed: st.speed, flat: !!st.flat, tile: st.tile !== false, ...(st.every ? { every: st.every } : {}) });
 }
 await browser.close();
 writeFileSync(join(OUT, 'manifest.json'), JSON.stringify(manifest));

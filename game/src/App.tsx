@@ -19,7 +19,7 @@ export default function App() {
   const gameRef = useRef(game);
   gameRef.current = game;
   // The train ride: braking into the chosen station, the doors, and walking out. Input waits while it plays.
-  const [fx, setFx] = useState({ ride: 0, dwell: 0, doors: 0 });
+  const [fx, setFx] = useState({ ride: 0, dwell: 0, doors: 0, lurch: 0 });
   const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
   const busy = useRef(false);
   const timers = useRef<number[]>([]);
@@ -34,9 +34,11 @@ export default function App() {
       if (act?.kind === 'ride' && door) {
         const k = gameRef.current.toys[`${here.world}/${act.toy}`] ?? 0;
         busy.current = true; held.current.clear(); target.current = null;
-        setFx({ ride: k + 1, dwell: 0, doors: 0 });
+        timers.current.forEach(clearTimeout); timers.current = [];
+        setFx({ ride: k + 1, dwell: 0, doors: 0, lurch: 1 });
+        later(BRAKE_S * 1000 - 150, () => setFx(f => ({ ...f, lurch: 0 })));
         later(BRAKE_S * 1000 + 250, () => setFx(f => ({ ...f, doors: 1 })));
-        later(BRAKE_S * 1000 + 800, () => { exit.current = { x: door.x, z: -150 - 90, then: () => { busy.current = false; exit.current = null; setFx({ ride: 0, dwell: 0, doors: 0 }); const r = reduce(content, gameRef.current, { a: 'confirm' }); gameRef.current = r[0]; setGame(r[0]); } }; });
+        later(BRAKE_S * 1000 + 800, () => { exit.current = { x: door.x, z: -150 - 90, then: () => { busy.current = false; exit.current = null; setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 }); const r = reduce(content, gameRef.current, { a: 'confirm' }); gameRef.current = r[0]; setGame(r[0]); } }; });
         return;
       }
     }
@@ -95,6 +97,7 @@ export default function App() {
   const prevWorld = useRef<WorldId | null>(null);
   useEffect(() => {
     if (!world || world === prevWorld.current || spot.k === 'lost') return;
+    const cameFrom = prevWorld.current;
     prevWorld.current = world;
     held.current.clear();
     stickSpent.current = true;
@@ -105,13 +108,17 @@ export default function App() {
     walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 };
     lastNear.current = s.id;
     cam.current.x = content.worlds[world].camera ? 0 : s.x; cam.current.z = 0;
-    if (world === 'mrt' && s.action.kind === 'ride') {
+    // Off the train: come down from the station at the world's way back to the MRT, then walk to the first stop.
+    const fromTrain = cameFrom === 'mrt' && world !== 'mrt' && !reducedMotion() ? content.worlds[world].stops.find(x => x.action.kind === 'road' && x.action.to === 'mrt') : undefined;
+    if (fromTrain) { walker.current = { x: fromTrain.x + 20, z: fromTrain.z - 50, vx: 0, vz: 0 }; lastNear.current = fromTrain.id; cam.current.x = content.worlds[world].camera ? content.worlds[world].camera!.x0 : fromTrain.x; target.current = { stop: s, open: false }; }
+    // Back from a work scene: the train stands at that station with its doors open, then closes them and pulls away.
+    if (world === 'mrt' && s.action.kind === 'ride' && cameFrom && cameFrom !== 'intro') {
       const k = (gameRef.current.toys[`mrt/${s.action.toy}`] ?? 0) + 1;
-      if (reducedMotion()) { setFx({ ride: 0, dwell: 0, doors: 0 }); return; }
-      setFx({ ride: 0, dwell: k, doors: 1 });
+      if (reducedMotion()) { setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 }); return; }
+      setFx({ ride: 0, dwell: k, doors: 1, lurch: 0 });
       later(1500, () => setFx(f => ({ ...f, doors: 0 })));
-      later(2300, () => setFx({ ride: 0, dwell: 0, doors: 0 }));
-    } else if (world === 'mrt') setFx({ ride: 0, dwell: 0, doors: 0 });
+      later(2300, () => setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 }));
+    } else if (world === 'mrt') setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 });
   }, [spawnKey]);
 
   const teleport = useCallback((w: WorldId, s: Stop) => {

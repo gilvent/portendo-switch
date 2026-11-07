@@ -205,7 +205,25 @@ function dressing(): Panel[] {
   const postFace = '#3d444e';
   const board = [...box({ id: 'board-post', x: 592, z: -34, w: 12, h: 120, d: 12, stock: 'greyboard', c: postFace, noTop: true }),
     ...box({ id: 'board', x: 592, z: -34, y: 120, w: 160, h: 82, d: 14, stock: 'cover', c: CREAM, noTop: true, front: `<rect x="5" y="5" width="150" height="72" fill="none" stroke="${BLUE}" stroke-width="2.5"/><text x="80" y="50" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="24" fill="${DEEP}">Blibli.com</text>` })];
-  const arrow: Panel = { id: 'out-arrow', stock: 'cover', c: SUN, w: 150, h: 126, o: [-715, 0, 60], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', mask: `<path d="M66 126V74H44V74L4 40L44 8V24H146V58H82V126Z" fill="#fff"/>`, print: `<rect x="66" y="66" width="16" height="60" fill="${postFace}"/><text x="92" y="48" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="15" fill="${INK}">BACK</text>` };
+  // The MRT entrance where the salaryman comes down from the line: a stair flight rising out of frame toward the
+  // viaduct in the backdrop, under a glass canopy, and the station totem on the pavement beside it.
+  const STEPS = 12, rise = 22, run = 18, sx = -742, sw = 112, z0 = 70, ry = STEPS * rise, rz = STEPS * run, sl = Math.hypot(ry, rz);
+  const steps = Array.from({ length: STEPS }, (_, i) => { const a = i * sl / STEPS; return `<rect y="${sl - a - sl / STEPS}" width="${sw}" height="${sl / STEPS}" fill="${i % 2 ? '#aab2bb' : '#b7bec6'}"/><rect y="${sl - a - 5}" width="${sw}" height="5" fill="${SUN}"/>`; }).join('');
+  const ramp: Panel = { id: 'mrt-stairs', stock: 'greyboard', c: '#b7bec6', w: sw, h: sl, o: [sx - sw / 2, 0, z0], u: [1, 0, 0], v: [0, ry / sl, -rz / sl], edge: 'fold', density: 1.4, print: steps };
+  const saw = Array.from({ length: STEPS }, (_, i) => `H${(i + 1) * run}V${ry - (i + 1) * rise}`).join('');
+  // The flight's side: a solid stringer wall under the treads with a balustrade along the slope.
+  const WH = ry + 64;
+  const wall = (id: string, x: number): Panel => ({ id, stock: 'greyboard', c: '#8a939c', w: rz, h: WH, o: [x, 0, z0], u: [0, 0, -1], v: [0, 1, 0], edge: 'cut', density: 1.4,
+    mask: `<path d="M0 ${WH}V${WH - 64}L${rz} 0V${WH}Z" fill="#fff"/>`,
+    print: `<rect width="${rz}" height="${WH}" fill="#8a939c"/><path d="M0 ${WH - 64}L${rz} 0V${ry}L0 ${WH}Z" fill="#9aa3ad" fill-opacity="0"/><path d="M0 ${WH - 22}L${rz} ${64 - 22 - 0}" stroke="#7e8893" stroke-width="44" stroke-opacity=".0"/><path d="M0 ${WH - 60}L${rz} 4" stroke="#5d6670" stroke-width="6"/><path d="M0 ${WH - 14}L${rz} ${WH - 14 - ry}" stroke="#bcc3ca" stroke-width="4"/>${Array.from({ length: 6 }, (_, i) => `<rect x="${i * rz / 6 + 8}" y="${WH - 60 - i * ry / 6}" width="4" height="46" fill="#5d6670"/>`).join('')}` });
+  const canopy: Panel = { id: 'mrt-canopy', stock: 'greyboard', c: '#5d6670', w: sw + 30, h: sl, o: [sx - sw / 2 - 15, 170, z0 + 10], u: [1, 0, 0], v: [0, ry / sl, -rz / sl], edge: 'cut', density: 1.2,
+    mask: `<rect width="7" height="${sl}" fill="#fff"/><rect x="${sw + 23}" width="7" height="${sl}" fill="#fff"/>${Array.from({ length: 7 }, (_, i) => `<rect y="${i * (sl - 5) / 6}" width="${sw + 30}" height="5" fill="#fff"/>`).join('')}`,
+    print: `<rect width="${sw + 30}" height="${sl}" fill="#cfe9f4"/><rect width="6" height="${sl}" fill="#5d6670"/><rect x="${sw + 24}" width="6" height="${sl}" fill="#5d6670"/>${Array.from({ length: 6 }, (_, i) => `<rect y="${i * sl / 6}" width="${sw + 30}" height="4" fill="#5d6670"/>`).join('')}` };
+  const flight = ramp;
+  const totem = [...box({ id: 'mrt-post', x: -655, z: 110, w: 12, h: 132, d: 12, stock: 'greyboard', c: '#3d444e', noTop: true }),
+    ...box({ id: 'mrt-sign', x: -655, z: 110, y: 132, w: 74, h: 74, d: 12, stock: 'cover', c: BLUE, noTop: false, front: `<circle cx="37" cy="31" r="24" fill="${CREAM}"/><circle cx="37" cy="31" r="18" fill="${CORAL}"/><path d="M27 40V22L37 33L47 22V40" stroke="${CREAM}" stroke-width="4.4" fill="none" stroke-linejoin="round"/><text x="37" y="68" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="12" fill="${CREAM}">MRT</text>`, top: `<rect width="74" height="12" fill="${DEEP}"/>` })].filter(p => !/rear|under/.test(p.id));
+  const posts = [-1, 1].map((k): Panel => ({ id: `mrt-canopy-post-${k < 0 ? 'l' : 'r'}`, stock: 'greyboard', c: '#5d6670', w: 6, h: 172, o: [sx + k * (sw / 2 + 12) - 3, 0, z0 + 10], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 2 }));
+  const arrow: Panel[] = [flight, wall('mrt-wall-r', sx + sw / 2), canopy, ...posts, ...totem];
   const pot = box({ id: 'pot', x: -90, z: -70, w: 70, h: 34, d: 70, stock: 'kraft', c: '#7a5237', top: '<rect x="6" y="6" width="58" height="58" fill="#3a2616"/>' });
   const leaves = (id: string, rot: number): Panel[] => {
     const c = Math.cos(rot), s = Math.sin(rot), p: Panel = { id, stock: 'sugar', c: MINT, w: 96, h: 130, o: [-90 - 48 * c, 34, -70 + 48 * s], u: [c, 0, -s], v: [0, 1, 0], edge: 'cut', mask: '<path d="M46 130V92Q8 88 4 40Q34 44 46 76V50Q28 22 48 0Q68 22 50 50V70Q60 30 92 22Q88 66 50 76V130Z" fill="#fff"/>', print: '<path d="M48 130V6" stroke="#2a7f58" stroke-width="2"/>' };
@@ -226,7 +244,7 @@ function dressing(): Panel[] {
   // Pigeons pecking on the pavement and two birds on the Blibli roof ridge.
   const bird = (id: string, x: number, z: number, y: number, flip: boolean, rot = 0, c = '#8d96a3'): Panel => card(id, x, z, 30, 22, c, { density: 3, mask: `<g ${flip ? 'transform="translate(30 0) scale(-1 1)"' : ''}><path d="M4 12Q4 4 12 6L16 2Q22 0 24 4L29 6L24 8Q24 16 16 18L18 22H15L13 18Q6 18 4 12Z M0 10L6 9L5 13Z" fill="#fff"/></g>`, print: `<g ${flip ? 'transform="translate(30 0) scale(-1 1)"' : ''}><rect width="30" height="22" fill="${c}"/><circle cx="21" cy="4.6" r="1.4" fill="${INK}"/><rect x="24" y="5" width="6" height="2" fill="${SUN}"/><path d="M9 10Q14 8 18 12" stroke="#6b7480" stroke-width="2" fill="none"/></g>` }, rot, y);
   const birds = [bird('pigeon-a', 60, 120, 0, false, 10), bird('pigeon-b', 104, 132, 0, true, -14, '#a4acb7'), bird('ridge-a', 70, -84, 470, false, 0, '#5b6470'), bird('ridge-b', 300, -84, 448, true, 0, '#5b6470')];
-  return [...board, arrow, ...birds, ...pot, ...leaves('plant-a', 0), ...shrub('shrub-d', 600, -130, 180, 92, FOLIAGE, '#2f7d48'), ...shrub('shrub-e', -330, -150, 150, 70, '#57b36f', '#3f9a5b'), ...tree, ...cart,
+  return [...board, ...arrow, ...birds, ...pot, ...leaves('plant-a', 0), ...shrub('shrub-d', 600, -130, 180, 92, FOLIAGE, '#2f7d48'), ...shrub('shrub-e', -330, -150, 150, 70, '#57b36f', '#3f9a5b'), ...tree, ...cart,
     ...streetLamp('lamp-a', -600, 176, 250, '#ffe7a8'), ...streetLamp('lamp-b', 720, 176, 230, '#fff4e2'), ...bench, ...aboard, bike, ...bin, ...hydrant, ...people, scooter];
 }
 const unitV = (a: V3): V3 => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2] / l]; };

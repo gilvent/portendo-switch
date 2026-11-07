@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import type { Stop, World } from './schema.ts';
 import { reducedMotion, shadowFilter } from './light.ts';
 import Salaryman from './art/Salaryman.tsx';
-import { WORLD_ART, WORLD_BACKDROP } from './art/blibli.tsx';
+import { WORLD_ART, WORLD_BACKDROP, WORLD_BEHIND } from './art/blibli.tsx';
 import { at } from './art/fold.tsx';
 
 let seed = 11;
@@ -24,7 +24,19 @@ export default function Scene({ world, nearStop, toys, stageRef, courierRef, fli
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
   const cards = useMemo(() => (drawn ? [] : scenery(world)), [world, drawn]);
-  const b = world.bounds, wipe = useRef<HTMLDivElement>(null);
+  const b = world.bounds, wipe = useRef<HTMLDivElement>(null), behind = useRef<HTMLDivElement>(null);
+  const Behind = WORLD_BEHIND[world.art];
+  // The open surroundings live in their own 3D context behind the stage, sharing its camera: the browser then never
+  // has to sort the diorama's sheets against the long scrolling strips.
+  useEffect(() => {
+    const st = stageRef.current, bh = behind.current;
+    if (!st || !bh) return;
+    const copy = () => { bh.style.transform = st.style.transform; };
+    copy();
+    const o = new MutationObserver(copy);
+    o.observe(st, { attributes: true, attributeFilter: ['style'] });
+    return () => o.disconnect();
+  }, [stageRef, Behind]);
   useEffect(() => {
     if (reducedMotion() || !wipe.current) return;
     const t = gsap.fromTo(wipe.current.children, { scaleX: 1 }, { scaleX: 0, duration: .55, ease: 'power3.inOut', stagger: .04 });
@@ -35,6 +47,7 @@ export default function Scene({ world, nearStop, toys, stageRef, courierRef, fli
       <svg width="0" height="0" className="defs" aria-hidden="true"><defs>
         {(['sm', 'md'] as const).map(n => <filter key={n} id={`paper-${n}`} x="-20%" y="-20%" width="150%" height="150%"><feDropShadow {...shadowFilter(n)} /></filter>)}
       </defs></svg>
+      {Behind && <div className="stage" ref={behind}><Behind near={nearStop} toys={toys} /></div>}
       <div className="stage" ref={stageRef}>
         {!drawn && <div className="floor" style={{ width: b.x1 - b.x0 + 2400, height: 3000, left: b.x0 - 1200, top: -1500, transform: `translateZ(${b.z0 + 1300}px) rotateX(90deg)` }} />}
         {cards.map((c, i) => <div key={i} className="prop" style={at(c.x, c.z)}><div className="card" style={{ width: c.w, height: c.h, marginLeft: -c.w / 2, background: `rgb(${c.g},${c.g + 3},${c.g + 8})` }} /></div>)}

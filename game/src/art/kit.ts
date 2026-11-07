@@ -13,7 +13,8 @@ export type Panel = {
 // lit like everything else, but they cast no shadow, so the variants that share one spot never shade each other.
 export type Show = { toy: string; at: number[] };
 // A motion plays while the courier stands at stop `when`, or while toy `toy` is in one of the states `at`.
-export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3 };
+// `roll` turns the piece in its own plane about the middle of its top edge, like a strap swinging from a rail.
+export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3; roll?: number };
 export type Lamp = { at: V3; color: readonly [number, number, number]; energy: number };
 export type Run = { group: string; from: V3; to: V3; count: number; seconds: number };
 export type Scene = {

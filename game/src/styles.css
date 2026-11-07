@@ -176,7 +176,7 @@ button { font:inherit; cursor:pointer; }
 .pp.pop { animation:pop .42s steps(5,end) both; }
 @keyframes pop { from { translate:0 -18px; } }
 @media (prefers-reduced-motion:reduce) { .pp.pop { animation:none; } }
-.art-train { background:linear-gradient(#8fd3f4 0%,#bfe6f8 55%,#e8f4f8 100%); }
-.outside,.station { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; }
-.strip { position:absolute; left:0; top:0; transform-origin:0 0; overflow:hidden; backface-visibility:hidden; background-repeat:no-repeat; }
-.strip > i { position:absolute; left:0; top:0; height:100%; display:block; background-repeat:repeat-x; will-change:transform; }
+.art-train { background:#8fd3f4 repeat-x 50% calc(42vh - 660px) / auto 760px; }
+.outside,.station,.carrier { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; }
+.strip { position:absolute; left:0; top:0; transform-origin:0 0; background-repeat:no-repeat; }
+@media (orientation:portrait) { .art-train { perspective-origin:50% 18%; } }
