@@ -3,9 +3,9 @@ import { BLUE, CORAL, CREAM, DEEP, INK, KRAFT, SUN, reseed, specks } from '../re
 import { SKIN, seated, standing, type Look } from './people.ts';
 import { station as buildStation } from './station.ts';
 
-// The home space: one MRT car on an elevated line, cut open along its near side like a cutaway model.
+// The home space: one MRT car standing in an underground station, cut open along its near side like a cutaway model.
 // The car runs along x. Its far side (the back wall) carries the doors, windows and the long benches;
-// the two ends are the gangways to the neighbouring cars. Everything outside moves past (src/art/Outside.tsx).
+// the two ends are the gangways to the neighbouring cars. The station around it is built in station.ts.
 const MINT = '#35b58a', PLUM = '#7c6be0', STEEL = '#3d444e', SKY = '#8fd3f4';
 const SHELL = '#e9edf1', SHELL_DARK = '#c9d1d9', SEAT = '#2f6f9f', SEAT_PRIORITY = '#c84a3a', FLOOR = '#9aa3ad', POLE = '#cfd6dd', LIVERY = '#e8552d';
 export const CAR = { W: 1180, D: 300, H: 250, COVE: 336, ROOF: 362, SEAT: 46, WIN: [104, 214] as const };
@@ -47,7 +47,7 @@ export function train(): Scene {
   reseed(41);
   const back = backWall(), cv = cove();
   // Floor: blue-grey vinyl with fleck, a lighter aisle, yellow threshold plates and tactile strips at both doors.
-  const fl: Panel = { id: 'floor', stock: 'greyboard', c: FLOOR, w: W, h: D, o: [-W / 2, 0, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.3, split: 4,
+  const fl: Panel = { id: 'floor', stock: 'greyboard', c: FLOOR, w: W, h: D, o: [-W / 2, 0, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.3, split: 8,
     print: `<rect width="${W}" height="${D}" fill="${FLOOR}"/>${specks(W, D, '#6f7882', 420, 2.6)}${specks(W, D, '#e3e8ec', 160, 2)}<rect y="${D - 70}" width="${W}" height="4" fill="#7e8893"/>`
       + DOORS.map(x => `<rect x="${bx(x) - DOOR_W / 2}" y="0" width="${DOOR_W}" height="14" fill="#c9ced3"/><path d="M${bx(x) - DOOR_W / 2} 7H${bx(x) + DOOR_W / 2}" stroke="#8a929b" stroke-width="2" stroke-dasharray="4 3"/><rect x="${bx(x) - DOOR_W / 2}" y="14" width="${DOOR_W}" height="10" fill="${SUN}"/>${Array.from({ length: 12 }, (_, i) => `<circle cx="${bx(x) - DOOR_W / 2 + 6 + i * 10}" cy="19" r="2" fill="#d9952a"/>`).join('')}`
         + `<g fill="${SUN}" fill-opacity=".9">${[-1, 1].map(s => `<path transform="translate(${bx(x) + s * 34} 46) scale(${s} 1)" d="M-8 0H8V14H16L0 30L-16 14H-8Z"/>`).join('')}</g>`).join('') };

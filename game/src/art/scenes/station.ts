@@ -39,7 +39,7 @@ function trackbed(): Panel[] {
 function conductor(): Panel {
   const y0 = CAR.ROOF + 56, h = TOP - y0;
   const drops = Array.from({ length: 9 }, (_, i) => i * 420 + 90);
-  return { id: 'conductor', stock: 'greyboard', c: '#3a4049', w: SPAN, h, o: [X0, y0, -96], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1, split: 3,
+  return { id: 'conductor', stock: 'greyboard', c: '#3a4049', w: SPAN, h, o: [X0, y0, -96], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .6, split: 3,
     mask: `<rect y="${h - 14}" width="${SPAN}" height="14" fill="#fff"/>${drops.map(x => `<rect x="${x}" y="0" width="7" height="${h - 14}" fill="#fff"/><rect x="${x - 26}" y="${h - 34}" width="60" height="8" fill="#fff"/><rect x="${x - 4}" y="${h - 60}" width="15" height="26" rx="4" fill="#fff"/>`).join('')}`,
     print: `<rect width="${SPAN}" height="${h}" fill="#3a4049"/><rect y="${h - 14}" width="${SPAN}" height="4" fill="#8e959c"/>${drops.map(x => `<rect x="${x - 4}" y="${h - 60}" width="15" height="26" rx="4" fill="#b0552e"/>`).join('')}` };
 }
@@ -60,7 +60,7 @@ function screenDoors(id: string, z: number, openings: readonly number[], withLea
   const solid = (fill: string, post: string) => `<rect width="${SPAN}" height="${HEAD_H}" fill="${fill}"/><rect y="${GB}" width="${SPAN}" height="${SILL}" fill="${fill}"/>${posts.map(x => `<rect x="${ox(x) - 7}" y="${GT}" width="14" height="${GB - GT}" fill="${post}"/>`).join('')}${jambs.map(x => `<rect x="${x}" y="${GT}" width="12" height="${GB - GT}" fill="${post}"/>`).join('')}`;
   const mask = spans.map(([a, b]) => `<rect x="${a}" y="${GT}" width="${b - a}" height="${GB - GT}" fill="#fff" fill-opacity=".14"/>`).join('') + solid('#fff', '#fff');
   const stickers = posts.filter((_, i) => i % 2).map(x => `<g transform="translate(${ox(x) + 44} ${GB - 150})"><circle r="11" fill="${SUN}"/><path d="M-5 -4L5 6M5 -4L-5 6" stroke="${INK}" stroke-width="2.4"/></g>`).join('');
-  const sheet: Panel = { id, stock: 'cover', c: STEEL, w: SPAN, h: H, o: [X0, 0, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.1, split: withLeaves ? 4 : 2, mask,
+  const sheet: Panel = { id, stock: 'cover', c: STEEL, w: SPAN, h: H, o: [X0, 0, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: withLeaves ? .9 : .6, split: withLeaves ? 4 : 2, mask,
     print: `<rect width="${SPAN}" height="${H}" fill="${GLASS}"/>${solid(STEEL, STAINLESS)}<rect y="${HEAD_H - 24}" width="${SPAN}" height="8" fill="${TEAL}"/><rect y="${GB}" width="${SPAN}" height="${SILL}" fill="#8e959c"/>${stickers}` };
   if (!withLeaves) return [sheet];
   // Two glass leaves per opening; they slide apart with the car's doors.
@@ -89,10 +89,13 @@ function island(): Panel[] {
 
 // Square columns clad in teal enamel over a stainless kick band; each carries small relief: a clock, a camera, a plate.
 function columns(): Panel[] {
-  const W = 58, H = TOP + 40;
+  // Columns stop just past the top of the frame: sheets that run far beyond it make the browser drop the far layers.
+  const W = 58, H = 800;
   const print = (w: number) => `<rect width="${w}" height="${H}" fill="${TEAL}"/>${Array.from({ length: 7 }, (_, i) => `<rect y="${H - 120 - i * 150}" width="${w}" height="2.4" fill="${TEAL_DEEP}"/>`).join('')}<rect y="${H - 110}" width="${w}" height="110" fill="${STAINLESS}"/><rect y="${H - 112}" width="${w}" height="4" fill="${STEEL}"/>`;
   return [-1260, -300, 660].flatMap((x, i) => {
-    const faces = box({ id: `col-${i}`, x, z: ST.COL_Z, w: W, h: H, d: W, stock: 'cover', c: TEAL, front: print(W), right: print(W), left: print(W) }).filter(p => /front|left|right/.test(p.id));
+    // Only the faces the game camera meets: the right side of columns left of it, the left side of the one to its right.
+    const faces = box({ id: `col-${i}`, x, z: ST.COL_Z, w: W, h: H, d: W, stock: 'cover', c: TEAL, front: print(W), right: print(W), left: print(W) })
+      .filter(p => p.id.endsWith('front') || p.id.endsWith(x < 0 ? 'right' : 'left')).map(p => ({ ...p, density: 1.2 }));
     const front = faces[0];
     const bits = carved(front, [
       ...box({ id: `col-${i}-plate`, x, z: ST.COL_Z + W / 2 + 4, y: 230, w: 44, h: 60, d: 8, stock: 'cover', c: '#fbf7ee', front: `<rect width="44" height="60" fill="#fbf7ee"/><rect width="44" height="12" fill="${TEAL_DEEP}"/><text x="22" y="40" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="20" fill="${INK}">${'ABC'[i]}</text>` }),
@@ -112,13 +115,13 @@ function escalator(): Panel[] {
   // Print coordinates: x from x0, y from the top of the sheet (world y = H - py).
   const py = (y: number) => H - y;
   const coreMask = `<path d="M0 ${H}V${py(LAND)}H${xs - x0}L${w} 0V${H}Z" fill="#fff"/>`;
-  const core: Panel = { id: 'esc-core', stock: 'cover', c: '#e6e0d3', w, h: H, o: [x0, 0, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .9, split: 2, mask: coreMask,
+  const core: Panel = { id: 'esc-core', stock: 'cover', c: '#e6e0d3', w, h: H, o: [x0, 0, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .75, split: 2, mask: coreMask,
     print: `<rect width="${w}" height="${H}" fill="#e6e0d3"/>${tiles(w, H, 90, '#d2cbbd')}<path d="M0 ${py(LAND)}H${xs - x0}L${w} 0V40L${xs - x0} ${py(LAND) + 40}H0Z" fill="${STAINLESS}"/><path d="M0 ${py(LAND) + 40}H${xs - x0}L${w} 40V52L${xs - x0} ${py(LAND) + 52}H0Z" fill="${TEAL}"/><rect y="${H - 26}" width="${w}" height="26" fill="#b9b2a4"/>` };
   // Glass balustrade on top of the truss, with the black handrail; one near, one far (seen through the near one).
   const balustrade = (id: string, zz: number, near: boolean): Panel => {
     const g = 96, top = (x: number) => py(yAt(x) + g);
     const m = `<path d="M0 ${py(LAND)}H${xs - x0}L${w} ${py(yAt(x1))}V${top(x1)}L${xs - x0} ${top(xs)}H0Z" fill="#fff" fill-opacity="${near ? .3 : .22}"/><path d="M0 ${top(xs)}H${xs - x0}L${w} ${top(x1)}V${top(x1) - 9}L${xs - x0} ${top(xs) - 9}H-6Q-12 ${top(xs) - 4} -6 ${top(xs)}Z" fill="#fff"/>`;
-    return { id, stock: 'vellum', c: GLASS, w, h: H, o: [x0, 0, zz], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .9, split: near ? 2 : 1, mask: m,
+    return { id, stock: 'vellum', c: GLASS, w, h: H, o: [x0, 0, zz], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .6, split: near ? 2 : 1, mask: m,
       print: `<rect width="${w}" height="${H}" fill="${GLASS}"/><path d="M0 ${top(xs)}H${xs - x0}L${w} ${top(x1)}V${top(x1) - 9}L${xs - x0} ${top(xs) - 9}H0Z" fill="${INK}"/>` };
   };
   // The steps, seen from above as one inclined sheet: grooved treads with yellow nosings, and a flat landing.
@@ -164,7 +167,7 @@ function escalator(): Panel[] {
   const local = (p: string) => `<g transform="translate(${-(mx0 - x0)} ${-mtop(mx1)})">${p}</g>`;
   // Everything outside the band is erased: black in a mask is a hole, and it stays inside the sheet's own mask.
   const erase = local(`<path fill-rule="evenodd" d="M${mx0 - x0 - 50} ${mtop(mx1) - 50}H${mx1 - x0 + 50}V${mbot + 50}H${mx0 - x0 - 50}Z ${band}" fill="#000"/>`);
-  const layer = (id: string, gap: number, c: string, shape: string) => on(core, gap, mx0 - x0, H - mbot, mw, mh, { id, stock: 'sugar', c, density: .9, mask: shape + erase, print: `<rect width="${mw}" height="${mh}" fill="${c}"/>` });
+  const layer = (id: string, gap: number, c: string, shape: string) => on(core, gap, mx0 - x0, H - mbot, mw, mh, { id, stock: 'sugar', c, density: .7, mask: shape + erase, print: `<rect width="${mw}" height="${mh}" fill="${c}"/>` });
   // Layers stand on the band's bottom edge; on the narrow left end only the near ones show.
   let ms = 7; const mr = (lo: number, hi: number) => { ms = (ms * 16807) % 2147483647; return lo + (ms / 2147483647) * (hi - lo); };
   const ridge = (base: number, amp: number, n: number, sharp: boolean) => { let d = `M0 ${mh + 10}V${base}`; for (let i = 0; i <= n; i++) { const xx = i * mw / n, yy = base - mr(.3, 1) * amp; d += sharp ? `L${(xx - mw / n / 2).toFixed(0)} ${(yy).toFixed(0)}L${xx.toFixed(0)} ${(base - amp * .2).toFixed(0)}` : `Q${(xx - mw / n / 2).toFixed(0)} ${(yy - amp * .6).toFixed(0)} ${xx.toFixed(0)} ${(base - amp * mr(0, .3)).toFixed(0)}`; } return `<path d="${d}L${mw} ${mh + 10}Z" fill="#fff"/>`; };
@@ -188,12 +191,12 @@ function escalator(): Panel[] {
 // Glass lift between the vending machines and the next car: shaft glass with a landing door, the cabin mid-ride
 // with two passengers.
 function lift(): Panel[] {
-  const x0 = -1030, w = 170, zf = -390, d = 150, H = TOP + 60;
-  const transoms = Array.from({ length: 8 }, (_, i) => `<rect y="${i * 130}" width="${w}" height="8" fill="#fff"/>`).join('');
+  const x0 = -1030, w = 170, zf = -390, d = 150, H = 820;
+  const transoms = Array.from({ length: 7 }, (_, i) => `<rect y="${i * 130}" width="${w}" height="8" fill="#fff"/>`).join('');
   const frameMask = (ww: number, door: boolean) => `<rect width="${ww}" height="${H}" fill="#fff" fill-opacity=".26"/><rect width="10" height="${H}" fill="#fff"/><rect x="${ww - 10}" width="10" height="${H}" fill="#fff"/>${transoms}${door ? `<rect x="22" y="${H - 220}" width="${ww - 44}" height="220" fill="#fff"/>` : ''}`;
-  const shaftPrint = (ww: number, door: boolean) => `<rect width="${ww}" height="${H}" fill="${GLASS}"/><rect width="10" height="${H}" fill="${STEEL}"/><rect x="${ww - 10}" width="10" height="${H}" fill="${STEEL}"/>${Array.from({ length: 8 }, (_, i) => `<rect y="${i * 130}" width="${ww}" height="8" fill="${STEEL}"/>`).join('')}`
+  const shaftPrint = (ww: number, door: boolean) => `<rect width="${ww}" height="${H}" fill="${GLASS}"/><rect width="10" height="${H}" fill="${STEEL}"/><rect x="${ww - 10}" width="10" height="${H}" fill="${STEEL}"/>${Array.from({ length: 7 }, (_, i) => `<rect y="${i * 130}" width="${ww}" height="8" fill="${STEEL}"/>`).join('')}`
     + (door ? `<rect x="22" y="${H - 220}" width="${ww - 44}" height="220" fill="${STAINLESS}"/><rect x="${ww / 2 - 1}" y="${H - 206}" width="2" height="206" fill="${STEEL}"/><rect x="22" y="${H - 220}" width="${ww - 44}" height="14" fill="${STEEL}"/><rect x="${ww / 2 - 18}" y="${H - 248}" width="36" height="22" rx="3" fill="#14171b"/><path d="M${ww / 2 - 8} ${H - 232}l8 -8 8 8" stroke="#ffb648" stroke-width="2.4" fill="none"/>` : '');
-  const front: Panel = { id: 'lift-front', stock: 'vellum', c: GLASS, w, h: H, o: [x0, 0, zf], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .9, split: 2, mask: frameMask(w, true), print: shaftPrint(w, true) };
+  const front: Panel = { id: 'lift-front', stock: 'vellum', c: GLASS, w, h: H, o: [x0, 0, zf], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .8, split: 2, mask: frameMask(w, true), print: shaftPrint(w, true) };
   const side: Panel = { id: 'lift-side', stock: 'vellum', c: GLASS, w: d, h: H, o: [x0 + w, 0, zf], u: [0, 0, -1], v: [0, 1, 0], edge: 'cut', density: .9, mask: frameMask(d, false), print: shaftPrint(d, false) };
   // The cabin, mid-ride: stainless back wall with a handrail, glass front, roof with the hoist, two riders.
   const cy = 300, ch = 210, cx0 = x0 + 16, cw = w - 32, cz = zf - 14, cd = d - 28;
@@ -281,7 +284,7 @@ function signs(): Panel[] {
   const led: Panel[] = box({ id: 'sign-led', x: lx + ledW / 2, z: z - 15, y: y + 4, w: ledW, h: h - 8, d: 26, stock: 'cover', c: '#14171b',
     front: `<rect width="${ledW}" height="${h - 8}" rx="4" fill="#14171b"/><rect x="6" y="6" width="${ledW - 12}" height="${h - 20}" fill="#221a0e"/><rect x="14" y="14" width="26" height="18" rx="3" fill="#ffb648"/><rect x="50" y="15" width="100" height="6" rx="3" fill="#ffb648"/><rect x="50" y="26" width="70" height="5" rx="2" fill="#ffb648" fill-opacity=".6"/><rect x="${ledW - 50}" y="13" width="34" height="20" rx="3" fill="none" stroke="#ffb648" stroke-width="2"/>` }).filter(p => /front|top/.test(p.id));
   const rodW = lx + ledW - nx, rodH = TOP - y - h + 6;
-  const rodSheet: Panel = { id: 'sign-rods', stock: 'greyboard', c: STEEL, w: rodW, h: rodH, o: [nx, y + h - 6, z - 12], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1,
+  const rodSheet: Panel = { id: 'sign-rods', stock: 'greyboard', c: STEEL, w: rodW, h: rodH, o: [nx, y + h - 6, z - 12], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .6,
     mask: [nx + 16, nx + nameW - 22, exx + 16, exx + exitW - 22, lx + 16, lx + ledW - 22].map(x => `<rect x="${x - nx}" width="6" height="${rodH}" fill="#fff"/>`).join('') };
   void rods;
   return [...name, lid, rodSheet, ...exit, ...led];
@@ -334,12 +337,12 @@ function far(): Panel[] {
     print: `<rect width="${FW}" height="${CH}" fill="#e9e2d4"/>${tiles(FW, CH, 48, '#d9d1c1')}<rect width="${FW}" height="${CH - 200}" fill="#a7adb4"/>${Array.from({ length: Math.floor((CH - 200) / 46) }, (_, r) => `<rect y="${CH - 200 - r * 46 - 30}" width="${FW}" height="4" fill="#8a9098"/>${Array.from({ length: 16 }, (_, i) => `<rect x="${i * 260 + 40 + (r % 2) * 130}" y="${CH - 200 - r * 46 - 20}" width="150" height="9" rx="4.5" fill="#fffbea"/>`).join('')}`).join('')}<rect y="${CH - 206}" width="${FW}" height="10" fill="${TEAL}"/>`
       + shop(-1400 - FX, 420, '#d9a27a', CORAL) + shop(700 - FX, 380, '#9cc6d9', DEEP) + gates(-500 - FX) + gates(1300 - FX)
       + `<rect x="${-200 - FX}" y="${CH - 330}" width="300" height="56" rx="6" fill="${SUN}"/><text x="${-50 - FX}" y="${CH - 292}" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="28" fill="${INK}">Exit &#183; Keluar</text>` };
-  return [ftrack, edgeFace, ffloor, life, wall, ...nameBand, gallery, concourse];
+  return [ftrack, edgeFace, ffloor, life, wall, ...nameBand, gallery, concourse].map(p => ({ ...p, behind: true }));
 }
 
 export function station(): { panels: Panel[]; lamps: Lamp[] } {
   const panels = [...trackbed(), conductor(), ...screenDoors('psd', PSD, DOORS, true), ...island(), ...columns(), ...escalator(), ...lift(), ...vending(), ...bench(), ...crowd(), ...signs(),
-    ...screenDoors('psd-far', ISLAND_BACK + 6, [], false), ...far()];
+    ...screenDoors('psd-far', ISLAND_BACK + 6, [], false).map(p => ({ ...p, behind: true })), ...far()];
   const lamps: Lamp[] = [
     ...[-1200, -600, 0, 600, 1200].map(x => ({ at: [x, 760, -420] as V3, color: [1, .97, .9] as const, energy: 900 })),
     ...[-1400, -500, 400, 1300].map(x => ({ at: [x, 640, -980] as V3, color: [1, .97, .9] as const, energy: 260 }))

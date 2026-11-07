@@ -181,7 +181,7 @@ def seen(p):
     return any(np.dot(np.array(p["n"]), cam - c) > 0 for cam in CAMERAS for c in corners)
 
 
-keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group", "show")
+keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group", "show", "behind")
 def tiles(q, n):
     if n <= 1:
         return [q]

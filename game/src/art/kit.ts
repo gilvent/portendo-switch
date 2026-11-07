@@ -8,6 +8,9 @@ export type Panel = {
   split?: number;
   // With `decal`: painted onto the parent as the game camera sees it, not straight along the parent's normal.
   view?: boolean;
+  // Drawn in the 3D context behind the stage (see Scene.tsx): far, wide sheets that the browser would otherwise split
+  // against the near quads' planes and drop.
+  behind?: boolean;
 };
 // A panel with `show` exists only while its toy is in one of the listed states. Such panels are baked as phantoms:
 // lit like everything else, but they cast no shadow, so the variants that share one spot never shade each other.
