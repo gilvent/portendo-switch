@@ -27,6 +27,9 @@ export default function App() {
   const dispatch = useCallback((x: Action) => {
     if (busy.current && x.a !== 'toggleController') return;
     if (x.a === 'confirm' && gameRef.current.place.k === 'letter') { dispatchEvent(new Event('letter-confirm')); return; }
+    // A while the salaryman is being walked to a stop (off the train, or after a tap) acts on that stop when he
+    // gets there, not on a stop he happens to pass on the way.
+    if (x.a === 'confirm' && target.current && gameRef.current.place.k === 'walk') { target.current.open = true; return; }
     const here = gameRef.current.place;
     if (x.a === 'confirm' && here.k === 'walk' && here.near && !reducedMotion()) {
       const act = stopOf(content, here.world, here.stop)?.action, door = stopOf(content, here.world, here.stop);
