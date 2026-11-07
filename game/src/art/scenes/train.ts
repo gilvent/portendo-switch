@@ -88,11 +88,9 @@ export function train(): Scene {
   ];
   const ads = [
     ...adFrame('ad-hello', -260, 220, `<rect width="220" height="64" fill="${SUN}"/><circle cx="34" cy="32" r="22" fill="${CREAM}"/><circle cx="34" cy="28" r="9" fill="#f3c9a0"/><path d="M22 26Q24 14 34 14Q44 14 46 24Q38 20 30 22Z" fill="#1d2228"/><path d="M20 50Q20 38 34 38Q48 38 48 50Z" fill="#2b3a55"/><text x="66" y="30" font-family="Fredoka" font-weight="600" font-size="17" fill="${INK}">Hey there!</text><rect x="66" y="38" width="120" height="6" rx="3" fill="${INK}" fill-opacity=".55"/><rect x="66" y="49" width="88" height="6" rx="3" fill="${INK}" fill-opacity=".35"/>`),
-    ...adFrame('ad-phone', -560, 130, `<rect width="130" height="64" fill="${BLUE}"/><rect x="14" y="10" width="26" height="46" rx="4" fill="#1d2228"/><rect x="17" y="14" width="20" height="36" fill="#bfe6f8"/><rect x="52" y="16" width="64" height="9" rx="4" fill="${CREAM}"/><rect x="52" y="32" width="44" height="7" rx="3" fill="${CREAM}" fill-opacity=".6"/>`),
-    ...adFrame('ad-coffee', 430, 130, `<rect width="130" height="64" fill="${MINT}"/><path d="M18 22H44V48Q44 56 36 56H26Q18 56 18 48Z" fill="${CREAM}"/><path d="M44 28Q54 28 54 36Q54 44 44 44" fill="none" stroke="${CREAM}" stroke-width="4"/><path d="M24 12Q28 16 24 20M34 12Q38 16 34 20" stroke="${CREAM}" stroke-width="2.4" fill="none"/><rect x="66" y="20" width="50" height="8" rx="4" fill="${CREAM}"/><rect x="66" y="34" width="36" height="7" rx="3" fill="${CREAM}" fill-opacity=".6"/>`),
   ];
   // The line map: one line, three named stations, the train's position, and a lamp that lights the chosen stop.
-  const lmX = 30, lmW = 250;
+  const lmX = 0, lmW = 250;
   const station = (k: number) => 30 + k * 95;
   const lineMap = adFrame('line-map', lmX, lmW, `<rect width="${lmW}" height="64" fill="#fbf7ee"/><rect width="${lmW}" height="12" fill="${DEEP}"/><rect x="6" y="3" width="40" height="6" rx="3" fill="${CREAM}"/><path d="M14 40H${lmW - 14}" stroke="${CORAL}" stroke-width="7" stroke-linecap="round"/>`
     + [0, 1, 2].map(k => `<circle cx="${station(k)}" cy="40" r="7" fill="#fff" stroke="${INK}" stroke-width="2.4"/><text x="${station(k)}" y="60" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="9" fill="${INK}">${STATIONS[k].name}</text>`).join('')
@@ -114,14 +112,16 @@ export function train(): Scene {
   const screen = (id: string, x: number): Panel => ({ id, stock: 'vellum', c: '#dff1f8', w: 64, h: 150, o: [x, 0, BACK], u: [0, 0, 1], v: [0, 1, 0], edge: 'cut', density: 2, mask: `<path fill-rule="evenodd" d="M0 0H64V150H0Z M8 8V142H56V8Z" fill="#fff"/>`, print: `<rect width="64" height="150" fill="${POLE}"/>` });
   const screens = [screen('screen-a', -404), screen('screen-b', -252), screen('screen-c', 252), screen('screen-d', 404)];
   // Grab poles at the door edges and the overhead rail with hanging straps. Poles meet the rail.
-  const RAIL_Y = 296, RAIL_Z = -62;
+  // The grab rail runs just under the cove, so it never crosses the signs printed there.
+  const RAIL_Y = 240, RAIL_Z = -62;
   const pole = (id: string, x: number, z: number): Panel[] => box({ id, x, z, w: 7, h: RAIL_Y, d: 7, stock: 'greyboard', c: POLE, front: `<rect x="1" width="2" height="${RAIL_Y}" fill="#fff" fill-opacity=".6"/>` }).filter(p => !/-(rear|under|top)$/.test(p.id));
   const poles = [...pole('pole-a', -330, -40), ...pole('pole-b', 330, -40), ...pole('pole-c', -252, BACK + 70), ...pole('pole-d', 252, BACK + 70)];
   // The overhead rail, its hangers and the hand straps, cut as one sheet: the train stands, so nothing swings.
   const strapXs = [-520, -460, -270, -205, -140, -75, 75, 140, 205, 270, 460, 520];
-  const SL = 104, RX0 = -W / 2 + 30, RW = W - 60, RT = CAR.COVE, RH = RT - (RAIL_Y - SL + 3), ry = (y: number) => RT - y;
+  const SL = 66, RX0 = -W / 2 + 30, RW = W - 60, RT = CAR.COVE, RH = RT - (RAIL_Y - SL + 3), ry = (y: number) => RT - y;
   const strapShape = (x: number) => { const l = x - RX0 - 10, t = ry(RAIL_Y + 3); return `M${l + 7} ${t}H${l + 13}V${t + SL - 34}H${l + 7}Z M${l + 5} ${t + SL - 36}H${l + 15}V${t + SL - 26}H${l + 5}Z M${l + 10} ${t + SL - 28}L${l + 20} ${t + SL - 12}Q${l + 20} ${t + SL} ${l + 10} ${t + SL}Q${l} ${t + SL} ${l} ${t + SL - 12}Z M${l + 10} ${t + SL - 21}L${l + 5} ${t + SL - 12}Q${l + 5} ${t + SL - 5} ${l + 10} ${t + SL - 5}Q${l + 15} ${t + SL - 5} ${l + 15} ${t + SL - 12}Z`; };
-  const hangerXs = [-480, -160, 160, 480];
+  // Hangers only in the gaps between the cove's signs.
+  const hangerXs = [-415, -20, 415];
   const overhead: Panel = { id: 'rail', stock: 'cover', c: POLE, w: RW, h: RH, o: [RX0, RT - RH, RAIL_Z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 2.4, split: 2,
     mask: `<rect y="${ry(RAIL_Y + 6)}" width="${RW}" height="6" fill="#fff"/>${hangerXs.map(x => `<rect x="${x - RX0 - 2.5}" y="0" width="5" height="${ry(RAIL_Y)}" fill="#fff"/>`).join('')}<path fill-rule="evenodd" d="${strapXs.map(strapShape).join(' ')}" fill="#fff"/>`,
     print: `<rect width="${RW}" height="${RH}" fill="${POLE}"/><rect y="${ry(RAIL_Y + 6)}" width="${RW}" height="2" fill="#fff" fill-opacity=".6"/>${strapXs.map(x => { const l = x - RX0 - 10, t = ry(RAIL_Y + 3), pri = x < -400; return `<rect x="${l}" y="${t}" width="20" height="${SL}" fill="${pri ? SUN : '#f4f6f8'}"/><rect x="${l + 7}" y="${t}" width="6" height="${SL - 34}" fill="${pri ? '#c9861f' : '#5d6670'}"/><rect x="${l + 5}" y="${t + SL - 36}" width="10" height="10" fill="${pri ? '#c9861f' : '#5d6670'}"/>`; }).join('')}` };

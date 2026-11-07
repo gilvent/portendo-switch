@@ -116,19 +116,39 @@ function backWall(): Panel[] {
   const adArt = (w: number, h: number, c: string, k: number) => `<rect width="${w - 16}" height="${h - 16}" fill="${c}"/><circle cx="${(w - 16) * .28}" cy="${(h - 16) / 2}" r="${(h - 16) * .3}" fill="${CREAM}" fill-opacity=".9"/>${k ? `<rect x="${(w - 16) * .2}" y="${(h - 16) * .3}" width="${(w - 16) * .16}" height="${(h - 16) * .4}" rx="6" fill="#1d2228"/>` : `<path d="M${(w - 16) * .2} ${(h - 16) * .4}h${(w - 16) * .16}v${(h - 16) * .22}q0 ${(h - 16) * .1} -10 ${(h - 16) * .1}h${-(w - 16) * .16 + 20}q-10 0 -10 -10z" fill="${CORAL}"/>`}<rect x="${(w - 16) * .5}" y="${(h - 16) * .3}" width="${(w - 16) * .4}" height="12" rx="6" fill="${CREAM}"/><rect x="${(w - 16) * .5}" y="${(h - 16) * .3 + 22}" width="${(w - 16) * .28}" height="9" rx="4.5" fill="${CREAM}" fill-opacity=".6"/><rect x="${(w - 16) * .5}" y="${(h - 16) * .62}" width="${(w - 16) * .22}" height="20" rx="10" fill="${SUN}"/>`;
   const relief = carved(wall, [
     // Over the roof: big lightboxes, a vent band, wall lights and the cable tray that runs the length of the wall.
-    ...lightbox('wall-ad-a', -620, 440, 260, 150, adArt(260, 150, CORAL, 0)),
-    ...lightbox('wall-ad-b', 40, 470, 300, 160, adArt(300, 160, DEEP, 1)),
-    ...B({ id: 'wall-exit-frame', x: (EX0 + EX1) / 2, z: z + 6, y: EY1, w: EX1 - EX0 + 40, h: 70, d: 12, stock: 'cover', c: SUN, front: `<rect width="${EX1 - EX0 + 40}" height="70" fill="${SUN}"/><path d="M24 35H70M58 21L72 35L58 49" stroke="${INK}" stroke-width="6" fill="none" stroke-linecap="round" transform="rotate(-30 47 35)"/><text x="92" y="46" font-family="Fredoka" font-weight="600" font-size="30" fill="${INK}">Exit &#183; Keluar</text>` }),
+    ...B({ id: 'wall-exit-frame', x: (EX0 + EX1) / 2, z: z + 6, y: EY1, w: EX1 - EX0 + 40, h: 70, d: 12, stock: 'cover', c: SUN, front: `<rect width="${EX1 - EX0 + 40}" height="70" fill="${SUN}"/><path d="M24 35H70M58 21L72 35L58 49" stroke="${INK}" stroke-width="6" fill="none" stroke-linecap="round" transform="rotate(-30 47 35)"/><text x="92" y="46" font-family="Fredoka" font-weight="600" font-size="30" fill="${INK}">Exit</text>` }),
     ...[EX0 - 14, EX1 + 14].flatMap((x, i) => B({ id: `wall-exit-jamb-${i}`, x, z: z + 6, y: EY0, w: 28, h: EY1 - EY0, d: 12, stock: 'cover', c: STAINLESS })),
     ...B({ id: 'wall-vent', x: -260, z: z + 3, y: 420, w: 240, h: 60, d: 5, stock: 'cover', c: STAINLESS, front: `<rect width="240" height="60" fill="${STAINLESS}"/>${Array.from({ length: 5 }, (_, r) => `<rect x="8" y="${8 + r * 10}" width="224" height="5" rx="2" fill="${STEEL}"/>`).join('')}` }),
-    ...[-1300, -620, -60, 400].flatMap((x, i) => B({ id: `wall-light-${i}`, x, z: z + 10, y: 640, w: 120, h: 16, d: 20, stock: 'cover', c: '#fffbea', front: `<rect width="120" height="16" rx="3" fill="#fffbea"/>` })),
+    ...[-1300, -60, 400].flatMap((x, i) => B({ id: `wall-light-${i}`, x, z: z + 10, y: 640, w: 120, h: 16, d: 20, stock: 'cover', c: '#fffbea', front: `<rect width="120" height="16" rx="3" fill="#fffbea"/>` })),
     ...B({ id: 'wall-tray', x: (X0 + X1) / 2, z: z + 14, y: 800, w: SPAN, h: 14, d: 28, stock: 'cover', c: '#8e959c', front: `<rect width="${SPAN}" height="14" fill="#8e959c"/>${Array.from({ length: SPAN / 30 }, (_, i) => `<rect x="${i * 30}" width="3" height="14" fill="#6c737a"/>`).join('')}`, top: `<rect width="${SPAN}" height="28" fill="#6c737a"/>${Array.from({ length: SPAN / 60 }, (_, i) => `<rect x="${i * 60}" y="${6 + (i % 3) * 5}" width="60" height="4" fill="${['#2b3037', '#c8392a', SUN][i % 3]}"/>`).join('')}` }),
     ...[-700, 300].flatMap((x, i) => B({ id: `wall-cam-${i}`, x, z: z + 10, y: 740, w: 26, h: 18, d: 20, stock: 'cover', c: '#f4f6f8', front: `<circle cx="13" cy="9" r="6" fill="${INK}"/>` }))
   ]).map(p => ({ ...p, behind: true, ...(p.id.startsWith('wall-tray') && !p.ghost ? { density: .6 } : {}) }));
+  // The network map, a framed board on the back wall above the name band: four lines, their interchanges, the three
+  // stations the line map can pick, and a legend. The "you are here" pin follows the line map.
+  const MX = -760, MY = 420, MW = 520, MH = 250, mx = (i: number) => 40 + i * 62, LY = 120;
+  const ns = ['Harbour', 'Old Town', STATIONS[0].name, 'Central', STATIONS[1].name, 'Riverside', STATIONS[2].name, 'Airport'];
+  const dot = (x: number, y: number, big = false) => `<circle cx="${x}" cy="${y}" r="${big ? 8 : 5.5}" fill="#fff" stroke="${INK}" stroke-width="${big ? 3 : 2.2}"/>`;
+  const label = (x: number, y: number, t: string, anchor = 'middle', size = 10) => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Fredoka" font-weight="600" font-size="${size}" fill="${INK}">${t}</text>`;
+  const mapArt = `<rect width="${MW}" height="${MH}" fill="${STEEL}"/><rect x="8" y="8" width="${MW - 16}" height="${MH - 16}" fill="#fbf7ee"/><rect x="8" y="8" width="${MW - 16}" height="28" fill="${TEAL_DEEP}"/>${label(22, 28, 'MRT Network', 'start', 15).replace(INK, '#fff')}${label(MW - 22, 28, 'Platform 1', 'end', 11).replace(INK, '#fff')}`
+    // North-South (the train's own line, coral), along the middle
+    + `<path d="M${mx(0)} ${LY}H${mx(7)}" stroke="${CORAL}" stroke-width="7" stroke-linecap="round"/>`
+    // East-West (blue), crossing at Central; Circle (teal), crossing at Riverside; the airport branch (sun) from the end
+    + `<path d="M${mx(3)} 52V${MH - 34}" stroke="${DEEP}" stroke-width="7" stroke-linecap="round"/>`
+    + `<path d="M${mx(5) - 70} ${MH - 40}Q${mx(5) - 40} ${LY} ${mx(5)} ${LY}Q${mx(5) + 50} ${LY} ${mx(5) + 60} 56" stroke="${TEAL}" stroke-width="7" fill="none" stroke-linecap="round"/>`
+    + `<path d="M${mx(7)} ${LY}L${mx(7) + 26} ${LY + 40}V${MH - 44}" stroke="${SUN}" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="1 0"/>`
+    + ns.map((n, i) => dot(mx(i), LY, i === 3 || i === 5) + label(mx(i), i % 2 ? LY + 26 : LY - 16, n)).join('')
+    + [[62, 'University'], [88, 'Museum'], [MH - 70, 'Stadium'], [MH - 44, 'Park']].map(([y, n]) => dot(mx(3), +y) + label(mx(3) + 12, +y + 4, `${n}`, 'start', 9)).join('')
+    + [[mx(5) - 52, MH - 66, 'Market'], [mx(5) + 50, 72, 'Hospital']].map(([x, y, n]) => dot(+x, +y) + label(+x + 10, +y + 4, `${n}`, 'start', 9)).join('')
+    + dot(mx(7) + 26, MH - 44) + label(mx(7) + 18, MH - 24, 'Terminal 2', 'middle', 9)
+    + [[CORAL, 'North-South'], [DEEP, 'East-West'], [TEAL, 'Circle'], [SUN, 'Airport']].map(([c, n], i) => `<rect x="${24 + i * 104}" y="${MH - 22}" width="22" height="7" rx="3" fill="${c}"/>${label(52 + i * 104, MH - 15, n, 'start', 9)}`).join('');
+  const netMap = carved(wall, B({ id: 'wall-network-map', x: MX, z: z + 6, y: MY, w: MW, h: MH, d: 10, stock: 'cover', c: STEEL, front: mapArt })).map(p => ({ ...p, behind: true }));
+  // "You are here": a coral ring around the station's dot, standing just off the board.
+  const pins = STATIONS.map((_, k): Panel => on(wall, 12, MX - MW / 2 + mx(2 + k * 2) - 13 - X0, MY - LOW + MH - LY - 13, 26, 26, { id: `wall-map-pin-${k}`, stock: 'cover', c: CORAL, density: 4, decal: undefined, behind: true, show: { toy: 'line', at: [k] },
+    mask: `<path fill-rule="evenodd" d="M13 0A13 13 0 1 1 13 26A13 13 0 1 1 13 0Z M13 5A8 8 0 1 0 13 21A8 8 0 1 0 13 5Z" fill="#fff"/>`, print: `<rect width="26" height="26" fill="${CORAL}"/>` }));
   // The station's name, repeated along the band: it follows the line map.
   const names = STATIONS.map((st, k): Panel => on(wall, 1.5, 0, 380 - LOW, SPAN, 34, { id: `wall-name-${k}`, stock: 'cover', c: TEAL_DEEP, density: 1, show: { toy: 'line', at: [k] }, decal: undefined, behind: true,
-    mask: Array.from({ length: Math.ceil(SPAN / 700) }, (_, i) => `<rect x="${i * 700 + 120}" y="0" width="300" height="34" rx="4" fill="#fff"/>`).join(''),
-    print: Array.from({ length: Math.ceil(SPAN / 700) }, (_, i) => `<rect x="${i * 700 + 120}" width="300" height="34" rx="4" fill="${TEAL_DEEP}"/><rect x="${i * 700 + 128}" y="6" width="22" height="22" rx="4" fill="${st.c}" stroke="${CREAM}" stroke-width="1.6"/><text x="${i * 700 + 280}" y="25" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="20" fill="#fff">${st.name}</text>`).join('') }));
+    mask: Array.from({ length: Math.ceil(SPAN / 1300) }, (_, i) => `<rect x="${i * 1300 + 520}" y="0" width="300" height="34" rx="4" fill="#fff"/>`).join(''),
+    print: Array.from({ length: Math.ceil(SPAN / 1300) }, (_, i) => `<rect x="${i * 1300 + 520}" width="300" height="34" rx="4" fill="${TEAL_DEEP}"/><rect x="${i * 1300 + 528}" y="6" width="22" height="22" rx="4" fill="${st.c}" stroke="${CREAM}" stroke-width="1.6"/><text x="${i * 1300 + 680}" y="25" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="20" fill="#fff">${st.name}</text>`).join('') }));
   const lowW = X1 - 560;
   const wallLow: Panel = { id: 'wall-low', stock: 'greyboard', c: CONCRETE, w: lowW, h: LOW, o: [560, 0, WALL], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: .7, behind: true,
     print: `<rect width="${lowW}" height="${LOW}" fill="${CONCRETE}"/>${specks(lowW, LOW, '#9d988e', 60, 2.6)}<rect y="${LOW - 26}" width="${lowW}" height="26" fill="#8f8a80"/>${[60, 120].map(y => `<rect y="${y}" width="${lowW}" height="1.6" fill="#a29d93"/>`).join('')}` };
@@ -136,7 +156,7 @@ function backWall(): Panel[] {
   const PW = EX1 - EX0 + 120, PH = EY1 - EY0 + 60;
   const passage: Panel = { id: 'exit-passage', stock: 'cover', c: '#e9e2d4', w: PW, h: PH, o: [EX0 - 60, EY0 - 10, WALL - 240], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1, behind: true, emit: .25,
     print: `<rect width="${PW}" height="${PH}" fill="#e9e2d4"/><rect width="${PW}" height="50" fill="#a7adb4"/>${[0, 1, 2].map(i => `<rect x="${40 + i * 120}" y="18" width="90" height="10" rx="5" fill="#fffbea"/>`).join('')}${Array.from({ length: 9 }, (_, i) => `<rect x="${60 + i * 6}" y="${PH - 30 - i * 20}" width="${PW - 120 - i * 12}" height="12" fill="#9aa3ad"/>`).join('')}<circle cx="${PW * .42}" cy="${PH - 190}" r="12" fill="${SKIN[1]}"/><rect x="${PW * .42 - 16}" y="${PH - 176}" width="32" height="54" rx="8" fill="${CORAL}"/><circle cx="${PW * .6}" cy="${PH - 220}" r="11" fill="${SKIN[2]}"/><rect x="${PW * .6 - 15}" y="${PH - 207}" width="30" height="50" rx="8" fill="${DEEP}"/>` };
-  return [wall, wallLow, ...relief, ...names, passage];
+  return [wall, wallLow, ...relief, ...netMap, ...pins, ...names, passage];
 }
 
 // The escalator up to the exit, rising to the right onto a deck along the back wall; the wall under the escalator
@@ -174,11 +194,9 @@ function escalator(): Panel[] {
   ];
   const wz = z + 1, B = (spec: Parameters<typeof box>[0]) => box(spec);
   const relief = carved(core, [
-    // Low, beside the escalator's foot: the "up" sign, the AED and the station map.
+    // Low, beside the escalator's foot: the "up" sign and the AED.
     ...B({ id: 'core-up', x: -330, z: wz + 4, y: 60, w: 70, h: 40, d: 6, stock: 'cover', c: TEAL, front: `<rect width="70" height="40" rx="5" fill="${TEAL}"/><path d="M14 30L30 12L46 30" stroke="#fff" stroke-width="5" fill="none"/><rect x="50" y="10" width="10" height="20" fill="#fff"/>` }),
     ...B({ id: 'core-aed', x: -150, z: wz + 9, y: 40, w: 40, h: 48, d: 18, stock: 'cover', c: '#f4f6f8', front: `<rect width="40" height="48" rx="3" fill="#f4f6f8"/><rect x="4" y="4" width="32" height="40" rx="2" fill="none" stroke="${TEAL}" stroke-width="2"/><path d="M20 32L10 22Q6 16 12 12Q17 10 20 15Q23 10 28 12Q34 16 30 22Z" fill="${TEAL}"/>` }),
-    ...B({ id: 'core-map', x: 20, z: wz + 3, y: 50, w: 150, h: 104, d: 6, stock: 'cover', c: '#fbf7ee',
-      front: `<rect width="150" height="104" fill="${STEEL}"/><rect x="5" y="5" width="140" height="94" fill="#fbf7ee"/><rect x="5" y="5" width="140" height="16" fill="${TEAL_DEEP}"/><path d="M18 64H132" stroke="${CORAL}" stroke-width="6" stroke-linecap="round"/>${[0, 1, 2, 3].map(i => `<circle cx="${24 + i * 34}" cy="64" r="6" fill="#fff" stroke="${INK}" stroke-width="2"/>`).join('')}` }),
     ...B({ id: 'core-fire', x: 170, z: wz + 12, y: 16, w: 74, h: 140, d: 24, stock: 'cover', c: '#c8392a', front: `<rect width="74" height="140" fill="#c8392a"/><rect x="7" y="9" width="60" height="94" rx="3" fill="#f3d6cf"/><g fill="none" stroke="#a52a1e" stroke-width="3">${[22, 17, 12].map(r => `<ellipse cx="37" cy="54" rx="${r}" ry="${r * .9}"/>`).join('')}</g><path d="M37 76V96H56" stroke="${INK}" stroke-width="4" fill="none"/><rect x="10" y="112" width="54" height="18" rx="2" fill="#fbf7ee"/>` }),
     ...B({ id: 'core-door-frame', x: 320, z: wz + 2, y: 0, w: 116, h: 214, d: 4, stock: 'cover', c: STAINLESS }),
     ...B({ id: 'core-door', x: 320, z: wz + 5, y: 0, w: 98, h: 204, d: 3, stock: 'cover', c: '#9aa3ad', front: `<rect width="98" height="204" fill="#9aa3ad"/><rect x="80" y="100" width="8" height="26" rx="3" fill="${STEEL}"/><rect x="20" y="40" width="58" height="22" rx="3" fill="${SUN}"/><rect x="26" y="48" width="46" height="5" fill="${INK}"/>` }),
@@ -186,8 +204,6 @@ function escalator(): Panel[] {
     ...B({ id: 'core-office', x: 640, z: wz + 4, y: 60, w: 200, h: 150, d: 6, stock: 'cover', c: STAINLESS, front: `<rect width="200" height="150" fill="${STAINLESS}"/><rect x="10" y="10" width="180" height="96" fill="#bfe0ea"/><rect x="10" y="10" width="180" height="96" fill="#fff" fill-opacity=".25"/><circle cx="100" cy="64" r="16" fill="${SKIN[0]}"/><rect x="80" y="80" width="40" height="26" rx="8" fill="${TEAL}"/><rect x="40" y="118" width="120" height="20" rx="4" fill="${TEAL_DEEP}"/><rect x="52" y="124" width="96" height="7" rx="3" fill="#fff"/>` }),
     ...B({ id: 'core-counter', x: 640, z: wz + 16, y: 60, w: 210, h: 10, d: 30, stock: 'cover', c: STEEL, top: `<rect width="210" height="30" fill="#8e959c"/>` }),
     ...B({ id: 'core-topup', x: 820, z: wz + 22, y: 0, w: 92, h: 168, d: 44, stock: 'cover', c: '#e9eef2', front: `<rect width="92" height="168" fill="#e9eef2"/><rect width="92" height="22" fill="${TEAL}"/><rect x="12" y="34" width="68" height="48" rx="4" fill="#14171b"/><rect x="16" y="38" width="60" height="40" fill="#5ec3a6"/><rect x="18" y="94" width="24" height="16" rx="3" fill="${STEEL}"/><rect x="26" y="128" width="40" height="12" rx="3" fill="${INK}"/>`, left: `<rect width="44" height="168" fill="#d6dde3"/>`, top: `<rect width="92" height="44" fill="#d6dde3"/>` }),
-    // High on the deck's fascia, over the roof: a big lightbox.
-    ...B({ id: 'core-ad-high', x: 680, z: wz + 8, y: 300, w: 300, h: 150, d: 12, stock: 'cover', c: STEEL, front: `<rect width="300" height="150" fill="${STEEL}"/><rect x="8" y="8" width="284" height="134" fill="${CORAL}"/><circle cx="70" cy="75" r="44" fill="${CREAM}"/><path d="M52 60H88V92Q88 102 78 102H62Q52 102 52 92Z" fill="${SUN}"/><rect x="134" y="44" width="140" height="16" rx="8" fill="${CREAM}"/><rect x="134" y="72" width="100" height="10" rx="5" fill="${CREAM}" fill-opacity=".6"/><rect x="134" y="98" width="70" height="22" rx="11" fill="${SUN}"/>` }),
   ]);
   return [core, ...relief, ...glass, steps, deck, ...riders];
 }
@@ -287,16 +303,17 @@ function signs(): Panel[] {
     print: `<rect width="${nameW}" height="${h}" fill="${TEAL_DEEP}"/><rect x="4" y="4" width="${nameW - 8}" height="${h - 8}" fill="none" stroke="${CREAM}" stroke-width="1.6"/><rect x="14" y="12" width="30" height="30" rx="6" fill="${st.c}" stroke="${CREAM}" stroke-width="2"/><text x="${nameW / 2 + 20}" y="37" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="26" fill="#fff">${st.name}</text>` }));
   const lid: Panel = { id: 'sign-name-top', stock: 'cover', c: STEEL, w: nameW, h: 30, o: [nx, y + h, z], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1 };
   const exitW = 260, exx = 180;
-  const exit: Panel[] = box({ id: 'sign-exit', x: exx + exitW / 2, z: z - 15, y, w: exitW, h, d: 30, stock: 'cover', c: SUN,
-    front: `<rect width="${exitW}" height="${h}" fill="${SUN}"/><path d="M18 27H50M38 15L50 27L38 39" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-35 34 27)"/><text x="72" y="36" font-family="Fredoka" font-weight="600" font-size="24" fill="${INK}">Exit &#183; Keluar</text>` }).filter(p => /front/.test(p.id)).map(p => ({ ...p, density: 2.2 }));
+  const exitUnused: Panel[] = box({ id: 'sign-exit', x: exx + exitW / 2, z: z - 15, y, w: exitW, h, d: 30, stock: 'cover', c: SUN,
+    front: `<rect width="${exitW}" height="${h}" fill="${SUN}"/><path d="M18 27H50M38 15L50 27L38 39" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-35 34 27)"/><text x="72" y="36" font-family="Fredoka" font-weight="600" font-size="24" fill="${INK}">Exit</text>` }).filter(p => /front/.test(p.id)).map(p => ({ ...p, density: 2.2 }));
   const ledW = 230, lx = 640;
   const led: Panel[] = box({ id: 'sign-led', x: lx + ledW / 2, z: z - 15, y: y + 4, w: ledW, h: h - 8, d: 26, stock: 'cover', c: '#14171b',
     front: `<rect width="${ledW}" height="${h - 8}" rx="4" fill="#14171b"/><rect x="6" y="6" width="${ledW - 12}" height="${h - 20}" fill="#221a0e"/><rect x="14" y="14" width="26" height="18" rx="3" fill="#ffb648"/><rect x="50" y="15" width="100" height="6" rx="3" fill="#ffb648"/><rect x="50" y="26" width="70" height="5" rx="2" fill="#ffb648" fill-opacity=".6"/><rect x="${ledW - 50}" y="13" width="34" height="20" rx="3" fill="none" stroke="#ffb648" stroke-width="2"/>` }).filter(p => /front|top/.test(p.id));
   const rodW = lx + ledW - nx, rodH = TOP - y - h + 6;
   const rodSheet: Panel = { id: 'sign-rods', stock: 'greyboard', c: STEEL, w: rodW, h: rodH, o: [nx, y + h - 6, z - 12], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .6,
-    mask: [nx + 16, nx + nameW - 22, exx + 16, exx + exitW - 22, lx + 16, lx + ledW - 22].map(x => `<rect x="${x - nx}" width="6" height="${rodH}" fill="#fff"/>`).join('') };
+    mask: [nx + 16, nx + nameW - 22, lx + 16, lx + ledW - 22].map(x => `<rect x="${x - nx}" width="6" height="${rodH}" fill="#fff"/>`).join('') };
   void rods;
-  return [...name, lid, rodSheet, ...exit, ...led];
+  void exitUnused;
+  return [...name, lid, rodSheet, ...led];
 }
 
 export function station(): { panels: Panel[]; lamps: Lamp[] } {

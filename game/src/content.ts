@@ -20,7 +20,7 @@ export const content: Content = validateContent({ worlds: {
     stops: [
       { id: 'intercom', label: 'Intercom', x: -440, z: -50, focus: 1.5, look: -400, action: { kind: 'letter', letter: 'contact' } },
       { id: 'ad', label: 'Ad poster', x: -150, z: -40, action: { kind: 'letter', letter: 'hello' } },
-      { id: 'line-map', label: 'Line map', x: 120, z: -50, focus: 1.6, look: 170, action: { kind: 'toy', toy: 'line', states: 3 } },
+      { id: 'line-map', label: 'Line map', x: 120, z: -50, focus: 1.6, look: 130, action: { kind: 'toy', toy: 'line', states: 3 } },
       { id: 'door', label: 'Doors', x: 330, z: -56, reach: 110, action: { kind: 'ride', toy: 'line', to: [
         { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' }, { world: 'radjastone', stop: 'quarry', label: 'Radjastone' }] } } ],
     letters: [
