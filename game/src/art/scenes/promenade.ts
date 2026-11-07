@@ -1,4 +1,4 @@
-import { add, box, carved, cross, normal, unit, yaw, type Panel, type V3 } from '../kit.ts';
+import { add, box, carved, cross, normal, on, unit, yaw, type Panel, type V3 } from '../kit.ts';
 import { BLUE, CORAL, CREAM, DEEP, INK, SUN } from '../recipes.ts';
 
 // The Blibli street is a riverside shopping promenade: a brick plaza closed by shops on three sides, with the river
@@ -93,7 +93,7 @@ function boats(): Panel[] {
     `<rect width="230" height="7" fill="${CREAM}"/>${[0, 1, 2, 3].map(k => `<circle cx="${50 + k * 40}" cy="18" r="5" fill="${CREAM}" fill-opacity=".9"/>`).join('')}`, 'cover', bx, 230);
   return [cabin, hull];
 }
-// The far bank, back to front: the palest row of towers, a middle row, trees, the waterfront shops, the quay wall with
+// The far bank, back to front: a middle row, trees, the waterfront shops, the quay wall with
 // a footbridge, and the water lapping in front.
 function farLayers(): Panel[] {
   s = 17;
@@ -117,9 +117,10 @@ function farLayers(): Panel[] {
     if (k < .55) return { m: `<rect x="${f(cx - 9)}" y="${f(top - 16)}" width="18" height="16" fill="#fff"/>`, p: `<rect x="${f(cx - 9)}" y="${f(top - 16)}" width="18" height="16" fill="#c9d9de"/>` };
     return { m: '', p: '' };
   });
-  // The card itself is the back row, with pale water below the far quay.
+  // The card itself is only pale water below the far quay: the city rows behind already give the distance, so the
+  // back row's towers stay uncut and only set the card's height.
   const backWater = `<rect y="${back.H - quay}" width="${W}" height="${quay}" fill="#fff"/>`;
-  const card: Panel = { id: FAR.id, stock: 'sugar', c: '#d6e6ea', w: W, h: back.H, o: [FAR.x0, y0, FAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR.density, split: 2, mask: back.mask + backWater, print: back.print + `<rect y="${back.H - quay}" width="${W}" height="${quay}" fill="#b9e0f2"/>` };
+  const card: Panel = { id: FAR.id, stock: 'sugar', c: '#d6e6ea', w: W, h: back.H, o: [FAR.x0, y0, FAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR.density, split: 2, mask: backWater, print: `<rect y="${back.H - quay}" width="${W}" height="${quay}" fill="#b9e0f2"/>` };
   // Middle row: offices and flats in soft mid tones, some with stepped tops.
   const mid = row('far-mid', 44, 58, 104, 70, 150, ['#a9c3cf', '#b8c9b4', '#cdbba8', '#adbdd6'], '#f1e6c9', '#98aeb9', .25, (x, top, bw) => {
     if (r(0, 1) > .4) return { m: '', p: '' };
@@ -242,10 +243,13 @@ export function planter(id: string, x: number, z: number, w: number, h = 40): Pa
   const tiles = (len: number) => `<rect width="${len}" height="${h}" fill="${TILE}"/>${Array.from({ length: Math.ceil(len / 20) }, (_, i) => `<rect x="${i * 20 + 1}" y="1" width="18" height="${h / 2 - 2}" fill="#4f5e70"/><rect x="${i * 20 + 11}" y="${h / 2 + 1}" width="18" height="${h / 2 - 2}" fill="#4f5e70"/>`).join('')}<rect width="${len}" height="5" fill="#c9ccd1"/>`;
   return box({ id, x, z, w, h, d: w, stock: 'cover', c: TILE, front: tiles(w), left: tiles(w), right: tiles(w), top: `<rect width="${w}" height="${w}" fill="#c9ccd1"/><rect x="7" y="7" width="${w - 14}" height="${w - 14}" fill="#6b4a33"/>${Array.from({ length: 8 }, (_, i) => `<circle cx="${12 + (i * 37) % (w - 24)}" cy="${12 + (i * 23) % (w - 24)}" r="2.5" fill="#d9cbbb"/>`).join('')}` });
 }
-// A low bush cut from two scalloped sheets, one in front of the other.
+// A low bush: a back sheet of scalloped leaves with a darker front cluster and a pale top cluster glued on a little
+// proud of it, so each layer throws a shadow on the one behind.
 export function bush(id: string, x: number, z: number, w: number, h: number, y = 0): Panel[] {
-  return [0].map((k): Panel => ({ id: `${id}-${k}`, stock: 'sugar', c: k ? LEAF : FROND, w: w * (k ? .8 : 1), h: h * (k ? .75 : 1), o: [x - w * (k ? .32 : .5), y, z + k * 10], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.4,
-    mask: `<path d="${scallopBlob(w * (k ? .8 : 1), h * (k ? .75 : 1) * 1.6, 9)}" fill="#fff"/>`, print: `<path transform="translate(0 6)" d="${scallopBlob(w * (k ? .8 : 1), h * (k ? .75 : 1) * 1.6, 7)}" fill="${FROND_DARK}" fill-opacity=".6"/><path transform="translate(${f(w * .15)} ${f(h * .3)}) scale(.7)" d="${scallopBlob(w, h * 1.6, 7)}" fill="${LEAF}"/>` }));
+  const back: Panel = { id: `${id}-0`, stock: 'sugar', c: FROND, w, h, o: [x - w / 2, y, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.4, mask: `<path d="${scallopBlob(w, h * 1.6, 9)}" fill="#fff"/>` };
+  const front = on(back, 6, w * .04, 0, w * .62, h * .62, { id: `${id}-1`, stock: 'sugar', c: FROND_DARK, mask: `<path d="${scallopBlob(w * .62, h * .62 * 1.6, 7)}" fill="#fff"/>` });
+  const top = on(back, 10, w * .4, h * .3, w * .5, h * .5, { id: `${id}-2`, stock: 'sugar', c: LEAF, mask: `<path d="${scallopBlob(w * .5, h * .5 * 1.6, 6)}" fill="#fff"/>` });
+  return [back, front, top];
 }
 // A string of festoon lights between two anchors at the same height.
 export function festoon(id: string, a: V3, b: V3, sag: number, every = 46): Panel {
@@ -382,4 +386,89 @@ export function bench(id: string, x: number, z: number, w = 160, rot = 0): Panel
     { id: `${id}-back`, stock: 'greyboard', c: '#8a5530', w, h: 40, o: at(-w / 2, 50, -20), u: R([1, 0, 0]), v: unit([0, 1, -.2]), edge: 'fold', density: 1.6, print: slats(3, 40) },
     ...[-1, 1].map((k): Panel => ({ id: `${id}-leg${k}`, stock: 'greyboard', c: '#2b2f36', w: 30, h: 70, o: at(k * (w / 2 - 20) - 15, 0, 18), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.8, mask: '<path d="M2 70V44H0V36H30V44H28V70H22V44H8V70Z M4 36V0H10V36Z" fill="#fff"/>' }))
   ];
+}
+
+/* ---------- vehicles: folded bodies with cut pieces glued on ---------- */
+// A piece in an object's own frame (x along it, y up, z across toward its near side), turned by the object's yaw.
+const piece = (x: number, z: number, rot: number) => {
+  const R = yaw(rot);
+  return (id: string, o: V3, u: V3, v: V3, w: number, h: number, rest: Partial<Panel> & Pick<Panel, 'stock' | 'c'>): Panel =>
+    ({ id, o: add([x, 0, z], R(o)), u: R(u), v: R(v), w, h, edge: 'cut', density: 1.8, ...rest });
+};
+const disc = (r: number) => `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>`;
+// A straight strip of card from one point to another, with rounded ends: a tube or a spoke cut as one shape.
+const bar = (x1: number, y1: number, x2: number, y2: number, w: number) => {
+  const l = Math.hypot(x2 - x1, y2 - y1) || 1, nx = -(y2 - y1) / l * w / 2, ny = (x2 - x1) / l * w / 2;
+  return `<path d="M${f(x1 + nx)} ${f(y1 + ny)}L${f(x2 + nx)} ${f(y2 + ny)}L${f(x2 - nx)} ${f(y2 - ny)}L${f(x1 - nx)} ${f(y1 - ny)}Z" fill="#fff"/><circle cx="${f(x1)}" cy="${f(y1)}" r="${f(w / 2)}" fill="#fff"/><circle cx="${f(x2)}" cy="${f(y2)}" r="${f(w / 2)}" fill="#fff"/>`;
+};
+// A courier's scooter: two wheels with a pale rim and hub glued on, a floorboard folded down into its skirt, the rear
+// cowl folded like a tent with the seat, a stripe and a tail lamp glued to it, a leg shield with the handlebar and
+// headlamp, and the cargo box folded on the rack. Detail comes from tones of the same blue, never outlines.
+export function scooter(id: string, x: number, z: number, rot: number): Panel[] {
+  const P = piece(x, z, rot), R = 21, TYRE = '#2b2f36', B2 = '#0a6aa8', B3 = '#46b3ea';
+  const wheel = (k: string, cx: number) => {
+    const w = P(`${id}-wheel-${k}`, [cx - R, 0, 0], [1, 0, 0], [0, 1, 0], 2 * R, 2 * R, { stock: 'greyboard', c: TYRE, mask: disc(R) });
+    return [w, on(w, 1.2, R - 13, R - 13, 26, 26, { id: `${id}-rim-${k}`, stock: 'cover', c: '#4a515c', mask: disc(13) }), on(w, 2.4, R - 6, R - 6, 12, 12, { id: `${id}-hub-${k}`, stock: 'cover', c: '#c9ccd1', mask: disc(6) })];
+  };
+  const deck = P(`${id}-deck`, [-26, 26, 15], [1, 0, 0], [0, 0, -1], 68, 30, { stock: 'cover', c: B2, edge: 'fold', print: Array.from({ length: 6 }, (_, i) => `<rect x="${6 + i * 10}" y="5" width="5" height="20" fill="#085890"/>`).join('') });
+  const skirt = P(`${id}-skirt`, [-26, 14, 15], [1, 0, 0], [0, 1, 0], 68, 12, { stock: 'cover', c: BLUE, edge: 'fold' });
+  // The cowl's near side, folded up to a ridge over the middle.
+  const ch = Math.hypot(46, 17), cowl = P(`${id}-cowl`, [-84, 26, 17], [1, 0, 0], unit([0, 46, -17]), 66, ch, { stock: 'cover', c: BLUE, edge: 'fold',
+    mask: `<path d="M6 ${f(ch)}H66L58 0H14Q0 4 0 22Z" fill="#fff"/>` });
+  const cowlBits = [
+    on(cowl, 1, 12, ch - 14, 50, 14, { id: `${id}-seat`, stock: 'cover', c: '#23272d', mask: '<path d="M0 14Q2 0 14 0H50V8Q30 14 0 14Z" fill="#fff"/>' }),
+    on(cowl, 1, 4, 12, 60, 9, { id: `${id}-stripe`, stock: 'cover', c: B3, mask: '<path d="M0 9Q20 0 60 0V9Z" fill="#fff"/>' }),
+    on(cowl, 1.6, 1, 22, 9, 12, { id: `${id}-tail`, stock: 'vellum', c: CORAL, emit: .4, mask: '<rect width="9" height="12" rx="3" fill="#fff"/>' })];
+  // The leg shield rises from the front of the floorboard and leans back to the handlebar.
+  const sh = 74, shield = P(`${id}-shield`, [40, 22, 26], [0, 0, -1], unit([-.28, 1, 0]), 52, sh, { stock: 'cover', c: BLUE,
+    mask: `<path d="M4 ${sh}Q2 34 14 14H38Q50 34 48 ${sh}Z M0 0H52V7H0Z M20 7H32V16H20Z" fill="#fff"/>` });
+  const shieldBits = [
+    on(shield, 1, 0, sh - 7, 9, 7, { id: `${id}-grip-l`, stock: 'cover', c: '#23272d' }), on(shield, 1, 43, sh - 7, 9, 7, { id: `${id}-grip-r`, stock: 'cover', c: '#23272d' }),
+    on(shield, 1.4, 19, sh - 32, 14, 14, { id: `${id}-lamp`, stock: 'vellum', c: '#fff4e2', emit: .5, mask: disc(7) }),
+    on(shield, 1, 10, 4, 20, 34, { id: `${id}-shine`, stock: 'cover', c: B3, mask: '<path d="M2 30Q0 12 6 0H10Q6 14 8 30Z" fill="#fff"/>' })];
+  const c = add([x, 0, z], yaw(rot)([-52, 0, 0]));
+  const cargo = box({ id: `${id}-cargo`, x: c[0], z: c[2], y: 70, w: 48, h: 40, d: 42, rot, stock: 'cover', c: CORAL,
+    front: `<rect y="14" width="48" height="7" fill="${CREAM}"/><rect width="48" height="5" fill="#c43f1e"/>`, right: `<rect y="14" width="42" height="7" fill="${CREAM}"/><rect width="42" height="5" fill="#c43f1e"/>`,
+    top: `<rect width="48" height="42" fill="#f06a43"/><rect y="20" width="48" height="2" fill="#c43f1e"/>` });
+  return [...wheel('r', -54), ...wheel('f', 56), deck, skirt, cowl, ...cowlBits, shield, ...shieldBits, ...cargo];
+}
+// A town bicycle: spoked wheels cut as rings, the frame a second sheet standing proud of them with the saddle, grips and
+// chainring glued on, and a folded kraft basket on the front carrying a parcel.
+export function bicycle(id: string, x: number, z: number, rot: number, c: string): Panel[] {
+  const P = piece(x, z, rot), R = 25;
+  const ring = `<path fill-rule="evenodd" d="M0 ${R}a${R} ${R} 0 1 0 ${2 * R} 0a${R} ${R} 0 1 0 ${-2 * R} 0Z M5 ${R}a${R - 5} ${R - 5} 0 1 0 ${2 * R - 10} 0a${R - 5} ${R - 5} 0 1 0 ${-2 * R + 10} 0Z" fill="#fff"/>`
+    + Array.from({ length: 8 }, (_, i) => bar(R, R, R + Math.cos(i * Math.PI / 4) * (R - 4), R + Math.sin(i * Math.PI / 4) * (R - 4), 1.6)).join('') + `<circle cx="${R}" cy="${R}" r="4" fill="#fff"/>`;
+  const wheel = (k: string, cx: number) => P(`${id}-wheel-${k}`, [cx - R, 0, 0], [1, 0, 0], [0, 1, 0], 2 * R, 2 * R, { stock: 'greyboard', c: '#2b2f36', mask: ring,
+    print: `<circle cx="${R}" cy="${R}" r="${R - 3.5}" fill="none" stroke="#6b7480" stroke-width="2.4"/><circle cx="${R}" cy="${R}" r="4" fill="#c9ccd1"/>` });
+  // Frame: rear hub (12,R), bottom bracket (46,R), seat cluster (36,64), head (78,62), front hub (98,R) in a 112 x 80 sheet.
+  const W = 112, H = 80, yy = (v: number) => H - v, tube = (pts: [number, number][], w = 5) => pts.slice(1).map(([a, b], i) => bar(pts[i][0], yy(pts[i][1]), a, yy(b), w)).join('');
+  const frameMask = tube([[12, R], [46, R], [36, 66], [12, R]]) + tube([[46, R], [78, 60]]) + tube([[36, 62], [78, 62]]) + tube([[78, 64], [98, R]], 4) + tube([[36, 66], [33, 74]], 4) + tube([[78, 62], [76, 74], [70, 76]], 4);
+  const frame = P(`${id}-frame`, [-56 + 6, 0, 3], [1, 0, 0], [0, 1, 0], W, H, { stock: 'sugar', c, mask: frameMask });
+  const bits = [
+    on(frame, 1, 24, yy(74) - 6 + 2, 18, 7, { id: `${id}-saddle`, stock: 'cover', c: '#23272d', mask: '<path d="M0 3Q0 0 6 0H18Q14 7 4 7Q0 7 0 3Z" fill="#fff"/>' }),
+    on(frame, 1, 64, yy(76) - 3, 10, 6, { id: `${id}-grip`, stock: 'cover', c: '#23272d' }),
+    on(frame, 1, 46 - 8, yy(R) - 8, 16, 16, { id: `${id}-chainring`, stock: 'cover', c: '#9aa3ad', mask: disc(8) }),
+    on(frame, 1.2, 46 - 3, yy(R) - 3, 6, 6, { id: `${id}-crank`, stock: 'cover', c: '#3d444e', mask: disc(3) })];
+  const bc = add([x, 0, z], yaw(rot)([30, 0, 3]));
+  const basket = box({ id: `${id}-basket`, x: bc[0], z: bc[2], y: 50, w: 26, h: 18, d: 22, rot, stock: 'kraft', c: '#b98450',
+    front: `${Array.from({ length: 5 }, (_, i) => `<rect x="${2 + i * 5}" width="2.4" height="18" fill="#9a6a3a"/>`).join('')}<rect width="26" height="3" fill="#8a5a30"/>`,
+    right: `${Array.from({ length: 4 }, (_, i) => `<rect x="${2 + i * 5}" width="2.4" height="18" fill="#9a6a3a"/>`).join('')}<rect width="22" height="3" fill="#8a5a30"/>`,
+    top: `<rect x="3" y="3" width="20" height="16" fill="#6e4a2a"/><rect x="6" y="5" width="13" height="10" fill="#c89a62"/><rect x="11" y="5" width="3" height="10" fill="#e9d2a8"/>` });
+  return [wheel('r', -44), wheel('f', 42), frame, ...bits, ...basket];
+}
+// A pigeon folded like a tent along its back, the way a paper fox is: the near side carries the wing, the neck's sheen,
+// the eye and beak as cut pieces glued on in tones of the same grey. The far side completes the fold for the light.
+export function pigeon(id: string, x: number, z: number, rot: number, c: string, flip = false): Panel[] {
+  const P = piece(x, z, rot), L = 34, H = 24, t = 6;
+  const sx = (v: number) => (flip ? L - v : v);
+  const body = `<path d="M${sx(2)} 15Q${sx(4)} 8 ${sx(13)} 9L${sx(19)} 3Q${sx(25)} 0 ${sx(28)} 4L${sx(33)} 6L${sx(28)} 8Q${sx(28)} 17 ${sx(19)} 20L${sx(21)} 24H${sx(17)}L${sx(15)} 20Q${sx(7)} 20 ${sx(2)} 15Z M${sx(0)} 13L${sx(7)} 12L${sx(6)} 16Z" fill="#fff"/>`;
+  const v = unit([0, H, -t]), h = Math.hypot(H, t);
+  const near = P(`${id}-near`, [0, 0, t], [1, 0, 0], v, L, h, { stock: 'sugar', c, density: 3, mask: body, edge: 'fold' });
+  const far = { ...P(`${id}-far`, [L, 0, -t], [-1, 0, 0], unit([0, H, t]), L, h, { stock: 'sugar', c, density: 1, mask: body }), ghost: true };
+  const g = (k: string, gap: number, px: number, py: number, w: number, hh: number, col: string, m: string) => on(near, gap, flip ? L - px - w : px, py, w, hh, { id: `${id}-${k}`, stock: 'sugar', c: col, density: 3, mask: flip ? `<g transform="translate(${w} 0) scale(-1 1)">${m}</g>` : m });
+  return [near, far,
+    g('wing', .8, 6, 7, 18, 9, '#7d8693', '<path d="M0 6Q8 -2 18 2Q12 9 0 9Z" fill="#fff"/>'),
+    g('sheen', .8, 17, 9, 9, 8, '#5f9b8a', '<path d="M0 8Q2 0 9 1Q8 7 4 8Z" fill="#fff"/>'),
+    g('eye', 1.2, 24, 17, 3, 3, '#e8752d', '<circle cx="1.5" cy="1.5" r="1.5" fill="#fff"/>'),
+    g('beak', 1, 28, 16, 5, 3, '#3d444e', '<path d="M0 0L5 1.5L0 3Z" fill="#fff"/>')];
 }
