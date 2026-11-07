@@ -111,11 +111,17 @@ Stops carry `focus` and `look`: the camera leans in on the object being used whi
 
 ### Moperty: the downtown block
 
-The Moperty space (`src/art/scenes/downtown.ts`) is a city block at golden hour, after a layered paper street-diorama reference: tall brick buildings framing the street, one avenue cutting back into a pale skyline, cabs, lit windows and fire escapes. Moperty is a property marketplace, so the whole block is its catalogue: every listing carries a For Sale or For Rent poster with the Moperty mark.
+The Moperty space (`src/art/scenes/downtown.ts`) is a small low-rise block at dusk, after a layered paper shadow-box of a city street: the walkable pavement runs along the block, and on its left the street crosses an avenue that runs back between rows of tall towers. Moperty is a property marketplace, so the block is its catalogue: every listing carries a For Sale or For Rent poster with the Moperty mark.
 
-- **The office is the logo.** Two gabled towers in indigo and lavender, the small white house in front as the entrance, each logo window cut through and lit in the logo's yellow. The name sits on a low stone sign at the foot of the indigo tower.
-- **Listings are part of the street.** The west tenement and the corner block have rooms for rent; the brownstone and the new build on the lot are for sale. A van is unloading at the corner block: someone has just moved into a rental.
-- **One building design** (`building`) makes all three neighbours: brick, storeys, columns, a shop or a stoop at street level, and carved sills, cornice, AC units, flower boxes and fire escapes with washing and pot plants.
+- **The sales gallery is the logo, built as two buildings joined into one.** The indigo and the lavender house keep their gables and the big yellow logo windows; the white house between them is the entrance. Each colour has three tones: deep for structure (mullions, awnings, balconettes, plinth), base for the boarded walls, light for trim (pilasters, string course, cornice, window surrounds, roundels). The ground floor is a lit gallery of house models on plinths.
+- **The block is small; the city is big.** The tenement, the café, the gallery, the brownstone and the corner shop are three to four storeys. The tall towers stand behind them in the CSS backdrop and down the avenue.
+- **The avenue is a carved shadow box.** Seven depths of tower rows flank the road, paler and taller with distance. The left row's avenue faces turn toward the camera, cars and lamps recede between the rows, a spire closes the view and folded paper cranes fly across. Every piece is real in the bake, so each layer shades the next, and then it is all painted onto one card along the camera's rays: one quad.
+- **Freestanding pieces are folded and glued.**
+  - Trees are a forked trunk card with a crown of two scalloped cards slotted together, plus a cluster glued proud. Topiaries use the same slot pair.
+  - The water tank is a hexagonal drum of staves with a three-gore cap on a cut stand.
+  - The taxi and the van are box folds with their wheels glued on.
+  - People are a toned body card with the near arm and whatever it carries (bag, case, phone) cut as a second card glued just in front.
+- **Flat pieces only where flat is right:** posters, flags, signs, kiosk screens, the finger-post arrows. Their detail comes from tone: lighter sunlit halves, deeper shade halves, patches in the same colour family.
 
 | Stop | What you do | What it stands for |
 |---|---|---|
@@ -125,7 +131,7 @@ The Moperty space (`src/art/scenes/downtown.ts`) is a city block at golden hour,
 | Painter | A paints over the pencil wireframe of the listing screen | Designing the UIs |
 | Finger-post | Each A lifts the Moperty arrow one place up the pole, under the magnifier | SEO |
 | Site board | Opens the tech stack | Tech stack |
-| Office door | The doors swing open; A visits moperty.id | The product |
+| Gallery door | The doors swing open; A visits moperty.id | The product |
 
 ### Outside and inside match
 
@@ -164,7 +170,9 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Street | 130 |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
-| Moperty downtown | 145 |
+| Moperty downtown | 185 |
+
+The Moperty block was measured in a cloud container slower than the reference machine (software GPU, 4x CPU throttle, DPR 2.625, landscape walk): 18 fps at the gallery, 24 at the corner and 26 at the site, against 22 for the Blibli street on the same run.
 
 A cut sheet whose holes are all filled by its decals (windows with lit rooms behind) ships as opaque.
 
@@ -182,6 +190,6 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Showcase phone | The chosen swatch chip rises |
 | Recommended shelf | Placeholder cards fold down |
 | Review board | The chosen filter tab rises |
-| Moperty office | Both door leaves swing inward |
+| Moperty gallery | Both door leaves swing inward |
 | Listings map | The chosen filter tab rises |
 | Any toy | A piece that appears drops into place in five stepped frames |

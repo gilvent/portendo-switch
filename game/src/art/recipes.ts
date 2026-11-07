@@ -141,7 +141,7 @@ export function tuft(id: string, x: number, z: number, w: number, h: number, c: 
 }
 
 let seed = 7;
-const rnd = (a: number, b: number) => { seed = (seed * 16807) % 2147483647; return a + (seed / 2147483647) * (b - a); };
+export const rnd = (a: number, b: number) => { seed = (seed * 16807) % 2147483647; return a + (seed / 2147483647) * (b - a); };
 export const reseed = (n: number) => { seed = n; };
 
 export const bricks = (w: number, h: number, c: string, mortar: string) => {
