@@ -14,7 +14,9 @@ export type Action =
 export type Effect = { open: string } | null;
 
 const INTRO: Spot = { k: 'walk', world: 'intro', stop: 'road-end', near: false };
-const HOME: Spot = { k: 'walk', world: 'crossroads', stop: 'crossing', near: true };
+export const HOME: Spot = { k: 'walk', world: 'mrt', stop: 'ad', near: true };
+// The station the train is heading for, from its line map.
+export const rideOf = (c: Content, g: Game, world: WorldId, stop: string) => { const a = stopOf(c, world, stop)?.action; return a?.kind === 'ride' ? a.to[g.toys[`${world}/${a.toy}`] ?? 0] : undefined; };
 export const toysOf = (g: Game, w: WorldId): Record<string, number> => Object.fromEntries(Object.entries(g.toys).filter(([k]) => k.startsWith(`${w}/`)).map(([k, v]) => [k.slice(w.length + 1), v]));
 export const stopOf = (c: Content, w: WorldId, id: string): Stop | undefined => c.worlds[w].stops.find(s => s.id === id);
 
@@ -32,7 +34,7 @@ export function parsePath(c: Content, path: string): Place {
   const seg = path.split('/').filter(Boolean);
   if (!seg.length) return INTRO;
   if (seg.length === 1 && seg[0] === 'route') return { k: 'routeSheet', back: HOME };
-  if (seg[0] === 'work' && seg[1] && isPlayable(c, seg[1]) && seg[1] !== 'crossroads') {
+  if (seg[0] === 'work' && seg[1] && isPlayable(c, seg[1]) && seg[1] !== 'mrt') {
     const s = firstLetter(c, seg[1]);
     if (seg.length === 2 && s) return { k: 'walk', world: seg[1], stop: s.id, near: true };
     if (seg.length === 3 && seg[2] === 'highlight' && s) return { k: 'letter', world: seg[1], stop: s.id };
@@ -80,6 +82,10 @@ export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
       if (act.kind === 'letter') return [{ ...g, place: { k: 'letter', world: p.world, stop: p.stop } }, null];
       if (act.kind === 'dock') return [{ ...g, controller: { ...g.controller, mode: 'docking' } }, null];
       if (act.kind === 'link') return [g, { open: act.href }];
+      if (act.kind === 'ride') {
+        const d = act.to[g.toys[`${p.world}/${act.toy}`] ?? 0];
+        return [{ ...g, place: { k: 'walk', world: d.world, stop: d.stop, near: true } }, null];
+      }
       if (act.kind === 'toy') {
         const key = `${p.world}/${act.toy}`, id = `${p.world}/${p.stop}`;
         return [{ ...g, toys: { ...g.toys, [key]: ((g.toys[key] ?? 0) + 1) % act.states }, stamps: g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];

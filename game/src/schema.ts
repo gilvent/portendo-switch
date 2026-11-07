@@ -1,4 +1,4 @@
-export type WorldId = 'intro' | 'crossroads' | 'blibli' | 'blibli-shop' | 'blibli-storeroom' | 'moperty' | 'radjastone';
+export type WorldId = 'intro' | 'mrt' | 'blibli' | 'blibli-shop' | 'blibli-storeroom' | 'moperty' | 'radjastone';
 export type Span = { t: string; strong?: boolean; em?: boolean };
 export type Rich = Span[];
 export type Image = { asset: string; alt: string };
@@ -19,13 +19,15 @@ export type StopAction =
   | { kind: 'road'; to: WorldId; stop: string }
   | { kind: 'link'; href: string }
   | { kind: 'dock' }
-  | { kind: 'toy'; toy: string; states: number };
+  | { kind: 'toy'; toy: string; states: number }
+  // The train doors: they open onto whichever station toy `toy` (the line map) has chosen.
+  | { kind: 'ride'; toy: string; to: { world: WorldId; stop: string; label: string }[] };
 // focus: the camera leans in while the courier stands at this stop (zoom multiplies the world zoom), centred on
 // `look`, the x of the thing being used, so the courier can stand beside it rather than in front of it.
 export type Stop = { id: string; label: string; x: number; z: number; reach?: number; focus?: number; look?: number; action: StopAction };
 export type Rect = { x0: number; x1: number; z0: number; z1: number };
 export type World = {
-  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom'; back?: { world: WorldId; stop: string }; camera?: { zoom: number; x0: number; x1: number }; path: 'round' | 'street' | 'store' | 'climb'; bounds: Rect; solid: Rect[];
+  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom' | 'train'; back?: { world: WorldId; stop: string }; camera?: { zoom: number; x0: number; x1: number }; path: 'round' | 'street' | 'store' | 'climb'; bounds: Rect; solid: Rect[];
   url?: string; role?: string; description?: string; logo?: string; color: string;
   stops: Stop[]; letters: Letter[];
   // Facts this world shows by play instead of text: each names the stops where it is acted out. Never displayed.
@@ -33,7 +35,7 @@ export type World = {
 };
 export type Content = { worlds: Record<WorldId, World> };
 
-export const WORLD_IDS = ['intro', 'crossroads', 'blibli', 'blibli-shop', 'blibli-storeroom', 'moperty', 'radjastone'] as const;
+export const WORLD_IDS = ['intro', 'mrt', 'blibli', 'blibli-shop', 'blibli-storeroom', 'moperty', 'radjastone'] as const;
 export class ContentError extends Error {}
 const fail = (at: string, why: string): never => { throw new ContentError(`content ${at}: ${why}`); };
 export function validateContent(c: Content): Content {
@@ -65,7 +67,9 @@ export function validateContent(c: Content): Content {
       if (s.action.kind === 'letter') { if (!letterIds.has(s.action.letter)) fail(`${at}.action.letter`, `unknown letter ${s.action.letter}`); used.add(s.action.letter); }
       if (s.action.kind === 'link' && !/^https:\/\//.test(s.action.href)) fail(`${at}.action.href`, 'must be https');
       if (s.action.kind === 'toy' && (!s.action.toy || s.action.states < 2)) fail(`${at}.action`, 'a toy needs a name and at least two states');
+      if (s.action.kind === 'ride') { const r = s.action; const t = w.stops.find(x => x.action.kind === 'toy' && x.action.toy === r.toy); if (!t || t.action.kind !== 'toy' || t.action.states !== r.to.length) fail(`${at}.action.toy`, `no toy ${r.toy} with one state per destination`); }
     });
+    w.stops.forEach((s, i) => { if (s.action.kind === 'ride') s.action.to.forEach((d, k) => { if (!c.worlds[d.world]?.stops.some(x => x.id === d.stop)) fail(`worlds.${id}.stops[${i}].action.to[${k}]`, `unknown stop ${d.world}/${d.stop}`); }); });
     w.stops.forEach((s, i) => { if (s.action.kind === 'road') { const t = c.worlds[s.action.to]; if (!t) fail(`worlds.${id}.stops[${i}].action.to`, `unknown world ${s.action.to}`); else if (!t.stops.some(x => x.id === (s.action as { stop: string }).stop)) fail(`worlds.${id}.stops[${i}].action.stop`, 'unknown arrival stop'); } });
     if (w.back && !c.worlds[w.back.world]?.stops.some(x => x.id === w.back?.stop)) fail(`worlds.${id}.back`, 'unknown stop');
     for (const l of letterIds) if (!used.has(l)) fail(`worlds.${id}.letters.${l}`, 'no stop opens this letter');

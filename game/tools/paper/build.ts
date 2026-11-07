@@ -3,7 +3,8 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
-import { normal, type Panel, type Scene, type Stock } from '../../src/art/kit.ts';
+import { normal, type Panel, type Scene } from '../../src/art/kit.ts';
+import { CREASE, FONTS, STOCK, svg, type Slot } from './paper.ts';
 import { SCENES } from '../../src/art/scenes/index.ts';
 import { SUN_TO_LIGHT } from '../../src/light.ts';
 
@@ -12,16 +13,6 @@ const BLENDER = process.env.BLENDER ?? '/Applications/Blender.app/Contents/MacOS
 for (const bin of [BLENDER, CHROME]) if (!existsSync(bin)) throw new Error(`missing required tool: ${bin}`);
 
 const DENSITY = 3, PAD = 6, ATLAS_W = 4096;
-const STOCK: Record<Stock, { core: string; freq: string; octaves: number; amp: number; transl: number; fleck: number }> = {
-  cover: { core: '#fffaf0', freq: '.9 .9', octaves: 3, amp: .05, transl: .08, fleck: 0 },
-  kraft: { core: '#e6c9a0', freq: '.8 1.6', octaves: 3, amp: .045, transl: .04, fleck: .05 },
-  greyboard: { core: '#b5ada2', freq: '.9 .9', octaves: 3, amp: .06, transl: 0, fleck: .08 },
-  bond: { core: '#ffffff', freq: '1.3 1.3', octaves: 2, amp: .03, transl: .3, fleck: 0 },
-  vellum: { core: '#fff6e4', freq: '.5 .9', octaves: 3, amp: .06, transl: .62, fleck: 0 },
-  sugar: { core: '', freq: '.7 .7', octaves: 4, amp: .07, transl: .16, fleck: .1 }
-};
-
-type Slot = { panel: Panel; x: number; y: number; pw: number; ph: number };
 // The far backdrop and its layers pack last, so finish.py can crop them off the bottom of the shipped atlas.
 function pack(panels: Panel[]) {
   const far = (p: Panel) => !!(p.backdrop || (p.decal && panels.find(q => q.id === p.decal)?.backdrop));
@@ -34,30 +25,14 @@ function pack(panels: Panel[]) {
   }
   return { slots, height: y + row + PAD };
 }
-const svg = ({ panel: p, x, y, pw, ph }: Slot, i: number) => {
-  const stock = STOCK[p.stock], s = { ...stock, core: stock.core || p.c }, m = `m${i}`, rectMask = `<rect width="${p.w}" height="${p.h}" fill="#fff"/>`;
-  const shape = p.mask ?? rectMask, n = Math.max(p.w, p.h);
-  const edge = p.edge === 'cut'
-    ? `<g>${shape.replace(/fill="#fff"/g, `fill="none" stroke="${s.core}" stroke-width="1.1"`)}</g>`
-    : `<rect width="${p.w}" height="${p.h}" fill="none" stroke="${s.core}" stroke-opacity=".62" stroke-width="1.1" filter="url(#crease)"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;left:${x}px;top:${y}px" width="${pw}" height="${ph}" viewBox="0 0 ${p.w} ${p.h}">
-<defs><mask id="${m}" maskUnits="userSpaceOnUse" x="0" y="0" width="${p.w}" height="${p.h}">${shape}</mask>
-<filter id="g${i}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="${s.freq}" numOctaves="${s.octaves}" seed="${i * 7 + 3}"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.6 0 0 0 -.62"/></filter>
-<filter id="f${i}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".5 .09" numOctaves="2" seed="${i * 11 + 5}"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .85  0 3.4 0 0 -1.95"/></filter></defs>
-<g mask="url(#${m})"><rect width="${n}" height="${n}" fill="${p.c}"/>${p.print ?? ''}
-<rect width="${p.w}" height="${p.h}" fill="#1a1006" filter="url(#g${i})" style="opacity:${s.amp * 2.4}"/>
-${s.fleck ? `<rect width="${p.w}" height="${p.h}" filter="url(#f${i})" opacity="${s.fleck}"/>` : ''}
-${edge}</g></svg>`;
-};
-
 async function build(scene: Scene, samples: number) {
   const WORK = join(HERE, '.work', scene.id), OUT = join(GAME, 'src/art/baked', scene.id);
   mkdirSync(WORK, { recursive: true }); mkdirSync(OUT, { recursive: true });
   const ids = new Set<string>();
   for (const p of scene.panels) { if (ids.has(p.id)) throw new Error(`${scene.id}: duplicate panel ${p.id}`); ids.add(p.id); if (p.decal && !scene.panels.some(q => q.id === p.decal)) throw new Error(`${p.id}: decal parent ${p.decal} missing`); }
   const { slots, height } = pack(scene.panels);
-  const html = `<!doctype html><html><head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Caveat:wght@700&display=swap"><style>html,body{margin:0;background:transparent}svg{overflow:hidden}</style></head><body>
-<svg width="0" height="0" style="position:absolute"><filter id="crease" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="1.2"/></filter></svg>
+  const html = `<!doctype html><html><head>${FONTS}<style>html,body{margin:0;background:transparent}svg{overflow:hidden}</style></head><body>
+${CREASE}
 <div style="position:relative;width:${ATLAS_W}px;height:${height}px">${slots.map(svg).join('\n')}</div></body></html>`;
   writeFileSync(join(WORK, 'albedo.html'), html.replaceAll('/PUBLIC/', `file://${join(GAME, 'public')}/`));
   const browser = await chromium.launch({ executablePath: CHROME, headless: true });

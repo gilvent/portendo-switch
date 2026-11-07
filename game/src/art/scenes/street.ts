@@ -10,7 +10,7 @@ let far = 1;
 const fr = (a: number, b: number) => { far = (far * 16807) % 2147483647; return a + (far / 2147483647) * (b - a); };
 // A row of separate blocks printed on one sheet: each its own colour, with windows, and a roof detail on some
 // (water tank, antenna, billboard, stepped top). The sheet is cut along the blocks' outline.
-function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], lit: string, roofs: boolean) {
+export function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], lit: string, roofs: boolean) {
   far = seed;
   let x = -fr(0, minW), mask = '', print = '';
   while (x < w) {
@@ -31,7 +31,7 @@ function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW
   return { mask, print };
 }
 // Trees in a row, three silhouettes (round, cone, palm-like burst) in two greens, cut as one strip.
-function treeRow(w: number, h: number, seed: number) {
+export function treeRow(w: number, h: number, seed: number) {
   far = seed;
   let x = 0, mask = `<rect y="${h - 40}" width="${w}" height="40" fill="#fff"/>`, print = `<rect y="${h - 40}" width="${w}" height="40" fill="#4f9c82"/>`;
   while (x < w) {
@@ -47,7 +47,7 @@ function treeRow(w: number, h: number, seed: number) {
   return { mask, print };
 }
 // Low houses in front of the city: gabled roofs, chimneys, a lit window or two.
-function houses(w: number, h: number, seed: number) {
+export function houses(w: number, h: number, seed: number) {
   far = seed;
   let x = -20, mask = '', print = '';
   const walls = ['#f2cf8a', '#e9a77b', '#f4e3c3', '#c7dcc0', '#e3b9a8'], roofs = ['#c8553d', '#a8442f', '#d77b6a', '#8f5a4a'];
@@ -63,7 +63,7 @@ function houses(w: number, h: number, seed: number) {
   }
   return { mask, print };
 }
-const birds = (pts: [number, number, number][]) => pts.map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#3d4a5a"/>`).join('');
+export const birds = (pts: [number, number, number][]) => pts.map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#3d4a5a"/>`).join('');
 // Open surroundings: the city beyond the street, many flat layers from the far mountains to the nearest rooftops,
 // alternating pale and deep. The whole stack bakes into the CSS backdrop.
 function backdrop(): Panel[] {

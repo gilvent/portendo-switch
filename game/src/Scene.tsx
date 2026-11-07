@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, type RefObject } from 'react';
 import gsap from 'gsap';
 import type { Stop, World } from './schema.ts';
 import { reducedMotion, shadowFilter } from './light.ts';
-import Courier from './art/Courier.tsx';
+import Salaryman from './art/Salaryman.tsx';
 import { WORLD_ART, WORLD_BACKDROP } from './art/blibli.tsx';
 import { at } from './art/fold.tsx';
 
@@ -51,7 +51,7 @@ export default function Scene({ world, nearStop, toys, stageRef, courierRef, fli
         ))}
         <div className="courier" ref={courierRef} data-testid="courier">
           <i className="ground-shadow small" />
-          <div className="flip" ref={flipRef}><Courier /></div>
+          <div className="flip" ref={flipRef}><Salaryman /></div>
         </div>
       </div>
       <div className="wipe" ref={wipe} aria-hidden="true"><i /><i /></div>

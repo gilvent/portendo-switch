@@ -19,8 +19,8 @@ button { font:inherit; cursor:pointer; }
 .flip { position:absolute; left:-40px; bottom:-2px; width:80px; height:124px; transform-style:preserve-3d; }
 .courier-art { position:absolute; left:0; top:0; display:block; }
 .defs { position:absolute; }
-.leg { position:absolute; top:88px; width:11px; height:32px; border-radius:4px; background:#1f3a5f; transform-origin:50% 0; }
-.leg-b { left:28px; } .leg-f { left:42px; background:#27496f; }
+.leg { position:absolute; top:90px; width:11px; height:32px; border-radius:3px 3px 5px 2px; background:linear-gradient(#2e3440 82%,#14171b 82%); transform-origin:50% 0; }
+.leg-b { left:27px; } .leg-f { left:41px; background:linear-gradient(#3a4150 82%,#14171b 82%); }
 [data-walking] .leg-f { animation:stride .32s ease-in-out infinite alternate; }
 [data-walking] .leg-b { animation:stride .32s ease-in-out infinite alternate-reverse; }
 @keyframes stride { from { transform:rotate(-24deg); } to { transform:rotate(24deg); } }
@@ -176,3 +176,7 @@ button { font:inherit; cursor:pointer; }
 .pp.pop { animation:pop .42s steps(5,end) both; }
 @keyframes pop { from { translate:0 -18px; } }
 @media (prefers-reduced-motion:reduce) { .pp.pop { animation:none; } }
+.art-train { background:linear-gradient(#8fd3f4 0%,#bfe6f8 55%,#e8f4f8 100%); }
+.outside,.station { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; }
+.strip { position:absolute; left:0; top:0; transform-origin:0 0; overflow:hidden; backface-visibility:hidden; background-repeat:no-repeat; }
+.strip > i { position:absolute; left:0; top:0; height:100%; display:block; background-repeat:repeat-x; will-change:transform; }

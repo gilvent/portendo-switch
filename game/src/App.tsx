@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { content } from './content.ts';
 import { pathOf, parsePath, reduce, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
+import { BRAKE_S } from './art/Outside.tsx';
 import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
 import { reducedMotion } from './light.ts';
@@ -17,8 +18,28 @@ export default function App() {
   const [game, setGame] = useState<Game>(() => start(content, location.pathname));
   const gameRef = useRef(game);
   gameRef.current = game;
+  // The train ride: braking into the chosen station, the doors, and walking out. Input waits while it plays.
+  const [fx, setFx] = useState({ ride: 0, dwell: 0, doors: 0 });
+  const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
+  const busy = useRef(false);
+  const timers = useRef<number[]>([]);
+  const later = (ms: number, f: () => void) => { timers.current.push(window.setTimeout(f, ms)); };
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const dispatch = useCallback((x: Action) => {
+    if (busy.current && x.a !== 'toggleController') return;
     if (x.a === 'confirm' && gameRef.current.place.k === 'letter') { dispatchEvent(new Event('letter-confirm')); return; }
+    const here = gameRef.current.place;
+    if (x.a === 'confirm' && here.k === 'walk' && here.near && !reducedMotion()) {
+      const act = stopOf(content, here.world, here.stop)?.action, door = stopOf(content, here.world, here.stop);
+      if (act?.kind === 'ride' && door) {
+        const k = gameRef.current.toys[`${here.world}/${act.toy}`] ?? 0;
+        busy.current = true; held.current.clear(); target.current = null;
+        setFx({ ride: k + 1, dwell: 0, doors: 0 });
+        later(BRAKE_S * 1000 + 250, () => setFx(f => ({ ...f, doors: 1 })));
+        later(BRAKE_S * 1000 + 800, () => { exit.current = { x: door.x, z: -150 - 90, then: () => { busy.current = false; exit.current = null; setFx({ ride: 0, dwell: 0, doors: 0 }); const r = reduce(content, gameRef.current, { a: 'confirm' }); gameRef.current = r[0]; setGame(r[0]); } }; });
+        return;
+      }
+    }
     const [next, effect] = reduce(content, gameRef.current, x);
     gameRef.current = next;
     setGame(next);
@@ -27,7 +48,7 @@ export default function App() {
 
   const spot = spotOf(game);
   const mode = game.controller.mode;
-  const world: WorldId | null = spot.k === 'lost' ? null : spot.world === 'intro' ? 'crossroads' : spot.world;
+  const world: WorldId | null = spot.k === 'lost' ? null : spot.world === 'intro' ? 'mrt' : spot.world;
   const reading = game.place.k !== 'walk' || mode !== game.controller.mode;
 
   const path = pathOf(game.place);
@@ -84,6 +105,13 @@ export default function App() {
     walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 };
     lastNear.current = s.id;
     cam.current.x = content.worlds[world].camera ? 0 : s.x; cam.current.z = 0;
+    if (world === 'mrt' && s.action.kind === 'ride') {
+      const k = (gameRef.current.toys[`mrt/${s.action.toy}`] ?? 0) + 1;
+      if (reducedMotion()) { setFx({ ride: 0, dwell: 0, doors: 0 }); return; }
+      setFx({ ride: 0, dwell: k, doors: 1 });
+      later(1500, () => setFx(f => ({ ...f, doors: 0 })));
+      later(2300, () => setFx({ ride: 0, dwell: 0, doors: 0 }));
+    } else if (world === 'mrt') setFx({ ride: 0, dwell: 0, doors: 0 });
   }, [spawnKey]);
 
   const teleport = useCallback((w: WorldId, s: Stop) => {
@@ -117,6 +145,15 @@ export default function App() {
       if (p.k === 'letter') { if (iz0 && letterRef.current) letterRef.current.scrollTop += iz0 * 900 * dt; return; }
       if (p.k !== 'walk' || g.controller.mode === 'docking') return;
       const w = content.worlds[p.world];
+      if (exit.current) {
+        const e = exit.current, u = walker.current, ex = e.x - u.x, ez = (Math.abs(ex) > 4 ? -56 : e.z) - u.z, d = Math.hypot(ex, ez), sp = Math.min(d / dt, 230);
+        if (d < 3 && Math.abs(ex) <= 4) { e.then(); return; }
+        walker.current = { x: u.x + ex / (d || 1) * sp * dt, z: u.z + ez / (d || 1) * sp * dt, vx: ex / (d || 1) * sp, vz: ez / (d || 1) * sp };
+        const n = walker.current;
+        courierRef.current?.toggleAttribute('data-walking', true);
+        if (courierRef.current) courierRef.current.style.transform = `translate3d(${n.x}px,${-Math.abs(Math.sin(phase.current += dt * 9)) * 5}px,${n.z}px)`;
+        return;
+      }
       let ix = ix0, iz = iz0;
       if (ix || iz) target.current = null;
       else if (target.current) [ix, iz] = seek(walker.current, target.current.stop.x, target.current.stop.z);
@@ -186,21 +223,21 @@ export default function App() {
   }, [dispatch]);
 
   const onDockDone = useCallback(() => {
-    const s = stopOf(content, 'crossroads', 'crossing');
-    if (!s) throw new Error('crossroads has no crossing stop');
-    teleport('crossroads', s);
+    const s = stopOf(content, 'mrt', 'ad');
+    if (!s) throw new Error('mrt has no ad stop');
+    teleport('mrt', s);
     walker.current = reducedMotion() ? { x: s.x, z: s.z, vx: 0, vz: 0 } : { x: s.x, z: 170, vx: 0, vz: 0 };
     dispatch({ a: 'dockDone' });
     if (!reducedMotion()) target.current = { stop: s, open: false };
   }, [dispatch, teleport]);
 
   const openStop = useMemo(() => (spot.k === 'letter' ? stopOf(content, spot.world, spot.stop) : undefined), [spot]);
-  const nearStop = spot.k === 'walk' && spot.near ? spot.stop : null;
+  const nearStop = spot.k === 'walk' && spot.near && !fx.ride ? spot.stop : null;
   const lit = game.place.k === 'letter' ? 'B' : nearStop && spot.k === 'walk' && stopOf(content, spot.world, nearStop)?.action.kind !== 'road' ? 'A' : game.place.k === 'walk' ? 'stick' : null;
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {world && <Scene key={world} world={content.worlds[world]} nearStop={nearStop} toys={toysOf(game, world)} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} onStop={onStop} />}
+      {world && <Scene key={world} world={content.worlds[world]} nearStop={nearStop} toys={world === 'mrt' ? { ...toysOf(game, world), ...fx } : toysOf(game, world)} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} atDock={spot.k === 'walk' && spot.world === 'intro' && spot.near} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       <div className="corner">
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
@@ -209,7 +246,7 @@ export default function App() {
       {game.stamps.length > 0 && <div className="stamps" key={game.stamps.length} data-testid="stamps">{game.stamps.length} {game.stamps.length === 1 ? 'stamp' : 'stamps'}</div>}
       {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}
-      {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Return to sender</h1><p>Nothing is delivered to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Go to the crossroads</button></section>}
+      {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Wrong stop</h1><p>No line runs to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Back on the train</button></section>}
     </div>
   );
 }
