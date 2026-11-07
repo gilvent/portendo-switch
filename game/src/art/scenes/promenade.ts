@@ -39,9 +39,10 @@ export function plaza(): Panel[] {
   const quay: Panel = { id: 'quay-edge', stock: 'greyboard', c: '#b7a99a', w: W, h: 14, o: [PLAZA.x0, 0, PLAZA.z0 - .5], u: [1, 0, 0], v: [0, 0, -1], density: .6, edge: 'cut', print: `<rect width="${W}" height="4" fill="#d9cbbb"/>` };
   // Inlaid brick medallions, laid flat in the paving: a sun-and-waves rosette before the shop door, and a wave band
   // along the quay that leads the eye to the river gate.
-  const inlay = (id: string, x: number, z: number, w: number, h: number, print: string, mask: string): Panel => ({ id, stock: 'greyboard', c: BORDER, w, h, o: [x - w / 2, .6, z + h / 2], u: [1, 0, 0], v: [0, 0, -1], edge: 'cut', density: .7, decal: 'lawn', print, mask });
+  // The rosette is its own sheet so it stays crisp; the long wave band is flattened into the paving.
+  const inlay = (id: string, x: number, z: number, w: number, h: number, print: string, mask: string, own = false): Panel => ({ id, stock: 'greyboard', c: BORDER, w, h, o: [x - w / 2, .6, z + h / 2], u: [1, 0, 0], v: [0, 0, -1], edge: 'cut', density: own ? 1.1 : .7, decal: own ? undefined : 'lawn', print, mask });
   const rays = Array.from({ length: 16 }, (_, i) => { const a = i * Math.PI / 8; return `<path d="M120 120L${f(120 + Math.cos(a - .1) * 112)} ${f(120 + Math.sin(a - .1) * 112)}L${f(120 + Math.cos(a + .1) * 112)} ${f(120 + Math.sin(a + .1) * 112)}Z" fill="${i % 2 ? '#e9c5ae' : '#cf927a'}"/>`; }).join('');
-  const rosette = inlay('inlay-rosette', 150, 110, 240, 240, `<circle cx="120" cy="120" r="120" fill="${BORDER}"/><circle cx="120" cy="120" r="112" fill="#e5b8a0"/>${rays}<circle cx="120" cy="120" r="46" fill="${BORDER}"/><circle cx="120" cy="120" r="38" fill="#f6b73c"/>${[0, 1].map(k => `<path d="M${88 + k * 0} ${112 + k * 16}q8 -8 16 0t16 0t16 0t16 0" stroke="#0a6aa8" stroke-width="5" fill="none"/>`).join('')}`, '<circle cx="120" cy="120" r="120" fill="#fff"/>');
+  const rosette = inlay('inlay-rosette', 150, 110, 240, 240, `<circle cx="120" cy="120" r="120" fill="${BORDER}"/><circle cx="120" cy="120" r="112" fill="#e5b8a0"/>${rays}<circle cx="120" cy="120" r="46" fill="${BORDER}"/><circle cx="120" cy="120" r="38" fill="#f6b73c"/>${[0, 1].map(k => `<path d="M${88 + k * 0} ${112 + k * 16}q8 -8 16 0t16 0t16 0t16 0" stroke="#0a6aa8" stroke-width="5" fill="none"/>`).join('')}`, '<circle cx="120" cy="120" r="120" fill="#fff"/>', true);
   const waveBand = inlay('inlay-waves', -300, -270, 1400, 40, `<rect width="1400" height="40" fill="#b98270"/>${Array.from({ length: 35 }, (_, i) => `<path d="M${i * 40} 26q10 -16 20 0t20 0" stroke="#0a6aa8" stroke-width="6" fill="none"/>`).join('')}`, '<rect width="1400" height="40" fill="#fff"/>');
   return [base, skirt, water, quay, rosette, waveBand];
 }
@@ -176,15 +177,30 @@ export function flagPole(id: string, x: number, z: number, h: number, flag: stri
 }
 // A slatted round-ish bin.
 export const bin = (id: string, x: number, z: number) => box({ id, x, z, w: 36, h: 58, d: 36, stock: 'greyboard', c: '#6b7480', front: Array.from({ length: 6 }, (_, i) => `<rect x="${2 + i * 6}" width="3" height="58" fill="#4d5560"/>`).join('') + '<rect width="36" height="6" fill="#3d444e"/>', top: '<rect x="5" y="5" width="26" height="26" fill="#2b2f36"/>' });
-// A shopper cut in two layers: the figure, and an arm with a bag standing a little proud of it.
-export function shopper(id: string, x: number, z: number, coat: string, legs: string, skin: string, hair: string, bag: string, flip: boolean, k = 1, rot = 0, arm = true): Panel[] {
+// A person cut from card in two layers: the figure, and an arm with whatever it carries standing a little proud of it.
+// One design, varied by build (trousers, shorts, dress, child), hat, backpack and colours.
+export type Look = { coat: string; legs: string; skin: string; hair: string; carry?: string; style?: 'trousers' | 'shorts' | 'dress'; hat?: string; pack?: string; shoes?: string };
+export function shopper(id: string, x: number, z: number, look: Look, flip = false, k = 1, rot = 0, arm = true): Panel[] {
+  const { coat, legs, skin, hair, carry, style = 'trousers', hat, pack, shoes = '#2b2622' } = look;
   const w = 74 * k, h = 176 * k, R = yaw(rot), fl = flip ? 'translate(74 0) scale(-1 1)' : '';
-  const body = 'M24 176V118H16V64Q16 46 30 43Q21 37 23 22Q25 5 37 5Q49 5 50 22Q51 37 43 43Q57 46 57 64V118H50V176H40V126H34V176Z';
+  const head = 'M23 22Q25 5 37 5Q49 5 50 22Q51 37 43 43H31Q21 37 23 22Z';
+  const body = style === 'dress' ? 'M31 43H43Q57 46 57 64V100L64 140H10L17 100V64Q17 46 31 43Z M24 140H32V172H24Z M42 140H50V172H42Z'
+    : style === 'shorts' ? 'M31 43H43Q57 46 57 64V116H50V128H48V170H40V128H34V170H26V128H24V116H17V64Q17 46 31 43Z'
+    : 'M31 43H43Q57 46 57 64V118H50V172H40V126H34V172H24V118H17V64Q17 46 31 43Z';
+  const feet = '<rect x="21" y="168" width="13" height="8" rx="3"/><rect x="38" y="168" width="14" height="8" rx="3"/>';
+  const hatShape = hat ? '<ellipse cx="37" cy="12" rx="22" ry="5"/><path d="M27 12Q27 0 37 0Q47 0 47 12Z"/>' : '';
+  const packShape = pack ? '<rect x="52" y="52" width="16" height="44" rx="5"/>' : '';
+  const g = (inner: string) => `<g transform="scale(${k}) ${fl}">${inner}</g>`;
+  const legsPrint = style === 'dress' ? `<rect y="140" width="74" height="36" fill="${skin}"/>` : style === 'shorts' ? `<rect y="116" width="74" height="14" fill="${legs}"/><rect y="130" width="74" height="40" fill="${skin}"/>` : `<rect y="116" width="74" height="56" fill="${legs}"/>`;
+  const print = `<rect width="74" height="176" fill="${coat}"/>${legsPrint}<rect width="74" height="44" fill="${skin}"/><path d="M23 22Q22 4 37 4Q52 4 51 22Q46 11 33 13Q27 15 23 22Z" fill="${hair}"/>` +
+    `<circle cx="42" cy="25" r="2" fill="${INK}"/><path d="M40 33q3 2 6 0" stroke="${INK}" stroke-width="1.4" fill="none"/>` +
+    `<path d="M31 43L37 52L43 43" fill="#fff" fill-opacity=".55"/><path d="M17 64V96M57 64V96" stroke="#000" stroke-opacity=".14" stroke-width="3"/>` +
+    (style === 'dress' ? `<path d="M17 100H57" stroke="#000" stroke-opacity=".15" stroke-width="3"/>${[0, 1, 2].map(i => `<circle cx="${26 + i * 11}" cy="${112 + (i % 2) * 12}" r="3" fill="#fff" fill-opacity=".5"/>`).join('')}` : `<rect x="17" y="112" width="40" height="5" fill="#000" fill-opacity=".25"/>`) +
+    `<g fill="${shoes}">${feet}</g>` + (hat ? `<g fill="${hat}">${hatShape}</g><rect x="27" y="7" width="20" height="3" fill="#000" fill-opacity=".2"/>` : '') + (pack ? `<rect x="52" y="52" width="16" height="44" rx="5" fill="${pack}"/><rect x="54" y="72" width="12" height="10" fill="#000" fill-opacity=".15"/>` : '');
   const base = (cid: string, ww: number, hh: number, dx: number, dz: number): Panel => ({ id: cid, stock: 'cover', c: coat, w: ww, h: hh, o: add([x, 0, z], R([-w / 2 + dx, 0, dz])), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.7 });
-  return [
-    { ...base(`${id}`, w, h, 0, 0), mask: `<g transform="scale(${k}) ${fl}"><path d="${body}" fill="#fff"/></g>`, print: `<g transform="scale(${k}) ${fl}"><rect width="74" height="44" fill="${skin}"/><path d="M22 20Q22 2 37 3Q52 2 51 20Q44 10 30 14Q26 16 22 20Z" fill="${hair}"/><rect y="43" width="74" height="76" fill="${coat}"/><rect y="118" width="74" height="58" fill="${legs}"/><circle cx="${flip ? 32 : 42}" cy="26" r="2" fill="${INK}"/></g>` },
-    { ...base(`${id}-arm`, 34 * k, 96 * k, flip ? 6 * k : 42 * k, 5), c: coat, mask: `<g transform="scale(${k})"><path d="M10 0H22V52H28V96H4V52H10Z" fill="#fff"/></g>`, print: `<g transform="scale(${k})"><rect width="34" height="52" fill="${coat}"/><rect y="46" width="34" height="6" fill="${skin}"/><rect y="52" width="34" height="44" fill="${bag}"/><rect x="8" y="58" width="16" height="4" fill="#fff" fill-opacity=".5"/></g>` }
-  ].slice(0, arm ? 2 : 1);
+  const parts: Panel[] = [{ ...base(id, w, h, 0, 0), mask: g(`<path d="${head}" fill="#fff"/><path d="${body}" fill="#fff"/><g fill="#fff">${feet}${hatShape}${packShape}</g>`), print: g(print) }];
+  if (arm && carry) parts.push({ ...base(`${id}-arm`, 34 * k, 96 * k, flip ? 6 * k : 42 * k, 5), mask: `<g transform="scale(${k})"><path d="M10 0H22V52H28V96H4V52H10Z" fill="#fff"/></g>`, print: `<g transform="scale(${k})"><rect width="34" height="52" fill="${coat}"/><rect y="46" width="34" height="6" fill="${skin}"/><rect y="52" width="34" height="44" fill="${carry}"/><rect x="8" y="58" width="16" height="4" fill="#fff" fill-opacity=".5"/><path d="M10 52q6 -10 12 0" stroke="#000" stroke-opacity=".3" stroke-width="2" fill="none"/></g>` });
+  return parts;
 }
 
 /* ---------- stalls ---------- */
@@ -197,7 +213,7 @@ export function ticketKiosk(id: string, x: number, z: number, rot: number): Pane
   const roof = box({ id: `${id}-roof`, x, z: z, y: 226, w: 230, h: 14, d: 104, rot, stock: 'greyboard', c: '#2b2f36', density: 1, front: '<rect y="9" width="230" height="5" fill="#f4f1ea"/>', top: '<rect width="230" height="104" fill="#3d444e"/>' });
   const poster: Panel = { id: `${id}-poster`, stock: 'bond', c: BLUE, w: 170, h: 140, o: at(-85, 80, -30), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.3,
     print: `<rect width="170" height="140" fill="${DEEP}"/><rect x="8" y="8" width="72" height="56" fill="#8fd3f4"/><path d="M14 46h56l-6 10h-44Z" fill="${CORAL}"/><rect x="24" y="34" width="34" height="12" fill="${CREAM}"/><rect x="88" y="8" width="74" height="56" fill="#8fd3f4"/><path d="M96 50h58l-6 8h-46Z" fill="#d8322f"/><rect x="104" y="38" width="22" height="12" fill="${CREAM}"/><rect x="8" y="72" width="154" height="60" fill="#8fd3f4"/><path d="M8 110Q60 90 100 112T162 104V132H8Z" fill="#4fa9d6"/><path d="M40 84h20v16h-20Z M110 90h16v10h-16Z" fill="${CREAM}"/>` };
-  const seller = shopper(`${id}-seller`, 0, 0, '#22324a', '#22324a', '#c99a7a', '#2b2622', '#22324a', false, .9).slice(0, 1).map((p): Panel => ({ ...p, o: at(-60, 0, -12), u: R([1, 0, 0]) }));
+  const seller = shopper(`${id}-seller`, 0, 0, { coat: '#22324a', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', hat: '#22324a' }, false, .9, 0, false).map((p): Panel => ({ ...p, o: at(-60, 0, -12), u: R([1, 0, 0]) }));
   const rack: Panel = { id: `${id}-brochures`, stock: 'bond', c: '#fff', w: 50, h: 34, o: at(40, 76, 20), u: R([1, 0, 0]), v: unit([0, 1, .35]), edge: 'cut', density: 2.2, print: `<rect width="50" height="34" fill="#fff"/>${[0, 1, 2].map(i => `<rect x="${3 + i * 16}" y="4" width="13" height="26" fill="${[CORAL, BLUE, SUN][i]}"/>`).join('')}` };
   const sign: Panel = { id: `${id}-sign`, stock: 'cover', c: SUN, w: 70, h: 52, o: at(-110, 170, 52), u: R([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 2.2, mask: '<circle cx="35" cy="26" r="26" fill="#fff"/>', print: `<circle cx="35" cy="26" r="20" fill="${CREAM}"/><path d="M20 30h30l-4 7h-22Z" fill="${BLUE}"/><path d="M30 20h10v10h-10Z" fill="${CORAL}"/>` };
   return [...counter, posts, ...roof, poster, ...seller, sign];

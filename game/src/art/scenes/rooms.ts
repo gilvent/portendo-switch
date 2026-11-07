@@ -27,17 +27,24 @@ const lampSet = (id: string, x: number, z: number, y: number, top: number): Pane
   { id: `${id}-cord`, stock: 'greyboard', c: '#1a1410', w: 3, h: top - y - 44, o: [x - 1.5, y + 44, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1 }
 ];
 const lamp = (x: number, z: number, y: number) => ({ at: [x, y - 4, z] as V3, color: WARM, energy: 46 });
-const stairCard = (id: string, x: number, flip: 1 | -1, wood: string): Panel[] => {
-  const steps = 7, run = 26, rise = 34, ry = steps * rise, rz = steps * run, sw = 150, sl = Math.hypot(ry, rz);
-  const stepPrint = Array.from({ length: steps }, (_, i) => { const a = i * sl / steps; return `<rect y="${a}" width="${sw}" height="${sl / steps}" fill="${i % 2 ? '#000' : '#fff'}" fill-opacity=".08"/><path d="M0 ${a}H${sw}" stroke="#3a2010" stroke-width="3"/>`; }).join('');
-  const ramp: Panel = { id, stock: 'greyboard', c: wood, w: sw, h: sl, o: [x - sw / 2, 0, -60], u: [1, 0, 0], v: [0, ry / sl, -rz / sl], edge: 'fold', density: 1.3, print: stepPrint };
-  const side = flip > 0 ? x - sw / 2 : x + sw / 2;
-  const sawtooth = Array.from({ length: steps }, (_, i) => `H${(i + 1) * run}V${ry - (i + 1) * rise}`).join('');
-  const stringer: Panel = flip > 0
-    ? { id: `${id}-side`, stock: 'greyboard', c: '#6d4524', w: rz, h: ry, o: [side, 0, -60 - rz], u: [0, 0, 1], v: [0, 1, 0], edge: 'cut', density: 1.3, mask: `<g transform="translate(${rz} 0) scale(-1 1)"><path d="M0 ${ry}V${ry}${sawtooth}V${ry}Z" fill="#fff"/></g>` }
-    : { id: `${id}-side`, stock: 'greyboard', c: '#6d4524', w: rz, h: ry, o: [side, 0, -60], u: [0, 0, -1], v: [0, 1, 0], edge: 'cut', density: 1.3, mask: `<path d="M0 ${ry}V${ry}${sawtooth}V${ry}Z" fill="#fff"/>` };
-  return [ramp, stringer];
-};
+// The outlet's stairs up: a flight with a sawtooth stringer and a balustrade, rising to a landing against the back wall,
+// where a lit doorway shows the next flight climbing on to the store-room.
+function shopStairs(back: Panel, x: number, wood: string): Panel[] {
+  const steps = 7, rise = 34, run = 24, sw = 150, ry = steps * rise, rz = steps * run, z1 = -D / 2 + 52, z0 = z1 + rz, sl = Math.hypot(ry, rz);
+  const treads = Array.from({ length: steps }, (_, i) => { const a = i * sl / steps, b = sl / steps; return `<rect y="${f(a)}" width="${sw}" height="${f(b * .42)}" fill="#7a4a24"/><rect y="${f(a + b * .42)}" width="${sw}" height="${f(b * .58)}" fill="${wood}"/><rect y="${f(a + b * .42)}" width="${sw}" height="4" fill="#d9a46a"/>`; }).join('');
+  const ramp: Panel = { id: 'stairs', stock: 'greyboard', c: wood, w: sw, h: sl, o: [x - sw / 2, 0, z0], u: [1, 0, 0], v: [0, ry / sl, -rz / sl], edge: 'fold', density: 1.4, print: treads };
+  const saw = Array.from({ length: steps }, (_, i) => `H${(i + 1) * run}V${ry - (i + 1) * rise}`).join('');
+  // Drawn from the back so its face turns toward the room (and the camera); the sawtooth is mirrored to match.
+  const stringer: Panel = { id: 'stairs-side', stock: 'greyboard', c: '#6d4524', w: rz, h: ry, o: [x - sw / 2, 0, z0 - rz], u: [0, 0, 1], v: [0, 1, 0], edge: 'cut', density: 1.3, mask: `<g transform="translate(${rz} 0) scale(-1 1)"><path d="M0 ${ry}${saw}V${ry}Z" fill="#fff"/></g>`, print: `<path d="M${rz} ${ry}L0 0" stroke="#4a2c14" stroke-width="3" stroke-opacity=".5"/>` };
+  const posts = Array.from({ length: 8 }, (_, i) => `<rect x="${f(i * (sl - 8) / 7)}" y="0" width="5" height="70" fill="#fff"/>`).join('');
+  const rail: Panel = { id: 'stairs-rail', stock: 'greyboard', c: '#4a2c14', w: sl, h: 70, o: [x - sw / 2 - 2, 4 + ry, z0 - rz], u: [0, -ry / sl, rz / sl], v: [0, rz / sl, ry / sl], edge: 'cut', density: 1.4, mask: `<rect width="${f(sl)}" height="7" fill="#fff"/>${posts}` };
+  const landing = box({ id: 'landing', x, z: (z1 + -D / 2) / 2, w: sw, h: ry, d: z1 + D / 2, stock: 'greyboard', c: wood, front: `<rect x="14" y="16" width="${sw - 28}" height="${ry - 30}" fill="#7a4a24"/><rect x="20" y="22" width="${sw / 2 - 23}" height="${ry - 42}" fill="${wood}"/><rect x="${sw / 2 + 3}" y="22" width="${sw / 2 - 23}" height="${ry - 42}" fill="${wood}"/><circle cx="${sw / 2 - 10}" cy="${ry / 2}" r="4" fill="${CREAM}"/><circle cx="${sw / 2 + 10}" cy="${ry / 2}" r="4" fill="${CREAM}"/>`, top: `<rect width="${sw}" height="6" fill="#d9a46a"/>` });
+  const dw = 104, dh = 170, dx = x + W / 2 - dw / 2;
+  const doorway = on(back, 1, dx, ry, dw, dh, { id: 'up-door', stock: 'cover', c: '#3a2416', emit: .25, print: `<rect width="${dw}" height="${dh}" fill="#ffd9a0"/>${Array.from({ length: 6 }, (_, i) => `<rect x="${10 + i * 8}" y="${dh - 18 - i * 22}" width="${dw - 20 - i * 16}" height="9" fill="#c58c4d"/><rect x="${10 + i * 8}" y="${dh - 9 - i * 22}" width="${dw - 20 - i * 16}" height="13" fill="#a8693a"/>`).join('')}` });
+  const frame = on(back, 2.2, dx - 10, ry, dw + 20, dh + 12, { id: 'up-door-frame', stock: 'cover', c: CREAM, mask: slot(dw + 20, dh + 12, [10, 12, dw, dh]) });
+  return [ramp, stringer, rail, ...landing, doorway, frame];
+}
+const f = (n: number) => n.toFixed(1);
 const carton = (id: string, x: number, z: number, y: number, w: number, h: number, d: number, c = KRAFT, rot = 0, group?: string): Panel[] => box({ id, x, z, y, w, h, d, rot, stock: 'kraft', c, front: `${flutes(w, h)}<rect x="${w / 2 - 6}" width="12" height="${h}" fill="#d9b781"/><rect x="5" y="${h - 18}" width="${Math.min(30, w * .4)}" height="13" fill="#fbf7ee"/>`, right: flutes(d, h) + (h > 40 ? upArrows(d * .34, h * .2) : ''), top: `${flutes(w, d)}<rect x="${w / 2 - 6}" width="12" height="${d}" fill="#d9b781"/><path d="M0 ${d / 2}H${w}" stroke="#4a2c14" stroke-opacity=".5"/>` }).filter(p => !/-left$/.test(p.id) || !group).map(p => (group ? { ...p, group, density: 2, ghost: /rear|under/.test(p.id) ? true : p.ghost } : p));
 
 /* ---------- shared prints ---------- */
@@ -57,7 +64,7 @@ export function shop(): Scene {
   reseed(21);
   const H = 420, brick = (w: number) => bricks(w, H, '#cf9554', '#b98a55');
   const back = backWall(W, H, '#d9a968', { id: 'wall-back', print: brick(W) });
-  const lw = leftWall(H, '#d9a968', 'wall-left', brick(D)), rw = rightWall(H, '#d9a968', 'wall-right', brick(D));
+  const lw = { ...leftWall(H, '#d9a968', 'wall-left', brick(D)), density: 1.8 }, rw = { ...rightWall(H, '#d9a968', 'wall-right', brick(D)), density: 1.8 };
   const fl = floor('floor', '#c58c4d', planks(W, D, '#c58c4d', '#7a4e24', 62));
   const rug = on(fl, .6, 360, 40, 320, 120, { id: 'rug', stock: 'sugar', c: CORAL, mask: '<rect width="320" height="120" rx="58" fill="#fff"/>', print: `<rect x="10" y="10" width="300" height="100" rx="50" fill="none" stroke="${CREAM}" stroke-width="7"/>` });
   const mat = on(fl, .6, 450, 0, 140, 44, { id: 'door-mat', stock: 'sugar', c: DEEP, print: `<g fill="${CREAM}">${Array.from({ length: 9 }, (_, i) => `<rect x="${14 + i * 13}" y="12" width="6" height="20" rx="3"/>`).join('')}</g>` });
@@ -96,11 +103,25 @@ export function shop(): Scene {
 
   // Right wall: a clock and a framed print of the phone, in relief.
   const rwOn = (id: string, z: number, y: number, w: number, h: number, c: string, print: string, out: number, mask?: string): Panel => ({ id, stock: 'cover', c, w, h, o: [W / 2 - out, y, z], u: [0, 0, 1], v: [0, 1, 0], edge: 'cut', print, mask });
-  const wallDeco = relief(rw, [
+  const wallDeco = carved(rw, [
     rwOn('clock', -40, 300, 64, 64, CREAM, `<circle cx="32" cy="32" r="26" fill="#fff"/><g stroke="${INK}" stroke-width="3" stroke-linecap="round"><path d="M32 32V14M32 32L44 38"/></g>${Array.from({ length: 12 }, (_, i) => `<circle cx="${32 + Math.cos(i * Math.PI / 6) * 21}" cy="${32 + Math.sin(i * Math.PI / 6) * 21}" r="1.6" fill="${INK}"/>`).join('')}`, 6, '<circle cx="32" cy="32" r="32" fill="#fff"/>'),
     rwOn('frame', 60, 180, 120, 150, WOOD, `<rect x="8" y="8" width="104" height="134" fill="${CORAL}"/><g transform="translate(36 26)">${phoneArt(48, 92, CORAL)}</g>`, 5),
-    rwOn('shelf-r', 210, 150, 120, 10, WOOD, '', 30), ...[0, 1].map(i => rwOn(`pot-r${i}`, 220 + i * 54, 160, 34, 40, i ? MINT : SUN, `<rect width="34" height="10" fill="${INK}" fill-opacity=".2"/>`, 22))
+    ...[].map(i => rwOn(`pot-r${i}`, 220 + i * 54, 160, 34, 40, i ? MINT : SUN, `<rect width="34" height="10" fill="${INK}" fill-opacity=".2"/>`, 22))
   ]);
+  // Display cabinets carved against both side walls: drawers below, boxed products and stands on top.
+  const cabinet = (wall: Panel, side: 1 | -1, id: string, z0: number, z1: number, goods: { w: number; h: number; c: string; print?: string }[]): Panel[] => {
+    const DEPTH = 40, x = side * (W / 2 - DEPTH / 2), len = z1 - z0, face = (p: string) => (side < 0 ? { right: p } : { left: p });
+    const drawers = `<rect width="${len}" height="96" fill="${WOOD}"/>${Array.from({ length: Math.floor(len / 70) }, (_, i) => `<rect x="${8 + i * 70}" y="14" width="62" height="34" fill="#c08a58"/><rect x="${8 + i * 70}" y="54" width="62" height="34" fill="#c08a58"/><rect x="${30 + i * 70}" y="28" width="18" height="5" fill="${CREAM}"/><rect x="${30 + i * 70}" y="68" width="18" height="5" fill="${CREAM}"/>`).join('')}<rect width="${len}" height="8" fill="#e9dcc4"/>`;
+    let z = z0 + 10;
+    const top = goods.flatMap((g, i) => { const at = z + g.w / 2; z += g.w + 10; return box({ id: `${id}-g${i}`, x: x + side * 4, z: at, y: 96, w: 26, h: g.h, d: g.w, stock: 'cover', c: g.c, ...face(g.print ?? '') }); });
+    return carved(wall, [...box({ id: `${id}-body`, x, z: (z0 + z1) / 2, w: DEPTH, h: 96, d: len, stock: 'greyboard', c: WOOD, ...face(drawers), top: `<rect width="${DEPTH}" height="${len}" fill="#e9dcc4"/>` }), ...top]);
+  };
+  const phoneBoxPrint = (c: string) => `<rect x="5" y="6" width="${14}" height="26" rx="2" fill="#1d2228"/><rect x="7" y="9" width="10" height="20" fill="${c}"/>`;
+  const headset = `<path d="M6 30Q6 8 20 8Q34 8 34 30" stroke="${INK}" stroke-width="4" fill="none"/><rect x="2" y="24" width="10" height="14" rx="3" fill="${INK}"/><rect x="28" y="24" width="10" height="14" rx="3" fill="${INK}"/>`;
+  const cabinets = [
+    ...cabinet(lw, -1, 'cab-l', -110, 200, [{ w: 24, h: 40, c: BLUE, print: phoneBoxPrint('#bfe6f8') }, { w: 24, h: 40, c: CORAL, print: phoneBoxPrint('#ffd3a8') }, { w: 24, h: 40, c: MINT, print: phoneBoxPrint('#c8f0d8') }, { w: 48, h: 44, c: CREAM, print: headset }, { w: 60, h: 24, c: SUN }, { w: 40, h: 54, c: PLUM, print: `<rect x="8" y="8" width="24" height="38" rx="4" fill="#1d2228"/>` }, { w: 30, h: 30, c: KRAFT }]),
+    ...cabinet(rw, 1, 'cab-r', 0, 230, [{ w: 50, h: 52, c: '#1d2228', print: `<rect x="5" y="5" width="40" height="30" fill="#8fd3f4"/><rect x="20" y="38" width="10" height="14" fill="${STEEL}"/>` }, { w: 40, h: 40, c: CREAM, print: headset }, { w: 24, h: 40, c: SUN, print: phoneBoxPrint('#bfe6f8') }, { w: 24, h: 40, c: BLUE, print: phoneBoxPrint('#ffd3a8') }, { w: 40, h: 26, c: CORAL }])
+  ];
   // Showcase: the phone on a turntable. Its colour is the page's variant picker; the chips are the swatches.
   const ped = box({ id: 'pedestal', x: 0, z: -112, w: 130, h: 76, d: 90, stock: 'cover', c: DEEP, front: `<rect x="10" y="10" width="110" height="56" fill="none" stroke="${CREAM}" stroke-width="3"/>`, top: `<ellipse cx="65" cy="45" rx="56" ry="38" fill="${CREAM}"/><ellipse cx="65" cy="45" rx="44" ry="28" fill="#e9dcc4"/>` });
   const phones = VARIANT_COLORS.map((c, i): Panel => ({ ...stand(`phone-${i}`, 0, -118, 78, 48, 92, c, { density: 3, mask: '<rect width="48" height="92" rx="7" fill="#fff"/>', print: phoneArt(48, 92, c, screens[i]) }, 0, 12), show: { toy: 'variant', at: [i] } }));
@@ -153,10 +174,10 @@ export function shop(): Scene {
   const string = `<path d="M0 30${Array.from({ length: 41 }, (_, i) => `L${(i + 1) * W / 41} ${sag((i + 1) * W / 41).toFixed(1)}`).join('')}" stroke="#fff" stroke-width="3" fill="none"/>`;
   const bunting: Panel = { id: 'bunting', stock: 'cover', c: CREAM, w: W, h: 96, o: [-W / 2, H - 100, 120], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.4, mask: string + flags, print: `${Array.from({ length: 22 }, (_, i) => `<rect x="${i * 46 + 9}" width="30" height="96" fill="${[CORAL, SUN, BLUE, MINT][i % 4]}"/>`).join('')}` };
   const lamps = [[-175, -60], [0, -90], [175, -60]] as const;
-  const panels = [sill('sill', '#6d4524'), bunting, fl, rug, mat, back, lw, rw, peg, ...accessories, ...wallDeco, ...win('win-a', 150, 4), ...win('win-b', 760, 9),
+  const panels = [sill('sill', '#6d4524'), bunting, fl, rug, mat, back, lw, rw, peg, ...accessories, ...wallDeco, ...cabinets, ...win('win-a', 150, 4), ...win('win-b', 760, 9),
     pennant('tag-promo', 120, 352, CORAL, percent), pennant('tag-phones', 800, 352, BLUE, phoneIcon), poster, ...shelves,
     ...ped, ...phones, ...chips, ...catStand, ...leaflet, ...promoStand, pole, ...tags, burst, coupon(0), coupon(1),
-    ...basket, handle, ...inCart, ...riser, ...recs, shopper, ...stairCard('stairs', 395, 1, WOOD),
+    ...basket, handle, ...inCart, ...riser, ...recs, shopper, ...shopStairs(back, 395, WOOD),
     ...lamps.flatMap(([x, z], i) => lampSet(`lamp-${i}`, x, z, 300, H)), ...foreground];
   return { id: 'shop', camera: { zoom: .8, x0: -30, x1: 30 }, light: ROOM_LIGHT, lamps: lamps.map(([x, z]) => lamp(x, z, 300)), panels };
 }

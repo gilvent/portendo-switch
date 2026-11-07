@@ -23,7 +23,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 
 | Space | Base | Accents | Neutral |
 |---|---|---|---|
-| Street | Sky `#8fd3f4`, grass `#7fbf6a`, foliage `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
+| Riverside promenade (street) | Sky `#8fd3f4`, brick paving `#dba38b`, river `#4fa9d6`, palm `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
 
@@ -59,6 +59,10 @@ Sun colour is warm (1, .96, .9) with a 8° soft edge. Sky fill is cool, at stren
 
 ## Composition
 
+### 0. Setting
+
+The Blibli street is a walkable riverside shopping promenade: a brick plaza closed by shops on the left, right and back, the Blibli shop as its anchor, and the river seen through a pergola gate at the back left, with boats on it and the far bank beyond. Every object must belong to that place: stalls, kiosks, palms, planters, café tables, flags, festoon lights, shoppers. Nothing is added only to fill space (no balloons, no mountains).
+
 Every space follows one scene standard. It is not limited to shoeboxes: a space can be a room box, a street on a curved ring, or any other diorama shape the game needs.
 
 ### 1. Technique by role and distance
@@ -68,8 +72,8 @@ Split each space into the **main space**, where the courier walks and plays, and
 | Part | Build | In the Blibli spaces |
 |---|---|---|
 | Main space | Freestanding folds with real volume: boxes, tubes, ridge folds, slotted pairs, stacked contours. Slim or intricate outlines (people, bikes, scooters) are stand-up cut cards. The ground is flat sheets at slightly different heights. | Mailbox, parcels, bench, sandwich board, bins, lamps; showcase pedestal, tri-fold leaflet, price stand, basket, riser; reviewer's desk, camera, belts |
-| Open surroundings | Many thin flat layers, one behind another, alternating pale and deep. Far detail is tiny flat print, and each layer carries its own small stories. They sit in the CSS backdrop when far enough. | Sky with sun, two cloud tones, balloons and birds; snow-capped mountains; hills dotted with trees; a far skyline with a broadcast tower and a crane; two mid-city rows of separately coloured blocks with water tanks, masts and billboards; a viaduct with trains; a mixed tree row; gabled houses. The street is also seen through every window |
-| Enclosed surroundings | Relief fixed to its surface, sticking out toward the main space: half pieces on walls, hanging pieces on ceilings, low edges on floors. Anything with depth is **carved** relief (`carved` in `kit.ts`): real volume, painted onto the wall as the game camera sees it, so shelf lips, box ends and tops all show | Neighbouring shopfronts with recessed windows and folded awnings; pegboard, shelves, clock and frame on the shop walls; steel racking stocked with cartons, totes, crates, binders and rolls on the store-room side walls; high shelves under the roof slopes |
+| Open surroundings | Many thin flat layers, one behind another, alternating pale and deep. Far detail is tiny flat print. They sit in the CSS backdrop when far enough. Only what belongs to the place. | The river through the gate: water with ripples, a tour boat and a sailboat, the far bank of shops, cafés, trees and a ferry; above it, sky, clouds, gulls and the city's offices with rooftop tanks, masts and billboards. The street is also seen through every window |
+| Enclosed surroundings | Bounding facades on every side the eye is stopped, built flat and dressed in relief fixed to their surface, sticking out toward the main space: half pieces on walls, hanging pieces on ceilings, low edges on floors. Anything with depth is **carved** relief (`carved` in `kit.ts`): real volume, painted onto the wall as the game camera sees it, so shelf lips, box ends and tops all show | The promenade's white waterfront building (souvenir stall, scarves, boat-tour office, balcony, window boxes), red café (striped awnings, shutters, menu board, planters) and boutique; window boxes, lanterns and a blade sign on the Blibli shop; pegboard, shelves, clock and frame on the shop walls; steel racking stocked with cartons, totes, crates, binders and rolls on the store-room side walls; high shelves under the roof slopes |
 
 - Layered shadow-box work (flat cards stacked a little apart, flattened along the surface's normal by `relief`) is only for flat objects (posters, boards, frames, cards) and for open distant views. Never use it for objects with depth on a wall indoors, above all on side walls, where the camera sees them edge-on and they collapse into flat strips.
 - One surface can be partly both: enclosure in front, the open view through its gaps. The alleys between the shops show the skyline; the windows show the street.
@@ -78,7 +82,8 @@ Split each space into the **main space**, where the courier walks and plays, and
 
 ### 2. Variants
 
-- One base design per object type, varied by size, proportion, repeated parts (storeys, tiers), pose and small add-ons. The street's three neighbours are one `shopfront` recipe; the passers-by are one figure, flipped, recoloured and scaled to a child.
+- One base design per object type, varied by size, proportion, repeated parts (storeys, tiers), pose and small add-ons. The facades share one frame and one set of relief parts (`fawning`, `fbalcony`, `fflowers`, `fblade`, `flamp`); shoppers are one figure varied by build (trousers, shorts, dress, child), hat, backpack and what they carry.
+- Freestanding objects carry real structure and detail, not one flat shape: a palm is a ringed trunk and fans of broad cut fronds at different headings and droops; a shade tree is a forked trunk under scalloped leaf clusters layered at different depths and greens; a person is a figure plus an arm-and-bag layer standing proud of it.
 - Colours come from a narrow family per type. Phones use the three variant colours wherever they appear.
 - Group in small clusters (a bench with a bike, a family of shoppers), not on an even grid, except where the subject is regular (shelves, belts), and then break it a little.
 
@@ -120,7 +125,7 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all three spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds all three spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
 1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
@@ -139,10 +144,12 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 - Use relief for anything against a wall: real depth in Blender, no quad in the browser. Carved relief costs nothing extra in the browser either.
 - Mark sheets with no cut-outs as opaque so the browser skips blending them.
 - Anything far away and flat belongs in the CSS backdrop.
+- Texture area costs as much as quad count: every quad is rasterised at its own texel size times the device pixel ratio. A scene sets `density` for panels that set none (the street uses 2.1), ghost faces pack at .35, and carved pieces are cut no finer than their wall.
+- Measured with `tests/perf.mjs` (software GPU, 4x CPU throttle, DPR 2.625) in a cloud container slower than the original machine: the old 112-quad street walked at 27.8fps there; the 200-quad promenade walks at about 17–21fps depending on texture density. Re-measure on the reference machine before trusting the 60fps target.
 
 | Space | Quad limit, enforced by the journey test |
 |---|---|
-| Street | 130 |
+| Street (riverside promenade) | 210 |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
 
