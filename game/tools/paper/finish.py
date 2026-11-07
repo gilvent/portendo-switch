@@ -25,6 +25,8 @@ AH0, AW0 = alpha.shape
 light = ndimage.zoom(light, (AH0 / light.shape[0], AW0 / light.shape[1], 1), order=1)[:AH0, :AW0]
 albedo = decode(rgba[:, :, :3])
 baked = np.zeros_like(albedo)
+glass = np.zeros_like(albedo)
+is_glass = np.zeros(alpha.shape, dtype=bool)
 BY_ID = {p["id"]: p for p in L["panels"]}
 SIGMA = float(__import__("os").environ.get("LIGHT_SMOOTH", "2.2"))
 
@@ -51,9 +53,17 @@ for p in L["panels"]:
     wsum = ndimage.gaussian_filter(m, k, mode="nearest") + 1e-6
     smooth = np.dstack([ndimage.gaussian_filter(part[..., c] * m, k, mode="nearest") / wsum for c in range(3)])
     baked[y:y + h, x:x + w] = albedo[y:y + h, x:x + w] * (smooth + p["emit"])
+    # Glass (a see-through pane, alpha well under one) takes the panel's typical light, not a nearest neighbour's:
+    # filling it from the nearest solid pixel cuts it into lit and shaded facets.
+    pane = (alpha[y:y + h, x:x + w] > 0.02) & (alpha[y:y + h, x:x + w] <= 0.5)
+    if pane.any():
+        typical = np.median(part[m > 0.5], axis=0)
+        glass[y:y + h, x:x + w][pane] = (albedo[y:y + h, x:x + w] * (typical + p["emit"]))[pane]
+        is_glass[y:y + h, x:x + w] |= pane
 solid = alpha > 0.5
 idx = ndimage.distance_transform_edt(~solid, return_distances=False, return_indices=True)
 lin = baked[idx[0], idx[1]]
+lin[is_glass] = glass[is_glass]
 a = alpha.copy()
 
 
@@ -95,7 +105,15 @@ for d in sorted((p for p in L["panels"] if p["decal"] and not p["view"]), key=he
 
 C = L["camera"]
 reach = 1160 / C["zoom"]
-CAMERAS = [np.array([x, reach * .225, reach * .974]) for x in (C["x0"], C["x1"])]
+if "lift" in C:
+    # The eye of the landscape game camera (1280x720: scale 1.1, perspective 900 at 42% height, stage pushed back 260
+    # and dropped by `lift`, tilted 13 degrees), worked back into world space.
+    zs, tilt = 1.1 * C["zoom"], np.radians(13)
+    ey, ez = (-720 * .08 - C["lift"] * 1.1) / zs, (900 + 260) / zs
+    eye_y, eye_z = -(ey * np.cos(tilt) - ez * np.sin(tilt)), ey * np.sin(tilt) + ez * np.cos(tilt)
+    CAMERAS = [np.array([x, eye_y, eye_z]) for x in (C["x0"], C["x1"])]
+else:
+    CAMERAS = [np.array([x, reach * .225, reach * .974]) for x in (C["x0"], C["x1"])]
 EYE = sum(CAMERAS) / len(CAMERAS)
 
 

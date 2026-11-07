@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { content } from './content.ts';
 import { pathOf, parsePath, reduce, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
-import { BRAKE_S } from './art/Outside.tsx';
 import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
 import { reducedMotion } from './light.ts';
@@ -18,8 +17,8 @@ export default function App() {
   const [game, setGame] = useState<Game>(() => start(content, location.pathname));
   const gameRef = useRef(game);
   gameRef.current = game;
-  // The train ride: braking into the chosen station, the doors, and walking out. Input waits while it plays.
-  const [fx, setFx] = useState({ ride: 0, dwell: 0, doors: 0, lurch: 0 });
+  // The train stands in the station: A at the doors opens them and the salaryman walks out. Input waits while it plays.
+  const [fx, setFx] = useState({ ride: 0, dwell: 0, doors: 0 });
   const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
   const busy = useRef(false);
   const timers = useRef<number[]>([]);
@@ -35,10 +34,9 @@ export default function App() {
         const k = gameRef.current.toys[`${here.world}/${act.toy}`] ?? 0;
         busy.current = true; held.current.clear(); target.current = null;
         timers.current.forEach(clearTimeout); timers.current = [];
-        setFx({ ride: k + 1, dwell: 0, doors: 0, lurch: 1 });
-        later(BRAKE_S * 1000 - 150, () => setFx(f => ({ ...f, lurch: 0 })));
-        later(BRAKE_S * 1000 + 250, () => setFx(f => ({ ...f, doors: 1 })));
-        later(BRAKE_S * 1000 + 800, () => { exit.current = { x: door.x, z: -150 - 90, then: () => { busy.current = false; exit.current = null; setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 }); const r = reduce(content, gameRef.current, { a: 'confirm' }); gameRef.current = r[0]; setGame(r[0]); } }; });
+        setFx({ ride: k + 1, dwell: 0, doors: 0 });
+        later(200, () => setFx(f => ({ ...f, doors: 1 })));
+        later(750, () => { exit.current = { x: door.x, z: -150 - 90, then: () => { busy.current = false; exit.current = null; setFx({ ride: 0, dwell: 0, doors: 0 }); const r = reduce(content, gameRef.current, { a: 'confirm' }); gameRef.current = r[0]; setGame(r[0]); } }; });
         return;
       }
     }
@@ -89,6 +87,8 @@ export default function App() {
   const framed = useRef<WorldId | null>(null);
 
   const measure = useCallback(() => { const tall = innerHeight > innerWidth; cam.current.scale = tall ? Math.min(.86, innerWidth / 480) : Math.max(.5, Math.min(innerWidth / 1100, innerHeight / 620, 1.1)); cam.current.lift = tall ? -40 : 150; }, []);
+  // A world may sit its diorama lower in the frame (more of what stands behind it shows), per orientation.
+  const liftOf = (w: WorldId) => { const c = content.worlds[w].camera; return (innerHeight > innerWidth ? c?.liftTall : c?.lift) ?? cam.current.lift; };
   useEffect(() => { measure(); addEventListener('resize', measure); return () => removeEventListener('resize', measure); }, [measure]);
 
   const worldRef = useRef(world);
@@ -111,14 +111,13 @@ export default function App() {
     // Off the train: come down from the station at the world's way back to the MRT, then walk to the first stop.
     const fromTrain = cameFrom === 'mrt' && world !== 'mrt' && !reducedMotion() ? content.worlds[world].stops.find(x => x.action.kind === 'road' && x.action.to === 'mrt') : undefined;
     if (fromTrain) { walker.current = { x: fromTrain.x + 20, z: fromTrain.z - 50, vx: 0, vz: 0 }; lastNear.current = fromTrain.id; cam.current.x = content.worlds[world].camera ? content.worlds[world].camera!.x0 : fromTrain.x; target.current = { stop: s, open: false }; }
-    // Back from a work scene: the train stands at that station with its doors open, then closes them and pulls away.
+    // Back from a work scene: the train stands with its doors open, then closes them.
     if (world === 'mrt' && s.action.kind === 'ride' && cameFrom && cameFrom !== 'intro') {
       const k = (gameRef.current.toys[`mrt/${s.action.toy}`] ?? 0) + 1;
-      if (reducedMotion()) { setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 }); return; }
-      setFx({ ride: 0, dwell: k, doors: 1, lurch: 0 });
+      if (reducedMotion()) { setFx({ ride: 0, dwell: 0, doors: 0 }); return; }
+      setFx({ ride: 0, dwell: k, doors: 1 });
       later(1500, () => setFx(f => ({ ...f, doors: 0 })));
-      later(2300, () => setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 }));
-    } else if (world === 'mrt') setFx({ ride: 0, dwell: 0, doors: 0, lurch: 0 });
+    } else if (world === 'mrt') setFx({ ride: 0, dwell: 0, doors: 0 });
   }, [spawnKey]);
 
   const teleport = useCallback((w: WorldId, s: Stop) => {
@@ -147,7 +146,7 @@ export default function App() {
       if (p.k === 'letter' && p.world !== framed.current) {
         framed.current = p.world;
         const c = cam.current, z = c.scale * (content.worlds[p.world].camera?.zoom ?? 1);
-        if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${c.lift * c.scale}px,-260px) scale3d(${z},${z},${z}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,0)`;
+        if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${liftOf(p.world) * c.scale}px,-260px) scale3d(${z},${z},${z}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,0)`;
       }
       if (p.k === 'letter') { if (iz0 && letterRef.current) letterRef.current.scrollTop += iz0 * 900 * dt; return; }
       if (p.k !== 'walk' || g.controller.mode === 'docking') return;
@@ -201,7 +200,7 @@ export default function App() {
       if (walking !== wasWalking.current) { wasWalking.current = walking; courierRef.current?.toggleAttribute('data-walking', walking); }
       if (courierRef.current) courierRef.current.style.transform = `translate3d(${n.x}px,${-bob}px,${n.z}px) rotateZ(${lean}deg)`;
       const zs = (c.scale * (w.camera?.zoom ?? 1) * c.focus).toFixed(4);
-      if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${(c.lift * c.scale * (1 + (c.focus - 1) * 1.6)).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
+      if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${(liftOf(p.world) * c.scale * (1 + (c.focus - 1) * 1.6)).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
     };
     gsap.ticker.add(tick);
     return () => gsap.ticker.remove(tick);

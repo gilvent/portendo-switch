@@ -20,7 +20,7 @@ export type Run = { group: string; from: V3; to: V3; count: number; seconds: num
 export type Scene = {
   id: string; panels: Panel[]; runs?: Run[]; lamps?: Lamp[];
   light: { sun: number; sky: number; skyColor: readonly [number, number, number] };
-  camera: { zoom: number; x0: number; x1: number };
+  camera: { zoom: number; x0: number; x1: number; lift?: number };
 };
 
 export const add = (a: V3, b: V3, k = 1): V3 => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];

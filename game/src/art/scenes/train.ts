@@ -1,5 +1,7 @@
-import { add, box, carved, on, slot, yaw, type Panel, type Scene, type V3 } from '../kit.ts';
+import { add, box, carved, on, slot, yaw, type BoxSpec, type Panel, type Scene, type V3 } from '../kit.ts';
 import { BLUE, CORAL, CREAM, DEEP, INK, KRAFT, SUN, reseed, specks } from '../recipes.ts';
+import { SKIN, seated, standing, type Look } from './people.ts';
+import { station as buildStation } from './station.ts';
 
 // The home space: one MRT car on an elevated line, cut open along its near side like a cutaway model.
 // The car runs along x. Its far side (the back wall) carries the doors, windows and the long benches;
@@ -31,58 +33,6 @@ const COVE_IN = 34, COVE_LEN = Math.hypot(CAR.COVE - H, COVE_IN), coveV: V3 = [0
 const cove = (): Panel => ({ id: 'cove', stock: 'cover', c: SHELL, w: W, h: COVE_LEN, o: [-W / 2, H, BACK], u: [1, 0, 0], v: coveV, edge: 'fold', density: 1.4, split: 3, print: `<rect width="${W}" height="${COVE_LEN}" fill="${SHELL}"/>` });
 const onCove = (x: number, y: number, w: number, h: number, rest: Partial<Panel> & Pick<Panel, 'id' | 'stock' | 'c'>, gap = 1) => on(cove(), gap, bx(x), y, w, h, rest);
 
-/* ---------- people: one cut figure, seated or standing, recoloured and given small props ---------- */
-type Look = { skin: string; hair: string; top: string; legs: string; shoes?: string; hairStyle?: 'short' | 'long' | 'bun' | 'cap' | 'grey'; capC?: string };
-const SKIN = ['#f3c9a0', '#d9a77e', '#b07a52', '#f6d5b8'];
-const hairPath = (cx: number, top: number, style: Look['hairStyle'], c: string, capC = CORAL) => {
-  const r = 12, cy = top + r;
-  if (style === 'long') return `<path d="M${cx - r - 1} ${cy + 16}V${cy}Q${cx - r} ${top - 1} ${cx} ${top - 1}Q${cx + r} ${top - 1} ${cx + r + 1} ${cy}V${cy + 16}H${cx + r - 4}V${cy - 2}Q${cx} ${cy - 6} ${cx - r + 4} ${cy - 2}V${cy + 16}Z" fill="${c}"/>`;
-  if (style === 'bun') return `<circle cx="${cx}" cy="${top - 3}" r="6" fill="${c}"/><path d="M${cx - r} ${cy}Q${cx - r} ${top - 1} ${cx} ${top - 1}Q${cx + r} ${top - 1} ${cx + r} ${cy}Q${cx} ${cy - 7} ${cx - r} ${cy}Z" fill="${c}"/>`;
-  if (style === 'cap') return `<path d="M${cx - r} ${cy - 1}Q${cx - r} ${top - 2} ${cx} ${top - 2}Q${cx + r} ${top - 2} ${cx + r} ${cy - 1}Z" fill="${capC}"/><rect x="${cx - r - 2}" y="${cy - 3}" width="${2 * r + 4}" height="4" rx="2" fill="${capC}"/>`;
-  return `<path d="M${cx - r} ${cy + 1}Q${cx - r} ${top - 1} ${cx} ${top - 1}Q${cx + r} ${top - 1} ${cx + r} ${cy + 1}Q${cx + 3} ${cy - 6} ${cx - r} ${cy + 1}Z" fill="${c}"/>`;
-};
-const face = (cx: number, cy: number, closed = false, glasses = false) => (closed
-  ? `<path d="M${cx - 6} ${cy}q2 2 4 0M${cx + 2} ${cy}q2 2 4 0" stroke="${INK}" stroke-width="1.2" fill="none"/>`
-  : `<circle cx="${cx - 4}" cy="${cy}" r="1.5" fill="${INK}"/><circle cx="${cx + 4}" cy="${cy}" r="1.5" fill="${INK}"/>`)
-  + (glasses ? `<g fill="none" stroke="${INK}" stroke-width="1"><rect x="${cx - 8}" y="${cy - 3}" width="7" height="6" rx="2"/><rect x="${cx + 1}" y="${cy - 3}" width="7" height="6" rx="2"/></g>` : '')
-  + `<path d="M${cx - 3} ${cy + 6}q3 2 6 0" stroke="#a5674a" stroke-width="1.1" fill="none"/>`;
-
-// Seated, facing the camera: head, torso, a short lap band, shins to the floor. 56 wide, 128 tall from the floor.
-function seated(id: string, x: number, look: Look, extra: { print?: string; mask?: string; closed?: boolean; glasses?: boolean; tilt?: number } = {}): Panel {
-  const w = 60, h = 130, cx = 30, top = 4;
-  const mask = `<circle cx="${cx}" cy="${top + 12}" r="12.5" fill="#fff"/><rect x="${cx - 5}" y="${top + 22}" width="10" height="8" fill="#fff"/>`
-    + `<path d="M${cx - 21} ${top + 36}Q${cx - 21} ${top + 28} ${cx - 12} ${top + 28}H${cx + 12}Q${cx + 21} ${top + 28} ${cx + 21} ${top + 36}V${top + 82}H${cx - 21}Z" fill="#fff"/>`
-    + `<rect x="${cx - 22}" y="${top + 76}" width="44" height="16" rx="5" fill="#fff"/><rect x="${cx - 17}" y="${top + 90}" width="13" height="${h - top - 98}" fill="#fff"/><rect x="${cx + 4}" y="${top + 90}" width="13" height="${h - top - 98}" fill="#fff"/>`
-    + `<rect x="${cx - 21}" y="${h - 9}" width="18" height="9" rx="3" fill="#fff"/><rect x="${cx + 3}" y="${h - 9}" width="18" height="9" rx="3" fill="#fff"/>` + (extra.mask ?? '');
-  const print = `<rect width="${w}" height="${h}" fill="${look.top}"/><circle cx="${cx}" cy="${top + 12}" r="12.5" fill="${look.skin}"/><rect x="${cx - 5}" y="${top + 22}" width="10" height="8" fill="${look.skin}"/>`
-    + hairPath(cx, top, look.hairStyle, look.hair, look.capC) + face(cx, top + 14, extra.closed, extra.glasses)
-    + `<path d="M${cx - 21} ${top + 40}V${top + 78}M${cx + 21} ${top + 40}V${top + 78}" stroke="#000" stroke-opacity=".14" stroke-width="5"/>`
-    + `<rect x="${cx - 22}" y="${top + 76}" width="44" height="16" rx="5" fill="${look.legs}"/><rect x="${cx - 17}" y="${top + 90}" width="13" height="${h - top - 98}" fill="${look.legs}"/><rect x="${cx + 4}" y="${top + 90}" width="13" height="${h - top - 98}" fill="${look.legs}"/>`
-    + `<rect x="${cx - 22}" y="${h - 9}" width="20" height="9" rx="3" fill="${look.shoes ?? INK}"/><rect x="${cx + 2}" y="${h - 9}" width="20" height="9" rx="3" fill="${look.shoes ?? INK}"/>` + (extra.print ?? '');
-  const r = yaw(extra.tilt ?? 0);
-  return { id, stock: 'cover', c: look.top, w, h, o: add([x, 0, BACK + 64], r([-w / 2, 0, 0])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 2.4, mask, print };
-}
-// Standing: 54 wide, 164 tall. `arm` raises one hand to a strap or pole above the head.
-function standing(id: string, x: number, z: number, look: Look, extra: { print?: string; mask?: string; arm?: 'left' | 'right'; rot?: number; scale?: number } = {}): Panel {
-  const k = extra.scale ?? 1, w = 64, h = 200, cx = 32, top = 54;
-  const armL = extra.arm === 'left', armR = extra.arm === 'right';
-  const mask = `<circle cx="${cx}" cy="${top + 12}" r="12.5" fill="#fff"/><rect x="${cx - 5}" y="${top + 22}" width="10" height="8" fill="#fff"/>`
-    + `<path d="M${cx - 20} ${top + 38}Q${cx - 20} ${top + 28} ${cx - 11} ${top + 28}H${cx + 11}Q${cx + 20} ${top + 28} ${cx + 20} ${top + 38}V${top + 92}H${cx - 20}Z" fill="#fff"/>`
-    + `<rect x="${cx - 17}" y="${top + 88}" width="15" height="${h - top - 96}" fill="#fff"/><rect x="${cx + 2}" y="${top + 88}" width="15" height="${h - top - 96}" fill="#fff"/>`
-    + `<rect x="${cx - 21}" y="${h - 9}" width="19" height="9" rx="3" fill="#fff"/><rect x="${cx + 2}" y="${h - 9}" width="19" height="9" rx="3" fill="#fff"/>`
-    + (armL ? `<path d="M${cx - 20} ${top + 40}L${cx - 25} 12L${cx - 12} 12L${cx - 12} ${top + 34}Z" fill="#fff"/><circle cx="${cx - 18.5}" cy="9" r="7.5" fill="#fff"/>` : '')
-    + (armR ? `<path d="M${cx + 20} ${top + 40}L${cx + 25} 12L${cx + 12} 12L${cx + 12} ${top + 34}Z" fill="#fff"/><circle cx="${cx + 18.5}" cy="9" r="7.5" fill="#fff"/>` : '') + (extra.mask ?? '');
-  const print = `<rect width="${w}" height="${h}" fill="${look.top}"/><circle cx="${cx}" cy="${top + 12}" r="12.5" fill="${look.skin}"/><rect x="${cx - 5}" y="${top + 22}" width="10" height="8" fill="${look.skin}"/>`
-    + hairPath(cx, top, look.hairStyle, look.hair, look.capC) + face(cx, top + 14)
-    + (armL ? `<path d="M${cx - 20} ${top + 38}L${cx - 24.5} 14L${cx - 12.5} 14L${cx - 12} ${top + 32}Z" fill="${look.top}"/><path d="M${cx - 24} 14H${cx - 13}V${top - 8}H${cx - 24}Z" fill="${look.skin}"/><circle cx="${cx - 18.5}" cy="9" r="7" fill="${look.skin}"/>` : '')
-    + (armR ? `<path d="M${cx + 20} ${top + 38}L${cx + 24.5} 14L${cx + 12.5} 14L${cx + 12} ${top + 32}Z" fill="${look.top}"/><path d="M${cx + 24} 14H${cx + 13}V${top - 8}H${cx + 24}Z" fill="${look.skin}"/><circle cx="${cx + 18.5}" cy="9" r="7" fill="${look.skin}"/>` : '')
-    + `<path d="M${cx - 20} ${top + 40}V${top + 88}M${cx + 20} ${top + 40}V${top + 88}" stroke="#000" stroke-opacity=".14" stroke-width="5"/>`
-    + `<rect x="${cx - 17}" y="${top + 88}" width="15" height="${h - top - 96}" fill="${look.legs}"/><rect x="${cx + 2}" y="${top + 88}" width="15" height="${h - top - 96}" fill="${look.legs}"/>`
-    + `<rect x="${cx - 21}" y="${h - 9}" width="19" height="9" rx="3" fill="${look.shoes ?? INK}"/><rect x="${cx + 2}" y="${h - 9}" width="19" height="9" rx="3" fill="${look.shoes ?? INK}"/>` + (extra.print ?? '');
-  const r = yaw(extra.rot ?? 0), u = r([k, 0, 0]);
-  return { id, stock: 'cover', c: look.top, w, h, o: add([x, 0, z], r([-w * k / 2, 0, 0])), u, v: [0, k, 0], edge: 'cut', density: 2.4, mask, print };
-}
-
 // Kneeling on the seat, facing the window: the back of a small passenger, shoes up on the cushion edge.
 function kneeling(id: string, x: number): Panel {
   const w = 44, h = 84;
@@ -110,6 +60,10 @@ export function train(): Scene {
     print: `<rect width="${W + 24}" height="${UNDER}" fill="#2f353d"/><rect width="${W + 24}" height="7" fill="#7e8893"/><rect y="7" width="${W + 24}" height="4" fill="#1d2228"/><rect y="11" width="${W + 24}" height="19" fill="${SHELL}"/><rect y="17" width="${W + 24}" height="7" fill="${LIVERY}"/><rect y="24" width="${W + 24}" height="3" fill="${DEEP}"/>`
       + `<g transform="translate(12 0)">${bogie(-440)}${bogie(440)}</g>${Array.from({ length: 7 }, (_, i) => `<rect x="${bx(-250) + 12 + i * 80}" y="30" width="54" height="22" rx="3" fill="#3a4049"/><rect x="${bx(-250) + 18 + i * 80}" y="36" width="42" height="3" fill="#5b636d"/>`).join('')}` };
 
+  // Seen through the section between the bogies: the undercar equipment boxes, the cable runs and, below them, the
+  // far rail on its sleepers, so the cut never opens onto nothing.
+  const under: Panel = { id: 'undercar', stock: 'greyboard', c: '#2b3037', w: W, h: UNDER + 20, o: [-W / 2, -UNDER - 20, FRONT - 40], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1, split: 2,
+    print: `<rect width="${W}" height="${UNDER + 20}" fill="#2b3037"/>${Array.from({ length: 9 }, (_, i) => `<rect x="${60 + i * 122}" y="${8 + (i % 3) * 4}" width="${70 + (i * 29) % 40}" height="${30 - (i % 3) * 4}" rx="3" fill="${['#3d444e', '#4a5059', '#353b44'][i % 3]}"/><rect x="${66 + i * 122}" y="${14 + (i % 3) * 4}" width="20" height="4" fill="#6c737a"/>`).join('')}<rect y="44" width="${W}" height="3" fill="#1d2228"/><rect y="${UNDER + 2}" width="${W}" height="18" fill="#6f6a62"/>${Array.from({ length: W / 56 }, (_, i) => `<rect x="${i * 56 + 10}" y="${UNDER + 6}" width="30" height="14" fill="#5a4a3c"/>`).join('')}<rect y="${UNDER - 2}" width="${W}" height="6" fill="#8e959c"/>` };
   // Back wall pieces that are flat: window frames, door frames, the destination LEDs over each door.
   const winFrames = WINDOWS.map(([a, b], i) => on(back, 1.4, bx(a) - 4, H - CAR.WIN[1] - 4, b - a + 8, CAR.WIN[1] - CAR.WIN[0] + 8, { id: `win-frame-${i}`, stock: 'cover', c: '#aeb8c2', density: 1.6,
     mask: `<path fill-rule="evenodd" d="M0 0H${b - a + 8}V${CAR.WIN[1] - CAR.WIN[0] + 8}H0Z M16 4h${b - a - 24}a12 12 0 0 1 12 12v${CAR.WIN[1] - CAR.WIN[0] - 24}a12 12 0 0 1 -12 12h${-(b - a - 24)}a12 12 0 0 1 -12 -12v${-(CAR.WIN[1] - CAR.WIN[0] - 24)}a12 12 0 0 1 12 -12Z" fill="#fff"/>` }));
@@ -170,8 +124,7 @@ export function train(): Scene {
   const straps = strapXs.map((x, i): Panel => { const pri = x < -400; return { id: `strap-${i}`, stock: 'cover', c: pri ? SUN : '#f4f6f8', w: 20, h: SL, o: [x - 10, RAIL_Y - SL + 3, RAIL_Z + 2], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 3,
     mask: `<path fill-rule="evenodd" d="M7 0H13V${SL - 34}H7Z M5 ${SL - 36}H15V${SL - 26}H5Z M10 ${SL - 28}L20 ${SL - 12}Q20 ${SL} 10 ${SL}Q0 ${SL} 0 ${SL - 12}Z M10 ${SL - 21}L5 ${SL - 12}Q5 ${SL - 5} 10 ${SL - 5}Q15 ${SL - 5} 15 ${SL - 12}Z" fill="#fff"/>`,
     print: `<rect width="20" height="${SL}" fill="${pri ? SUN : '#f4f6f8'}"/><rect x="7" width="6" height="${SL - 34}" fill="${pri ? '#c9861f' : '#5d6670'}"/><rect x="5" y="${SL - 36}" width="10" height="10" fill="${pri ? '#c9861f' : '#5d6670'}"/>`,
-    // Braking throws the straps forward, the way the train is heading; they settle once it stands.
-    motion: { toy: 'lurch', at: [1], roll: -(9 + (i * 7) % 6) } }; });
+  }; });
 
   // End walls: the gangway doors into the neighbouring cars, a fire extinguisher and the intercom at the left.
   const endWall = (side: 1 | -1, id: string): Panel => {
@@ -188,6 +141,35 @@ export function train(): Scene {
     ...box({ id: 'extinguisher', x: -W / 2 + 12, z: 92, y: 60, w: 20, h: 62, d: 20, stock: 'cover', c: CORAL, right: `<rect y="18" width="20" height="22" fill="${CREAM}"/><rect x="4" y="24" width="10" height="3" fill="${INK}"/>`, top: `<circle cx="10" cy="10" r="5" fill="${INK}"/>` })
   ]);
   // The intercom: a help point beside the left door, carved onto the wall with a speaker grille and a call button.
+  // Relief on the car's own walls, so the shell reads as a built thing and not a printed sheet: each window gets a sill
+  // ledge, a top lip and jambs standing out from the wall; each door a pair of jambs and a header; the end walls a
+  // framed gangway door, an emergency handle, a sign plate; the cove CCTV domes and speaker grilles.
+  const TRIM = '#c3ccd4';
+  const windowTrim = carved(back, WINDOWS.flatMap(([a, b], i) => [
+    ...box({ id: `win-sill-${i}`, x: (a + b) / 2, z: BACK + 8, y: CAR.WIN[0] - 12, w: b - a + 16, h: 12, d: 16, stock: 'cover', c: TRIM, front: `<rect width="${b - a + 16}" height="12" fill="${TRIM}"/><rect width="${b - a + 16}" height="2" fill="#fff" fill-opacity=".6"/>` }),
+    ...box({ id: `win-lip-${i}`, x: (a + b) / 2, z: BACK + 5, y: CAR.WIN[1], w: b - a + 16, h: 8, d: 10, stock: 'cover', c: TRIM }),
+    ...[a - 4, b + 4].map((x, k) => box({ id: `win-jamb-${i}-${k}`, x, z: BACK + 4, y: CAR.WIN[0], w: 8, h: CAR.WIN[1] - CAR.WIN[0], d: 8, stock: 'cover', c: TRIM })).flat()
+  ]));
+  const doorTrim = carved(back, DOORS.flatMap((x, i) => [
+    ...[-1, 1].flatMap(s => box({ id: `door-jamb-${i}-${s}`, x: x + s * (DOOR_W / 2 + 8), z: BACK + 7, w: 14, h: DOOR_H + 4, d: 14, stock: 'cover', c: TRIM, front: `<rect width="14" height="${DOOR_H + 4}" fill="${TRIM}"/><rect x="5" y="40" width="4" height="${DOOR_H - 80}" fill="#9aa4ae"/>` })),
+    ...box({ id: `door-head-${i}`, x, z: BACK + 8, y: DOOR_H, w: DOOR_W + 30, h: 16, d: 16, stock: 'cover', c: TRIM, front: `<rect width="${DOOR_W + 30}" height="16" fill="${TRIM}"/><circle cx="${DOOR_W / 2 + 15}" cy="8" r="4" fill="${i === 1 ? CORAL : '#9aa4ae'}"/>` })
+  ]));
+  // A box facing into the car from an end wall: `side` -1 is the left wall, 1 the right; zc along the wall.
+  const endBox = (side: -1 | 1, spec: Omit<BoxSpec, 'x' | 'rot'>) => box({ ...spec, x: side * (W / 2 - spec.d / 2), rot: -side * 90 });
+  const gangway = (side: -1 | 1, zc: number, id: string) => [
+    ...[-1, 1].flatMap(s => endBox(side, { id: `${id}-jamb-${s}`, z: zc + s * 52, w: 14, h: 214, d: 12, stock: 'cover', c: TRIM })),
+    ...endBox(side, { id: `${id}-head`, z: zc, y: 214, w: 118, h: 16, d: 14, stock: 'cover', c: TRIM }),
+    ...endBox(side, { id: `${id}-leaf`, z: zc, w: 90, h: 206, d: 4, stock: 'cover', c: '#d6dde3', front: `<rect width="90" height="206" fill="#d6dde3"/><rect x="14" y="16" width="62" height="96" rx="6" fill="#33404d"/><rect x="18" y="20" width="54" height="88" rx="4" fill="#7d93a6"/><rect x="22" y="56" width="46" height="40" fill="#e9edf1" fill-opacity=".55"/><rect x="${side < 0 ? 72 : 12}" y="110" width="6" height="22" rx="3" fill="#5b636d"/><rect y="146" width="90" height="8" fill="${SUN}"/>` }),
+    ...endBox(side, { id: `${id}-handle`, z: zc + side * 76, y: 120, w: 26, h: 38, d: 10, stock: 'cover', c: CORAL, front: `<rect width="26" height="38" rx="3" fill="${CORAL}"/><rect x="7" y="8" width="12" height="18" rx="2" fill="#fff"/><rect x="10" y="12" width="6" height="10" fill="${CORAL}"/>` }),
+    ...endBox(side, { id: `${id}-plate`, z: zc - side * 92, y: 168, w: 40, h: 40, d: 3, stock: 'cover', c: DEEP, front: `<rect width="40" height="40" rx="5" fill="${DEEP}"/><circle cx="18" cy="11" r="4" fill="#fff"/><path d="M16 16V26H26L30 33" stroke="#fff" stroke-width="3" fill="none"/><circle cx="17" cy="28" r="7" fill="none" stroke="#fff" stroke-width="2.4"/>` })
+  ];
+  const endTrim = [...carved(lw, gangway(-1, -10, 'gw-l')), ...carved(rw, gangway(1, 10, 'gw-r'))];
+  // The cove: two CCTV domes and speaker grilles between the ads.
+  const coveAt = (x: number, y: number): [number, number] => [H + y * coveV[1], BACK + y * coveV[2]];
+  const coveTrim = carved(cv, [
+    ...[-400, 300].flatMap((x, i) => { const [y, z] = coveAt(x, 40); return box({ id: `cctv-${i}`, x, z: z + 8, y: y - 6, w: 22, h: 16, d: 16, stock: 'cover', c: '#f4f6f8', front: `<circle cx="11" cy="8" r="6" fill="${INK}"/><circle cx="9" cy="6" r="2" fill="#fff" fill-opacity=".6"/>` }); }),
+    ...[-30, 340, -460].flatMap((x, i) => { const [y, z] = coveAt(x, 30); return box({ id: `speaker-${i}`, x, z: z + 4, y: y - 6, w: 48, h: 14, d: 6, stock: 'cover', c: TRIM, front: `<rect width="48" height="14" rx="3" fill="${TRIM}"/>${Array.from({ length: 7 }, (_, k) => `<rect x="${5 + k * 6}" y="4" width="3" height="6" rx="1" fill="${STEEL}"/>`).join('')}` }); })
+  ]);
   const intercom = carved(back, box({ id: 'intercom', x: -404, z: BACK + 6, y: 150, w: 44, h: 64, d: 12, stock: 'cover', c: SUN,
     front: `<rect width="44" height="64" rx="4" fill="${SUN}"/><rect x="6" y="6" width="32" height="10" rx="2" fill="${INK}"/><g fill="${INK}">${Array.from({ length: 12 }, (_, i) => `<circle cx="${12 + (i % 4) * 7}" cy="${24 + Math.floor(i / 4) * 6}" r="1.6"/>`).join('')}</g><circle cx="22" cy="51" r="7" fill="${CORAL}"/><circle cx="22" cy="51" r="3.4" fill="#ff8a64"/>` }));
   const emergency = on(back, 1.2, bx(-404) - 20, 96, 40, 40, { id: 'help-sign', stock: 'bond', c: '#fff', density: 3, print: `<rect width="40" height="40" rx="4" fill="#fff"/><rect x="3" y="3" width="34" height="34" rx="3" fill="none" stroke="${CORAL}" stroke-width="2"/><path d="M14 12H26V18H20V22H26V28H14Z" fill="none"/><path d="M12 28L20 10L28 28Z" fill="none" stroke="${CORAL}" stroke-width="3" stroke-linejoin="round"/><rect x="19" y="17" width="2.4" height="6" fill="${CORAL}"/><circle cx="20.2" cy="25.5" r="1.4" fill="${CORAL}"/>` });
@@ -203,16 +185,44 @@ export function train(): Scene {
     mask: `<path d="M10 ${PH}V${PH - 8}H70V${PH}Z M18 ${PH - 8}L74 ${PH - 30}L78 ${PH - 26}L24 ${PH - 6}Z M74 ${PH - 30}L40 4L45 2L80 ${PH - 28}Z M14 0H86V5H14Z M8 3Q8 0 12 0V5Q8 5 8 3Z M88 3Q92 3 92 0H86V5Z M18 ${PH}V${PH - 10}H26V${PH}Z M54 ${PH}V${PH - 10}H62V${PH}Z" fill="#fff"/>`,
     print: `<rect width="130" height="${PH}" fill="#3a4049"/><rect x="14" width="72" height="5" fill="#c9ced3"/><rect x="18" y="${PH - 10}" width="8" height="10" fill="#b0552e"/><rect x="54" y="${PH - 10}" width="8" height="10" fill="#b0552e"/>` }];
 
-  // Neighbour cars past each end: the gangway bellows and a slice of the next car, closed, seen from outside.
+  // Neighbour cars past each gangway, closed, seen from outside: a near shell with cut windows and a door, and behind
+  // it the car's interior (floor, far wall with benches and riders in relief, its own windows), so each window shows
+  // the inside of that car and, through its far windows, the screen doors and the island beyond.
   const bellows = (id: string, x: number): Panel => ({ id, stock: 'greyboard', c: '#2b3037', w: 30, h: H + 50, o: [x, 0, -60], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.4, print: `<rect width="30" height="${H + 50}" fill="#2b3037"/>${Array.from({ length: 5 }, (_, i) => `<rect x="${3 + i * 6}" width="3" height="${H + 50}" fill="#4a5059"/>`).join('')}` });
-  const nextCar = (id: string, x: number, flip: boolean): Panel => {
-    const w = 360, h = CAR.ROOF + 14;
-    const print = `<rect width="${w}" height="${h}" fill="${SHELL}"/><rect y="${h - 70}" width="${w}" height="8" fill="${LIVERY}"/><rect y="${h - 62}" width="${w}" height="3" fill="${DEEP}"/><rect y="0" width="${w}" height="26" fill="#d4dbe1"/>`
-      + Array.from({ length: 3 }, (_, i) => `<rect x="${40 + i * 110}" y="${h - CAR.WIN[1] - 14}" width="80" height="${CAR.WIN[1] - CAR.WIN[0]}" rx="12" fill="#3b5266"/><rect x="${46 + i * 110}" y="${h - CAR.WIN[1] - 8}" width="68" height="40" rx="8" fill="#5f7a91"/>${i === 1 ? `<circle cx="${70 + i * 110}" cy="${h - CAR.WIN[1] + 40}" r="9" fill="#d9a77e"/><rect x="${60 + i * 110}" y="${h - CAR.WIN[1] + 50}" width="20" height="30" fill="${MINT}"/>` : ''}`).join('');
-    const full = h + UNDER - 30;
-    return { id, stock: 'cover', c: SHELL, w, h: full, o: [x, -UNDER, -150], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1, mask: `<path d="${flip ? `M0 ${h}V0H${w - 40}Q${w} 0 ${w} 40V${h}Z` : `M0 ${h}V40Q0 0 40 0H${w}V${h}Z`}" fill="#fff"/><g transform="translate(${flip ? 40 : 136} ${h})"><rect width="184" height="${UNDER - 30}" fill="#fff"/></g>`, print: print + `<g transform="translate(${flip ? 40 : 136} ${h})"><rect width="184" height="${UNDER - 30}" fill="#2f353d"/><circle cx="32" cy="${UNDER - 48}" r="15" fill="#23272d"/><circle cx="152" cy="${UNDER - 48}" r="15" fill="#23272d"/><circle cx="32" cy="${UNDER - 48}" r="5" fill="#aab2bb"/><circle cx="152" cy="${UNDER - 48}" r="5" fill="#aab2bb"/></g>` };
+  const NW = 560, NH = CAR.ROOF + 14, NU = 74;
+  const nextCar = (side: -1 | 1): Panel[] => {
+    const x0 = side < 0 ? -W / 2 - 30 - NW : W / 2 + 30, inner = side < 0 ? NW : 0, id = side < 0 ? 'car-l' : 'car-r';
+    const lx = (ix: number) => (side < 0 ? NW - ix : ix);
+    const wins = [[60, 200], [300, 470]].map(([a, b]) => [lx(a), lx(b)].sort((p, q) => p - q) as [number, number]);
+    const door = lx(250) - 62;
+    const win = ([a, b]: [number, number], y0 = CAR.WIN[0], y1 = CAR.WIN[1]) => `M${a + 10} ${NH - y1}h${b - a - 20}a10 10 0 0 1 10 10v${y1 - y0 - 20}a10 10 0 0 1 -10 10h${-(b - a - 20)}a10 10 0 0 1 -10 -10v${-(y1 - y0 - 20)}a10 10 0 0 1 10 -10Z`;
+    const doorWin = `M${door + 18} ${NH - 200}h88v100h-88Z`;
+    const corner = inner ? `M0 ${NH + NU}V0H${NW - 40}Q${NW} 0 ${NW} 40V${NH + NU}Z` : `M0 ${NH + NU}V40Q0 0 40 0H${NW}V${NH + NU}Z`;
+    const wheel = (x: number) => `<circle cx="${x}" cy="${NH + NU - 18}" r="15" fill="#23272d"/><circle cx="${x}" cy="${NH + NU - 18}" r="5" fill="#aab2bb"/>`;
+    const shell: Panel = { id: `${id}-shell`, stock: 'cover', c: SHELL, w: NW, h: NH + NU, o: [x0, -NU, FRONT], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.1, split: 2,
+      mask: `<path fill-rule="evenodd" d="${corner} ${wins.map(w => win(w)).join(' ')} ${doorWin}" fill="#fff"/>`,
+      print: `<rect width="${NW}" height="${NH + NU}" fill="${SHELL}"/><rect width="${NW}" height="26" fill="#d4dbe1"/><rect y="${NH - CAR.WIN[1] - 12}" width="${NW}" height="${CAR.WIN[1] - CAR.WIN[0] + 24}" fill="#3b4652"/><rect y="${NH - 70}" width="${NW}" height="8" fill="${LIVERY}"/><rect y="${NH - 62}" width="${NW}" height="3" fill="${DEEP}"/>`
+        + `<rect x="${door}" y="${NH - 214}" width="124" height="214" fill="#d6dde3"/><rect x="${door + 61}" y="${NH - 214}" width="2" height="214" fill="${INK}"/><rect x="${door + 10}" y="${NH - 214}" width="104" height="6" fill="#9aa4ae"/>`
+        + `<rect y="${NH}" width="${NW}" height="${NU}" fill="#2f353d"/><rect y="${NH}" width="${NW}" height="7" fill="#7e8893"/>${[lx(110), lx(230)].map(c => `<rect x="${c - 80}" y="${NH + 30}" width="160" height="18" rx="4" fill="#3a4049"/>${wheel(c - 50)}${wheel(c + 50)}`).join('')}` };
+    // Window and door frames stand a little proud of the shell: layered relief.
+    const frames = wins.map(([a, b], i) => on(shell, 1.2, a - 2, NU + CAR.WIN[0] - 2, b - a + 4, CAR.WIN[1] - CAR.WIN[0] + 4, { id: `${id}-wf-${i}`, stock: 'cover', c: '#aeb8c2', density: 1.4,
+      mask: `<path fill-rule="evenodd" d="M0 0H${b - a + 4}V${CAR.WIN[1] - CAR.WIN[0] + 4}H0Z M12 6h${b - a - 20}a8 8 0 0 1 8 8v${CAR.WIN[1] - CAR.WIN[0] - 24}a8 8 0 0 1 -8 8h${-(b - a - 20)}a8 8 0 0 1 -8 -8v${-(CAR.WIN[1] - CAR.WIN[0] - 24)}a8 8 0 0 1 8 -8Z" fill="#fff"/>` }));
+    const floor: Panel = { id: `${id}-floor`, stock: 'greyboard', c: FLOOR, w: NW, h: D - 4, o: [x0, 0, FRONT - 2], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: .9, print: `<rect width="${NW}" height="${D}" fill="${FLOOR}"/>${specks(NW, D, '#6f7882', 120, 2.4)}` };
+    // The far wall inside, with its windows (holes onto the station) over a bench of riders, all relief.
+    const fw: Panel = { id: `${id}-far`, stock: 'cover', c: SHELL, w: NW, h: H, o: [x0, 0, BACK + 4], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1,
+      mask: `<path fill-rule="evenodd" d="M0 0H${NW}V${H}H0Z ${wins.map(w => win(w, CAR.WIN[0], CAR.WIN[1]).replace(/M(\S+) (\S+)h/, (_m, x, y) => `M${x} ${+y - (NH - H)}h`)).join(' ')}" fill="#fff"/>`,
+      print: `<rect width="${NW}" height="${H}" fill="${SHELL}"/><rect y="${H - 34}" width="${NW}" height="34" fill="${SHELL_DARK}"/>` };
+    const riders = carved(fw, [
+      ...box({ id: `${id}-bench`, x: x0 + NW / 2, z: BACK + 34, w: NW - 40, h: CAR.SEAT, d: 56, stock: 'cover', c: '#b7c0c9', front: `<rect width="${NW - 40}" height="12" fill="${SEAT}"/>`, top: `<rect width="${NW - 40}" height="56" fill="${SEAT}"/>` }),
+      ...[[60, 1, '#e9ebee'], [150, 2, CORAL], [330, 0, MINT], [420, 3, '#2b3a55']].map(([ix, sk, top], i) => seated(`${id}-rider-${i}`, x0 + lx(ix as number), { skin: SKIN[sk as number], hair: i % 2 ? '#4a2c1a' : INK, top: top as string, legs: '#2e3440', hairStyle: (['short', 'long', 'bun', 'short'] as const)[i] }, { z: BACK + 62 })),
+      standing(`${id}-stander`, x0 + lx(250), -10, { skin: SKIN[1], hair: INK, top: SUN, legs: '#3f5f7a', hairStyle: 'short' }, { arm: side < 0 ? 'left' : 'right' })
+    ]);
+    const roof: Panel = { id: `${id}-roof`, stock: 'cover', c: '#dfe4e8', w: NW, h: D, o: [x0, NH, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: .9,
+      print: `<rect width="${NW}" height="${D}" fill="#dfe4e8"/>${Array.from({ length: 5 }, (_, i) => `<path d="M${(i + 1) * NW / 6} 0V${D}" stroke="#c3cad1" stroke-width="1.4"/>`).join('')}<rect x="${lx(160) - 90}" y="${D / 2 - 40}" width="180" height="80" fill="#c9d0d6"/>` };
+    void inner;
+    return [shell, ...frames, floor, fw, ...riders, roof];
   };
-  const neighbours = [bellows('bellows-l', -W / 2 - 30), bellows('bellows-r', W / 2), nextCar('car-l', -W / 2 - 30 - 360, true), nextCar('car-r', W / 2 + 30, false)];
+  const neighbours = [bellows('bellows-l', -W / 2 - 30), bellows('bellows-r', W / 2), ...nextCar(-1), ...nextCar(1)];
 
   /* ---------- passengers: a morning crowd, each with a small story ---------- */
   const L = (skin: number, hair: string, top: string, legs: string, hairStyle?: Look['hairStyle'], capC?: string): Look => ({ skin: SKIN[skin], hair, top, legs, hairStyle, capC });
@@ -246,13 +256,14 @@ export function train(): Scene {
     mask: `<path d="M8 50Q8 20 36 18L40 50Z M36 18Q62 22 62 50H40Z M4 50H66V64H4Z M64 40L70 4H66L60 40Z" fill="#fff"/><circle cx="14" cy="80" r="11" fill="#fff"/><circle cx="56" cy="80" r="11" fill="#fff"/><path d="M12 64H18L18 72H12Z M52 64H58V72H52Z" fill="#fff"/>`,
     print: `<rect width="70" height="92" fill="${MINT}"/><path d="M8 50Q8 20 36 18L40 50Z" fill="#2a8d6a"/><rect x="4" y="50" width="62" height="14" fill="#2a8d6a"/><rect x="60" width="10" height="44" fill="${STEEL}"/><circle cx="14" cy="80" r="11" fill="${INK}"/><circle cx="56" cy="80" r="11" fill="${INK}"/><circle cx="14" cy="80" r="4" fill="#aab2bb"/><circle cx="56" cy="80" r="4" fill="#aab2bb"/>` };
   const cup = box({ id: 'cup', x: 478, z: BACK + 98, w: 12, h: 18, d: 12, stock: 'cover', c: CREAM, front: `<rect y="5" width="12" height="7" fill="${MINT}"/>`, top: `<circle cx="6" cy="6" r="5" fill="#6d4524"/>` }).filter(p => /front|top/.test(p.id));
-  const panels: Panel[] = [section, fl, back, cv, lw, rw, roofTop, roofCut, ...acs, ...panto, ...neighbours,
+  const panels: Panel[] = [section, under, fl, back, cv, lw, rw, roofTop, roofCut, ...acs, ...panto, ...neighbours,
     ...winFrames, ...doorFrames, ...leaves, ...[0, 1].flatMap(i => [0, 1, 2].map(k => led(i, k))), ...ads, ...lineMap, ...lamps, strip,
-    ...benches, priority, ...screens, ...poles, rail, ...hangers, ...straps, ...wallBits, ...intercom, emergency,
+    ...benches, priority, ...screens, ...poles, rail, ...hangers, ...straps, ...wallBits, ...intercom, emergency, ...windowTrim, ...doorTrim, ...endTrim, ...coveTrim,
     ...people, ...suitcase, bag, umbrella, stroller, ...cup];
+  const st = buildStation();
   return {
-    id: 'train', camera: { zoom: .96, x0: -150, x1: 150 }, panels,
-    light: { sun: 1.6, sky: .5, skyColor: [.86, .92, 1] },
-    lamps: [-420, -140, 140, 420].map(x => ({ at: [x, CAR.COVE - 12, -70] as V3, color: [1, .98, .92] as const, energy: 38 }))
+    id: 'train', camera: { zoom: .96, x0: -150, x1: 150, lift: 250 }, panels: [...panels, ...st.panels],
+    light: { sun: 1.4, sky: .4, skyColor: [1, .97, .92] },
+    lamps: [...[-420, -140, 140, 420].map(x => ({ at: [x, CAR.COVE - 12, -70] as V3, color: [1, .98, .92] as const, energy: 48 })), ...st.lamps]
   };
 }

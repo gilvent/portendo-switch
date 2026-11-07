@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
 import { PaperScene, at, type Manifest, type Toys } from './fold.tsx';
-import Outside from './Outside.tsx';
-import trainFar from './baked/outside/far.webp';
 import type { Stop } from '../schema.ts';
 import streetUrl from './baked/street/atlas.webp';
 import streetManifest from './baked/street/manifest.json';
@@ -16,6 +14,6 @@ import trainManifest from './baked/train/manifest.json';
 export type Art = (props: { near: string | null; toys: Toys }) => ReactNode;
 const art = (manifest: unknown, url: string): Art => ({ near, toys }) => <PaperScene manifest={manifest as Manifest} url={url} near={near} toys={toys} />;
 export const WORLD_ART: Record<string, Art> = { street: art(streetManifest, streetUrl), shop: art(shopManifest, shopUrl), storeroom: art(storeroomManifest, storeroomUrl), train: art(trainManifest, trainUrl) };
-export const WORLD_BEHIND: Record<string, Art> = { train: ({ toys }) => <Outside ride={toys.ride ?? 0} dwell={toys.dwell ?? 0} /> };
-export const WORLD_BACKDROP: Record<string, string> = { street: streetBackdrop, train: trainFar };
+export const WORLD_BEHIND: Record<string, Art> = {};
+export const WORLD_BACKDROP: Record<string, string> = { street: streetBackdrop };
 export const placeOf = (s: Stop) => at(s.x, s.z);

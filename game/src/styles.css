@@ -176,7 +176,5 @@ button { font:inherit; cursor:pointer; }
 .pp.pop { animation:pop .42s steps(5,end) both; }
 @keyframes pop { from { translate:0 -18px; } }
 @media (prefers-reduced-motion:reduce) { .pp.pop { animation:none; } }
-.art-train { background:#8fd3f4 repeat-x 50% calc(42vh - 660px) / auto 760px; }
-.outside,.station,.carrier { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; }
-.strip { position:absolute; left:0; top:0; transform-origin:0 0; background-repeat:no-repeat; }
+.art-train { background:#2e2a26; }
 @media (orientation:portrait) { .art-train { perspective-origin:50% 18%; } }
