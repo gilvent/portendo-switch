@@ -290,10 +290,10 @@ export function shopper(id: string, x: number, z: number, look: Look, flip = fal
   const shapes = `<g fill="#fff" stroke="#fff" stroke-width="6" stroke-linejoin="round">${packShape}<path d="${armL}"/><circle cx="17" cy="89.5" r="4.5"/>${ownArm ? `<path d="${armR}"/><circle cx="63" cy="89" r="5"/>` : ''}<path d="${legsD}"/>${feet}<path d="${bodyD}"/><ellipse cx="18" cy="45" rx="4.4" ry="6"/><ellipse cx="62" cy="45" rx="4.4" ry="6"/><path d="${faceD}"/><path d="${hairD}"/>${hatShape}</g>`;
   const g = (inner: string) => `<g transform="scale(${k}) ${fl}">${inner}</g>`;
   // An avatar eye: white, a tall iris looking a little right, the upper lid line with a flick at the outer corner.
-  const eye = (cx: number, out: number) => `<ellipse cx="${cx}" cy="44" rx="6" ry="6.6" fill="#fff"/><ellipse cx="${cx + .6}" cy="45" rx="4" ry="5.3" fill="${eyes}"/><ellipse cx="${cx + .6}" cy="46" rx="2.1" ry="3" fill="${tone(eyes, -.55)}"/>` +
+  const eye = (cx: number, out: number) => `<g transform="translate(${cx} 44) scale(.72) translate(${-cx} -44)"><ellipse cx="${cx}" cy="44" rx="6" ry="6.6" fill="#fff"/><ellipse cx="${cx + .6}" cy="45" rx="4" ry="5.3" fill="${eyes}"/><ellipse cx="${cx + .6}" cy="46" rx="2.1" ry="3" fill="${tone(eyes, -.55)}"/>` +
     `<path d="M${cx - 2.8} 48.4Q${cx + .6} 51 ${cx + 4} 48.4" stroke="${tone(eyes, .35)}" stroke-width="1.1" fill="none"/><circle cx="${cx - 1}" cy="42.6" r="1.3" fill="#fff"/>` +
-    `<path d="M${cx - out * 6.6} ${41.6}Q${cx} ${36.4} ${cx + out * 6.6} ${41}L${cx + out * 8} ${39.4}" stroke="${INK}" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` +
-    `<path d="M${cx - 3.6} 51Q${cx} 52.2 ${cx + 3.6} 51" stroke="${INK}" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
+    `<path d="M${cx - out * 6.6} ${41.6}Q${cx} ${36.4} ${cx + out * 6.6} ${41}L${cx + out * 8} ${39.4}" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<path d="M${cx - 3.6} 51Q${cx} 52.2 ${cx + 3.6} 51" stroke="${INK}" stroke-width="1.2" fill="none" stroke-linecap="round"/></g>`;
   const lowerLegs = style === 'trousers' ? legs : skin;
   const print = `<rect width="${W}" height="${H}" fill="#fff"/>` +
     (pack ? `<rect x="13" y="68" width="54" height="24" rx="6" fill="${pack}"/>` : '') +

@@ -11,16 +11,17 @@ const body = 'M20 89Q20 79 30 78H50Q60 79 60 89V104Q60 107 57 107H23Q20 107 20 1
 const armL = 'M22 81Q15 87 15 98Q16 102 20 101L24 89Z', armR = 'M58 81Q65 87 65 97Q64 101 60 101L56 89Z';
 const caseBody = 'M55 104H76Q78 104 78 106V117Q78 119 76 119H55Q53 119 53 117V106Q53 104 55 104Z', caseHandle = 'M60 104V101Q60 99 62 99H67Q69 99 69 101V104';
 // One eye, looking `k` and with its lash flick on the `out` side: white, a tall iris, and a heavy lid lowered over the top of it, its lash line nearly flat — bored, not cute.
-const eye = (cx: number, cy: number, k: 1 | -1, out: 1 | -1) => <>
+const EYE = .7; // eyes are drawn at full size and cut down around their centre
+const eye = (cx: number, cy: number, k: 1 | -1, out: 1 | -1) => <g transform={`translate(${cx} ${cy}) scale(${EYE}) translate(${-cx} ${-cy})`}>
   <ellipse cx={cx} cy={cy} rx="6.2" ry="6.8" fill="#fff" />
   <ellipse cx={cx + k * .6} cy={cy + 1} rx="4.1" ry="5.5" fill="#4a3426" /><ellipse cx={cx + k * .6} cy={cy + 2} rx="2.2" ry="3.1" fill="#1f1611" />
   <path d={`M${cx + k * .6 - 3.4} ${cy + 3.6}Q${cx + k * .6} ${cy + 6.2} ${cx + k * .6 + 3.4} ${cy + 3.6}`} fill="none" stroke="#7a5a44" strokeWidth="1.1" />
   <circle cx={cx + k * .6 - 1.5} cy={cy + .3} r="1.2" fill="#fff" />
   <path d={`M${cx - 7.4} ${cy - 8}H${cx + 7.4}V${cy - 1.4}Q${cx} ${cy - 2.8} ${cx - 7.4} ${cy - .8}Z`} fill={SKIN} />
-  <path d={out > 0 ? `M${cx - 7} ${cy - .6}Q${cx} ${cy - 3} ${cx + 7} ${cy - 1.6}L${cx + 8.4} ${cy - 3}` : `M${cx + 7} ${cy - 1.6}Q${cx} ${cy - 3} ${cx - 7} ${cy - .6}L${cx - 8.4} ${cy - 2}`} fill="none" stroke={INK} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-  <path d={`M${cx - 3.8} ${cy + 7.1}Q${cx} ${cy + 8.3} ${cx + 3.8} ${cy + 7.1}`} fill="none" stroke={INK} strokeWidth=".9" strokeLinecap="round" />
-  <path d={`M${cx - 4.2} ${cy + 9.8}Q${cx} ${cy + 11.2} ${cx + 4.2} ${cy + 9.8}`} fill="none" stroke={SKIN_DARK} strokeWidth="1.2" strokeLinecap="round" />
-</>;
+  <path d={out > 0 ? `M${cx - 7} ${cy - .6}Q${cx} ${cy - 3} ${cx + 7} ${cy - 1.6}L${cx + 8.4} ${cy - 3}` : `M${cx + 7} ${cy - 1.6}Q${cx} ${cy - 3} ${cx - 7} ${cy - .6}L${cx - 8.4} ${cy - 2}`} fill="none" stroke={INK} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+  <path d={`M${cx - 3.8} ${cy + 7.1}Q${cx} ${cy + 8.3} ${cx + 3.8} ${cy + 7.1}`} fill="none" stroke={INK} strokeWidth="1.2" strokeLinecap="round" />
+  <path d={`M${cx - 4.2} ${cy + 9.8}Q${cx} ${cy + 11.2} ${cx + 4.2} ${cy + 9.8}`} fill="none" stroke={SKIN_DARK} strokeWidth="1.6" strokeLinecap="round" />
+</g>;
 const silhouette = <>
   <path d={armL} /><circle cx="17" cy="101" r="4.6" /><path d={armR} /><path d={body} /><path d={caseBody} /><path d={caseHandle} fill="none" /><circle cx="63" cy="101" r="5" />
   <ellipse cx="18" cy="57" rx="4.4" ry="6" /><ellipse cx="62" cy="57" rx="4.4" ry="6" /><path d={face} /><path d={hair} />
