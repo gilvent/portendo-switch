@@ -146,11 +146,11 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 - Mark sheets with no cut-outs as opaque so the browser skips blending them.
 - Anything far away and flat belongs in the CSS backdrop. Open views that must keep parallax are built as layers and flattened onto one or two cards: the river view's 14 layers ship as four quads.
 - Texture area costs as much as quad count: every quad is rasterised at its own texel size times the device pixel ratio. A scene sets `density` for panels that set none (the street uses 2.1), ghost faces pack at .35, and carved pieces are cut no finer than their wall.
-- Measured with `tests/perf.mjs` (software GPU, 4x CPU throttle, DPR 2.625) in a cloud container slower than the original machine: the old 112-quad street walked at 27.8fps there; the 200-quad promenade walks at about 17–21fps depending on texture density. With the river view rebuilt as a layered shadow box (198 quads), the same run measured 17.5fps against 16.6fps for the 200-quad version just before it. Re-measure on the reference machine before trusting the 60fps target.
+- Measured with `tests/perf.mjs` (software GPU, 4x CPU throttle, DPR 2.625) in a cloud container slower than the original machine: the old 112-quad street walked at 27.8fps there; the 200-quad promenade walks at about 17–21fps depending on texture density. With the river view rebuilt as a layered shadow box (198 quads, 192 once the sailboat, yachts and front bench were removed), the same run measured 17.5fps against 16.6fps for the 200-quad version just before it. Re-measure on the reference machine before trusting the 60fps target.
 
 | Space | Quad limit, enforced by the journey test |
 |---|---|
-| Street (riverside promenade) | 210 (uses 198) |
+| Street (riverside promenade) | 210 (uses 192) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
 
