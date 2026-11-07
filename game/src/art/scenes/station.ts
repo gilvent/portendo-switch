@@ -182,16 +182,17 @@ function escalator(): Panel[] {
   return [core, ...relief, ...glass, steps, deck, ...riders];
 }
 
-// The glass lift on the left: shaft glass with its landing door, the cabin on its way up with two passengers.
+// The glass lift beside the exit deck, behind the escalator: it rides from the platform up to the deck, so both ways
+// up arrive at the exit. Shaft glass with its landing door, the cabin on its way up with two passengers.
 function lift(): Panel[] {
-  const x0 = -1060, w = 170, zf = -820, d = 150, H = 820;
+  const x0 = ST.ESC_X + (ST.DECK_Y - 14) / Math.tan(Math.PI / 6) - 176, w = 170, zf = -900, d = 150, H = 820;
   const transoms = Array.from({ length: 7 }, (_, i) => `<rect y="${i * 130}" width="${w}" height="8" fill="#fff"/>`).join('');
   const frameMask = (ww: number, door: boolean) => `<rect width="${ww}" height="${H}" fill="#fff" fill-opacity=".26"/><rect width="10" height="${H}" fill="#fff"/><rect x="${ww - 10}" width="10" height="${H}" fill="#fff"/>${transoms}${door ? `<rect x="22" y="${H - 220}" width="${ww - 44}" height="220" fill="#fff"/>` : ''}`;
   const shaftPrint = (ww: number, door: boolean) => `<rect width="${ww}" height="${H}" fill="${GLASS}"/><rect width="10" height="${H}" fill="${STEEL}"/><rect x="${ww - 10}" width="10" height="${H}" fill="${STEEL}"/>${Array.from({ length: 7 }, (_, i) => `<rect y="${i * 130}" width="${ww}" height="8" fill="${STEEL}"/>`).join('')}`
     + (door ? `<rect x="22" y="${H - 220}" width="${ww - 44}" height="220" fill="${STAINLESS}"/><rect x="${ww / 2 - 1}" y="${H - 206}" width="2" height="206" fill="${STEEL}"/><rect x="22" y="${H - 220}" width="${ww - 44}" height="14" fill="${STEEL}"/><rect x="${ww / 2 - 18}" y="${H - 248}" width="36" height="22" rx="3" fill="#14171b"/><path d="M${ww / 2 - 8} ${H - 232}l8 -8 8 8" stroke="#ffb648" stroke-width="2.4" fill="none"/>` : '');
   const front: Panel = { id: 'lift-front', stock: 'vellum', c: GLASS, w, h: H, o: [x0, 0, zf], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .8, split: 2, mask: frameMask(w, true), print: shaftPrint(w, true) };
-  const side: Panel = { id: 'lift-side', stock: 'vellum', c: GLASS, w: d, h: H, o: [x0 + w, 0, zf], u: [0, 0, -1], v: [0, 1, 0], edge: 'cut', density: .8, mask: frameMask(d, false), print: shaftPrint(d, false) };
-  const cy = 340, ch = 210, cx0 = x0 + 16, cw = w - 32, cz = zf - 14, cd = d - 28;
+  const side: Panel = { id: 'lift-side', stock: 'vellum', c: GLASS, w: d, h: H, o: [x0, 0, zf - d], u: [0, 0, 1], v: [0, 1, 0], edge: 'cut', density: .8, mask: frameMask(d, false), print: shaftPrint(d, false) };
+  const cy = ST.DECK_Y - 60, ch = 210, cx0 = x0 + 16, cw = w - 32, cz = zf - 14, cd = d - 28;
   const back: Panel = { id: 'cab-back', stock: 'cover', c: STAINLESS, w: cw, h: ch, o: [cx0, cy, cz - cd], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.4, print: `<rect width="${cw}" height="${ch}" fill="${STAINLESS}"/><rect y="${ch - 90}" width="${cw}" height="6" fill="${STEEL}"/><rect x="10" y="10" width="${cw - 20}" height="${ch - 110}" fill="#e3eaef"/>` };
   const lid: Panel = { id: 'cab-top', stock: 'greyboard', c: '#8e959c', w: cw, h: cd, o: [cx0, cy + ch, cz], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.4, print: `<rect width="${cw}" height="${cd}" fill="#8e959c"/><rect x="${cw / 2 - 20}" y="${cd / 2 - 20}" width="40" height="40" rx="6" fill="${STEEL}"/>` };
   const glassFront: Panel = { id: 'cab-front', stock: 'vellum', c: GLASS, w: cw, h: ch, o: [cx0, cy, cz], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.2,
