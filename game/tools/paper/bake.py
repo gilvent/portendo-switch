@@ -155,7 +155,11 @@ def build(name, panels, phantom):
 
 
 # Panels that swap or ride a belt are lit but cast no shadow: their rest pose is not where they usually are.
-is_phantom = lambda p: bool(p.get("show") or p.get("group"))
+# The far backdrop and its layers are the same: they stand in for things far away, so they never shade the scene
+# (finish.py lights them evenly and works out the shadows they throw on each other itself).
+BY_ID = {p["id"]: p for p in L["panels"]}
+far = lambda p: bool(p.get("backdrop") or (p.get("decal") and BY_ID[p["decal"]].get("backdrop")))
+is_phantom = lambda p: bool(p.get("show") or p.get("group") or far(p))
 solid_panels = [p for p in L["panels"] if not is_phantom(p)]
 phantom_panels = [p for p in L["panels"] if is_phantom(p)]
 objs = [build("paper", solid_panels, False)]
