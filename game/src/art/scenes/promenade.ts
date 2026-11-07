@@ -90,7 +90,7 @@ function boats(): Panel[] {
     '<path d="M30 74V30H196V74Z M48 30V0H128V30Z M140 30V8H146V30Z" fill="#fff"/>',
     `${Array.from({ length: 6 }, (_, i) => `<rect x="${40 + i * 26}" y="40" width="17" height="15" fill="#5d7f95"/>`).join('')}<rect x="48" width="80" height="30" fill="${CORAL}"/><rect x="58" y="7" width="60" height="11" fill="#5d7f95"/><rect x="140" y="8" width="6" height="22" fill="#3d444e"/><rect x="30" y="64" width="166" height="10" fill="#e9dcc4"/>`, 'cover', bx, 230);
   const hull = sheet(NEAR, 'boat-tour-hull', 116, y0 + by, 34, BLUE, '<path d="M0 0H230L206 34H22Z" fill="#fff"/>',
-    `<rect width="230" height="7" fill="${CREAM}"/>${[0, 1, 2, 3].map(k => `<circle cx="${50 + k * 40}" cy="18" r="5" fill="${CREAM}" fill-opacity=".9"/>`).join('')}`, 'cover', bx, 230);
+    `<rect width="230" height="7" fill="${CREAM}"/>${[0, 1, 2, 3].map(k => `<circle cx="${50 + k * 40}" cy="18" r="5" fill="${CREAM}"/>`).join('')}`, 'cover', bx, 230);
   return [cabin, hull];
 }
 // The far bank, back to front: a middle row, trees, the waterfront shops, the quay wall with
@@ -168,7 +168,7 @@ export const riverView = (): Panel[] => [...nearWater(), ...boats(), ...farLayer
 /* ---------- the river gate: columns, a slatted pergola, a sign, a railing, boats beyond ---------- */
 export function riverGate(x0: number, x1: number, z: number): Panel[] {
   const mid = (x0 + x1) / 2, span = x1 - x0, H = 300;
-  const col = (id: string, x: number) => box({ id, x, z, w: 34, h: H, d: 34, stock: 'cover', c: '#f4f1ea', front: `<rect x="4" width="3" height="${H}" fill="#000" fill-opacity=".08"/><rect y="${H - 30}" width="34" height="30" fill="#e2ddd2"/>`, left: `<rect y="${H - 30}" width="34" height="30" fill="#e2ddd2"/>`, right: `<rect y="${H - 30}" width="34" height="30" fill="#e2ddd2"/>`, noTop: true });
+  const col = (id: string, x: number) => box({ id, x, z, w: 34, h: H, d: 34, stock: 'cover', c: '#f4f1ea', front: `<rect x="4" width="3" height="${H}" fill="${tone('#f4f1ea', -.08)}"/><rect y="${H - 30}" width="34" height="30" fill="#e2ddd2"/>`, left: `<rect y="${H - 30}" width="34" height="30" fill="#e2ddd2"/>`, right: `<rect y="${H - 30}" width="34" height="30" fill="#e2ddd2"/>`, noTop: true });
   const beam = box({ id: 'gate-beam', x: mid, z, y: H, w: span + 60, h: 30, d: 44, stock: 'cover', c: '#f4f1ea', front: `<rect y="24" width="${span + 60}" height="6" fill="#e2ddd2"/>` });
   // Seen from below: the pergola's slats over the gateway, and a glass canopy tinted aqua above them.
   const slats = Array.from({ length: Math.floor(span / 26) }, (_, i) => `<rect x="${i * 26 + 4}" width="12" height="150" fill="#fff"/>`).join('');
@@ -204,7 +204,7 @@ function frondFan(id: string, top: V3, deg: number, droop: number, L: number, W:
   const H = 2 * L * Math.sin(spread * Math.PI / 180) + W, mid = H / 2;
   const one = (ang: number, len: number, k: number) => `<g transform="translate(0 ${f(mid)}) rotate(${ang}) translate(0 ${f(-W / 2)})">${frondMask(len, W, seed + k).replace('fill="#fff"', 'FILL')}</g>`;
   const fronds = [[-spread, L * .86], [0, L], [spread, L * .8]].map(([ang, len], k) => one(ang, len, k));
-  const ribs = [[-spread, L * .86], [0, L], [spread, L * .8]].map(([ang, len]) => `<g transform="translate(0 ${f(mid)}) rotate(${ang})"><path d="M0 0H${f(len)}" stroke="${vein}" stroke-width="2.6"/>${Array.from({ length: 12 }, (_, i) => `<path d="M${f(i * len / 12 + 6)} 0l${f(len / 14)} ${f(-W * .32)}M${f(i * len / 12 + 6)} 0l${f(len / 14)} ${f(W * .32)}" stroke="#000" stroke-opacity=".1" stroke-width="1.4"/>`).join('')}</g>`).join('');
+  const ribs = [[-spread, L * .86], [0, L], [spread, L * .8]].map(([ang, len]) => `<g transform="translate(0 ${f(mid)}) rotate(${ang})"><path d="M0 0H${f(len)}" stroke="${vein}" stroke-width="2.6"/>${Array.from({ length: 12 }, (_, i) => `<path d="M${f(i * len / 12 + 6)} 0l${f(len / 14)} ${f(-W * .32)}M${f(i * len / 12 + 6)} 0l${f(len / 14)} ${f(W * .32)}" stroke="${tone(c, -.16)}" stroke-width="1.4"/>`).join('')}</g>`).join('');
   return toCamera({ id, stock: 'sugar', c, w: L, h: H, o: add(top, side, -mid), u: dir, v: side, edge: 'cut', density: .9, mask: fronds.map(m => m.replace('FILL', 'fill="#fff"')).join(''), print: `${fronds.map((m, k) => m.replace('FILL', `fill="${k === 1 ? c : k ? LEAF : FROND_DARK}"`)).join('')}${ribs}` });
 }
 export function palm(id: string, x: number, z: number, h: number, lean: number, spin = 0): Panel[] {
@@ -263,7 +263,7 @@ export function festoon(id: string, a: V3, b: V3, sag: number, every = 46): Pane
 export function flagPole(id: string, x: number, z: number, h: number, flag: string): Panel[] {
   return [{ id: `${id}-pole`, stock: 'greyboard', c: '#f4f1ea', w: 10, h, o: [x - 5, 0, z + 5], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1 } as Panel,
     { id: `${id}-lamp`, stock: 'vellum', c: '#fff4e2', w: 46, h: 30, o: [x - 23, h + 2, z + 6], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', emit: .5, density: 2, mask: '<path d="M8 30H38L46 10H40V0H6V10H0Z" fill="#fff"/>', print: '<rect width="46" height="10" fill="#3d444e"/><rect x="20" y="10" width="6" height="20" fill="#3d444e" fill-opacity=".4"/>' },
-    { id: `${id}-flag`, stock: 'cover', c: flag, w: 40, h: 110, o: [x + 5, h - 140, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.6, mask: '<path d="M0 0H36L40 50L30 110L18 92L0 106Z" fill="#fff"/>', print: '<rect width="40" height="6" fill="#000" fill-opacity=".15"/><path d="M8 30h20M8 40h14" stroke="#fff" stroke-opacity=".5" stroke-width="3"/>' }];
+    { id: `${id}-flag`, stock: 'cover', c: flag, w: 40, h: 110, o: [x + 5, h - 140, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.6, mask: '<path d="M0 0H36L40 50L30 110L18 92L0 106Z" fill="#fff"/>', print: `<rect width="40" height="6" fill="${tone(flag, -.15)}"/><path d="M8 30h20M8 40h14" stroke="${tone(flag, .45)}" stroke-width="3"/>` }];
 }
 // A slatted round-ish bin.
 export const bin = (id: string, x: number, z: number) => box({ id, x, z, w: 36, h: 58, d: 36, stock: 'greyboard', c: '#6b7480', front: Array.from({ length: 6 }, (_, i) => `<rect x="${2 + i * 6}" width="3" height="58" fill="#4d5560"/>`).join('') + '<rect width="36" height="6" fill="#3d444e"/>', top: '<rect x="5" y="5" width="26" height="26" fill="#2b2f36"/>' });
@@ -329,7 +329,7 @@ export function clothesStall(id: string, x: number, z: number): Panel[] {
   for (let i = 0; i < 7; i++) {
     const cx = 18 + i * 27, dress = i % 3 !== 1, len = dress ? 120 + (i % 2) * 20 : 70;
     const shape = dress ? `M${cx - 6} 6h12l4 14l10 ${len - 20}h-40l10 ${-(len - 20)}Z` : `M${cx - 8} 6h16l12 14l-6 6l-4 -4v${len - 26}h-20v${-(len - 26)}l-4 4l-6 -6Z`;
-    mask += `<path d="${shape}" fill="#fff"/>`; print += `<path d="${shape}" fill="${colours[i]}"/><path d="${shape}" fill="none" stroke="#000" stroke-opacity=".15" stroke-width="2"/>`;
+    mask += `<path d="${shape}" fill="#fff"/>`; print += `<path d="${shape}" fill="${colours[i]}"/><path d="${shape}" fill="none" stroke="${tone(colours[i], -.15)}" stroke-width="2"/>`;
   }
   const rail: Panel = { id: `${id}-rail`, stock: 'cover', c: '#3d444e', w: 200, h: 190, o: [x - 100, 0, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.8, mask, print };
   const stripe = (w: number) => Array.from({ length: Math.ceil(w / 40) }, (_, i) => `<rect x="${i * 40}" width="20" height="200" fill="${CREAM}"/>`).join('');
@@ -344,7 +344,7 @@ export function parasolTable(id: string, x: number, z: number, c: string, seats 
   const corner = (k: number): V3 => [x + R * Math.cos((45 + 90 * k) * Math.PI / 180), y0, z + R * Math.sin((45 + 90 * k) * Math.PI / 180)];
   const canopy = [0, 1, 2, 3].map((k): Panel => {
     const a = corner(k), b = corner(k + 1), w = Math.hypot(b[0] - a[0], b[2] - a[2]), mid: V3 = [(a[0] + b[0]) / 2, y0, (a[2] + b[2]) / 2], up: V3 = [apex[0] - mid[0], apex[1] - mid[1], apex[2] - mid[2]], h = Math.hypot(...up);
-    return { id: `${id}-canopy${k}`, stock: 'cover', c, w, h, o: a, u: [(b[0] - a[0]) / w, 0, (b[2] - a[2]) / w], v: unit(up), edge: 'fold', density: 1.4, mask: `<path d="M0 ${f(h)}H${f(w)}L${f(w / 2)} 0Z" fill="#fff"/>`, print: `<path d="M${f(w * .25)} ${f(h * .5)}L${f(w / 2)} 0L${f(w * .75)} ${f(h * .5)}" fill="#fff" fill-opacity=".25"/><rect y="${f(h - 6)}" width="${f(w)}" height="6" fill="#fff" fill-opacity=".6"/>` };
+    return { id: `${id}-canopy${k}`, stock: 'cover', c, w, h, o: a, u: [(b[0] - a[0]) / w, 0, (b[2] - a[2]) / w], v: unit(up), edge: 'fold', density: 1.4, mask: `<path d="M0 ${f(h)}H${f(w)}L${f(w / 2)} 0Z" fill="#fff"/>`, print: `<path d="M${f(w * .25)} ${f(h * .5)}L${f(w / 2)} 0L${f(w * .75)} ${f(h * .5)}" fill="${tone(c, .25)}"/><rect y="${f(h - 6)}" width="${f(w)}" height="6" fill="#fff" fill-opacity=".6"/>` };
   });
   const pole: Panel = { id: `${id}-pole`, stock: 'greyboard', c: '#f4f1ea', w: 5, h: y0, o: [x - 2.5, 0, z + 1], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.4 };
   const table = [{ id: `${id}-table`, stock: 'cover', c: '#f4f1ea', w: 70, h: 70, o: [x - 35, 62, z + 35], u: [1, 0, 0], v: [0, 0, -1], edge: 'cut', density: 1.4, mask: '<circle cx="35" cy="35" r="35" fill="#fff"/>', print: '<circle cx="35" cy="35" r="10" fill="#e88ab0"/><rect x="48" y="20" width="10" height="14" fill="#fff"/>' } as Panel];

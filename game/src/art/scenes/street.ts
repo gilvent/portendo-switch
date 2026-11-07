@@ -1,7 +1,7 @@
 import { add, backOf, box, hinged, normal, on, slot, yaw, type Panel, type Scene, type V3 } from '../kit.ts';
 import { BLUE, CORAL, CREAM, DEEP, FOLIAGE, INK, SUN, cloud, parcel, reseed, scallopTop, specks } from '../recipes.ts';
 import { heroPanels } from './_hero.ts';
-import { bench, bin, bush, carved, clothesStall, fat, fawning, fbalcony, fblade, fbox, festoon, fflat, fflowers, flagPole, flamp, frame, FROND, palm, riverView, scooter, bicycle, pigeon, parasolTable, planter, plaza, riverGate, scallopBlob, shadeTree, shopper, ticketKiosk } from './promenade.ts';
+import { bench, bin, bush, carved, clothesStall, fat, fawning, fbalcony, fblade, fbox, festoon, fflat, fflowers, flagPole, flamp, frame, FROND, palm, riverView, scooter, bicycle, pigeon, tone, parasolTable, planter, plaza, riverGate, scallopBlob, shadeTree, shopper, ticketKiosk } from './promenade.ts';
 
 const MINT = '#35b58a', PLUM = '#7c6be0', WARM = '#ffe7a8', LEAF = '#57b36f';
 const SHOP = { x: 150, z: -80, w: 720, d: 300, ground: 230, upper: 150, peak: 120 };
@@ -17,7 +17,7 @@ function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW
   while (x < w) {
     const bw = fr(minW, maxW), bh = fr(lo, hi), top = h - bh, c = cols[Math.floor(fr(0, cols.length))];
     mask += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="#fff"/>`;
-    print += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="${c}"/><rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${bw.toFixed(0)}" height="6" fill="#000" fill-opacity=".12"/>`;
+    print += `<rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${(bw + 1).toFixed(0)}" height="${bh.toFixed(0)}" fill="${c}"/><rect x="${x.toFixed(0)}" y="${top.toFixed(0)}" width="${bw.toFixed(0)}" height="6" fill="${tone(c, -.12)}"/>`;
     const step = bw > 90 ? 22 : 18;
     for (let wx = x + 10; wx < x + bw - 14; wx += step) for (let wy = top + 18; wy < h - 16; wy += 26) if (fr(0, 1) > .3) print += `<rect x="${wx.toFixed(0)}" y="${wy.toFixed(0)}" width="8" height="12" fill="${fr(0, 1) > .8 ? '#fff4e2' : lit}"/>`;
     if (roofs) {
@@ -25,7 +25,7 @@ function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW
       if (kind === 0) { mask += `<rect x="${(cx - 14).toFixed(0)}" y="${(top - 30).toFixed(0)}" width="28" height="22" fill="#fff"/><rect x="${(cx - 12).toFixed(0)}" y="${(top - 10).toFixed(0)}" width="3" height="10" fill="#fff"/><rect x="${(cx + 9).toFixed(0)}" y="${(top - 10).toFixed(0)}" width="3" height="10" fill="#fff"/>`; print += `<rect x="${(cx - 14).toFixed(0)}" y="${(top - 30).toFixed(0)}" width="28" height="22" fill="#9b7a5c"/><path d="M${(cx - 14).toFixed(0)} ${(top - 22).toFixed(0)}h28M${(cx - 14).toFixed(0)} ${(top - 15).toFixed(0)}h28" stroke="#7a5c42" stroke-width="2"/><rect x="${(cx - 12).toFixed(0)}" y="${(top - 10).toFixed(0)}" width="24" height="10" fill="#5c4a3c"/>`; }
       if (kind === 1) { mask += `<rect x="${(cx - 1.5).toFixed(0)}" y="${(top - 54).toFixed(0)}" width="3" height="54" fill="#fff"/><rect x="${(cx - 10).toFixed(0)}" y="${(top - 40).toFixed(0)}" width="20" height="3" fill="#fff"/>`; print += `<rect x="${(cx - 10).toFixed(0)}" y="${(top - 54).toFixed(0)}" width="20" height="54" fill="#5d6670"/><circle cx="${cx.toFixed(0)}" cy="${(top - 54).toFixed(0)}" r="3" fill="${CORAL}"/>`; mask += `<circle cx="${cx.toFixed(0)}" cy="${(top - 54).toFixed(0)}" r="3" fill="#fff"/>`; }
       if (kind === 2 && bw > 70) { const bwid = Math.min(bw - 16, 70); mask += `<rect x="${(cx - bwid / 2).toFixed(0)}" y="${(top - 40).toFixed(0)}" width="${bwid.toFixed(0)}" height="32" fill="#fff"/><rect x="${(cx - bwid / 2 + 6).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="3" height="8" fill="#fff"/><rect x="${(cx + bwid / 2 - 9).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="3" height="8" fill="#fff"/>`; print += `<rect x="${(cx - bwid / 2).toFixed(0)}" y="${(top - 40).toFixed(0)}" width="${bwid.toFixed(0)}" height="32" fill="${CREAM}"/><rect x="${(cx - bwid / 2 + 4).toFixed(0)}" y="${(top - 36).toFixed(0)}" width="${(bwid - 8).toFixed(0)}" height="24" fill="${[CORAL, BLUE, MINT, SUN][Math.floor(fr(0, 4))]}"/><rect x="${(cx - bwid / 2 + 10).toFixed(0)}" y="${(top - 30).toFixed(0)}" width="${(bwid * .4).toFixed(0)}" height="5" fill="${CREAM}"/><rect x="${(cx - bwid / 2).toFixed(0)}" y="${(top - 8).toFixed(0)}" width="${bwid.toFixed(0)}" height="8" fill="#5d6670"/>`; }
-      if (kind === 3) { mask += `<rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="24" fill="#fff"/>`; print += `<rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="24" fill="${c}"/><rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="5" fill="#000" fill-opacity=".12"/>`; }
+      if (kind === 3) { mask += `<rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="24" fill="#fff"/>`; print += `<rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="24" fill="${c}"/><rect x="${(x + bw * .2).toFixed(0)}" y="${(top - 24).toFixed(0)}" width="${(bw * .6).toFixed(0)}" height="5" fill="${tone(c, -.12)}"/>`; }
     }
     x += bw;
   }
@@ -82,7 +82,7 @@ function shop(): Panel[] {
   const roof = (id: string, s: 1 | -1): Panel[] => {
     const dn: V3 = [s * Math.cos(a), -Math.sin(a), 0], base: Panel = s < 0 ? { id, stock: 'cover', c: DEEP, w: rise, h: rd, o: add(ridge, dn, rise), u: [-dn[0], -dn[1], -dn[2]], v: [0, 0, -1], edge: 'cut', density: 1 } : { id, stock: 'cover', c: DEEP, w: rise, h: rd, o: ridge, u: dn, v: [0, 0, -1], edge: 'cut', density: 1 };
     const lip: Panel = { id: `${id}-lip`, stock: 'cover', c: CREAM, w: rise, h: 8, o: add(s < 0 ? add(ridge, dn, rise) : ridge, [0, -8, 0]), u: base.u, v: [0, 1, 0], edge: 'fold', density: 1.4 };
-    return [{ ...base, print: Array.from({ length: 13 }, (_, i) => `<path d="M${(i + 1) * rise / 14} 0V${rd}" stroke="#063f66" stroke-opacity=".6" stroke-width="3"/>`).join('') }, lip];
+    return [{ ...base, print: Array.from({ length: 13 }, (_, i) => `<path d="M${(i + 1) * rise / 14} 0V${rd}" stroke="${tone(DEEP, -.3)}" stroke-width="3"/>`).join('') }, lip];
   };
   const stripe = Array.from({ length: 8 }, (_, i) => `<rect x="${i * 88}" width="44" height="66" fill="${CREAM}"/>`).join('');
   const awningTop: Panel = { id: 'awning', stock: 'cover', c: CORAL, w: 690, h: 66, o: [x - 345, g - 42, z + 60], u: [1, 0, 0], v: [0, .75, -.66], edge: 'fold', density: 1.6, print: stripe };
@@ -167,7 +167,7 @@ function surroundings(): Panel[] {
   const rRelief = carved(rFront, [
     ...[40, 200, 360].flatMap((x, i) => fawning(R, `right-awning-${i}`, x - 10, 230, 160, 70, 34, '#d8322f')),
     ...fblade(R, 'right-cup', 504, 240, 66, 66, CREAM, `<circle cx="33" cy="33" r="30" fill="${CREAM}"/><rect x="20" y="22" width="22" height="22" rx="4" fill="#d8322f"/><path d="M42 27q8 0 8 6t-8 6" stroke="#d8322f" stroke-width="4" fill="none"/>`, '<circle cx="33" cy="33" r="33" fill="#fff"/>'),
-    ...[40, 200, 360, 500].flatMap((x, i) => [fflat(R, `right-shutter-l${i}`, x - 22, 136, 2, 20, 100, { c: '#2f7d5b', print: Array.from({ length: 9 }, (_, k) => `<rect y="${6 + k * 10}" width="20" height="3" fill="#000" fill-opacity=".2"/>`).join('') }), fflat(R, `right-shutter-r${i}`, x + 72, 136, 2, 20, 100, { c: '#2f7d5b', print: Array.from({ length: 9 }, (_, k) => `<rect y="${6 + k * 10}" width="20" height="3" fill="#000" fill-opacity=".2"/>`).join('') }), ...fflowers(R, `right-flowers${i}`, x - 4, 118, 78)]),
+    ...[40, 200, 360, 500].flatMap((x, i) => [fflat(R, `right-shutter-l${i}`, x - 22, 136, 2, 20, 100, { c: '#2f7d5b', print: Array.from({ length: 9 }, (_, k) => `<rect y="${6 + k * 10}" width="20" height="3" fill="${tone('#2f7d5b', -.2)}"/>`).join('') }), fflat(R, `right-shutter-r${i}`, x + 72, 136, 2, 20, 100, { c: '#2f7d5b', print: Array.from({ length: 9 }, (_, k) => `<rect y="${6 + k * 10}" width="20" height="3" fill="${tone('#2f7d5b', -.2)}"/>`).join('') }), ...fflowers(R, `right-flowers${i}`, x - 4, 118, 78)]),
     ...fbox(R, 'right-menu', 446, 0, 30, 50, 90, 8, { c: INK, front: `<rect x="5" y="8" width="40" height="60" fill="#3d444e"/>${[0, 1, 2, 3, 4].map(k => `<rect x="10" y="${14 + k * 10}" width="${20 + (k % 2) * 8}" height="3" fill="${CREAM}"/>`).join('')}` }),
     ...[0, 1].flatMap(k => fbox(R, `right-planter${k}`, 20 + k * 470, 0, 4, 60, 44, 40, { c: '#3d4a5a' })), ...[0, 1].map(k => fflat(R, `right-shrub${k}`, 16 + k * 470, 40, 26, 68, 50, { stock: 'sugar', c: FROND, mask: `<path d="${scallopBlob(68, 70, 8)}" fill="#fff"/>` })),
     ...flamp(R, 'right-lamp', 190, 250), ...fbox(R, 'right-cornice', 0, RH - 20, 0, RW, 20, 20, { c: '#efe6d8' })
