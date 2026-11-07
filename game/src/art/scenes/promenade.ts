@@ -4,7 +4,7 @@ import { BLUE, CORAL, CREAM, DEEP, INK, SUN } from '../recipes.ts';
 // The Blibli street is a riverside shopping promenade: a brick plaza closed by shops on three sides, with the river
 // seen through a gateway at the back. Everything here is the plaza's furniture and its bounding facades.
 export const MINT = '#35b58a', PLUM = '#7c6be0', LEAF = '#57b36f', FROND = '#3f9a5b', FROND_DARK = '#2f7d48', BARK = '#9a7b5c';
-const PAVER = ['#dba38b', '#e5b8a0', '#cf927a', '#e9c5ae'], BORDER = '#9c6d5c', TILE = '#3d4a5a', WATER = '#4fa9d6';
+const PAVER = ['#dba38b', '#e5b8a0', '#cf927a', '#e9c5ae'], BORDER = '#9c6d5c', TILE = '#3d4a5a';
 // The game camera for this scene (zoom 1): pieces turn their printed side toward it.
 const CAM: V3 = [0, 261, 1130];
 export const PLAZA = { x0: -1500, x1: 1500, z0: -330, z1: 330 };
@@ -34,8 +34,6 @@ export function plaza(): Panel[] {
   const base: Panel = { id: 'lawn', stock: 'greyboard', c: '#c98f78', w: W, h: D, o: [PLAZA.x0, 0, PLAZA.z1], u: [1, 0, 0], v: [0, 0, -1], density: .42, edge: 'fold', split: 8, print: `<rect width="${W}" height="${D}" fill="#b98270"/>${bricks}${bands}` };
   const skirt: Panel = { id: 'lawn-skirt', stock: 'greyboard', c: '#7a5546', w: W, h: 50, o: [PLAZA.x0, -50, PLAZA.z1 + 1], u: [1, 0, 0], v: [0, 1, 0], density: .6, edge: 'cut', split: 2, print: `<rect width="${W}" height="8" fill="#a8786a"/>` };
   // The river runs behind the quay, a little below the plaza.
-  const ripples = Array.from({ length: 160 }, () => { const x = r(0, W), y = r(10, 650), l = r(20, 70); return `<path d="M${f(x)} ${f(y)}q${f(l / 4)} -5 ${f(l / 2)} 0t${f(l / 2)} 0" stroke="#bfe6f8" stroke-width="${f(r(2, 4))}" fill="none" stroke-opacity="${f(r(.4, .8))}"/>`; }).join('');
-  const water: Panel = { id: 'river', stock: 'cover', c: WATER, w: W, h: 680, o: [PLAZA.x0, -26, PLAZA.z0], u: [1, 0, 0], v: [0, 0, -1], density: .32, edge: 'fold', split: 2, print: `<rect width="${W}" height="680" fill="${WATER}"/><rect width="${W}" height="60" fill="#3d8fbd"/>${ripples}` };
   const quay: Panel = { id: 'quay-edge', stock: 'greyboard', c: '#b7a99a', w: W, h: 14, o: [PLAZA.x0, 0, PLAZA.z0 - .5], u: [1, 0, 0], v: [0, 0, -1], density: .6, edge: 'cut', print: `<rect width="${W}" height="4" fill="#d9cbbb"/>` };
   // Inlaid brick medallions, laid flat in the paving: a sun-and-waves rosette before the shop door, and a wave band
   // along the quay that leads the eye to the river gate.
@@ -44,35 +42,137 @@ export function plaza(): Panel[] {
   const rays = Array.from({ length: 16 }, (_, i) => { const a = i * Math.PI / 8; return `<path d="M120 120L${f(120 + Math.cos(a - .1) * 112)} ${f(120 + Math.sin(a - .1) * 112)}L${f(120 + Math.cos(a + .1) * 112)} ${f(120 + Math.sin(a + .1) * 112)}Z" fill="${i % 2 ? '#e9c5ae' : '#cf927a'}"/>`; }).join('');
   const rosette = inlay('inlay-rosette', 150, 110, 240, 240, `<circle cx="120" cy="120" r="120" fill="${BORDER}"/><circle cx="120" cy="120" r="112" fill="#e5b8a0"/>${rays}<circle cx="120" cy="120" r="46" fill="${BORDER}"/><circle cx="120" cy="120" r="38" fill="#f6b73c"/>${[0, 1].map(k => `<path d="M${88 + k * 0} ${112 + k * 16}q8 -8 16 0t16 0t16 0t16 0" stroke="#0a6aa8" stroke-width="5" fill="none"/>`).join('')}`, '<circle cx="120" cy="120" r="120" fill="#fff"/>', true);
   const waveBand = inlay('inlay-waves', -300, -270, 1400, 40, `<rect width="1400" height="40" fill="#b98270"/>${Array.from({ length: 35 }, (_, i) => `<path d="M${i * 40} 26q10 -16 20 0t20 0" stroke="#0a6aa8" stroke-width="6" fill="none"/>`).join('')}`, '<rect width="1400" height="40" fill="#fff"/>');
-  return [base, skirt, water, quay, rosette, waveBand];
+  return [base, skirt, quay, rosette, waveBand];
 }
 
-// The far bank: quay wall, warehouses turned into shops and cafés, trees and a moored ferry, cut as one sheet.
-export function farBank(): Panel {
-  s = 17;
-  const W = 3000, H = 300;
-  let mask = `<rect y="${H - 60}" width="${W}" height="60" fill="#fff"/>`, print = `<rect y="${H - 60}" width="${W}" height="60" fill="#a99a8a"/><rect y="${H - 60}" width="${W}" height="6" fill="#d9cbbb"/>`;
-  const walls = ['#f2cf8a', '#e9a77b', '#f4e3c3', '#c7dcc0', '#e3b9a8', '#d8322f', '#9fc7b4'];
-  for (let x = 0; x < W;) {
-    const bw = r(110, 220), bh = r(110, 200), top = H - 60 - bh, c = walls[Math.floor(r(0, walls.length))];
-    if (r(0, 1) < .22) { // a tree between buildings
-      mask += `<circle cx="${f(x + 40)}" cy="${f(H - 110)}" r="44" fill="#fff"/><rect x="${f(x + 36)}" y="${f(H - 110)}" width="8" height="50" fill="#fff"/>`;
-      print += `<rect x="${f(x + 36)}" y="${f(H - 110)}" width="8" height="50" fill="${BARK}"/><circle cx="${f(x + 40)}" cy="${f(H - 110)}" r="44" fill="${FROND}"/><circle cx="${f(x + 30)}" cy="${f(H - 124)}" r="20" fill="${LEAF}"/>`;
-      x += 84; continue;
-    }
-    const roof = r(0, 1) > .5;
-    mask += `<rect x="${f(x)}" y="${f(top)}" width="${f(bw)}" height="${f(bh)}" fill="#fff"/>` + (roof ? `<path d="M${f(x - 6)} ${f(top)}L${f(x + bw / 2)} ${f(top - 34)}L${f(x + bw + 6)} ${f(top)}Z" fill="#fff"/>` : '');
-    print += `<rect x="${f(x)}" y="${f(top)}" width="${f(bw)}" height="${f(bh)}" fill="${c}"/>` + (roof ? `<path d="M${f(x - 6)} ${f(top)}L${f(x + bw / 2)} ${f(top - 34)}L${f(x + bw + 6)} ${f(top)}Z" fill="#8f5a4a"/>` : `<rect x="${f(x)}" y="${f(top)}" width="${f(bw)}" height="8" fill="#000" fill-opacity=".15"/>`);
-    for (let wx = x + 14; wx < x + bw - 24; wx += 30) for (let wy = top + 16; wy < H - 110; wy += 34) print += `<rect x="${f(wx)}" y="${f(wy)}" width="14" height="18" fill="${r(0, 1) > .6 ? '#fff4e2' : '#5d7f95'}"/>`;
-    // shop awning at the quay level
-    print += `<rect x="${f(x + 6)}" y="${f(H - 104)}" width="${f(bw - 12)}" height="14" fill="${[CORAL, BLUE, MINT, SUN][Math.floor(r(0, 4))]}"/><rect x="${f(x + 12)}" y="${f(H - 90)}" width="${f(bw - 24)}" height="30" fill="#fff4e2" fill-opacity=".85"/>`;
-    x += bw + r(0, 10);
-  }
-  // A ferry tied up at the far quay.
-  print += `<path d="M1180 ${H - 62}h300l-24 30h-252Z" fill="${CREAM}"/><rect x="1230" y="${H - 96}" width="170" height="34" fill="${CREAM}"/><rect x="1240" y="${H - 90}" width="150" height="12" fill="#5d7f95"/><rect x="1180" y="${H - 44}" width="276" height="6" fill="${BLUE}"/>`;
-  mask += `<path d="M1180 ${H - 62}h300l-24 30h-252Z M1230 ${H - 96}h170v34h-170Z" fill="#fff"/>`;
-  return { id: 'far-bank', stock: 'sugar', c: '#a99a8a', w: W, h: H, o: [-W / 2, -26, -1000], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: .38, split: 2, mask, print };
+/* ---------- the open view across the river: a shadow box ---------- */
+// What the eye travels into through the gate is built the way a paper shadow box is: thin cut layers stood a little
+// apart, one behind another, alternating pale and deep, each throwing its shadow and sky occlusion on the next.
+// The layers are real in the bake, then flattened into two cards, so the whole view costs four quads.
+// Card one stands just behind the quay railing and holds the near water and the boats. Card two stands further
+// back and holds the far bank, so the two slide past each other as the camera walks.
+type Card = { id: string; x0: number; z: number; w: number; density: number };
+const NEAR: Card = { id: 'river-near', x0: -1320, z: -420, w: 1300, density: .95 };
+const FAR: Card = { id: 'far-bank', x0: -1560, z: -740, w: 1620, density: .7 };
+// One cut layer of a card: drawn in the card's own coordinates (x across, y up from the card's foot at y0), standing
+// `gap` units in front of it.
+const sheet = (card: Card, id: string, gap: number, y0: number, h: number, c: string, mask: string, print = '', stock: Panel['stock'] = 'sugar', x = 0, w = card.w): Panel =>
+  ({ id, stock, c, w, h, o: [card.x0 + x, y0, card.z + gap], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: card.density, decal: card.id, mask, print });
+// A band of water whose top is cut as a soft run of swells; y is measured down the sheet from its top.
+function swell(w: number, h: number, top: number, amp: number, len: number, phase: number) {
+  let d = `M0 ${h}V${f(top + amp * Math.sin(phase))}`;
+  for (let x = 0; x < w; x += len) d += `Q${f(x + len / 4)} ${f(top - amp)} ${f(x + len / 2)} ${f(top)}T${f(x + len)} ${f(top)}`;
+  return `<path d="${d}V${h}Z" fill="#fff"/>`;
 }
+const ripples = (w: number, h: number, top: number, n: number, c: string, len: [number, number]) => Array.from({ length: n }, () => {
+  const x = r(0, w), y = r(top + 4, h - 2), l = r(...len);
+  return `<path d="M${f(x)} ${f(y)}q${f(l / 4)} -3 ${f(l / 2)} 0t${f(l / 2)} 0" stroke="${c}" stroke-width="${f(r(1.6, 2.6))}" fill="none" stroke-opacity="${f(r(.5, .85))}"/>`;
+}).join('');
+// The near water: five bands from the deep one at the railing to the pale one meeting the far bank.
+const WATERS = ['#b4e0f3', '#6dbbe3', '#9ad2ee', '#4aa3d3', '#2f7fb3'];
+function nearWater(): Panel[] {
+  s = 41;
+  const H = 130, y0 = -50, tops = [122, 102, 88, 74, 58], gaps = [0, 12, 24, 40, 52];
+  // Card coordinates: the card's foot is at y0, and a band whose top is t sits t units above it.
+  return tops.map((t, i) => {
+    const h = t + 6, top = 6, mask = swell(NEAR.w, h, top, 2.4 + i * .5, 90 + i * 26, i);
+    const print = ripples(NEAR.w, h, top, 26 + i * 8, i % 2 ? '#d3eefa' : '#bfe6f8', [14 + i * 6, 34 + i * 10]);
+    const base: Panel = { id: i ? `river-band${i}` : NEAR.id, stock: 'sugar', c: WATERS[i], w: NEAR.w, h, o: [NEAR.x0, y0, NEAR.z + gaps[i]], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: NEAR.density, mask, print, split: i ? undefined : 2 };
+    return i ? { ...base, decal: NEAR.id } : base;
+  });
+}
+// The boats ride between bands: each is two cut layers, the hull standing proud of the cabin or sail.
+function boats(): Panel[] {
+  const y0 = -50;
+  // A tour boat between the fourth and fifth bands, its waterline hidden behind the deep band.
+  const bx = 470, by = 50;
+  const cabin = sheet(NEAR, 'boat-tour-cabin', 44, y0 + by + 22, 74, CREAM,
+    '<path d="M30 74V30H196V74Z M48 30V0H128V30Z M140 30V8H146V30Z" fill="#fff"/>',
+    `${Array.from({ length: 6 }, (_, i) => `<rect x="${40 + i * 26}" y="40" width="17" height="15" fill="#5d7f95"/>`).join('')}<rect x="48" width="80" height="30" fill="${CORAL}"/><rect x="58" y="7" width="60" height="11" fill="#5d7f95"/><rect x="140" y="8" width="6" height="22" fill="#3d444e"/><rect x="30" y="64" width="166" height="10" fill="#e9dcc4"/>`, 'cover', bx, 230);
+  const hull = sheet(NEAR, 'boat-tour-hull', 48, y0 + by, 34, BLUE, '<path d="M0 0H230L206 34H22Z" fill="#fff"/>',
+    `<rect width="230" height="7" fill="${CREAM}"/>${[0, 1, 2, 3].map(k => `<circle cx="${50 + k * 40}" cy="18" r="5" fill="${CREAM}" fill-opacity=".9"/>`).join('')}`, 'cover', bx, 230);
+  // A sailboat further out, between the pale band and the next.
+  const sx = 830, sy = 96;
+  const sails = sheet(NEAR, 'sailboat-sails', 7, y0 + sy + 12, 116, '#fffdf6',
+    '<path d="M48 0V116H51V0Z M53 6L96 108H53Z M46 22L8 108H46Z" fill="#fff"/>', `<rect x="48" width="3" height="116" fill="${BARK}"/><path d="M46 22L8 108H46Z" fill="#f4e3c3"/><path d="M53 70H96" stroke="${CORAL}" stroke-width="5"/>`, 'cover', sx, 100);
+  const shull = sheet(NEAR, 'sailboat-hull', 10, y0 + sy, 16, CORAL, '<path d="M0 0H100L86 16H12Z" fill="#fff"/>', `<rect width="100" height="4" fill="${CREAM}"/>`, 'cover', sx, 100);
+  return [cabin, hull, sails, shull];
+}
+// The far bank, back to front: the palest row of towers, a middle row, trees, the waterfront shops, the quay wall with
+// a footbridge and a moored ferry, and the water lapping in front.
+function farLayers(): Panel[] {
+  s = 17;
+  const W = FAR.w, y0 = -40, quay = 64; // the far quay's top sits quay units above the card's foot
+  const row = (id: string, gap: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], win: string, roofC: string, breaks: number, extra: (x: number, top: number, bw: number, H: number) => { m: string; p: string }) => {
+    const H = quay + hi + 50; let mask = '', print = '';
+    for (let x = r(-20, 0); x < W;) {
+      const bw = r(minW, maxW), bh = r(lo, hi), top = H - quay - bh, c = cols[Math.floor(r(0, cols.length))];
+      mask += `<rect x="${f(x)}" y="${f(top)}" width="${f(bw + 1)}" height="${f(H - top)}" fill="#fff"/>`;
+      print += `<rect x="${f(x)}" y="${f(top)}" width="${f(bw + 1)}" height="${f(H - top)}" fill="${c}"/><rect x="${f(x)}" y="${f(top)}" width="${f(bw)}" height="4" fill="${roofC}"/>`;
+      for (let wx = x + 8; wx < x + bw - 12; wx += 16) for (let wy = top + 12; wy < H - quay - 10; wy += 20) if (r(0, 1) > .35) print += `<rect x="${f(wx)}" y="${f(wy)}" width="7" height="10" fill="${win}"/>`;
+      const e = extra(x, top, bw, H); mask += e.m; print += e.p;
+      x += bw + (r(0, 1) < breaks ? r(36, 90) : r(-2, 6));
+    }
+    return { mask, print, H };
+  };
+  // Back row: tall pale towers with masts and tanks, barely tinted.
+  const back = row('far-back', 0, 90, 150, 60, 120, ['#d6e6ea', '#dfe9e3', '#e6e2ec', '#d2e2ec'], '#eef6f8', '#c3d6dd', 0, (x, top, bw) => {
+    const k = r(0, 1), cx = x + bw * r(.3, .7);
+    if (k < .3) return { m: `<rect x="${f(cx - 1)}" y="${f(top - 34)}" width="2.5" height="34" fill="#fff"/>`, p: `<rect x="${f(cx - 1)}" y="${f(top - 34)}" width="2.5" height="34" fill="#b3c8d0"/>` };
+    if (k < .55) return { m: `<rect x="${f(cx - 9)}" y="${f(top - 16)}" width="18" height="16" fill="#fff"/>`, p: `<rect x="${f(cx - 9)}" y="${f(top - 16)}" width="18" height="16" fill="#c9d9de"/>` };
+    return { m: '', p: '' };
+  });
+  // The card itself is the back row, with pale water below the far quay.
+  const backWater = `<rect y="${back.H - quay}" width="${W}" height="${quay}" fill="#fff"/>`;
+  const card: Panel = { id: FAR.id, stock: 'sugar', c: '#d6e6ea', w: W, h: back.H, o: [FAR.x0, y0, FAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR.density, split: 2, mask: back.mask + backWater, print: back.print + `<rect y="${back.H - quay}" width="${W}" height="${quay}" fill="#b9e0f2"/>` };
+  // Middle row: offices and flats in soft mid tones, some with stepped tops.
+  const mid = row('far-mid', 10, 58, 104, 70, 150, ['#a9c3cf', '#b8c9b4', '#cdbba8', '#adbdd6'], '#f1e6c9', '#98aeb9', .25, (x, top, bw) => {
+    if (r(0, 1) > .4) return { m: '', p: '' };
+    const sw = bw * .5, sx = x + bw * .25; return { m: `<rect x="${f(sx)}" y="${f(top - 20)}" width="${f(sw)}" height="20" fill="#fff"/>`, p: `<rect x="${f(sx)}" y="${f(top - 20)}" width="${f(sw)}" height="20" fill="#c3d2da"/>` };
+  });
+  // Trees along the far promenade: scalloped crowns, a few palms rising out of them.
+  let tm = '', tp = '';
+  const TH = quay + 120;
+  for (let x = r(0, 30); x < W; x += r(46, 80)) {
+    const cr = r(20, 34), cy = TH - quay - cr * .9 - r(0, 10);
+    tm += `<circle cx="${f(x)}" cy="${f(cy)}" r="${f(cr)}" fill="#fff"/><circle cx="${f(x + cr * .8)}" cy="${f(cy + 6)}" r="${f(cr * .75)}" fill="#fff"/><rect x="${f(x - cr)}" y="${f(cy)}" width="${f(cr * 2.6)}" height="${f(TH - cy)}" fill="#fff"/>`;
+    tp += `<circle cx="${f(x)}" cy="${f(cy)}" r="${f(cr)}" fill="${r(0, 1) > .5 ? '#4f9e66' : '#5aab70'}"/><circle cx="${f(x + cr * .8)}" cy="${f(cy + 6)}" r="${f(cr * .75)}" fill="#438c59"/>`;
+    if (r(0, 1) < .22) { // a palm
+      const px = x + cr * 1.6, top = TH - quay - r(96, 116);
+      tm += `<rect x="${f(px - 2)}" y="${f(top)}" width="4" height="${f(TH - top)}" fill="#fff"/>` + [-50, -15, 20, 160, 200].map(a => `<path transform="translate(${f(px)} ${f(top)}) rotate(${a})" d="M0 -3Q14 -8 30 2Q14 0 0 3Z" fill="#fff"/>`).join('');
+      tp += `<rect x="${f(px - 2)}" y="${f(top)}" width="4" height="${f(TH - top)}" fill="${BARK}"/>` + [-50, -15, 20, 160, 200].map(a => `<path transform="translate(${f(px)} ${f(top)}) rotate(${a})" d="M0 -3Q14 -8 30 2Q14 0 0 3Z" fill="${FROND}"/>`).join('');
+    }
+  }
+  const trees = sheet(FAR, 'far-trees', 18, y0, TH, '#4f9e66', tm + `<rect y="${TH - quay}" width="${W}" height="${quay}" fill="#fff"/>`, tp + `<rect y="${TH - quay}" width="${W}" height="${quay}" fill="#4f9e66"/>`);
+  // The waterfront: low warm shops and cafés with awnings and a flag or two.
+  const front = row('far-front', 26, 40, 78, 60, 120, ['#f2cf8a', '#e9a77b', '#f4e3c3', '#e3b9a8', '#d8322f', '#9fc7b4', '#f6efe4'], '#5d7f95', '#8f5a4a', .45, (x, top, bw, H) => {
+    const aw = [CORAL, BLUE, MINT, SUN][Math.floor(r(0, 4))];
+    let m = `<path d="M${f(x + 4)} ${f(H - quay - 30)}h${f(bw - 8)}l4 10h${f(-bw)}Z" fill="#fff"/>`, p = `<path d="M${f(x + 4)} ${f(H - quay - 30)}h${f(bw - 8)}l4 10h${f(-bw)}Z" fill="${aw}"/><rect x="${f(x + 8)}" y="${f(H - quay - 20)}" width="${f(bw - 16)}" height="20" fill="#fff4e2"/>`;
+    if (r(0, 1) > .5) { const roof = `M${f(x - 4)} ${f(top)}L${f(x + bw / 2)} ${f(top - 22)}L${f(x + bw + 4)} ${f(top)}Z`; m += `<path d="${roof}" fill="#fff"/>`; p += `<path d="${roof}" fill="#a8634e"/>`; }
+    else if (r(0, 1) > .6) { m += `<rect x="${f(x + 10)}" y="${f(top - 26)}" width="2" height="26" fill="#fff"/><path d="M${f(x + 12)} ${f(top - 26)}l14 5l-14 5Z" fill="#fff"/>`; p += `<rect x="${f(x + 10)}" y="${f(top - 26)}" width="2" height="26" fill="#3d444e"/><path d="M${f(x + 12)} ${f(top - 26)}l14 5l-14 5Z" fill="${[CORAL, SUN, MINT][Math.floor(r(0, 3))]}"/>`; }
+    return { m, p };
+  });
+  const frontSheet = sheet(FAR, 'far-front', 26, y0, front.H, '#f2cf8a', front.mask + `<rect y="${front.H - quay}" width="${W}" height="${quay}" fill="#fff"/>`, front.print + `<rect y="${front.H - quay}" width="${W}" height="${quay}" fill="#f2cf8a"/>`);
+  // The quay wall with lamp posts and bollards, and a footbridge arching across from it toward the near bank.
+  const QH = quay + 40;
+  let qm = `<rect y="40" width="${W}" height="${quay}" fill="#fff"/>`, qp = `<rect y="40" width="${W}" height="${quay}" fill="#a99a8a"/><rect y="40" width="${W}" height="6" fill="#e2d6c4"/>${Array.from({ length: Math.floor(W / 34) }, (_, i) => `<path d="M${i * 34 + 10} 52v${quay - 14}" stroke="#93857a" stroke-width="1.4"/>`).join('')}`;
+  for (let x = 30; x < W; x += r(110, 170)) { qm += `<rect x="${f(x)}" y="6" width="3" height="34" fill="#fff"/><circle cx="${f(x + 1.5)}" cy="6" r="5" fill="#fff"/>`; qp += `<rect x="${f(x)}" y="6" width="3" height="34" fill="#3d444e"/><circle cx="${f(x + 1.5)}" cy="6" r="5" fill="#fff4e2"/>`; }
+  const quaySheet = sheet(FAR, 'far-quay', 34, y0, QH, '#a99a8a', qm, qp, 'greyboard');
+  // The footbridge: a white arch on two piers, rising from the far quay at the right of the view.
+  const bw = 300, bh = 70, bx = 1110;
+  const arch = `M0 ${bh}V30Q${bw / 2} -6 ${bw} 30V${bh}H${bw - 22}V48Q${bw / 2} 22 22 48V${bh}Z`;
+  const bridge = sheet(FAR, 'far-bridge', 40, y0 + quay - 26, bh, '#f4f1ea', `<path d="${arch}" fill="#fff"/><path d="M0 22Q${bw / 2} -14 ${bw} 22V26Q${bw / 2} -10 0 26Z" fill="#fff"/>${Array.from({ length: 15 }, (_, i) => `<rect x="${f(12 + i * 21)}" y="${f(18 - 18 * Math.sin(Math.PI * (12 + i * 21) / bw))}" width="2" height="14" fill="#fff"/>`).join('')}`,
+    `<path d="M0 30Q${bw / 2} -6 ${bw} 30" stroke="#d9d2c4" stroke-width="3" fill="none"/><rect y="${bh - 8}" width="${bw}" height="8" fill="#d9d2c4"/>`, 'cover', bx, bw);
+  // Two small yachts moored at the far quay, masts up.
+  const yacht = (id: string, x: number, hull: string, k: number) => sheet(FAR, id, 44, y0 + quay - 30, 96 * k, '#fffdf6',
+    `<g transform="scale(${k})"><path d="M0 76H110L96 96H12Z M30 58H80V76H30Z M54 0V58H57V0Z M59 6L92 56H59Z M52 16L24 56H52Z" fill="#fff"/></g>`,
+    `<g transform="scale(${k})"><path d="M0 76H110L96 96H12Z" fill="${hull}"/><rect y="76" width="110" height="4" fill="${CREAM}"/><rect x="30" y="58" width="50" height="18" fill="#f4f1ea"/><rect x="38" y="63" width="9" height="7" fill="#5d7f95"/><rect x="52" y="63" width="9" height="7" fill="#5d7f95"/><rect x="54" width="3" height="58" fill="${BARK}"/><path d="M52 16L24 56H52Z" fill="#f4e3c3"/></g>`, 'cover', x, 110 * k);
+  const ferry = [yacht('far-yacht-a', 600, CORAL, .62), yacht('far-yacht-b', 690, '#2f7d5b', .52)];
+  // Water lapping along the foot of the far quay, hiding the ferry's waterline.
+  const lap = sheet(FAR, 'far-water', 52, y0, quay - 22, '#9ad3ee', swell(W, quay - 22, 4, 2, 70, 0), ripples(W, quay - 22, 4, 40, '#d3eefa', [10, 26]));
+  return [card, sheet(FAR, 'far-mid', 10, y0, mid.H, '#c6d3c4', mid.mask, mid.print), trees, frontSheet, quaySheet, bridge, ...ferry, lap];
+}
+export const riverView = (): Panel[] => [...nearWater(), ...boats(), ...farLayers()];
 
 /* ---------- the river gate: columns, a slatted pergola, a sign, a railing, boats beyond ---------- */
 export function riverGate(x0: number, x1: number, z: number): Panel[] {
@@ -88,14 +188,10 @@ export function riverGate(x0: number, x1: number, z: number): Panel[] {
   const flag = (x: number, c: string) => ({ m: `<rect x="${x}" width="3" height="60" fill="#fff"/><path d="M${x + 3} 2L${x + 40} 14L${x + 3} 26Z" fill="#fff"/>`, p: `<rect x="${x}" width="3" height="60" fill="#3d444e"/><path d="M${x + 3} 2L${x + 40} 14L${x + 3} 26Z" fill="${c}"/>` });
   const fl = [flag(8, CORAL), flag(span / 2 + 28, SUN), flag(span + 48, MINT)];
   const flagsOnTop = [{ id: 'gate-flags', stock: 'cover', c: CORAL, w: span + 92, h: 60, o: [x0 - 30, H + 30, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.4, mask: fl.map(q => q.m).join(''), print: fl.map(q => q.p).join('') } as Panel];
-  // The quay railing across the opening, and the boats moored beyond it.
+  // The quay railing across the opening.
   const posts = Array.from({ length: 24 }, (_, i) => `<rect x="${i * ((span + 200) / 23)}" y="6" width="4" height="50" fill="#fff"/>`).join('');
   const railing: Panel = { id: 'quay-rail', stock: 'greyboard', c: '#e8e4dc', w: span + 200, h: 56, o: [x0 - 100, 0, -326], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.4, mask: `<rect width="${span + 200}" height="6" fill="#fff"/><rect y="26" width="${span + 200}" height="3" fill="#fff"/>${posts}` };
-  const boat: Panel = { id: 'boat-tour', stock: 'cover', c: CREAM, w: 300, h: 110, o: [mid - 220, -30, -520], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.3,
-    mask: '<path d="M0 70H300L270 110H24Z M40 30H220V70H40Z M60 0H150V30H60Z" fill="#fff"/>', print: `<rect y="70" width="300" height="40" fill="${BLUE}"/><rect y="70" width="300" height="8" fill="${CREAM}"/><rect x="40" y="30" width="180" height="40" fill="${CREAM}"/>${Array.from({ length: 6 }, (_, i) => `<rect x="${50 + i * 28}" y="38" width="18" height="16" fill="#5d7f95"/>`).join('')}<rect x="60" width="90" height="30" fill="${CORAL}"/><rect x="70" y="8" width="70" height="12" fill="#5d7f95"/>` };
-  const sail: Panel = { id: 'sailboat', stock: 'cover', c: '#fff', w: 140, h: 210, o: [mid + 150, -30, -700], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.1,
-    mask: '<path d="M10 180H140L120 210H24Z M66 0V176H70V0Z M72 10L132 170H72Z M64 30L14 170H64Z" fill="#fff"/>', print: `<rect y="180" width="140" height="30" fill="${CORAL}"/><rect x="66" width="4" height="176" fill="${BARK}"/><path d="M72 10L132 170H72Z" fill="#fffdf6"/><path d="M64 30L14 170H64Z" fill="#f4e3c3"/>` };
-  return [...col('gate-col-l', x0), ...col('gate-col-r', x1), ...beam, pergola, sign, ...flagsOnTop, railing, boat, sail];
+  return [...col('gate-col-l', x0), ...col('gate-col-r', x1), ...beam, pergola, sign, ...flagsOnTop, railing];
 }
 
 /* ---------- trees ---------- */

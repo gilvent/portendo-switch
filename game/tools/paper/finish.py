@@ -80,9 +80,42 @@ def flatten(d):
     colour = np.dstack([ndimage.map_coordinates(lin[..., c], coords, order=1) for c in range(3)])
     y, x = base["y"], base["x"]
     region = lin[y:y + base["ph"], x:x + base["pw"]]
+    if base["backdrop"]:
+        region *= far_shade(d, base, world, n, dn, do, du, dv, over)[..., None]
     region[:] = region * (1 - over[..., None]) + colour * over[..., None]
     held = a[y:y + base["ph"], x:x + base["pw"]]
     held[:] = held * (1 - over) + over
+
+
+# The far backdrop is lit evenly because nothing in the near scene can shade it, but its own cut layers still shade
+# one another, as in any shadow box. For flat layers under one sun that shadow is plain geometry: each pixel looks
+# toward the sun along SUN_TO_LIGHT and is shaded where it meets a layer standing in front of it. The sun's soft edge
+# widens the shadow with the gap, and the layer also hides part of the sky from what lies close behind it.
+SUN = np.array(L["sunToLight"], dtype=float) / np.linalg.norm(L["sunToLight"])
+FAR_DEPTH = {}
+
+
+def far_shade(d, base, world, n, dn, do, du, dv, over):
+    hb = FAR_DEPTH.setdefault(base["id"], np.zeros((base["ph"], base["pw"])))
+    hd = height(d)
+    gap = np.maximum(hd - hb, 0)
+    start = world + hb[..., None] * n
+    t = ((do - start) @ dn) / (SUN @ dn)
+    rel = start + t[..., None] * SUN - do
+    dx = (rel @ du) / d["w"] * d["pw"]
+    dy = (1 - (rel @ dv) / d["h"]) * d["ph"]
+    inside = (dx >= 0) & (dx < d["pw"]) & (dy >= 0) & (dy < d["ph"])
+    occ = ndimage.map_coordinates(alpha, [dy + d["y"] - .5, dx + d["x"] - .5], order=1) * inside
+    px_per_unit = base["pw"] / base["w"]
+    g = float(np.median(gap[occ > .5])) if (occ > .5).any() else float(hd)
+    occ = ndimage.gaussian_filter(occ, max(.5, g * .14 / 2.5 * px_per_unit), mode="nearest")
+    sun, sky = L["light"]["sun"] * max(float(SUN @ n), 0), L["light"]["sky"]
+    # Shadowed paper still takes the sky and the bounce off the lit layer beside it, so it never goes black.
+    shade = 1 - occ * sun / (sun + sky) * .55
+    near = ndimage.gaussian_filter(over, max(.5, g * .9 * px_per_unit), mode="nearest")
+    shade *= 1 - np.clip(near - over, 0, 1) * sky / (sun + sky) * .9
+    hb[over > .5] = hd
+    return shade
 
 
 def height(d):

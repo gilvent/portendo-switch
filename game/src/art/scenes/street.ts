@@ -1,7 +1,7 @@
 import { add, backOf, box, hinged, normal, on, slot, yaw, type Panel, type Scene, type V3 } from '../kit.ts';
 import { BLUE, CORAL, CREAM, DEEP, FOLIAGE, INK, SUN, cloud, parcel, reseed, scallopTop, specks } from '../recipes.ts';
 import { heroPanels } from './_hero.ts';
-import { bench, bin, bush, carved, clothesStall, fat, fawning, fbalcony, fblade, fbox, festoon, fflat, fflowers, flagPole, flamp, frame, FROND, farBank, palm, parasolTable, planter, plaza, riverGate, scallopBlob, shadeTree, shopper, ticketKiosk } from './promenade.ts';
+import { bench, bin, bush, carved, clothesStall, fat, fawning, fbalcony, fblade, fbox, festoon, fflat, fflowers, flagPole, flamp, frame, FROND, palm, riverView, parasolTable, planter, plaza, riverGate, scallopBlob, shadeTree, shopper, ticketKiosk } from './promenade.ts';
 
 const MINT = '#35b58a', PLUM = '#7c6be0', WARM = '#ffe7a8', LEAF = '#57b36f';
 const SHOP = { x: 150, z: -80, w: 720, d: 300, ground: 230, upper: 150, peak: 120 };
@@ -43,8 +43,12 @@ function backdrop(): Panel[] {
   return [
     // Only world heights of about 400 to 780 show above the street (sheet rows 560 to 940), so the sky's detail lives there.
     { id: 'sky', backdrop: true, stock: 'cover', c: '#7cc6ea', w: 5200, h: 1500, o: [-2480, -160, -780], u: [1, 0, 0], v: [0, 1, 0], density: FAR,
-      print: `${cloud(700, 640, 1.1, '#d8eef8')}${cloud(2650, 600, 1.2, '#d8eef8')}${cloud(4200, 700, 1, '#d8eef8')}${cloud(1050, 590, 1.6)}${cloud(1900, 660, 1.2)}${cloud(3150, 610, 1.5)}${cloud(2350, 760, .8)}${cloud(4500, 600, 1.1)}${cloud(1500, 780, .7)}${birds([[2180, 640, 1.2], [2215, 622, 1], [2245, 650, .9], [3420, 700, 1], [3450, 686, .8], [1650, 720, .9]])}` },
-    ...[card('city-far', -650, 0, 4200, 640, '#a6cfe0', farCity.mask, farCity.print), card('city-mid', -600, 0, 3900, 520, '#7fb2c4', midCity.mask, midCity.print)].map(p => ({ ...p, decal: 'sky' }))
+      print: birds([[2180, 640, 1.2], [2215, 622, 1], [2245, 650, .9], [3420, 700, 1], [3450, 686, .8], [1650, 720, .9]]) },
+    // Clouds are cut sheets stood off the sky, the far pale ones behind the white ones, so each throws a soft shadow.
+    ...[['clouds-far', 10, [[700, 640, 1.1], [2650, 600, 1.2], [4200, 700, 1]], '#d8eef8'], ['clouds-near', 28, [[1050, 590, 1.6], [1900, 660, 1.2], [3150, 610, 1.5], [2350, 760, .8], [4500, 600, 1.1], [1500, 780, .7]], '#fffdf6']].map(([id, gap, at, c]) =>
+      ({ id, stock: 'sugar', c, w: 5200, h: 1500, o: [-2480, -160, -780 + (gap as number)], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR, decal: 'sky', mask: (at as number[][]).map(([x, y, k]) => cloud(x, y, k, '#fff')).join('') }) as Panel),
+    // The city stands in two cut rows a little off the sky: the pale far towers, then the deeper middle row.
+    ...[card('city-far', -780 + 44, 0, 4200, 640, '#a6cfe0', farCity.mask, farCity.print), card('city-mid', -780 + 72, 0, 3900, 520, '#7fb2c4', midCity.mask, midCity.print)].map(p => ({ ...p, decal: 'sky' }))
   ];
 }
 function windowBox(id: string, parent: Panel, x: number, y: number, w: number, h: number, goods: string, cols: number, rows: number, gap = 18): Panel[] {
@@ -187,7 +191,7 @@ function surroundings(): Panel[] {
   // String lights from the white building to the café, over the walk.
   const la = fat(L, 140, 360, 4), lb = fat(L, 470, 380, 4), ra = fat(R, 470, 360, 4), rb = fat(R, 150, 380, 4);
   const lights = [festoon('lights-a', la, [ra[0], la[1], ra[2]], 70), festoon('lights-b', lb, [rb[0], lb[1], rb[2]], 60), festoon('lights-c', [430, 400, -60], [fat(R, 330, 400, 4)[0], 400, fat(R, 330, 400, 4)[2]], 40)];
-  return [lFront, lEnd, ...lRelief, rFront, ...rRelief, bFront, ...bRelief, ...gate, ...palms, ...lights, farBank(),
+  return [lFront, lEnd, ...lRelief, rFront, ...rRelief, bFront, ...bRelief, ...gate, ...palms, ...lights, ...riverView(),
     ...ticketKiosk('ticket', -800, -60, 62), ...clothesStall('clothes', 720, -190),
     ...parasolTable('cafe-a', 790, 150, '#d8322f'), ...parasolTable('cafe-b', 930, 20, CREAM),
     ...shadeTree('tree-l', 1080, 260, 330), ...planter('tree-l-bed', 1080, 260, 110),
