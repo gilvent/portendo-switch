@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, type MutableRefObject, type RefObje
 import gsap from 'gsap';
 import type { Action, ControllerMode } from './game.ts';
 import { reducedMotion } from './light.ts';
-import Courier from './art/Courier.tsx';
+import Salaryman from './art/Salaryman.tsx';
 
 type Props = { rigRef: RefObject<HTMLDivElement>; mode: ControllerMode; visible: boolean; lit: string | null; atDock: boolean; introRef: RefObject<HTMLDivElement>; stick: MutableRefObject<{ x: number; z: number }>; stickSpent: MutableRefObject<boolean>; dispatch: (a: Action) => void; onDockDone: () => void };
 
@@ -60,7 +60,7 @@ export default function Controller({ rigRef, mode, visible, lit, atDock, introRe
       <div className="console" ref={body}>
         <div className="screen" data-testid="handheld-screen">
           <div className="mini-road" />
-          <div className="mini-courier" ref={introRef}><Courier /></div>
+          <div className="mini-courier" ref={introRef}><Salaryman /></div>
           {atDock && <b className="prompt end" data-testid="prompt-a">A</b>}
         </div>
       </div>
