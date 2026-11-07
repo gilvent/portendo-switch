@@ -177,7 +177,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Second-floor store-room | 115 |
 | MRT car and station | 170 (the moving outside, about 70 DOM sheets, is gone) |
 
-Measured in the cloud container (software GPU, 4x CPU throttle, DPR 2.625), which runs slower than the reference machine: the street at 27 fps landscape and 44 portrait, and the MRT car with its old moving outside at 16 and 27 (the station replaced that outside; see the budget above). Unthrottled in the same container, the car walking past the deep station runs at about 14 fps landscape and 37 portrait, against 21 and 47 for the shallow first station: the deep platform's large back sheets and its escalator and lift each cost a few frames.
+Measured in the cloud container (software GPU, 4x CPU throttle, DPR 2.625), which runs slower than the reference machine: the street at 27 fps landscape and 44 portrait, and the MRT car with its old moving outside at 16 and 27 (the station replaced that outside; see the budget above). Unthrottled in the same container, the car walking past the deep station runs at about 15 fps landscape and 38 portrait, against 21 and 47 for the shallow first station: the deep platform's large back sheets and its escalator and lift each cost a few frames. Hidden floor and wall still cost drawing, so they are cut to what the camera can see.
 - Sheets that only exist to move can merge once they stand still: the car's rail, hangers and twelve straps are one cut sheet.
 - A slope's glass is a sheared sheet along the slope, not a rectangle around it.
 

@@ -79,10 +79,15 @@ function screenDoors(id: string, z: number, openings: readonly number[], withLea
 
 /* ---------- the platform and its concrete wall ---------- */
 function platform(): Panel[] {
-  const D = EDGE - WALL;
+  // Through the windows the floor shows no deeper than -900; past the cab it shows to the wall. Hidden floor still
+  // costs drawing, so the deep part is only the piece past the cab.
+  const D = EDGE + 900;
   // Granite floor: tactile strip and the safety line along the edge, wear along the doors.
   const floor: Panel = { id: 'platform-floor', stock: 'greyboard', c: GRANITE, w: SPAN, h: D, o: [X0, 0, EDGE], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: .8, split: 4,
     print: `<rect width="${SPAN}" height="${D}" fill="${GRANITE}"/>${tiles(SPAN, D, 60, '#c4bcae')}${specks(SPAN, D, '#a9a194', 800, 2.2)}<rect y="${D - 40}" width="${SPAN}" height="28" fill="${SUN}"/>${Array.from({ length: SPAN / 12 }, (_, i) => `<circle cx="${i * 12 + 6}" cy="${D - 26}" r="2.6" fill="#d9952a"/>`).join('')}<rect y="${D - 54}" width="${SPAN}" height="5" fill="#fff" fill-opacity=".7"/><rect y="0" width="${SPAN}" height="16" fill="#9a958c"/>` };
+  const RX = 560, RD = -900 - WALL;
+  const floorEnd: Panel = { id: 'platform-floor-end', stock: 'greyboard', c: GRANITE, w: X1 - RX, h: RD, o: [RX, 0, -900], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: .8,
+    print: `<rect width="${X1 - RX}" height="${RD}" fill="${GRANITE}"/>${tiles(X1 - RX, RD, 60, '#c4bcae')}${specks(X1 - RX, RD, '#a9a194', 80, 2.2)}` };
   // The platform's edge face, seen past the cab: concrete under the yellow lip.
   const edge: Panel = { id: 'platform-edge', stock: 'greyboard', c: '#a9a397', w: SPAN, h: -RAIL, o: [X0, RAIL, EDGE + 1], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: .8, split: 2,
     print: `<rect width="${SPAN}" height="${-RAIL}" fill="#a9a397"/><rect width="${SPAN}" height="8" fill="${SUN}"/><rect y="8" width="${SPAN}" height="6" fill="#857f74"/>${Array.from({ length: SPAN / 90 }, (_, i) => `<rect x="${i * 90 + 30}" y="30" width="26" height="20" fill="#5d646d"/>`).join('')}` };
@@ -91,7 +96,7 @@ function platform(): Panel[] {
   const track: Panel = { id: 'track-end', stock: 'greyboard', c: '#8f8a80', w: X1 - tx0, h: 170 - (EDGE - 1), o: [tx0, RAIL - 12, 170], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1,
     print: `<rect width="${X1 - tx0}" height="${-TD}" fill="#8f8a80"/>${specks(X1 - tx0, -TD, '#6f6a62', 160, 3)}${Array.from({ length: Math.ceil((X1 - tx0) / 46) }, (_, i) => `<rect x="${i * 46 + 8}" y="${170 - 150}" width="24" height="300" fill="#6d5a48"/>`).join('')}${[170 - 120, 170 + 110].map(y => `<rect y="${y}" width="${X1 - tx0}" height="8" fill="#c9ced3"/><rect y="${y + 8}" width="${X1 - tx0}" height="3" fill="#5b636d"/>`).join('')}` };
   void TD;
-  return [floor, edge, track];
+  return [floor, floorEnd, edge, track];
 }
 
 // The concrete wall closing the platform: board-marked concrete with tie holes, a teal band with the station's name
@@ -101,8 +106,10 @@ function backWall(): Panel[] {
   const formwork = `${Array.from({ length: Math.ceil(H / 60) }, (_, r) => `<rect y="${r * 60}" width="${SPAN}" height="1.6" fill="#a29d93"/>`).join('')}${Array.from({ length: Math.ceil(SPAN / 240) * Math.ceil(H / 120) }, (_, i) => { const c = i % Math.ceil(SPAN / 240), r = Math.floor(i / Math.ceil(SPAN / 240)); return `<circle cx="${c * 240 + 40}" cy="${r * 120 + 30}" r="3.4" fill="#8f8a80"/><circle cx="${c * 240 + 200}" cy="${r * 120 + 30}" r="3.4" fill="#8f8a80"/><rect x="${c * 240}" y="${r * 120}" width="1.6" height="120" fill="#a9a49a"/>`; }).join('')}`;
   // The exit: an opening above the escalator's deck, onto the passage up to the concourse.
   const EX0 = 600, EX1 = 860, EY0 = ST.DECK_Y, EY1 = 700, hole = `M${EX0 - X0} ${H - EY1}H${EX1 - X0}V${H - EY0}H${EX0 - X0}Z`;
-  const wall: Panel = { id: 'wall-concrete', stock: 'greyboard', c: CONCRETE, w: SPAN, h: H, o: [X0, 0, WALL], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: .7, split: 3, behind: true,
-    mask: `<path fill-rule="evenodd" d="M0 0H${SPAN}V${H}H0Z ${hole}" fill="#fff"/>`,
+  // The wall's low band is hidden behind the car everywhere but past the cab: the full sheet starts above it.
+  const LOW = 180;
+  const wall: Panel = { id: 'wall-concrete', stock: 'greyboard', c: CONCRETE, w: SPAN, h: H - LOW, o: [X0, LOW, WALL], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: .7, split: 3, behind: true,
+    mask: `<path fill-rule="evenodd" d="M0 0H${SPAN}V${H - LOW}H0Z ${hole}" fill="#fff"/>`,
     print: `<rect width="${SPAN}" height="${H}" fill="${CONCRETE}"/>${specks(SPAN, H, '#9d988e', 900, 2.6)}${formwork}<rect y="${H - 414}" width="${SPAN}" height="34" fill="${TEAL}"/><rect y="${H - 380}" width="${SPAN}" height="5" fill="${SUN}"/><rect y="${H - 26}" width="${SPAN}" height="26" fill="#8f8a80"/>` };
   const z = WALL + 1, B = (spec: Parameters<typeof box>[0]) => box(spec);
   const lightbox = (id: string, x: number, y: number, w: number, h: number, art: string) => B({ id, x, z: z + 7, y, w, h, d: 12, stock: 'cover', c: STEEL, front: `<rect width="${w}" height="${h}" fill="${STEEL}"/><g transform="translate(8 8)">${art}</g>` });
@@ -119,14 +126,17 @@ function backWall(): Panel[] {
     ...[-700, 300].flatMap((x, i) => B({ id: `wall-cam-${i}`, x, z: z + 10, y: 740, w: 26, h: 18, d: 20, stock: 'cover', c: '#f4f6f8', front: `<circle cx="13" cy="9" r="6" fill="${INK}"/>` }))
   ]).map(p => ({ ...p, behind: true, ...(p.id.startsWith('wall-tray') && !p.ghost ? { density: .6 } : {}) }));
   // The station's name, repeated along the band: it follows the line map.
-  const names = STATIONS.map((st, k): Panel => on(wall, 1.5, 0, 380, SPAN, 34, { id: `wall-name-${k}`, stock: 'cover', c: TEAL_DEEP, density: 1, show: { toy: 'line', at: [k] }, decal: undefined, behind: true,
+  const names = STATIONS.map((st, k): Panel => on(wall, 1.5, 0, 380 - LOW, SPAN, 34, { id: `wall-name-${k}`, stock: 'cover', c: TEAL_DEEP, density: 1, show: { toy: 'line', at: [k] }, decal: undefined, behind: true,
     mask: Array.from({ length: Math.ceil(SPAN / 700) }, (_, i) => `<rect x="${i * 700 + 120}" y="0" width="300" height="34" rx="4" fill="#fff"/>`).join(''),
     print: Array.from({ length: Math.ceil(SPAN / 700) }, (_, i) => `<rect x="${i * 700 + 120}" width="300" height="34" rx="4" fill="${TEAL_DEEP}"/><rect x="${i * 700 + 128}" y="6" width="22" height="22" rx="4" fill="${st.c}" stroke="${CREAM}" stroke-width="1.6"/><text x="${i * 700 + 280}" y="25" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="20" fill="#fff">${st.name}</text>`).join('') }));
+  const lowW = X1 - 560;
+  const wallLow: Panel = { id: 'wall-low', stock: 'greyboard', c: CONCRETE, w: lowW, h: LOW, o: [560, 0, WALL], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: .7, behind: true,
+    print: `<rect width="${lowW}" height="${LOW}" fill="${CONCRETE}"/>${specks(lowW, LOW, '#9d988e', 60, 2.6)}<rect y="${LOW - 26}" width="${lowW}" height="26" fill="#8f8a80"/>${[60, 120].map(y => `<rect y="${y}" width="${lowW}" height="1.6" fill="#a29d93"/>`).join('')}` };
   // Behind the opening: the passage up to the concourse, a stair rising away under strip lights, people going up.
   const PW = EX1 - EX0 + 120, PH = EY1 - EY0 + 60;
   const passage: Panel = { id: 'exit-passage', stock: 'cover', c: '#e9e2d4', w: PW, h: PH, o: [EX0 - 60, EY0 - 10, WALL - 240], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1, behind: true, emit: .25,
     print: `<rect width="${PW}" height="${PH}" fill="#e9e2d4"/><rect width="${PW}" height="50" fill="#a7adb4"/>${[0, 1, 2].map(i => `<rect x="${40 + i * 120}" y="18" width="90" height="10" rx="5" fill="#fffbea"/>`).join('')}${Array.from({ length: 9 }, (_, i) => `<rect x="${60 + i * 6}" y="${PH - 30 - i * 20}" width="${PW - 120 - i * 12}" height="12" fill="#9aa3ad"/>`).join('')}<circle cx="${PW * .42}" cy="${PH - 190}" r="12" fill="${SKIN[1]}"/><rect x="${PW * .42 - 16}" y="${PH - 176}" width="32" height="54" rx="8" fill="${CORAL}"/><circle cx="${PW * .6}" cy="${PH - 220}" r="11" fill="${SKIN[2]}"/><rect x="${PW * .6 - 15}" y="${PH - 207}" width="30" height="50" rx="8" fill="${DEEP}"/>` };
-  return [wall, ...relief, ...names, passage];
+  return [wall, wallLow, ...relief, ...names, passage];
 }
 
 // The escalator up to the exit, rising to the right onto a deck along the back wall; the wall under the escalator
