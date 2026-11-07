@@ -45,10 +45,10 @@ function backdrop(): Panel[] {
     { id: 'sky', backdrop: true, stock: 'cover', c: '#7cc6ea', w: 5200, h: 1500, o: [-2480, -160, -780], u: [1, 0, 0], v: [0, 1, 0], density: FAR,
       print: birds([[2180, 640, 1.2], [2215, 622, 1], [2245, 650, .9], [3420, 700, 1], [3450, 686, .8], [1650, 720, .9]]) },
     // Clouds are cut sheets stood off the sky, the far pale ones behind the white ones, so each throws a soft shadow.
-    ...[['clouds-far', 10, [[700, 640, 1.1], [2650, 600, 1.2], [4200, 700, 1]], '#d8eef8'], ['clouds-near', 28, [[1050, 590, 1.6], [1900, 660, 1.2], [3150, 610, 1.5], [2350, 760, .8], [4500, 600, 1.1], [1500, 780, .7]], '#fffdf6']].map(([id, gap, at, c]) =>
+    ...[['clouds-far', 14, [[700, 640, 1.1], [2650, 600, 1.2], [4200, 700, 1]], '#d8eef8'], ['clouds-near', 34, [[1050, 590, 1.6], [1900, 660, 1.2], [3150, 610, 1.5], [2350, 760, .8], [4500, 600, 1.1], [1500, 780, .7]], '#fffdf6']].map(([id, gap, at, c]) =>
       ({ id, stock: 'sugar', c, w: 5200, h: 1500, o: [-2480, -160, -780 + (gap as number)], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR, decal: 'sky', mask: (at as number[][]).map(([x, y, k]) => cloud(x, y, k, '#fff')).join('') }) as Panel),
     // The city stands in two cut rows a little off the sky: the pale far towers, then the deeper middle row.
-    ...[card('city-far', -780 + 44, 0, 4200, 640, '#a6cfe0', farCity.mask, farCity.print), card('city-mid', -780 + 72, 0, 3900, 520, '#7fb2c4', midCity.mask, midCity.print)].map(p => ({ ...p, decal: 'sky' }))
+    ...[card('city-far', -780 + 50, 0, 4200, 640, '#a6cfe0', farCity.mask, farCity.print), card('city-mid', -780 + 110, 0, 3900, 520, '#7fb2c4', midCity.mask, midCity.print)].map(p => ({ ...p, decal: 'sky' }))
   ];
 }
 function windowBox(id: string, parent: Panel, x: number, y: number, w: number, h: number, goods: string, cols: number, rows: number, gap = 18): Panel[] {
