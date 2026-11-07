@@ -117,14 +117,14 @@ export function train(): Scene {
   const RAIL_Y = 296, RAIL_Z = -62;
   const pole = (id: string, x: number, z: number): Panel[] => box({ id, x, z, w: 7, h: RAIL_Y, d: 7, stock: 'greyboard', c: POLE, front: `<rect x="1" width="2" height="${RAIL_Y}" fill="#fff" fill-opacity=".6"/>` }).filter(p => !/-(rear|under|top)$/.test(p.id));
   const poles = [...pole('pole-a', -330, -40), ...pole('pole-b', 330, -40), ...pole('pole-c', -252, BACK + 70), ...pole('pole-d', 252, BACK + 70)];
-  const rail: Panel = { id: 'rail', stock: 'greyboard', c: POLE, w: W - 60, h: 6, o: [-W / 2 + 30, RAIL_Y, RAIL_Z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 2, print: `<rect width="${W - 60}" height="2" fill="#fff" fill-opacity=".6"/>` };
-  const hangers = [-480, -160, 160, 480].map((x, i): Panel => ({ id: `hanger-${i}`, stock: 'greyboard', c: POLE, w: 5, h: CAR.COVE - RAIL_Y, o: [x - 2.5, RAIL_Y, RAIL_Z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 2 }));
+  // The overhead rail, its hangers and the hand straps, cut as one sheet: the train stands, so nothing swings.
   const strapXs = [-520, -460, -270, -205, -140, -75, 75, 140, 205, 270, 460, 520];
-  const SL = 104;
-  const straps = strapXs.map((x, i): Panel => { const pri = x < -400; return { id: `strap-${i}`, stock: 'cover', c: pri ? SUN : '#f4f6f8', w: 20, h: SL, o: [x - 10, RAIL_Y - SL + 3, RAIL_Z + 2], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 3,
-    mask: `<path fill-rule="evenodd" d="M7 0H13V${SL - 34}H7Z M5 ${SL - 36}H15V${SL - 26}H5Z M10 ${SL - 28}L20 ${SL - 12}Q20 ${SL} 10 ${SL}Q0 ${SL} 0 ${SL - 12}Z M10 ${SL - 21}L5 ${SL - 12}Q5 ${SL - 5} 10 ${SL - 5}Q15 ${SL - 5} 15 ${SL - 12}Z" fill="#fff"/>`,
-    print: `<rect width="20" height="${SL}" fill="${pri ? SUN : '#f4f6f8'}"/><rect x="7" width="6" height="${SL - 34}" fill="${pri ? '#c9861f' : '#5d6670'}"/><rect x="5" y="${SL - 36}" width="10" height="10" fill="${pri ? '#c9861f' : '#5d6670'}"/>`,
-  }; });
+  const SL = 104, RX0 = -W / 2 + 30, RW = W - 60, RT = CAR.COVE, RH = RT - (RAIL_Y - SL + 3), ry = (y: number) => RT - y;
+  const strapShape = (x: number) => { const l = x - RX0 - 10, t = ry(RAIL_Y + 3); return `M${l + 7} ${t}H${l + 13}V${t + SL - 34}H${l + 7}Z M${l + 5} ${t + SL - 36}H${l + 15}V${t + SL - 26}H${l + 5}Z M${l + 10} ${t + SL - 28}L${l + 20} ${t + SL - 12}Q${l + 20} ${t + SL} ${l + 10} ${t + SL}Q${l} ${t + SL} ${l} ${t + SL - 12}Z M${l + 10} ${t + SL - 21}L${l + 5} ${t + SL - 12}Q${l + 5} ${t + SL - 5} ${l + 10} ${t + SL - 5}Q${l + 15} ${t + SL - 5} ${l + 15} ${t + SL - 12}Z`; };
+  const hangerXs = [-480, -160, 160, 480];
+  const overhead: Panel = { id: 'rail', stock: 'cover', c: POLE, w: RW, h: RH, o: [RX0, RT - RH, RAIL_Z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 2.4, split: 2,
+    mask: `<rect y="${ry(RAIL_Y + 6)}" width="${RW}" height="6" fill="#fff"/>${hangerXs.map(x => `<rect x="${x - RX0 - 2.5}" y="0" width="5" height="${ry(RAIL_Y)}" fill="#fff"/>`).join('')}<path fill-rule="evenodd" d="${strapXs.map(strapShape).join(' ')}" fill="#fff"/>`,
+    print: `<rect width="${RW}" height="${RH}" fill="${POLE}"/><rect y="${ry(RAIL_Y + 6)}" width="${RW}" height="2" fill="#fff" fill-opacity=".6"/>${strapXs.map(x => { const l = x - RX0 - 10, t = ry(RAIL_Y + 3), pri = x < -400; return `<rect x="${l}" y="${t}" width="20" height="${SL}" fill="${pri ? SUN : '#f4f6f8'}"/><rect x="${l + 7}" y="${t}" width="6" height="${SL - 34}" fill="${pri ? '#c9861f' : '#5d6670'}"/><rect x="${l + 5}" y="${t + SL - 36}" width="10" height="10" fill="${pri ? '#c9861f' : '#5d6670'}"/>`; }).join('')}` };
 
   // End walls: the gangway doors into the neighbouring cars, a fire extinguisher and the intercom at the left.
   const endWall = (side: 1 | -1, id: string): Panel => {
@@ -292,7 +292,7 @@ export function train(): Scene {
   const cup = box({ id: 'cup', x: 478, z: BACK + 98, w: 12, h: 18, d: 12, stock: 'cover', c: CREAM, front: `<rect y="5" width="12" height="7" fill="${MINT}"/>`, top: `<circle cx="6" cy="6" r="5" fill="#6d4524"/>` }).filter(p => /front|top/.test(p.id));
   const panels: Panel[] = [section, under, fl, back, cv, lw, rw, roofTop, roofCut, ...acs, ...panto, ...neighbours,
     ...winFrames, ...doorFrames, ...leaves, ...[0, 1].flatMap(i => [0, 1, 2].map(k => led(i, k))), ...ads, ...lineMap, ...lamps, strip,
-    ...benches, priority, ...screens, ...poles, rail, ...hangers, ...straps, ...wallBits, ...intercom, emergency, ...windowTrim, ...doorTrim, ...endTrim, ...coveTrim,
+    ...benches, priority, ...screens, ...poles, overhead, ...wallBits, ...intercom, emergency, ...windowTrim, ...doorTrim, ...endTrim, ...coveTrim,
     ...people, ...suitcase, bag, umbrella, stroller, ...cup];
   const st = buildStation();
   return {
