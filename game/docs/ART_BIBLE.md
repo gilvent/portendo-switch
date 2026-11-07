@@ -92,6 +92,10 @@ Split each space into the **main space**, where the courier walks and plays, and
 
 ### The player and home: the morning commute
 
+![The MRT car, home](spaces/mrt.png)
+
+![Doors open at the station](spaces/mrt-doors.png)
+
 The player is a salaryman: white shirt, coral tie, navy suit, blue lanyard with an ID card, glasses and a briefcase, cut as one card with white core edges. Home is not a crossroads but one MRT car on an elevated line, cut open along its near side like a cutaway model.
 
 | Part | Build in the MRT car |
