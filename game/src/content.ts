@@ -97,11 +97,11 @@ export const content: Content = validateContent({ worlds: {
     stops: [
       out('moperty'),
       { id: 'signpost', label: 'Finger-post', x: -330, z: -10, focus: 1.5, look: -320, action: { kind: 'toy', toy: 'rank', states: 3 } },
-      { id: 'listings', label: 'Listings window', x: -156, z: -10, focus: 1.6, look: -156, action: { kind: 'toy', toy: 'filter', states: 3 } },
+      { id: 'listings', label: 'Listings window', x: -52, z: -10, focus: 1.6, look: -140, action: { kind: 'toy', toy: 'filter', states: 3 } },
       { id: 'gallery-door', label: 'Visit Moperty', x: 40, z: -6, reach: 90, action: { kind: 'link', href: 'https://moperty.id' } },
-      { id: 'kiosk', label: 'Street poster', x: 430, z: -10, focus: 1.8, look: 430, action: { kind: 'toy', toy: 'app', states: 3 } },
-      { id: 'easel', label: 'Drawing board', x: 570, z: -10, focus: 1.6, look: 570, action: { kind: 'toy', toy: 'paint', states: 2 } },
-      { id: 'site-board', label: 'Site board', x: 760, z: -10, action: { kind: 'letter', letter: 'stack' } },
+      { id: 'kiosk', label: 'Street poster', x: 384, z: -10, focus: 1.8, look: 420, action: { kind: 'toy', toy: 'app', states: 3 } },
+      { id: 'easel', label: 'Drawing board', x: 482, z: -10, focus: 1.6, look: 556, action: { kind: 'toy', toy: 'paint', states: 2 } },
+      { id: 'site-board', label: 'Site board', x: 736, z: -10, action: { kind: 'letter', letter: 'stack' } },
       { id: 'site', label: 'Tower crane', x: 866, z: 20, action: { kind: 'toy', toy: 'build', states: 4 } } ],
     letters: [stack([T.vue, T.laravel, T.sass, T.postgres, T.nginx, T.gcloud])],
     encoded: [

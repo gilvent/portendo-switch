@@ -158,7 +158,7 @@ function gableRoof(id: string, cx: number, zf: number, half: number, peak: numbe
 function gallery(): Panel[] {
   const { x, z, w, d, wall, peak } = G, H = wall + peak, x0 = x - w / 2, hw = w / 2, density = 1.25;
   // Holes, measured from the wall's left foot: the listings window, the model window, and the two logo windows upstairs.
-  const win = { list: [24, 40, 180, 150], model: [416, 40, 180, 150], upL: [110, 232, 90, 84], upR: [420, 232, 90, 84] } as const;
+  const win = { list: [24, 40, 180, 150], model: [416, 40, 180, 150], upL: [110, 256, 90, 80], upR: [420, 256, 90, 80] } as const;
   const holes = Object.values(win).map(([a, b, c, e]) => `M${a} ${H - b}V${H - b - e}H${a + c}V${H - b}Z`).join(' ');
   const boards = (cx: number, c: string) => Array.from({ length: 16 }, (_, i) => `<path d="M${cx} ${peak + (i + 1) * 20}h${hw}" stroke="${tone(c, -.16)}" stroke-width="2"/>`).join('');
   const front: Panel = { id: 'gallery-front', stock: 'cover', c: INDIGO, w, h: H, o: [x0, 0, z], u: [1, 0, 0], v: [0, 1, 0], density, edge: 'cut',
@@ -171,7 +171,7 @@ function gallery(): Panel[] {
   // Through the listings window: a pale pinboard wall. The listing cards themselves hang in front of the glass.
   const pinboard = `<rect width="200" height="170" fill="#f7efe0"/><rect y="6" width="200" height="6" fill="${tone(INDIGO, .5)}"/><rect y="84" width="200" height="4" fill="#e6dac6"/>`;
   // Through the model window: three house models on plinths.
-  const models = `<rect width="200" height="170" fill="#f7efe0"/>${[0, 1, 2].map(k => `<rect x="${18 + k * 60}" y="${112 - (k % 2) * 14}" width="44" height="${58 + (k % 2) * 14}" fill="#fff"/><g transform="translate(${17 + k * 60} ${66 - (k % 2) * 14}) scale(1.55)">${house([LAV, CREAM, INDIGO][k], [INDIGO, YEL, tone(INDIGO, -.3)][k])}</g>`).join('')}`;
+  const models = `<rect width="200" height="170" fill="#ecdcc0"/>${[0, 1, 2].map(k => `<rect x="${18 + k * 60}" y="${112 - (k % 2) * 14}" width="44" height="${58 + (k % 2) * 14}" fill="#fff"/><g transform="translate(${17 + k * 60} ${66 - (k % 2) * 14}) scale(1.55)">${house([LAV, CREAM, INDIGO][k], [INDIGO, YEL, tone(INDIGO, -.3)][k])}</g>`).join('')}`;
   const windows = [...windowBox('g-list', front, win.list[0], win.list[1], win.list[2], win.list[3], pinboard, 1, 1, 14), ...windowBox('g-model', front, win.model[0], win.model[1], win.model[2], win.model[3], models, 2, 1),
     ...windowBox('g-up-l', front, win.upL[0], win.upL[1], win.upL[2], win.upL[3], yellow, 2, 2, 10), ...windowBox('g-up-r', front, win.upR[0], win.upR[1], win.upR[2], win.upR[3], yellow, 2, 2, 10)];
   const walls = box({ id: 'gallery-body', x, z: z - d / 2, w, h: wall, d, stock: 'cover', c: INDIGO, side: INDIGO, noTop: true, left: boards(0, INDIGO).replaceAll(`h${hw}`, `h${d}`), right: boards(0, LAV).replaceAll(`h${hw}`, `h${d}`) })
@@ -208,8 +208,8 @@ function gallery(): Panel[] {
   const icons = [`<g fill="${INDIGO}"><rect x="13" y="6" width="7" height="7"/><rect x="23" y="6" width="7" height="7"/><rect x="13" y="15" width="7" height="7"/><rect x="23" y="15" width="7" height="7"/></g>`,
     `<path d="M11 14L20 5H32V17L23 26Z" fill="${STEEL}"/><circle cx="27.5" cy="9.5" r="2.4" fill="${YEL}"/>`,
     `<circle cx="15" cy="14" r="7" fill="none" stroke="${STEEL}" stroke-width="4"/><path d="M22 14H35M30 14V20M34 14V19" stroke="${STEEL}" stroke-width="4" fill="none"/>`];
-  const tabs = icons.map((icon, i): Panel => ({ id: `tab-${i}`, stock: 'cover', c: [CREAM, YEL, LAV][i], w: 44, h: 28, o: [lx + 14 + i * 54, ly + win.list[3] + 12, z + 2.4], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 3,
-    mask: '<path d="M0 28V7Q0 0 7 0H37Q44 0 44 7V28Z" fill="#fff"/>', print: icon, motion: { toy: 'filter', at: [i], slide: [0, 10, 0] } }));
+  const tabs = icons.map((icon, i): Panel => ({ id: `tab-${i}`, stock: 'cover', c: [CREAM, YEL, LAV][i], w: 44, h: 26, o: [lx + 14 + i * 54, ly + win.list[3] + 10, z + 2.4], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 3,
+    mask: '<path d="M0 26V7Q0 0 7 0H37Q44 0 44 7V26Z" fill="#fff"/>', print: icon, motion: { toy: 'filter', at: [i], slide: [0, 10, 0] } }));
   const rail = on(front, 1, win.list[0] - 4, win.list[1] + win.list[3] + 6, win.list[2] + 8, 8, { id: 'tab-rail', stock: 'cover', c: tone(INDIGO, -.3) });
   return [front, ...dress, ...walls, ...windows, ...roofs, eFront, ...eWalls, ...eRoof, room, leaf('gdoor-l', x - E.door / 2, 'left'), leaf('gdoor-r', x, 'right'), rail, ...tabs, ...cards];
 }
@@ -419,7 +419,7 @@ function surroundings(): Panel[] {
 
   return [lFront, lEnd, ...lRelief, rFront, ...rRelief, ...lights, back,
     // Left pavement: a shade tree over a bench, a bicycle against it, the signal at the crossing.
-    ...shadeTree('tree-l', -790, -150, 270), ...planter('tree-l-bed', -790, -150, 96), ...bench('bench', -745, -70, 150), ...bicycle('bike', -752, -30, 6, INDIGO),
+    ...shadeTree('tree-l', -692, -170, 270), ...planter('tree-l-bed', -692, -170, 96), ...bench('bench', -720, -100, 150), ...bicycle('bike', -872, 70, 78, INDIGO),
     ...signal('signal', -654, -46), ...hydrant('hydrant', 150, 170),
     // The avenue corner: the finger-post, and a bed of bushes against the gallery's side wall.
     ...fingerPost(-376, -64), ...planter('corner-bed', -318, -200, 90, 34), ...bush('corner-bush', -318, -206, 104, 60, 30),
@@ -441,7 +441,7 @@ function surroundings(): Panel[] {
     ...shadeTree('tree-r', 1250, 250, 330), ...planter('tree-r-bed', 1250, 250, 110),
     // The kerb: lamps, a commuter waiting to cross, a taxi at the stand, a low bed of bushes at the front edge.
     ...streetLamp('lamp-a', -900, 180, 250, '#ffe7a8'), ...streetLamp('lamp-b', 1150, 184, 250, '#ffe7a8'),
-    ...shopper('commuter', 356, 156, { coat: '#2bb5b8', legs: '#c8915a', skin: '#a8714f', hair: '#1d1a17', style: 'shorts', pack: INDIGO, hat: '#f4f1ea', build: 'average', face: 'cool' }, true, .95, 0, false),
+    ...shopper('commuter', 392, 150, { coat: '#2bb5b8', legs: '#c8915a', skin: '#a8714f', hair: '#1d1a17', style: 'shorts', pack: INDIGO, hat: '#f4f1ea', build: 'average', face: 'cool' }, true, .95, 0, false),
     ...taxi('taxi', 230, 262, 0)];
 }
 

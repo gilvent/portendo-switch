@@ -26,6 +26,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | Riverside promenade (street) | Sky `#8fd3f4`, brick paving `#dba38b`, river `#4fa9d6`, palm `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
+| Moperty downtown | Sky `#a9d8f0`, stone paving `#e3c9a0`, brick `#b0664c`, asphalt `#5d616b` | Moperty indigo `#5b6bdc` with lavender `#a3adf2`, window yellow `#f5b400` | Cream `#fff4e2`, steel `#2f343c` |
 
 Tech colours from `content.ts` appear only as small label bars.
 
@@ -125,6 +126,28 @@ Neither floor carries a written account of the work. Each part of the work is an
 
 Stops carry `focus` and `look`: the camera leans in on the object being used while the courier stands beside it, not in front of it.
 
+### Moperty: the downtown corner
+
+The Moperty space (`src/art/scenes/downtown.ts`) is a street corner in front of the Moperty sales gallery, built from the promenade's kit and to the same standard. Moperty is a property marketplace, so the corner is its catalogue: a listings window, a flat to let, a new block going up.
+
+- **Main space:** the stone pavement along the gallery, with a raised brick crossing where the avenue meets it. The kerb, the road and a taxi at the stand frame the front edge.
+- **Open surroundings:** the avenue on the left runs back to a shadow box. Card one closes it with the cross street: shops, street trees, a pale rail viaduct with an indigo train standing on it, a bus passing in front, a clipped hedge. Card two stands further back with three rows of towers, pale, deep, then warm, and a billboard carrying the mark. The city in the CSS backdrop goes pale, cool, then warm sand, so the indigo gallery always stands clear of it.
+- **Enclosed surroundings:** a brick walk-up with a bakery on the left, the gallery and the building site at the back, the corner café on the right. Awnings, balconies, flower boxes, lanterns and blade signs are carved relief.
+- **The gallery is the mark, built as a building:** an indigo and a lavender gabled house joined into one, each with the mark's yellow window, and the small white house between them as the entrance.
+- **Freestanding objects are folded:** the taxi is a body box with the cabin set back on it and a lit roof sign, with wheels, sill and lamps glued on; the dog is a tent fold with its head a card glued across the front and its tail a card behind; cones are two slotted cards; the hydrant, signal, poster totem and brick pallet are box folds with their small parts glued on. The crane's mast and jib, the scaffolding, the barrier and the finger-post's arrows are flat because they are plane-shaped.
+- **Small stories, not scattered props:** the dog walker on the crossing, the couple at the model window, pigeons on the doormat side of the pavement, the painter at the drawing board, the forewoman shouting past the barrier, a guest asleep on the café terrace, a commuter by the taxi.
+- **Stops stand beside what they use,** in walking order, so the player never covers the object being played.
+
+| Stop | What you do | What it stands for |
+|---|---|---|
+| Finger-post | Each A lifts the Moperty arrow one place up the pole, under the magnifier | SEO |
+| Listings window | The tabs filter the cards in the window: all, for sale (yellow ribbon), for rent (lavender ribbon) | Browsing local real estate |
+| Gallery door | The doors swing open; A visits moperty.id | The product |
+| Street poster | A turns the lit screen: the site in a browser, the neighbourhood map, then the icon on a home screen | A progressive web app |
+| Drawing board | A paints over the pencil wireframe of the listing page | Designing the UIs |
+| Site board | Opens the tech stack | Tech stack |
+| Tower crane | Each A sets the next module on the new block: backend base (Postgres, Laravel), two front-end floors (Vue, Sass), then the roof (Nginx, Google Cloud) and its lit sign | Building and running the whole product, front end and back end |
+
 ### Outside and inside match
 
 A room diorama is the building seen from the street, cut open. Every room's outline must match the exterior that holds it.
@@ -137,9 +160,9 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all three spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds every space. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
-1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
+1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
 3. Blender Cycles bakes light only, at half the atlas size (`LIGHT_SCALE`): each surface sees itself as white while bounce rays still take on the colours around it. Light is smooth by nature, so a low sample count is enough once `finish.py` smooths it within each panel.
 4. `finish.py` multiplies the crisp print back over the light, lights the far backdrop evenly (nothing near can shade it) apart from the shadows its own cut layers throw on each other, worked out from `SUN_TO_LIGHT`, the sun's soft edge and each layer's gap, flattens decals and flat relief into their parents along the parent's normal, paints carved relief onto its wall along the game camera's rays (nearest piece wins), culls faces no game camera can see, and writes the atlas, backdrop and manifest. Far layers are packed last and cropped off the shipped atlas, so the backdrop can be cut at high resolution for free.
@@ -164,6 +187,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Street (riverside promenade) | 210 (uses 209) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
+| Moperty downtown | 210 (uses 209) |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
@@ -179,4 +203,6 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Showcase phone | The chosen swatch chip rises |
 | Recommended shelf | Placeholder cards fold down |
 | Review board | The chosen filter tab rises |
+| Moperty gallery | Both door leaves swing inward |
+| Listings window | The chosen filter tab rises |
 | Any toy | A piece that appears drops into place in five stepped frames |
