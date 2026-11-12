@@ -18,7 +18,7 @@ export const content: Content = validateContent({ worlds: {
   crossroads: { id: 'crossroads', art: 'blockout', bounds: B, solid: [], title: 'Crossroads', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'road-blibli', label: 'Blibli.com', x: -660, z: 0, reach: 300, action: { kind: 'road', to: 'blibli', stop: 'mailbox' } },
-      { id: 'road-moperty', label: 'Moperty', x: 0, z: -220, reach: 120, action: { kind: 'road', to: 'moperty', stop: 'first-house' } },
+      { id: 'road-moperty', label: 'Moperty', x: 0, z: -220, reach: 120, action: { kind: 'road', to: 'moperty', stop: 'gallery-door' } },
       { id: 'crossing', label: 'Crossroads', x: 0, z: 70, action: { kind: 'letter', letter: 'hello' } },
       { id: 'road-radjastone', label: 'Radjastone', x: 660, z: 0, reach: 300, action: { kind: 'road', to: 'radjastone', stop: 'quarry' } },
       { id: 'mailbox', label: 'Mailbox', x: 280, z: -90, action: { kind: 'letter', letter: 'contact' } } ],
@@ -89,16 +89,27 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'A few learnings...', at: ['camera', 'gallery'] },
       { fact: "Try our best to test on real device :). This time is my first encounter with an issue that uploaded image is rotated when uploaded using mobile web's camera capture (caused by EXIF orientation that needs to be handled).", at: ['camera'] },
       { fact: 'User generated images vary in ratio. Consider all possibilities when developing the UI components displaying these images!', at: ['gallery'] } ] },
-  moperty: { id: 'moperty', art: 'blockout', back: { world: 'crossroads', stop: 'road-moperty' }, bounds: B, solid: [], title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
+  // Moperty: a downtown corner where every listing, sign and screen is part of the product. Nothing is read; it is used.
+  moperty: { id: 'moperty', art: 'downtown', back: { world: 'crossroads', stop: 'road-moperty' }, camera: { zoom: 1, x0: -400, x1: 520 }, bounds: { x0: -720, x1: 880, z0: -30, z1: 180 },
+    solid: [{ x0: -50, x1: 130, z0: -60, z1: -22 }],
+    title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
     stops: [
       out('moperty'),
-      { id: 'first-house', label: 'Moperty', x: -420, z: 0, action: { kind: 'letter', letter: 'summary' } },
-      { id: 'workshop', label: 'Tech Stack', x: 0, z: -100, action: { kind: 'letter', letter: 'stack' } },
-      { id: 'for-sale', label: 'Visit Moperty', x: 420, z: 0, action: { kind: 'link', href: 'https://moperty.id' } } ],
-    letters: [
-      { id: 'summary', title: 'Moperty', surface: 'note', blocks: [{ kind: 'paragraph', text: [s('To boost confidence in web development, I feel the need to '), b('build and run a whole product'), s('. So I came up with '), b('Moperty'), s(': I '), b('design'), s(' the UIs, '), b('code'), s(' frontends and backends, and also '), b('implement SEO'), s(' techniques.')] }] },
-      stack([T.vue, T.laravel, T.sass, T.postgres, T.nginx, T.gcloud]) ] },
+      { id: 'signpost', label: 'Finger-post', x: -330, z: -10, focus: 1.5, look: -320, action: { kind: 'toy', toy: 'rank', states: 3 } },
+      { id: 'listings', label: 'Listings window', x: -156, z: -10, focus: 1.6, look: -156, action: { kind: 'toy', toy: 'filter', states: 3 } },
+      { id: 'gallery-door', label: 'Visit Moperty', x: 40, z: -6, reach: 90, action: { kind: 'link', href: 'https://moperty.id' } },
+      { id: 'kiosk', label: 'Street poster', x: 430, z: -10, focus: 1.8, look: 430, action: { kind: 'toy', toy: 'app', states: 3 } },
+      { id: 'easel', label: 'Drawing board', x: 570, z: -10, focus: 1.6, look: 570, action: { kind: 'toy', toy: 'paint', states: 2 } },
+      { id: 'site-board', label: 'Site board', x: 760, z: -10, action: { kind: 'letter', letter: 'stack' } },
+      { id: 'site', label: 'Tower crane', x: 866, z: 20, action: { kind: 'toy', toy: 'build', states: 4 } } ],
+    letters: [stack([T.vue, T.laravel, T.sass, T.postgres, T.nginx, T.gcloud])],
+    encoded: [
+      { fact: 'A progressive web app', at: ['kiosk'] },
+      { fact: 'to browse available real estate in local area around my hometown.', at: ['listings', 'kiosk'] },
+      { fact: 'To boost confidence in web development, I feel the need to', at: ['site'] }, { fact: 'build and run a whole product', at: ['site'] },
+      { fact: '. So I came up with', at: ['gallery-door'] }, { fact: 'Moperty', at: ['gallery-door'] }, { fact: ': I', at: ['easel'] }, { fact: 'design', at: ['easel'] }, { fact: 'the UIs,', at: ['easel'] },
+      { fact: 'code', at: ['site'] }, { fact: 'frontends and backends, and also', at: ['site'] }, { fact: 'implement SEO', at: ['signpost'] }, { fact: 'techniques.', at: ['signpost'] } ] },
   radjastone: { id: 'radjastone', art: 'blockout', back: { world: 'crossroads', stop: 'road-radjastone' }, bounds: B, solid: [], title: 'Radjastone', path: 'climb', url: 'https://radjastone.com', role: 'Build A Website For', color: '#9a883f', logo: 'brand/rj-limestone-white.svg',
     description: 'An Indonesian company providing services related to architecture / interior / exterior design made with natural stones.',
     stops: [
