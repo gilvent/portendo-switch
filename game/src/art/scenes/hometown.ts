@@ -33,8 +33,8 @@ function ground(): Panel[] {
   const W = X1 - X0, D = FRONT - GARDEN, SETT = ['#f1e4cc', '#f6ecd8', '#e9dabd', '#f3e7d0'];
   let setts = '';
   for (let row = 0, y = 0; y < D; row++, y += 40) for (let x = row % 2 ? -32 : 0; x < W; x += 64) { const h = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; setts += `<rect x="${x + 1}" y="${y + 1}" width="62" height="38" fill="${SETT[Math.floor((h - Math.floor(h)) * 4)]}"/>`; }
-  // A ring of darker setts marks the middle of the square, in front of the lane.
-  const ring = `<ellipse cx="${-X0}" cy="${170 - GARDEN}" rx="210" ry="120" fill="none" stroke="#d6c4a2" stroke-width="20"/><ellipse cx="${-X0}" cy="${170 - GARDEN}" rx="120" ry="64" fill="#e6d6b8"/><g transform="translate(${-X0 - 42} ${170 - GARDEN - 30}) scale(2)">${mark(1, '#d6c4a2', '#dccbaa', '#e6d6b8')}</g>`;
+  // A ring of darker setts marks the middle of the square, around the clock.
+  const ring = `<ellipse cx="${-X0}" cy="${170 - GARDEN}" rx="210" ry="120" fill="none" stroke="#d6c4a2" stroke-width="20"/><ellipse cx="${-X0}" cy="${170 - GARDEN}" rx="150" ry="84" fill="#e6d6b8"/>`;
   // Both sheets ship as sixteen tiles: the camera here leans in close, and with wider tiles the browser's 3D sorting tears
   // holes in the ground where standing pieces' planes cut across it.
   const square: Panel = { id: 'square', stock: 'greyboard', c: '#e2d3b6', w: W, h: D, o: [X0, 0, FRONT], u: [1, 0, 0], v: [0, 0, -1], density: .42, edge: 'fold', split: 16, print: `<rect width="${W}" height="${D}" fill="#dccdb0"/>${setts}${ring}<rect y="${D - 14}" width="${W}" height="14" fill="#cdb48c"/>` };
@@ -50,7 +50,7 @@ function ground(): Panel[] {
 
 /* ---------- the open view down the lane: a shadow box ---------- */
 // Thin cut layers stood well apart, alternating pale and deep, each shading the next; real in the bake, then flattened
-// onto two cards. Card one is the lower town just below the square. Card two, further back, is the valley: the river, the
+// onto two cards. Card one is the lower town just below the square. Card two, further back, is the valley floor and the
 // far bank and the hills.
 type Card = { id: string; x0: number; z: number; w: number; density: number };
 const NEAR: Card = { id: 'lane-near', x0: -1300, z: -480, w: 2600, density: .95 };
@@ -170,7 +170,8 @@ function laneView(): Panel[] {
   for (let x = 14; x < W; x += r(22, 60)) if (Math.abs(x - mid) > 120) { wm += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="#fff"/>`; wp += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="${pick(['#e8552d', YEL, '#e88ab0', WHITE])}"/><rect x="${f(x - 1)}" y="${WH - 46}" width="2" height="6" fill="#4aa067"/>`; }
   for (const gx of [mid - 96, mid + 78]) { wm += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#fff"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff"/>`; wp += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#e6dccb"/><rect x="${gx + 12}" y="14" width="6" height="${WH - 14}" fill="#d3c7b2"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff4e2"/>`; }
 
-  // Card two, the valley, back to front. Eight layers, 30 to 50 units apart, alternating pale and deep.
+  // Card two, the valley, back to front. Nine layers, 30 to 50 units apart, alternating pale and deep. There is no water
+  // in it: the Blibli street already has the river.
   s = 67;
   const FW = FAR.w, fy = -90, fmid = FW / 2;
   // 1. A pale hill of terraced fields.
@@ -189,25 +190,36 @@ function laneView(): Panel[] {
   const road = `<path d="${rd}" stroke="#f4ead8" stroke-width="9" fill="none" stroke-linejoin="round"/>`;
   // 5. The far bank's town: a street of houses with towers and poplars.
   const DH = 220, town = street(FW, DH, 54, 110, 46, 88, ['#f4ead8', STONE, '#e8c9a8', WHITE, LAV], [BRICK, TILE, INDIGO, '#8a6a5c'], '#7c7f9c', .3, .4, ['poplar', 'tower', 'oak', 'oak']);
-  // 6. The quay: a stone wall under a row of plane trees, with a bridge of three arches crossing toward us.
-  const EH = 300, quay = woods(FW, EH, () => 236, [[0, fmid - 260], [fmid + 320, FW]], ['oak'], ['#3f8f5a', '#4aa067'], 54, 72, 64);
-  const bx = fmid - 220, bw = 500, arches = [0, 1, 2].map(i => `M${bx + 30 + i * 150} ${EH}V${EH - 190}a55 44 0 0 1 110 0V${EH}Z`).join(' ');
-  const qm = `<rect y="${EH - 240}" width="${FW}" height="240" fill="#fff"/>` + quay.m + `<path fill-rule="evenodd" d="M${bx} ${EH}V${EH - 262}H${bx + bw}V${EH}Z" fill="#fff"/>`;
-  const qp = `<rect y="${EH - 240}" width="${FW}" height="240" fill="#bfb39c"/><rect y="${EH - 240}" width="${FW}" height="8" fill="#e6dccb"/>${Array.from({ length: Math.floor(FW / 44) }, (_, i) => `<path d="M${i * 44 + 12} ${EH - 232}v40" stroke="#a89c86" stroke-width="2"/>`).join('')}` + quay.p +
-    `<rect x="${bx}" y="${EH - 262}" width="${bw}" height="262" fill="#e9dfcb"/><rect x="${bx}" y="${EH - 262}" width="${bw}" height="10" fill="#fff7e6"/><path d="${arches}" fill="#8fcbe8"/>${[0, 1, 2].map(i => `<path d="M${bx + 30 + i * 150} ${EH - 190}a55 44 0 0 1 110 0" stroke="#cfc2aa" stroke-width="7" fill="none"/>`).join('')}${Array.from({ length: 12 }, (_, i) => `<rect x="${bx + 10 + i * 42}" y="${EH - 276}" width="4" height="16" fill="#e9dfcb"/>`).join('')}<rect x="${bx}" y="${EH - 280}" width="${bw}" height="5" fill="#e9dfcb"/>`;
-  const qmFull = qm + Array.from({ length: 12 }, (_, i) => `<rect x="${bx + 10 + i * 42}" y="${EH - 276}" width="4" height="16" fill="#fff"/>`).join('') + `<rect x="${bx}" y="${EH - 280}" width="${bw}" height="5" fill="#fff"/>`;
-  // 7. Boats on the river: two rowing boats and a ferry, standing between the quay and the water.
-  const boat = (x: number, y: number, k: number, hull: string): Art => ({ m: `<g transform="translate(${x} ${y}) scale(${k})"><path d="M0 0H70L60 16H10Z" fill="#fff"/><rect x="20" y="-16" width="30" height="16" fill="#fff"/></g>`, p: `<g transform="translate(${x} ${y}) scale(${k})"><path d="M0 0H70L60 16H10Z" fill="${hull}"/><rect width="70" height="4" fill="#fff7e6"/><rect x="20" y="-16" width="30" height="16" fill="#fff7e6"/><rect x="24" y="-12" width="8" height="7" fill="${GLASS}"/><rect x="38" y="-12" width="8" height="7" fill="${GLASS}"/></g>` });
-  const BTH = 250, boats = join([boat(fmid - 520, BTH - 222, 1.3, INDIGO), boat(fmid + 420, BTH - 214, 1, BRICK), boat(fmid + 760, BTH - 226, 1.5, YEL), boat(fmid - 900, BTH - 216, 1.1, TEAL)]);
-  // 8. The river in front, in two tones of blue with cut ripples.
-  const RH = 232, river: Prof = rolling(224, 3, 40, 0);
-  const ripple = Array.from({ length: 120 }, () => { const x = r(0, FW), y = r(16, RH - 8), l = r(20, 60); return `<path d="M${f(x)} ${f(y)}q${f(l / 4)} -3 ${f(l / 2)} 0t${f(l / 2)} 0" stroke="${pick(['#d3eefa', '#bfe6f8', '#6fb6da'])}" stroke-width="2.6" fill="none"/>`; }).join('');
+  // 6. The MRT line crossing the valley on slim concrete piers, with a train on it: the line you arrived by, above ground.
+  const VH = 356, deck = 28, vm = `<rect width="${FW}" height="${deck}" fill="#fff"/>` + Array.from({ length: Math.ceil(FW / 230) }, (_, i) => `<path d="M${i * 230 + 60} ${deck}h60l-16 26V${VH}h-28V${deck + 26}Z" fill="#fff"/>`).join('');
+  const vp = `<rect width="${FW}" height="${deck}" fill="#e9e5da"/><rect width="${FW}" height="7" fill="#f8f5ec"/><rect y="${deck - 6}" width="${FW}" height="6" fill="#cfc9bb"/>` + Array.from({ length: Math.ceil(FW / 230) }, (_, i) => `<path d="M${i * 230 + 60} ${deck}h60l-16 26V${VH}h-28V${deck + 26}Z" fill="#dcd7ca"/><rect x="${i * 230 + 94}" y="${deck + 26}" width="10" height="${VH}" fill="#c9c3b4"/>`).join('') +
+    Array.from({ length: Math.ceil(FW / 46) }, (_, i) => `<rect x="${i * 46 + 20}" y="8" width="2.4" height="${deck - 14}" fill="#cfc9bb"/>`).join('');
+  const tx = fmid - 760, cars = [0, 1, 2, 3].map(i => `<rect x="${tx + i * 152}" y="2" width="146" height="40" rx="9" fill="FILL"/>`).join('');
+  const train = `${[0, 1, 2, 3].map(i => `<rect x="${tx + i * 152}" y="2" width="146" height="40" fill="${WHITE}"/><rect x="${tx + i * 152}" y="2" width="146" height="8" fill="${TEAL}"/><rect x="${tx + i * 152}" y="30" width="146" height="5" fill="${TEAL}"/>${[0, 1, 2, 3].map(k => `<rect x="${tx + i * 152 + 12 + k * 32}" y="14" width="24" height="12" fill="${k === 1 ? tone(TEAL, -.3) : GLASS}"/>`).join('')}`).join('')}`;
+  // 7. Farmland on the valley floor: a deep band patched with ploughed fields, hedgerow trees, barns and a silo on its crest.
+  const GHh = 250, farm: Prof = rolling(238, 9, 120, 1.7), farmTrees = woods(FW, GHh + 90, farm, [[0, fmid - 500], [fmid - 260, fmid + 200], [fmid + 520, FW]], ['oak', 'oak', 'poplar'], ['#3f8f5a', '#4aa067', '#347a4b'], 40, 64, 70);
+  const barns: Art[] = [fmid - 380, fmid + 360, fmid + 1100, fmid - 1200].map((x, i) => join([building(x, GHh + 90 - farm(x) + 6, 70, 44, ['#c8553d', WHITE, '#c8553d', STONE][i], [STEEL, BRICK, '#5d4a3c', TILE][i], '#5d4a3c', 0),
+    i % 2 ? none : { m: `<rect x="${f(x + 76)}" y="${f(GHh + 90 - farm(x) - 62)}" width="22" height="70" fill="#fff"/><circle cx="${f(x + 87)}" cy="${f(GHh + 90 - farm(x) - 62)}" r="11" fill="#fff"/>`, p: `<rect x="${f(x + 76)}" y="${f(GHh + 90 - farm(x) - 62)}" width="22" height="70" fill="#d9dde6"/><rect x="${f(x + 90)}" y="${f(GHh + 90 - farm(x) - 62)}" width="8" height="70" fill="#b7bfc7"/><circle cx="${f(x + 87)}" cy="${f(GHh + 90 - farm(x) - 62)}" r="11" fill="#c9d0d6"/>` }]));
+  const farmTop = join([farmTrees, ...barns]);
+  const patches = Array.from({ length: 26 }, (_, i) => { const x = 30 + i * 138 + r(-16, 16); return field(x, GHh + 90 - farm(x) + r(22, 70), r(80, 130), r(30, 50), pick([-26, -14, 14, 26]), pick(['#e6d48a', '#8fc47a', '#d6c06a', '#a9d68f', '#c98a5a']), pick(['#d6c06a', '#7fb46a', '#c4ad58', '#96c67c', '#b5774a'])); }).join('');
+  const hay = Array.from({ length: 30 }, () => { const x = r(0, FW), y = GHh + 90 - farm(x) + r(30, 110); return `<path d="M${f(x - 7)} ${f(y)}a7 8 0 0 1 14 0Z" fill="#e6c860"/><path d="M${f(x - 7)} ${f(y)}a7 8 0 0 1 7 -8Z" fill="#f2dc86"/>`; }).join('');
+  // 8. A pale meadow in front: allotment strips, a lane with a bus on it, sheep, and a post-and-rail fence along its crest.
+  const MH = 214, mead: Prof = rolling(200, 6, 90, .6);
+  let fm = '', fp = ''; for (let x = 6; x < FW; x += 34) { fm += `<rect x="${x}" y="${f(MH + 16 - mead(x) - 14)}" width="4" height="16" fill="#fff"/>`; fp += `<rect x="${x}" y="${f(MH + 16 - mead(x) - 14)}" width="4" height="16" fill="#f4ead8"/>`; }
+  const rails = [4, 10].map(d => `<path d="${line(FW, MH + 16, mead, -d)}" stroke="#f4ead8" stroke-width="2.6" fill="none"/>`).join('');
+  const railsM = [4, 10].map(d => `<path d="${line(FW, MH + 16, mead, -d)}" stroke="#fff" stroke-width="2.6" fill="none"/>`).join('');
+  const sheep = Array.from({ length: 22 }, () => { const x = r(0, FW), y = MH + 16 - mead(x) + r(26, 80); return `<ellipse cx="${f(x)}" cy="${f(y)}" rx="8" ry="5.4" fill="#fdfcf6"/><circle cx="${f(x + 7)}" cy="${f(y - 2)}" r="3" fill="${STEEL}"/><rect x="${f(x - 5)}" y="${f(y + 4)}" width="2" height="4" fill="${STEEL}"/><rect x="${f(x + 3)}" y="${f(y + 4)}" width="2" height="4" fill="${STEEL}"/>`; }).join('');
+  const plots = Array.from({ length: 14 }, (_, i) => field(120 + i * 250 + r(-30, 30), MH + 16 - mead(120 + i * 250) + r(70, 110), r(90, 140), r(34, 50), pick([-18, 12, 20]), pick(['#b9d98a', '#e2dc9c', '#a3cf7c']), pick(['#a3c878', '#cfc884', '#8fbf6a']))).join('');
+  const bus = `<g transform="translate(${fmid + 240} ${MH + 16 - mead(fmid + 240) + 96})"><rect width="76" height="30" rx="5" fill="${YEL}"/><rect y="19" width="76" height="4" fill="${WHITE}"/>${[0, 1, 2, 3].map(k => `<rect x="${6 + k * 17}" y="5" width="13" height="10" fill="${GLASS}"/>`).join('')}<circle cx="16" cy="30" r="6" fill="${STEEL}"/><circle cx="60" cy="30" r="6" fill="${STEEL}"/></g>`;
+  let ln = ''; for (let x = 0; x <= FW; x += 40) ln += `${x ? 'L' : 'M'}${x} ${f(MH + 16 - mead(x) + 124 + 10 * Math.sin(x / 150))}`;
   return [card, sheet(NEAR, 'lane-trees', 30, y0 - 40, TH, '#3f8f5a', trees.m, trees.p), sheet(NEAR, 'lane-cottages', 62, y0 - 30, CH, WHITE, near.m, near.p),
     sheet(NEAR, 'lane-gardens', 96, y0 - 10, GH, '#7fbf86', gm + orchard.m, gp + orchard.p), sheet(NEAR, 'lane-wall', 128, y0, WH, '#cfc2aa', wm, wp, 'greyboard'),
     far, sheet(FAR, 'lane-wood', 36, fy, BHh + 60, '#2f7453', wood1.m, wood1.p), sheet(FAR, 'lane-ridge', 52, fy, BHh, '#5fa77a', cut(FW, BHh, b), ridgeArt),
     sheet(FAR, 'lane-orchard', 92, fy, CHh, '#a9d68f', cut(FW, CHh, c2), crest(FW, CHh, c2, '#a9d68f') + orch + road),
-    sheet(FAR, 'lane-town', 132, 138, DH, STONE, town.m, town.p), sheet(FAR, 'lane-quay', 170, fy, EH, '#bfb39c', qmFull, qp, 'greyboard'),
-    sheet(FAR, 'lane-boats', 196, fy, BTH, WHITE, boats.m, boats.p, 'cover'), sheet(FAR, 'lane-river', 222, fy, RH, '#8fcbe8', cut(FW, RH, river), `<rect y="${RH - 120}" width="${FW}" height="120" fill="#7fbfe0"/>` + ripple)];
+    sheet(FAR, 'lane-town', 126, 140, DH, STONE, town.m, town.p),
+    sheet(FAR, 'lane-train', 156, fy + VH - 2, 44, WHITE, cars.replaceAll('FILL', '#fff'), train, 'cover'), sheet(FAR, 'lane-viaduct', 168, fy, VH, '#e9e5da', vm, vp, 'greyboard'),
+    sheet(FAR, 'lane-farm', 200, fy, GHh + 90, '#6fae6a', cut(FW, GHh + 90, farm) + farmTop.m, crest(FW, GHh + 90, farm, '#6fae6a', 0) + patches + hay + farmTop.p),
+    sheet(FAR, 'lane-meadow', 232, fy, MH + 16, '#cfe6a8', cut(FW, MH + 16, mead) + fm + railsM, crest(FW, MH + 16, mead, '#cfe6a8', 0) + plots + `<path d="${ln}" stroke="#f4ead8" stroke-width="12" fill="none"/>` + bus + sheep + fp + rails)];
 }
 // The far distance, in the CSS backdrop: sky, a pale sun, two layers of cut clouds, then seven layers of land from snowy
 // peaks down to the wooded hills behind the valley. Kinds and values alternate, and each wood is its own sheet behind its
@@ -399,6 +411,41 @@ function van(id: string, x: number, z: number, rot: number): Panel[] {
 // A carton: a folded kraft box with a strip of tape and a little house stamped on it.
 const carton = (id: string, x: number, z: number, w: number, h: number, d: number, rot = 0, y = 0) => box({ id, x, z, y, w, h, d, rot, stock: 'kraft', c: KRAFT, side: '#a8743f', density: 1.8,
   front: `<rect x="${w / 2 - 5}" width="10" height="${h}" fill="#d9b781"/><g transform="translate(6 ${h - 24}) scale(.6)"><path d="M2 14L15 3L28 14V16H2Z" fill="#7a5237"/><rect x="5" y="15" width="20" height="13" fill="#7a5237"/></g>`, top: `<rect x="${w / 2 - 5}" width="10" height="${d}" fill="#d9b781"/>` });
+// A dog folded like a tent along its back, with the head a separate card glued square across the front and the tail a
+// card behind. Ears, nose and a patch are glued on in tones of its own colour.
+function dog(id: string, x: number, z: number, rot: number, c: string): Panel[] {
+  const P = piece(x, z, rot), L = 58, H = 36, t = 9, h = Math.hypot(H, t);
+  const body = `<path d="M3 ${f(h)}V12Q3 2 14 2H46Q56 2 56 12V${f(h)}H46V${f(h * .62)}H36V${f(h)}H26V${f(h * .62)}H14V${f(h)}Z" fill="#fff"/>`;
+  const near = P(`${id}-near`, [-L / 2, 0, t], [1, 0, 0], unit([0, H, -t]), L, h, { stock: 'sugar', c, density: 2.6, mask: body, edge: 'fold' });
+  const far: Panel = { ...P(`${id}-far`, [L / 2, 0, -t], [-1, 0, 0], unit([0, H, t]), L, h, { stock: 'sugar', c, density: 1, mask: body }), ghost: true };
+  const head = toCamera(P(`${id}-head`, [L / 2 - 2, 14, 15], [0, 0, -1], [0, 1, 0], 30, 34, { stock: 'sugar', c, density: 2.6, mask: '<path d="M4 10L1 0L11 5H19L29 0L26 10V22Q26 34 15 34Q4 34 4 22Z" fill="#fff"/>' }));
+  const tail = P(`${id}-tail`, [-L / 2 - 9, 20, 1], [1, 0, 0], [0, 1, 0], 14, 26, { stock: 'sugar', c: tone(c, -.12), density: 2.6, mask: '<path d="M14 26Q0 20 2 0Q8 10 14 16Z" fill="#fff"/>' });
+  return [near, far, head, tail,
+    on(near, .8, 16, 12, 22, 14, { id: `${id}-patch`, stock: 'sugar', c: tone(c, .4), density: 2.6, mask: '<ellipse cx="11" cy="7" rx="11" ry="7" fill="#fff"/>' }),
+    on(near, .8, 40, h - 10, 14, 5, { id: `${id}-collar`, stock: 'cover', c: INDIGO, density: 2.6 }),
+    on(head, .8, 9, 4, 12, 9, { id: `${id}-muzzle`, stock: 'sugar', c: tone(c, .4), density: 2.6, mask: '<ellipse cx="6" cy="4.5" rx="6" ry="4.5" fill="#fff"/>' }),
+    on(head, 1.4, 12.5, 8, 5, 4, { id: `${id}-nose`, stock: 'cover', c: STEEL, density: 2.6, mask: '<ellipse cx="2.5" cy="2" rx="2.5" ry="2" fill="#fff"/>' }),
+    on(head, .8, 7, 17, 4, 4, { id: `${id}-eye-l`, stock: 'cover', c: STEEL, density: 2.6, mask: disc(2) }), on(head, .8, 19, 17, 4, 4, { id: `${id}-eye-r`, stock: 'cover', c: STEEL, density: 2.6, mask: disc(2) })];
+}
+// A long raised bed for the front edge: a folded stone box of soil, with bushes in layers and cut blossoms glued on.
+function longBed(id: string, x: number, z: number, w: number): Panel[] {
+  const stone = (len: number) => `<rect width="${len}" height="30" fill="#d6c9b0"/>${Array.from({ length: Math.ceil(len / 30) }, (_, i) => `<rect x="${i * 30 + 1}" y="9" width="28" height="9" fill="#cdbfa4"/><rect x="${i * 30 + 16}" y="20" width="28" height="9" fill="#c6b89e"/>`).join('')}<rect width="${len}" height="6" fill="#efe6d4"/>`;
+  const bed = box({ id, x, z, w, h: 30, d: 64, stock: 'cover', c: '#d6c9b0', front: stone(w), left: stone(64), right: stone(64), top: `<rect width="${w}" height="64" fill="#efe6d4"/><rect x="7" y="7" width="${w - 14}" height="50" fill="#6b4a33"/>` });
+  const n = Math.floor(w / 96), plants = Array.from({ length: n }, (_, i) => { const bx = x - w / 2 + (i + .5) * w / n, b = bush(`${id}-bush${i}`, bx, z - 6 + (i % 2) * 8, 92, 46 + (i % 2) * 10, 26);
+    return [...b, ...[0, 1, 2, 3].map(k => on(b[0], 12, 12 + k * 20, 18 + (k % 2) * 16, 11, 11, { id: `${id}-bloom${i}${k}`, stock: 'sugar', c: [YEL, WHITE, '#e88ab0', LAV][(i + k) % 4], mask: disc(5.5) }))]; });
+  return [...bed, ...plants.flat()];
+}
+// The square's centrepiece: a low folded bed of flowers with the town clock standing in it. The clock's head is a folded
+// box with a cut face glued on; its post is a flat strip.
+function clockBed(x: number, z: number): Panel[] {
+  const side = (len: number) => `<rect width="${len}" height="26" fill="#d6c9b0"/><rect width="${len}" height="6" fill="#efe6d4"/>${Array.from({ length: Math.ceil(len / 34) }, (_, i) => `<rect x="${i * 34 + 2}" y="10" width="30" height="13" fill="#cdbfa4"/>`).join('')}`;
+  const bed = box({ id: 'clock-bed', x, z, w: 190, h: 26, d: 130, stock: 'cover', c: '#d6c9b0', front: side(190), left: side(130), right: side(130), top: `<rect width="190" height="130" fill="#efe6d4"/><rect x="8" y="8" width="174" height="114" fill="#8fc48a"/>${Array.from({ length: 26 }, (_, i) => `<circle cx="${20 + (i * 53) % 150}" cy="${20 + (i * 31) % 90}" r="5" fill="${[YEL, WHITE, '#e88ab0', LAV, '#e8552d'][i % 5]}"/>`).join('')}` });
+  const post: Panel = { id: 'clock-post', stock: 'greyboard', c: STEEL, w: 9, h: 150, o: [x - 4.5, 26, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.8 };
+  const head = box({ id: 'clock-head', x, z, y: 170, w: 54, h: 54, d: 16, stock: 'cover', c: tone(INDIGO, -.3), density: 2.4, front: `<rect width="54" height="54" fill="${tone(INDIGO, -.3)}"/>` });
+  const face = on(head[0], 1.2, 6, 6, 42, 42, { id: 'clock-face', stock: 'cover', c: '#fffdf6', density: 2.4, mask: disc(21), print: `<circle cx="21" cy="21" r="21" fill="#fffdf6"/>${Array.from({ length: 12 }, (_, i) => `<rect x="20" y="2" width="2" height="${i % 3 ? 3 : 6}" fill="${STEEL}" transform="rotate(${i * 30} 21 21)"/>`).join('')}<path d="M21 21V9M21 21L29 25" stroke="${STEEL}" stroke-width="2.6" stroke-linecap="round"/><circle cx="21" cy="21" r="2.4" fill="${YEL}"/>` });
+  const cap = box({ id: 'clock-cap', x, z, y: 224, w: 64, h: 8, d: 24, stock: 'cover', c: YEL, density: 2 });
+  return [...bed, post, ...head, face, ...cap, ...bush('clock-bush-a', x - 54, z - 14, 70, 40, 24), ...bush('clock-bush-b', x + 56, z - 10, 64, 36, 24)];
+}
 // A cat sitting on a fence rail: flat, because it sits against the fence.
 const cat = (id: string, x: number, y: number, z: number, c: string): Panel => ({ id, stock: 'sugar', c, w: 44, h: 40, o: [x - 22, y, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 2.6,
   mask: '<path d="M10 40V18Q8 12 10 2L16 8H24L30 2Q32 12 30 18Q40 22 40 40Z" fill="#fff"/><path d="M38 40Q46 30 42 18" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>',
@@ -437,7 +484,7 @@ function surroundings(): Panel[] {
   return [...sides,
     ...HOMES.flatMap((h, i) => [...home(h, h === h3), ...fence(h), offerSign(h, i), ...bush(`${h.id}-bush`, h.x + h.w / 2 + 8, GARDEN - 22, 96, 50)]), ...rooms(h3),
     // The MRT exit at the left end of the square, with the way to the product beside it.
-    ...mrtExit(-930, 60), ...aBoard('visit', -710, 120, -10),
+    ...mrtExit(-930, 60), ...aBoard('visit', -640, 96, -10),
     // The flyer board stands at the mouth of the lane.
     ...flyerBoard(-84, -74, 0),
     // Small stories. A couple looking over the home that opens; a neighbour at her gate; a cat on the next fence.
@@ -450,13 +497,16 @@ function surroundings(): Panel[] {
     ...van('van', h4.x + 120, 96, 8), ...carton('carton-a', h4.x - 60, 70, 56, 44, 44, -8), ...carton('carton-b', h4.x - 66, 68, 44, 34, 36, 10, 44), ...carton('carton-c', h4.x - 2, 100, 46, 36, 40, 14),
     ...shopper('mover', h4.x - 6, -10, { coat: '#f4f1ea', legs: '#5b6bdc', skin: '#a8714f', hair: '#1d1a17', build: 'big', face: 'determined', carry: KRAFT, hat: INDIGO }),
     ...shopper('child', h4.x - 130, 150, { coat: YEL, legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'shorts', face: 'cheerful' }, false, .7, 0, false),
-    ...pigeon('pigeon-a', 60, 190, -20, '#9aa3ad'), ...pigeon('pigeon-b', 108, 204, 16, '#b3bac3', true),
+    ...dog('dog', h4.x - 190, 176, -30, '#c98a4e'),
+    ...pigeon('pigeon-a', 150, 250, -20, '#9aa3ad'), ...pigeon('pigeon-b', 198, 262, 16, '#b3bac3', true),
     // The right end: a shade tree over a bench, someone dozing beside it.
     ...shadeTree('tree', 1010, 150, 300), ...planter('tree-bed', 1010, 150, 104), ...bench('bench', 880, 210, 150, -10),
     ...shopper('dozer', 930, 250, { coat: LAV, legs: '#3d444e', skin: '#f3c9a0', hair: '#8a5a3a', build: 'average', face: 'sleepy', hat: '#f4f1ea' }, true, 1, 0, false),
     // The front edge: a lamp at each end and two low beds of bushes.
     ...streetLamp('lamp-a', -1060, 340, 250, '#ffe7a8'), ...streetLamp('lamp-b', 1150, 344, 250, '#ffe7a8'),
-    ...planter('front-bed-a', -420, 336, 84, 30), ...bush('front-bush-a', -420, 330, 96, 54, 26), ...planter('front-bed-b', 470, 336, 84, 30), ...bush('front-bush-b', 470, 330, 96, 54, 26)];
+    ...longBed('front-bed-a', -520, 338, 300), ...longBed('front-bed-b', 560, 338, 300),
+    // The middle of the square: the town clock in its bed of flowers.
+    ...clockBed(0, 176)];
 }
 
 export function hometown(): Scene {

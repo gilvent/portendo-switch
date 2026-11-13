@@ -92,12 +92,12 @@ export const content: Content = validateContent({ worlds: {
   // Moperty: the square of a small hometown where a handful of homes are on offer. Only the product is shown, and by
   // things you can touch: a board of flyers, signs in the gardens, a home that opens. No screens, no tech.
   moperty: { id: 'moperty', art: 'hometown', back: { world: 'crossroads', stop: 'road-moperty' }, camera: { zoom: .85, x0: -420, x1: 380 }, bounds: { x0: -1000, x1: 900, z0: -40, z1: 240 },
-    solid: [{ x0: -1050, x1: -810, z0: -40, z1: 140 }, { x0: 660, x1: 880, z0: 40, z1: 150 }],
+    solid: [{ x0: -1050, x1: -810, z0: -40, z1: 140 }, { x0: 660, x1: 880, z0: 40, z1: 150 }, { x0: -100, x1: 100, z0: 106, z1: 240 }],
     title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
     stops: [
       { id: 'way-out', label: 'Back to the crossroads', x: -930, z: 180, reach: 100, action: { kind: 'road', to: 'crossroads', stop: 'road-moperty' } },
-      { id: 'visit', label: 'Visit Moperty', x: -710, z: 160, action: { kind: 'link', href: 'https://moperty.id' } },
+      { id: 'visit', label: 'Visit Moperty', x: -590, z: 130, action: { kind: 'link', href: 'https://moperty.id' } },
       { id: 'board', label: 'Flyer board', x: -84, z: -10, focus: 1.5, look: -84, action: { kind: 'toy', toy: 'flyer', states: 5 } },
       { id: 'home', label: 'Open house', x: 500, z: 10, focus: 1.45, look: 330, action: { kind: 'toy', toy: 'home', states: 2 } } ],
     letters: [],
