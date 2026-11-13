@@ -26,7 +26,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | Riverside promenade (street) | Sky `#8fd3f4`, brick paving `#dba38b`, river `#4fa9d6`, palm `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
-| Moperty hometown square | Sky `#a9d8f0`, setts `#f1e4cc`, grass `#a9d3a2`, stone `#e3c9a0` | Moperty indigo `#5b6bdc` with lavender `#a3adf2`, window yellow `#f5b400` | Cream `#fff4e2`, steel `#2f343c` |
+| Moperty hometown green | Sky `#a9d8f0`, setts `#f1e4cc`, grass `#a9d3a2`, stone `#e3c9a0` | Moperty indigo `#5b6bdc` with lavender `#a3adf2`, window yellow `#f5b400` | Cream `#fff4e2`, steel `#2f343c` |
 
 Tech colours from `content.ts` appear only as small label bars.
 
@@ -126,28 +126,27 @@ Neither floor carries a written account of the work. Each part of the work is an
 
 Stops carry `focus` and `look`: the camera leans in on the object being used while the courier stands beside it, not in front of it.
 
-### Moperty: the hometown square
+### Moperty: the hometown green
 
-The Moperty space (`src/art/scenes/hometown.ts`) is the square of a small hometown where a handful of homes are on offer. It shows only the product, an app for browsing homes for sale or rent around a hometown, and shows it without a screen: you look around the way people did before the app. Nothing about how it was made or what it was made with is in the scene.
+The Moperty space (`src/art/scenes/hometown.ts`) is a green on a ridge in a small hometown where a handful of homes are on offer. It shows only the product, an app for browsing homes for sale or rent around a hometown, and shows it without a screen: you look around the way people did before the app. Nothing about how it was made or what it was made with is in the scene.
 
-- **Arrival:** the MRT exit stands at the left end: a head house with the stair going down under a teal canopy, and the line's roundel on a totem.
-- **Main space:** the square, paved in pale setts. It is wider and deeper than the Blibli street, so the camera stands further back (zoom .85) and pans further.
-- **The homes:** four folded houses under gabled roofs face the square behind picket fences. Each garden has a board on a stake that says what is on offer by picture alone: a yellow tag for sale, a lavender key for rent.
-- **Open surroundings:** a lane between the homes drops to the valley, built as about twenty-five cut layers. Layers differ in kind, not only in colour (faceted peaks, hills that sweep up from one side, rounded mounds, rolling bands), and alternate pale and deep.
-  - *Card one, the lower town (five layers, about 30 units apart):* a back street of taller houses with a clock tower and poplars; garden trees; a near street of cottages with shutters, flower boxes and washing lines; back-garden hedges with fruit trees; the lane's coursed stone wall with gate posts and flowers.
-  - *Card two, the valley (nine layers, 30 to 50 apart):* a pale hill of terraced fields; a wood on its own sheet behind the next ridge; that ridge with hamlets; a bright hill with orchard rows and a winding road; the far town; the MRT line on slim concrete piers with a train on it; farmland with barns, a silo, haystacks and hedgerow trees; a pale meadow with allotments, a lane with a bus, sheep and a post-and-rail fence. There is no water in it: the Blibli street already has the river.
+- **A layout of its own.** The Blibli street is closed at both sides by relief facades and opens through one gate at the back. This space is the reverse: the homes close the middle of the back, the valley opens at both ends, and nothing stands at the sides but trees. There is no river and no MRT structure in it.
+- **Main space:** the green, paved in pale setts, wider and deeper than the Blibli street, so the camera stands further back (zoom .85) and pans further.
+- **The homes:** four folded houses under gabled roofs stand shoulder to shoulder behind picket fences. Each garden has a board on a stake that says what is on offer by picture alone: a yellow tag for sale, a lavender key for rent.
+- **Open surroundings:** at both ends of the green the ridge falls away to the valley, built as about twenty-five cut layers. Layers differ in kind, not only in colour (faceted peaks, hills that sweep up from one side, rounded mounds, rolling bands), and alternate pale and deep.
+  - *Card one, the lower town (five layers, about 30 units apart):* a back street of taller houses with a clock tower and poplars; garden trees; a near street of cottages with shutters, flower boxes and washing lines; back-garden hedges with fruit trees; the coursed stone wall along the back of the green, with piers and flowers.
+  - *Card two, the valley (nine layers, 30 to 50 apart):* a pale hill of terraced fields; a wood on its own sheet behind the next ridge; that ridge with hamlets; a bright hill with orchard rows and a winding road; the far town; an avenue of poplars with telegraph poles; farmland with barns, a silo, haystacks and hedgerow trees; a pale meadow with allotments, a lane with a bus, sheep and a post-and-rail fence.
   - *The CSS backdrop:* sky, a pale sun, two layers of clouds, three ranges of faceted peaks with zigzag snow caps, then five hills (wooded band, terraced fields, a mound with a village, a deep sweep, rolling woods), each wood on its own sheet behind its hill.
   - *Detail on every sheet:* a pale strip along each crest where light catches the cut edge and darker contour lines below it; trees in three kinds (pine, oak, poplar), each cut in two tones; buildings that vary in roof (gable, hip, side-on, flat), chimneys, dormers, shutters, doors and flower boxes; fields as ploughed stripes lying on the slope.
-- **Enclosed surroundings:** a pair of terraced houses turned inward at each end, their porches, flower boxes, lanterns and steps carved in relief.
-- **The square's furniture:** the town clock stands in a low folded flower bed at the centre (a folded head with a cut face glued on, on a flat post); two long folded stone beds with layered bushes and cut blossoms frame the front edge, with a lamp at each end.
+- **The green's furniture:** the town clock stands in a low folded flower bed at the centre (a folded head with a cut face glued on, on a flat post); two long folded stone beds with layered bushes and cut blossoms frame the front edge, with a lamp at each end; a shade tree stands at each end of the green.
 - **Small stories:** a couple by the clock, a neighbour at her gate, a cat on a fence, moving day at the last home (a folded van, cartons, a mover, a child and a tent-folded dog watching), someone dozing by the bench under the tree with a bicycle beside it.
 - **Thin posts are flat strips.** A folded post has both side faces in view from this wide camera, and the browser tears the ground between two such planes. For the same reason both ground sheets ship as sixteen tiles.
 
 | Stop | What you do | What it stands for |
 |---|---|---|
-| Flyer board | One flyer for each home on the square, with a fringe of tear-off tabs. Each A tears a tab off the next flyer, and that home's board lifts in its garden | Browsing the homes on offer nearby |
+| Flyer board | One flyer for each home on the green, with a fringe of tear-off tabs. Each A tears a tab off the next flyer, and that home's board lifts in its garden | Browsing the homes on offer nearby |
 | Open house | A swings the home's front away on its fold, like a doll's house: a living room, a kitchen, a bedroom and a study, with furniture carved in relief. A again closes it | Looking at one home |
-| Visit Moperty | The A-board by the exit carries the mark; A visits moperty.id | The product |
+| Visit Moperty | The A-board near the flyer board carries the mark; A visits moperty.id | The product |
 
 ### Outside and inside match
 
@@ -188,7 +187,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Street (riverside promenade) | 210 (uses 209) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
-| Moperty hometown square | 210 (uses 201) |
+| Moperty hometown green | 210 (uses 203) |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 

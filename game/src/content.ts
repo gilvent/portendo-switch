@@ -18,7 +18,7 @@ export const content: Content = validateContent({ worlds: {
   crossroads: { id: 'crossroads', art: 'blockout', bounds: B, solid: [], title: 'Crossroads', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'road-blibli', label: 'Blibli.com', x: -660, z: 0, reach: 300, action: { kind: 'road', to: 'blibli', stop: 'mailbox' } },
-      { id: 'road-moperty', label: 'Moperty', x: 0, z: -220, reach: 120, action: { kind: 'road', to: 'moperty', stop: 'visit' } },
+      { id: 'road-moperty', label: 'Moperty', x: 0, z: -220, reach: 120, action: { kind: 'road', to: 'moperty', stop: 'board' } },
       { id: 'crossing', label: 'Crossroads', x: 0, z: 70, action: { kind: 'letter', letter: 'hello' } },
       { id: 'road-radjastone', label: 'Radjastone', x: 660, z: 0, reach: 300, action: { kind: 'road', to: 'radjastone', stop: 'quarry' } },
       { id: 'mailbox', label: 'Mailbox', x: 280, z: -90, action: { kind: 'letter', letter: 'contact' } } ],
@@ -89,17 +89,17 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'A few learnings...', at: ['camera', 'gallery'] },
       { fact: "Try our best to test on real device :). This time is my first encounter with an issue that uploaded image is rotated when uploaded using mobile web's camera capture (caused by EXIF orientation that needs to be handled).", at: ['camera'] },
       { fact: 'User generated images vary in ratio. Consider all possibilities when developing the UI components displaying these images!', at: ['gallery'] } ] },
-  // Moperty: the square of a small hometown where a handful of homes are on offer. Only the product is shown, and by
-  // things you can touch: a board of flyers, signs in the gardens, a home that opens. No screens, no tech.
-  moperty: { id: 'moperty', art: 'hometown', back: { world: 'crossroads', stop: 'road-moperty' }, camera: { zoom: .85, x0: -420, x1: 380 }, bounds: { x0: -1000, x1: 900, z0: -40, z1: 240 },
-    solid: [{ x0: -1050, x1: -810, z0: -40, z1: 140 }, { x0: 660, x1: 880, z0: 40, z1: 150 }, { x0: -100, x1: 100, z0: 106, z1: 240 }],
+  // Moperty: a green on a ridge in a small hometown, where a handful of homes are on offer. Only the product is shown, and
+  // by things you can touch: a board of flyers, signs in the gardens, a home that opens. No screens, no tech.
+  moperty: { id: 'moperty', art: 'hometown', back: { world: 'crossroads', stop: 'road-moperty' }, camera: { zoom: .85, x0: -400, x1: 340 }, bounds: { x0: -1060, x1: 900, z0: -40, z1: 240 },
+    solid: [{ x0: 430, x1: 660, z0: 40, z1: 150 }, { x0: -100, x1: 100, z0: 106, z1: 240 }],
     title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
     stops: [
-      { id: 'way-out', label: 'Back to the crossroads', x: -930, z: 180, reach: 100, action: { kind: 'road', to: 'crossroads', stop: 'road-moperty' } },
-      { id: 'visit', label: 'Visit Moperty', x: -640, z: 110, action: { kind: 'link', href: 'https://moperty.id' } },
-      { id: 'board', label: 'Flyer board', x: -84, z: -10, focus: 1.5, look: -84, action: { kind: 'toy', toy: 'flyer', states: 5 } },
-      { id: 'home', label: 'Open house', x: 500, z: 10, focus: 1.45, look: 330, action: { kind: 'toy', toy: 'home', states: 2 } } ],
+      { id: 'way-out', label: 'Back to the crossroads', x: -1010, z: 110, reach: 90, action: { kind: 'road', to: 'crossroads', stop: 'road-moperty' } },
+      { id: 'board', label: 'Flyer board', x: -800, z: -10, focus: 1.5, look: -800, action: { kind: 'toy', toy: 'flyer', states: 5 } },
+      { id: 'visit', label: 'Visit Moperty', x: -540, z: 70, action: { kind: 'link', href: 'https://moperty.id' } },
+      { id: 'home', label: 'Open house', x: 280, z: 10, focus: 1.45, look: 110, action: { kind: 'toy', toy: 'home', states: 2 } } ],
     letters: [],
     encoded: [
       { fact: 'A progressive web app', at: ['visit'] },

@@ -3,10 +3,10 @@ import { CREAM, cloud } from '../recipes.ts';
 import { bench, bicycle, bush, disc, fawning, fbox, fflat, fflowers, flamp, frame, piece, pigeon, planter, shadeTree, shopper, toCamera, tone, type Frame } from './promenade.ts';
 import { streetLamp } from './street.ts';
 
-// Moperty's hometown square. You come up from the MRT into the square of a small town where a handful of homes are on
-// offer. The square is the main space. A lane between the homes drops to the valley, the one open view. A house turned
-// inward at each end closes the sides. Nothing here is a screen: the flyer board lists the homes, and a home opens on
-// its fold like a doll's house.
+// Moperty's hometown green. A handful of homes on offer stand shoulder to shoulder along the back of a green on a ridge.
+// The green is the main space. The homes close the middle of the back; at both ends the ridge falls away and the valley
+// is the open view, over a low wall. Nothing stands at the sides but trees. Nothing here is a screen: the flyer board
+// lists the homes, and a home opens on its fold like a doll's house.
 const INDIGO = '#5b6bdc', LAV = '#a3adf2', YEL = '#f5b400', BRICK = '#b0664c', TILE = '#c98a6e', STONE = '#e3c9a0', WHITE = '#fbf7ee', STEEL = '#2f343c', TEAL = '#2a8d6a';
 const LIT = '#ffdf9e', GLASS = '#5d7f95', GRASS = '#a9d3a2', KRAFT = '#b98450';
 const X0 = -1600, X1 = 1600, GARDEN = -60, BACK = -340, FRONT = 380, HZ = -150, HD = 190;
@@ -21,14 +21,14 @@ const mark = (k: number, a: string, b: string, m = '#fff') => `<g transform="sca
 const offer = (kind: Offer, c: string) => kind === 'sale' ? `<path d="M6 17L17 4H35V20L24 33Z" fill="${c}"/><circle cx="29" cy="10" r="3" fill="${YEL}"/>` : `<circle cx="11" cy="17" r="8" fill="none" stroke="${c}" stroke-width="5"/><path d="M19 17H38M31 17V25M37 17V24" stroke="${c}" stroke-width="5" fill="none"/>`;
 type Offer = 'sale' | 'rent';
 type Home = { id: string; x: number; w: number; wall: number; peak: number; c: string; roof: string; door: string; offer: Offer; storeys: 1 | 2; chimney?: boolean };
-// The four homes on the square, left to right. The lane runs between the second and the third.
+// The four homes on the green, left to right, close together: no way through between them.
 const HOMES: Home[] = [
-  { id: 'h1', x: -640, w: 230, wall: 250, peak: 92, c: WHITE, roof: INDIGO, door: INDIGO, offer: 'sale', storeys: 2, chimney: true },
-  { id: 'h2', x: -355, w: 250, wall: 172, peak: 100, c: LAV, roof: tone(INDIGO, -.32), door: tone(INDIGO, -.32), offer: 'rent', storeys: 1 },
-  { id: 'h3', x: 355, w: 240, wall: 250, peak: 92, c: STONE, roof: BRICK, door: BRICK, offer: 'sale', storeys: 2 },
-  { id: 'h4', x: 650, w: 230, wall: 172, peak: 96, c: WHITE, roof: TILE, door: TILE, offer: 'rent', storeys: 1, chimney: true }];
+  { id: 'h1', x: -425, w: 230, wall: 250, peak: 92, c: WHITE, roof: INDIGO, door: INDIGO, offer: 'sale', storeys: 2, chimney: true },
+  { id: 'h2', x: -150, w: 250, wall: 172, peak: 100, c: LAV, roof: tone(INDIGO, -.32), door: tone(INDIGO, -.32), offer: 'rent', storeys: 1 },
+  { id: 'h3', x: 130, w: 240, wall: 250, peak: 92, c: STONE, roof: BRICK, door: BRICK, offer: 'sale', storeys: 2 },
+  { id: 'h4', x: 400, w: 230, wall: 172, peak: 96, c: WHITE, roof: TILE, door: TILE, offer: 'rent', storeys: 1, chimney: true }];
 
-/* ---------- ground: the square, the front gardens and the lane ---------- */
+/* ---------- ground: the green's paving and the grass behind it ---------- */
 function ground(): Panel[] {
   const W = X1 - X0, D = FRONT - GARDEN, SETT = ['#f1e4cc', '#f6ecd8', '#e9dabd', '#f3e7d0'];
   let setts = '';
@@ -38,23 +38,23 @@ function ground(): Panel[] {
   // Both sheets ship as sixteen tiles: the camera here leans in close, and with wider tiles the browser's 3D sorting tears
   // holes in the ground where standing pieces' planes cut across it.
   const square: Panel = { id: 'square', stock: 'greyboard', c: '#e2d3b6', w: W, h: D, o: [X0, 0, FRONT], u: [1, 0, 0], v: [0, 0, -1], density: .42, edge: 'fold', split: 16, print: `<rect width="${W}" height="${D}" fill="#dccdb0"/>${setts}${ring}<rect y="${D - 14}" width="${W}" height="14" fill="#cdb48c"/>` };
-  // The gardens: grass, with the lane's setts running through and a path from each gate to its door.
+  // The grass behind: the homes' gardens in the middle, open verge at both ends, and a path from each gate to its door.
   const GD = GARDEN - BACK;
   const paths = HOMES.map(h => `<rect x="${h.x - X0 - 22}" y="${GD - (GARDEN - HZ)}" width="44" height="${GARDEN - HZ}" fill="#e9dabd"/>${[0, 1, 2].map(k => `<rect x="${h.x - X0 - 18}" y="${GD - 28 - k * 30}" width="36" height="22" rx="4" fill="#f6ecd8"/>`).join('')}`).join('');
   const beds = HOMES.map(h => `<ellipse cx="${h.x - X0 - h.w * .32}" cy="${GD - 40}" rx="34" ry="16" fill="#8fc48a"/><ellipse cx="${h.x - X0 + h.w * .32}" cy="${GD - 40}" rx="34" ry="16" fill="#8fc48a"/>`).join('');
   const garden: Panel = { id: 'garden', stock: 'sugar', c: GRASS, w: W, h: GD, o: [X0, 0, GARDEN], u: [1, 0, 0], v: [0, 0, -1], density: .5, edge: 'fold', split: 16,
-    print: `<rect width="${W}" height="${GD}" fill="${GRASS}"/><rect x="${-X0 - 120}" width="240" height="${GD}" fill="#dccdb0"/>${Array.from({ length: 7 }, (_, i) => `<rect x="${-X0 - 116}" y="${i * 40 + 2}" width="232" height="36" fill="${SETT[i % 4]}"/>`).join('')}${paths}${beds}` };
+    print: `<rect width="${W}" height="${GD}" fill="${GRASS}"/>${paths}${beds}` };
   const skirt: Panel = { id: 'square-skirt', stock: 'greyboard', c: '#9a8566', w: W, h: 50, o: [X0, -50, FRONT + 1], u: [1, 0, 0], v: [0, 1, 0], density: .6, edge: 'cut', split: 2, print: `<rect width="${W}" height="8" fill="#cdb48c"/>` };
   return [square, garden, skirt];
 }
 
-/* ---------- the open view down the lane: a shadow box ---------- */
+/* ---------- the open view at both ends of the green: a shadow box ---------- */
 // Thin cut layers stood well apart, alternating pale and deep, each shading the next; real in the bake, then flattened
 // onto two cards. Card one is the lower town just below the square. Card two, further back, is the valley floor and the
 // far bank and the hills.
 type Card = { id: string; x0: number; z: number; w: number; density: number };
-const NEAR: Card = { id: 'lane-near', x0: -1300, z: -480, w: 2600, density: .95 };
-const FAR: Card = { id: 'lane-far', x0: -1800, z: -740, w: 3600, density: .6 };
+const NEAR: Card = { id: 'lane-near', x0: -1900, z: -480, w: 3800, density: .95 };
+const FAR: Card = { id: 'lane-far', x0: -2200, z: -740, w: 4400, density: .6 };
 const sheet = (card: Card, id: string, gap: number, y0: number, h: number, c: string, mask: string, print = '', stock: Panel['stock'] = 'sugar'): Panel =>
   ({ id, stock, c, w: card.w, h, o: [card.x0, y0, card.z + gap], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: card.density, decal: card.id, mask, print });
 /* The landscape kit. Every layer of the view is one cut sheet whose top edge is a profile: a height above the sheet's
@@ -162,13 +162,13 @@ function laneView(): Panel[] {
   // 4. Back gardens: a clipped hedge with fruit trees and bean poles standing out of it.
   const GH = 118; let gm = `<rect y="${GH - 30}" width="${W}" height="30" fill="#fff"/>`, gp = '';
   for (let x = 0; x < W; x += 40) { gm += `<circle cx="${x + 20}" cy="${GH - 32}" r="24" fill="#fff"/>`; gp += `<circle cx="${x + 20}" cy="${GH - 32}" r="24" fill="${x % 80 ? '#7fbf86' : '#8fc994'}"/><circle cx="${x + 12}" cy="${GH - 40}" r="10" fill="#a3d6a3"/>`; }
-  const orchard = woods(W, GH, () => 30, [[0, mid - 200], [mid + 200, W]], ['oak'], ['#5fb07a', '#6fbf86'], 60, 84, 150);
-  // 5. The wall at the foot of the lane: stone, coped, with gate posts where the lane goes through and flowers along it.
+  const orchard = woods(W, GH, () => 30, [[0, W]], ['oak'], ['#5fb07a', '#6fbf86'], 60, 84, 150);
+  // 5. The wall along the back of the green: coursed stone with a coping, flowers growing along its top, a pier every so often.
   const WH = 96;
   let wm = `<rect y="${WH - 46}" width="${W}" height="46" fill="#fff"/>`, wp = `<rect y="${WH - 46}" width="${W}" height="46" fill="#cfc2aa"/><rect y="${WH - 46}" width="${W}" height="7" fill="#e6dccb"/>`;
   for (let row = 0; row < 3; row++) for (let x = row % 2 ? -18 : 0; x < W; x += 36) wp += `<rect x="${x + 1}" y="${WH - 38 + row * 13}" width="34" height="11" fill="${pick(['#c6b89e', '#d6c9b0', '#bfb096'])}"/>`;
-  for (let x = 14; x < W; x += r(22, 60)) if (Math.abs(x - mid) > 120) { wm += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="#fff"/>`; wp += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="${pick(['#e8552d', YEL, '#e88ab0', WHITE])}"/><rect x="${f(x - 1)}" y="${WH - 46}" width="2" height="6" fill="#4aa067"/>`; }
-  for (const gx of [mid - 96, mid + 78]) { wm += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#fff"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff"/>`; wp += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#e6dccb"/><rect x="${gx + 12}" y="14" width="6" height="${WH - 14}" fill="#d3c7b2"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff4e2"/>`; }
+  for (let x = 14; x < W; x += r(22, 60)) { wm += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="#fff"/>`; wp += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="${pick(['#e8552d', YEL, '#e88ab0', WHITE])}"/><rect x="${f(x - 1)}" y="${WH - 46}" width="2" height="6" fill="#4aa067"/>`; }
+  for (let gx = 120; gx < W; gx += 420) { wm += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#fff"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff"/>`; wp += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#e6dccb"/><rect x="${gx + 12}" y="14" width="6" height="${WH - 14}" fill="#d3c7b2"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff4e2"/>`; }
 
   // Card two, the valley, back to front. Nine layers, 30 to 50 units apart, alternating pale and deep. There is no water
   // in it: the Blibli street already has the river.
@@ -190,12 +190,9 @@ function laneView(): Panel[] {
   const road = `<path d="${rd}" stroke="#f4ead8" stroke-width="9" fill="none" stroke-linejoin="round"/>`;
   // 5. The far bank's town: a street of houses with towers and poplars.
   const DH = 220, town = street(FW, DH, 54, 110, 46, 88, ['#f4ead8', STONE, '#e8c9a8', WHITE, LAV], [BRICK, TILE, INDIGO, '#8a6a5c'], '#7c7f9c', .3, .4, ['poplar', 'tower', 'oak', 'oak']);
-  // 6. The MRT line crossing the valley on slim concrete piers, with a train on it: the line you arrived by, above ground.
-  const VH = 356, deck = 28, vm = `<rect width="${FW}" height="${deck}" fill="#fff"/>` + Array.from({ length: Math.ceil(FW / 230) }, (_, i) => `<path d="M${i * 230 + 60} ${deck}h60l-16 26V${VH}h-28V${deck + 26}Z" fill="#fff"/>`).join('');
-  const vp = `<rect width="${FW}" height="${deck}" fill="#e9e5da"/><rect width="${FW}" height="7" fill="#f8f5ec"/><rect y="${deck - 6}" width="${FW}" height="6" fill="#cfc9bb"/>` + Array.from({ length: Math.ceil(FW / 230) }, (_, i) => `<path d="M${i * 230 + 60} ${deck}h60l-16 26V${VH}h-28V${deck + 26}Z" fill="#dcd7ca"/><rect x="${i * 230 + 94}" y="${deck + 26}" width="10" height="${VH}" fill="#c9c3b4"/>`).join('') +
-    Array.from({ length: Math.ceil(FW / 46) }, (_, i) => `<rect x="${i * 46 + 20}" y="8" width="2.4" height="${deck - 14}" fill="#cfc9bb"/>`).join('');
-  const tx = fmid - 760, cars = [0, 1, 2, 3].map(i => `<rect x="${tx + i * 152}" y="2" width="146" height="40" rx="9" fill="FILL"/>`).join('');
-  const train = `${[0, 1, 2, 3].map(i => `<rect x="${tx + i * 152}" y="2" width="146" height="40" fill="${WHITE}"/><rect x="${tx + i * 152}" y="2" width="146" height="8" fill="${TEAL}"/><rect x="${tx + i * 152}" y="30" width="146" height="5" fill="${TEAL}"/>${[0, 1, 2, 3].map(k => `<rect x="${tx + i * 152 + 12 + k * 32}" y="14" width="24" height="12" fill="${k === 1 ? tone(TEAL, -.3) : GLASS}"/>`).join('')}`).join('')}`;
+  // 6. An avenue of poplars along the road below the town, on a low green bank, with telegraph poles between them.
+  const VH = 300, bank: Prof = rolling(250, 5, 140, 2.2), avenue = woods(FW, VH + 110, bank, [[0, FW]], ['poplar', 'poplar', 'oak'], ['#3f8f5a', '#347a4b', '#4aa067'], 70, 104, 58);
+  let pm = '', pp = ''; for (let x = 40; x < FW; x += 190) { const y = VH + 110 - bank(x) - 74; pm += `<rect x="${x}" y="${f(y)}" width="4" height="80" fill="#fff"/><rect x="${x - 12}" y="${f(y + 6)}" width="28" height="3" fill="#fff"/>`; pp += `<rect x="${x}" y="${f(y)}" width="4" height="80" fill="#7a5c42"/><rect x="${x - 12}" y="${f(y + 6)}" width="28" height="3" fill="#7a5c42"/>`; }
   // 7. Farmland on the valley floor: a deep band patched with ploughed fields, hedgerow trees, barns and a silo on its crest.
   const GHh = 250, farm: Prof = rolling(238, 9, 120, 1.7), farmTrees = woods(FW, GHh + 90, farm, [[0, fmid - 500], [fmid - 260, fmid + 200], [fmid + 520, FW]], ['oak', 'oak', 'poplar'], ['#3f8f5a', '#4aa067', '#347a4b'], 40, 64, 70);
   const barns: Art[] = [fmid - 380, fmid + 360, fmid + 1100, fmid - 1200].map((x, i) => join([building(x, GHh + 90 - farm(x) + 6, 70, 44, ['#c8553d', WHITE, '#c8553d', STONE][i], [STEEL, BRICK, '#5d4a3c', TILE][i], '#5d4a3c', 0),
@@ -217,7 +214,7 @@ function laneView(): Panel[] {
     far, sheet(FAR, 'lane-wood', 36, fy, BHh + 60, '#2f7453', wood1.m, wood1.p), sheet(FAR, 'lane-ridge', 52, fy, BHh, '#5fa77a', cut(FW, BHh, b), ridgeArt),
     sheet(FAR, 'lane-orchard', 92, fy, CHh, '#a9d68f', cut(FW, CHh, c2), crest(FW, CHh, c2, '#a9d68f') + orch + road),
     sheet(FAR, 'lane-town', 126, 140, DH, STONE, town.m, town.p),
-    sheet(FAR, 'lane-train', 156, fy + VH - 2, 44, WHITE, cars.replaceAll('FILL', '#fff'), train, 'cover'), sheet(FAR, 'lane-viaduct', 168, fy, VH, '#e9e5da', vm, vp, 'greyboard'),
+    sheet(FAR, 'lane-avenue', 164, fy, VH + 110, '#5fa77a', cut(FW, VH + 110, bank) + avenue.m + pm, crest(FW, VH + 110, bank, '#5fa77a', 0) + avenue.p + pp),
     sheet(FAR, 'lane-farm', 200, fy, GHh + 90, '#6fae6a', cut(FW, GHh + 90, farm) + farmTop.m, crest(FW, GHh + 90, farm, '#6fae6a', 0) + patches + hay + farmTop.p),
     sheet(FAR, 'lane-meadow', 232, fy, MH + 16, '#cfe6a8', cut(FW, MH + 16, mead) + fm + railsM, crest(FW, MH + 16, mead, '#cfe6a8', 0) + plots + `<path d="${ln}" stroke="#f4ead8" stroke-width="12" fill="none"/>` + bus + sheep + fp + rails)];
 }
@@ -353,7 +350,7 @@ const offerSign = (h: Home, i: number): Panel => ({ id: `sign-${i}`, stock: 'cov
   motion: { toy: 'flyer', at: [i + 1], slide: [0, 26, 0] } });
 
 /* ---------- the flyer board ---------- */
-// A roofed noticeboard at the mouth of the lane, one flyer for each home on the square: the home's own colours, a ribbon
+// A roofed noticeboard at the left end of the green, one flyer for each home on the square: the home's own colours, a ribbon
 // in yellow (for sale) or lavender (for rent), and a fringe of tear-off tabs. Each A tears one tab off the next flyer.
 function flyerBoard(x: number, z: number, rot: number): Panel[] {
   const P = piece(x, z, rot), W = 330, BH = 150, y0 = 62;
@@ -374,23 +371,6 @@ function flyerBoard(x: number, z: number, rot: number): Panel[] {
     return [body, tab];
   });
   return [back, ...posts, ...roof, ...flyers];
-}
-
-/* ---------- the MRT exit ---------- */
-// A small head house: the stair down to the platforms under a teal canopy, and the station totem beside it.
-function mrtExit(x: number, z: number): Panel[] {
-  const W = 230, H = 170, D = 150, x0 = x - W / 2, fz = z + D / 2;
-  const front: Panel = { id: 'mrt-front', stock: 'greyboard', c: '#c9d0d6', w: W, h: H, o: [x0, 0, fz], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.5,
-    mask: `<path fill-rule="evenodd" d="M0 0H${W}V${H}H0Z M22 ${H}V34H${W - 22}V${H}Z" fill="#fff"/>`, print: `<rect width="${W}" height="${H}" fill="#c9d0d6"/><rect width="${W}" height="30" fill="${TEAL}"/><rect x="14" y="7" width="${W - 28}" height="16" rx="8" fill="#fff"/>${[0, 1, 2, 3, 4].map(k => `<rect x="${30 + k * 36}" y="12" width="${k === 2 ? 26 : 18}" height="6" rx="3" fill="${k === 2 ? TEAL : '#b9c0c8'}"/>`).join('')}` };
-  // The stair, going down into the dark: each tread a step lower and a tone deeper.
-  const stair: Panel = { id: 'mrt-stair', stock: 'greyboard', c: '#3d444e', w: W - 30, h: H - 30, o: [x0 + 15, 0, fz - 40], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.4, emit: .2,
-    print: `<rect width="${W - 30}" height="${H - 30}" fill="#23272d"/>${[0, 1, 2, 3, 4, 5].map(k => `<rect x="${k * 9}" y="${H - 30 - (6 - k) * 17}" width="${W - 30 - k * 18}" height="17" fill="${tone('#8e96a3', -k * .12)}"/><rect x="${k * 9}" y="${H - 30 - (6 - k) * 17}" width="${W - 30 - k * 18}" height="4" fill="${YEL}"/>`).join('')}<rect x="${(W - 30) / 2 - 3}" y="20" width="6" height="${H - 60}" fill="#c9d0d6"/>` };
-  const walls = box({ id: 'mrt-body', x, z, w: W, h: H, d: D, stock: 'greyboard', c: '#c9d0d6', side: '#b7bfc7', noTop: true, density: 1 }).filter(p => !p.id.endsWith('front'));
-  const canopy = box({ id: 'mrt-canopy', x, z: z + 16, y: H, w: W + 50, h: 16, d: D + 70, stock: 'cover', c: TEAL, front: `<rect width="${W + 50}" height="5" fill="${tone(TEAL, -.25)}"/>`, top: `<rect width="${W + 50}" height="${D + 70}" fill="${tone(TEAL, .12)}"/>`, density: 1.2 });
-  // The totem: a post with the line's roundel.
-  const tx = x + W / 2 + 46, post = box({ id: 'mrt-totem', x: tx, z: fz + 6, w: 12, h: 230, d: 12, stock: 'greyboard', c: STEEL, noTop: true });
-  const roundel: Panel = { id: 'mrt-roundel', stock: 'cover', c: TEAL, w: 76, h: 76, o: [tx - 38, 218, fz + 13], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 2.4, mask: disc(38), print: `<circle cx="38" cy="38" r="31" fill="${TEAL}"/><text x="38" y="52" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="40" fill="#fff">M</text>` };
-  return [front, stair, ...walls, ...canopy, ...post, roundel];
 }
 
 /* ---------- moving day ---------- */
@@ -454,6 +434,12 @@ const cat = (id: string, x: number, y: number, z: number, c: string): Panel => (
 // A letter box on a post by a gate.
 const letterBox = (id: string, x: number, z: number, c: string): Panel[] => [{ id: `${id}-post`, stock: 'greyboard', c: STEEL, w: 6, h: 44, o: [x - 3, 0, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.8 },
   ...box({ id, x, z, y: 44, w: 30, h: 20, d: 20, stock: 'cover', c, front: `<rect x="5" y="6" width="20" height="3" fill="${tone(c, -.3)}"/>`, density: 2 })];
+// The way back: a finger-post whose arrow points off the green. The arrow is a cut card; the post is a flat strip.
+function wayBack(x: number, z: number): Panel[] {
+  return [{ id: 'back-post', stock: 'greyboard', c: STEEL, w: 9, h: 170, o: [x - 4.5, 0, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.8 },
+    { id: 'back-arrow', stock: 'cover', c: YEL, w: 150, h: 46, o: [x - 140, 118, z + 3], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 2.2, mask: '<path d="M26 0H150V46H26L0 23Z" fill="#fff"/>',
+      print: `<rect width="150" height="46" fill="${YEL}"/><text x="88" y="31" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="22" fill="${STEEL}">BACK</text>` }];
+}
 // The sign that takes you to the product itself: a folded A-board with the mark.
 function aBoard(id: string, x: number, z: number, rot: number): Panel[] {
   const P = piece(x, z, rot), face = `<rect x="5" y="5" width="60" height="86" fill="${INDIGO}"/><g transform="translate(14 20)">${mark(1, '#fff', LAV, INDIGO)}</g><rect x="14" y="60" width="42" height="6" rx="3" fill="#fff"/><rect x="20" y="72" width="30" height="5" rx="2.5" fill="${LAV}"/>`;
@@ -461,55 +447,37 @@ function aBoard(id: string, x: number, z: number, rot: number): Panel[] {
     { ...P(`${id}-b`, [35, 0, -14], [-1, 0, 0], unit([0, 96, 14]), 70, Math.hypot(96, 14), { stock: 'cover', c: CREAM, density: 1 }), ghost: true }];
 }
 
-/* ---------- the sides, and everything on the square ---------- */
+/* ---------- everything on the green ---------- */
 function surroundings(): Panel[] {
-  // Left: a row of two terraced houses turned in toward the square.
-  const terrace = (id: string, F: Frame, W: number, H: number, cols: [string, string], roofC: string, doors: [string, string]): Panel[] => {
-    const half = W / 2, g = 150;
-    const win = (x: number, y: number, lit: boolean) => `<rect x="${x}" y="${H - y - 88}" width="66" height="88" fill="#fff"/><rect x="${x + 6}" y="${H - y - 82}" width="54" height="76" fill="${lit ? LIT : GLASS}"/><path d="M${x + 33} ${H - y - 82}v76M${x + 6} ${H - y - 44}h54" stroke="#fff" stroke-width="4"/>`;
-    const one = (x: number, c: string, door: string, k: number) => `<rect x="${x}" width="${half}" height="${H}" fill="${c}"/>${Array.from({ length: Math.floor(H / 20) }, (_, i) => `<path d="M${x} ${46 + i * 20}h${half}" stroke="${tone(c, -.1)}" stroke-width="2"/>`).join('')}<rect x="${x}" y="${H - 12}" width="${half}" height="12" fill="${tone(c, -.2)}"/>` +
-      win(x + 30, g + 40, k === 0) + win(x + half - 96, g + 40, k === 1) + win(x + 30, 36, k === 1) +
-      `<rect x="${x + half - 100}" y="${H - 120}" width="64" height="120" fill="#fff"/><rect x="${x + half - 94}" y="${H - 114}" width="52" height="114" fill="${door}"/><rect x="${x + half - 88}" y="${H - 108}" width="40" height="22" fill="${LIT}"/>`;
-    const front: Panel = { id: `${id}-front`, stock: 'cover', c: cols[0], w: W, h: H, o: F.o, u: F.u, v: [0, 1, 0], edge: 'cut', density: .9,
-      mask: `<path d="M0 ${H}V44L${half / 2} 0L${half} 44L${half * 1.5} 0L${W} 44V${H}Z" fill="#fff"/>`, print: one(0, cols[0], doors[0], 0) + one(half, cols[1], doors[1], 1) + `<path d="M0 44L${half / 2} 0L${half} 44Z M${half} 44L${half * 1.5} 0L${W} 44Z" fill="none" stroke="${roofC}" stroke-width="16"/>` };
-    const end: Panel = { id: `${id}-end`, stock: 'cover', c: tone(cols[0], -.12), w: 170, h: H - 44, o: add(F.o, F.n, -170), u: F.n, v: [0, 1, 0], edge: 'fold', density: 1, print: `<rect x="50" y="80" width="60" height="80" fill="${GLASS}"/>` };
-    return [front, end, ...carved(front, [
-      ...[0, 1].flatMap(k => [...fflowers(F, `${id}-fl${k}a`, k * half + 26, g + 24, 74), ...fflowers(F, `${id}-fl${k}b`, k * half + half - 100, g + 24, 74), ...fawning(F, `${id}-porch${k}`, k * half + half - 112, 150, 88, 40, 20, roofC, false), ...flamp(F, `${id}-lamp${k}`, k * half + half - 20, 80),
-        ...fbox(F, `${id}-step${k}`, k * half + half - 108, 0, 0, 80, 8, 22, { c: '#e6dccb' })]),
-      ...fbox(F, `${id}-eaves`, 0, H - 56, 0, W, 10, 18, { c: '#fff' })])];
-  };
-  const L = frame(-1210, 330, 80), R = frame(1230, -300, -72);
-  const sides = [...terrace('left', L, 620, 380, [STONE, WHITE], BRICK, [BRICK, INDIGO]), ...terrace('right', R, 620, 380, [WHITE, LAV], INDIGO, [TILE, tone(INDIGO, -.3)])];
-
-  const h3 = HOMES[2], h4 = HOMES[3], h2 = HOMES[1], h1 = HOMES[0];
-  return [...sides,
-    ...HOMES.flatMap((h, i) => [...home(h, h === h3), ...fence(h), offerSign(h, i), ...bush(`${h.id}-bush`, h.x + h.w / 2 + 8, GARDEN - 22, 96, 50)]), ...rooms(h3),
-    // The MRT exit at the left end of the square, with the way to the product beside it.
-    ...mrtExit(-930, 60), ...aBoard('visit', -716, 44, -8),
-    // The flyer board stands at the mouth of the lane.
-    ...flyerBoard(-84, -74, 0),
-    // Small stories. A couple looking over the home that opens; a neighbour at her gate; a cat on the next fence.
-    ...shopper('viewer-a', h3.x - 130, 196, { coat: '#e88ab0', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'dress', face: 'surprised', carry: YEL }, true),
-    ...shopper('viewer-b', h3.x - 182, 186, { coat: '#2bb5b8', legs: '#3d444e', skin: '#f3c9a0', hair: '#4a2c1a', build: 'average', face: 'cool' }, false, 1, 0, false),
+  const [h1, h2, h3, h4] = HOMES;
+  return [
+    ...HOMES.flatMap((h, i) => [...home(h, h === h3), ...fence(h), offerSign(h, i)]), ...rooms(h3),
+    ...bush('h1-bush', h1.x - h1.w / 2 - 40, GARDEN - 22, 96, 50), ...bush('h4-bush', h4.x + h4.w / 2 + 44, GARDEN - 22, 96, 50),
+    // The left end, open to the valley: the way back, the flyer board, and the way to the product itself.
+    ...wayBack(-1010, 60), ...flyerBoard(-800, -80, 0), ...aBoard('visit', -600, 30, -8),
+    ...shadeTree('tree-l', -1230, 40, 320), ...planter('tree-l-bed', -1230, 40, 104),
+    // Small stories. A couple by the clock; a neighbour at her gate; a cat on the next fence.
+    ...shopper('viewer-a', -150, 204, { coat: '#e88ab0', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'dress', face: 'surprised', carry: YEL }, true),
+    ...shopper('viewer-b', -204, 194, { coat: '#2bb5b8', legs: '#3d444e', skin: '#f3c9a0', hair: '#4a2c1a', build: 'average', face: 'cool' }, false, 1, 0, false),
     ...shopper('neighbour', h1.x + 70, -34, { coat: '#35b58a', legs: '#f4f1ea', skin: '#f3c9a0', hair: '#c9ccd1', style: 'dress', hat: '#f4e3c3', face: 'grumpy', carry: '#57b36f' }),
-    cat('cat', h2.x - 80, 40, GARDEN + 3, '#3d444e'), ...letterBox('box-h2', h2.x + 62, GARDEN + 16, INDIGO), ...letterBox('box-h3', h3.x - 60, GARDEN + 16, BRICK),
-    // Moving day at the last home: the van, cartons on the paving, the mover carrying one in, a child watching.
-    ...van('van', h4.x + 120, 96, 8), ...carton('carton-a', h4.x - 60, 70, 56, 44, 44, -8), ...carton('carton-b', h4.x - 66, 68, 44, 34, 36, 10, 44), ...carton('carton-c', h4.x - 2, 100, 46, 36, 40, 14),
-    ...shopper('mover', h4.x - 6, -10, { coat: '#f4f1ea', legs: '#5b6bdc', skin: '#a8714f', hair: '#1d1a17', build: 'big', face: 'determined', carry: KRAFT, hat: INDIGO }),
-    ...shopper('child', h4.x - 130, 150, { coat: YEL, legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'shorts', face: 'cheerful' }, false, .7, 0, false),
-    ...dog('dog', h4.x - 190, 176, -30, '#c98a4e'),
+    cat('cat', h2.x - 80, 40, GARDEN + 3, '#3d444e'), ...letterBox('box-h2', h2.x + 62, GARDEN + 16, INDIGO), ...letterBox('box-h3', h3.x + 64, GARDEN + 16, BRICK),
+    // Moving day at the last home: the van, cartons on the paving, the mover carrying one in, a child and a dog watching.
+    ...van('van', h4.x + 150, 96, 8), ...carton('carton-a', h4.x - 40, 70, 56, 44, 44, -8), ...carton('carton-b', h4.x - 46, 68, 44, 34, 36, 10, 44), ...carton('carton-c', h4.x + 18, 100, 46, 36, 40, 14),
+    ...shopper('mover', h4.x + 10, -10, { coat: '#f4f1ea', legs: '#5b6bdc', skin: '#a8714f', hair: '#1d1a17', build: 'big', face: 'determined', carry: KRAFT, hat: INDIGO }),
+    ...shopper('child', h4.x - 60, 190, { coat: YEL, legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'shorts', face: 'cheerful' }, false, .7, 0, false),
+    ...dog('dog', h4.x - 120, 210, -30, '#c98a4e'),
     ...pigeon('pigeon-a', 150, 250, -20, '#9aa3ad'), ...pigeon('pigeon-b', 198, 262, 16, '#b3bac3', true),
-    // The right end: a shade tree over a bench, someone dozing beside it.
-    ...shadeTree('tree', 1010, 150, 300), ...planter('tree-bed', 1010, 150, 104), ...bench('bench', 880, 210, 150, -10), ...bicycle('bike', 1090, 40, -8, INDIGO),
-    ...shopper('dozer', 930, 250, { coat: LAV, legs: '#3d444e', skin: '#f3c9a0', hair: '#8a5a3a', build: 'average', face: 'sleepy', hat: '#f4f1ea' }, true, 1, 0, false),
-    // The front edge: a lamp at each end and two low beds of bushes.
-    ...streetLamp('lamp-a', -1060, 340, 250, '#ffe7a8'), ...streetLamp('lamp-b', 1150, 344, 250, '#ffe7a8'),
+    // The right end, open to the valley: a shade tree over a bench, someone dozing, a bicycle against the tree's bed.
+    ...shadeTree('tree', 900, 60, 300), ...planter('tree-bed', 900, 60, 104), ...bench('bench', 800, 150, 150, -10), ...bicycle('bike', 1010, -20, -8, INDIGO),
+    ...shopper('dozer', 850, 196, { coat: LAV, legs: '#3d444e', skin: '#f3c9a0', hair: '#8a5a3a', build: 'average', face: 'sleepy', hat: '#f4f1ea' }, true, 1, 0, false),
+    // The front edge: a lamp at each end and two long beds of bushes.
+    ...streetLamp('lamp-a', -1100, 340, 250, '#ffe7a8'), ...streetLamp('lamp-b', 1150, 344, 250, '#ffe7a8'),
     ...longBed('front-bed-a', -520, 338, 300), ...longBed('front-bed-b', 560, 338, 300),
-    // The middle of the square: the town clock in its bed of flowers.
+    // The middle of the green: the town clock in its bed of flowers.
     ...clockBed(0, 176)];
 }
 
 export function hometown(): Scene {
-  return { id: 'hometown', density: 2.1, camera: { zoom: .85, x0: -420, x1: 380 }, light: { sun: 2.6, sky: .62, skyColor: [.86, .92, 1] },
+  return { id: 'hometown', density: 2.1, camera: { zoom: .85, x0: -400, x1: 340 }, light: { sun: 2.6, sky: .62, skyColor: [.86, .92, 1] },
     panels: [...backdrop(), ...ground(), ...laneView(), ...surroundings()] };
 }
