@@ -26,7 +26,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | Riverside promenade (street) | Sky `#8fd3f4`, brick paving `#dba38b`, river `#4fa9d6`, palm `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
-| Moperty downtown | Sky `#a9d8f0`, stone paving `#e3c9a0`, brick `#b0664c`, asphalt `#5d616b` | Moperty indigo `#5b6bdc` with lavender `#a3adf2`, window yellow `#f5b400` | Cream `#fff4e2`, steel `#2f343c` |
+| Moperty hometown square | Sky `#a9d8f0`, setts `#f1e4cc`, grass `#a9d3a2`, stone `#e3c9a0` | Moperty indigo `#5b6bdc` with lavender `#a3adf2`, window yellow `#f5b400` | Cream `#fff4e2`, steel `#2f343c` |
 
 Tech colours from `content.ts` appear only as small label bars.
 
@@ -126,27 +126,23 @@ Neither floor carries a written account of the work. Each part of the work is an
 
 Stops carry `focus` and `look`: the camera leans in on the object being used while the courier stands beside it, not in front of it.
 
-### Moperty: the downtown corner
+### Moperty: the hometown square
 
-The Moperty space (`src/art/scenes/downtown.ts`) is a street corner in front of the Moperty sales gallery, built from the promenade's kit and to the same standard. Moperty is a property marketplace, so the corner is its catalogue: a listings window, a flat to let, a new block going up.
+The Moperty space (`src/art/scenes/hometown.ts`) is the square of a small hometown where a handful of homes are on offer. It shows only the product, an app for browsing homes for sale or rent around a hometown, and shows it without a screen: you look around the way people did before the app. Nothing about how it was made or what it was made with is in the scene.
 
-- **Main space:** the stone pavement along the gallery, with a raised brick crossing where the avenue meets it. The kerb, the road and a taxi at the stand frame the front edge.
-- **Open surroundings:** the avenue on the left runs back to a shadow box. Card one closes it with the cross street: shops, street trees, a pale rail viaduct with an indigo train standing on it, a bus passing in front, a clipped hedge. Card two stands further back with three rows of towers, pale, deep, then warm, and a billboard carrying the mark. The city in the CSS backdrop goes pale, cool, then warm sand, so the indigo gallery always stands clear of it.
-- **Enclosed surroundings:** a brick walk-up with a bakery on the left, the gallery and the building site at the back, the corner café on the right. Awnings, balconies, flower boxes, lanterns and blade signs are carved relief.
-- **The gallery is the mark, built as a building:** an indigo and a lavender gabled house joined into one, each with the mark's yellow window, and the small white house between them as the entrance.
-- **Freestanding objects are folded:** the taxi is a body box with the cabin set back on it and a lit roof sign, with wheels, sill and lamps glued on; the dog is a tent fold with its head a card glued across the front and its tail a card behind; cones are two slotted cards; the hydrant, signal, poster totem and brick pallet are box folds with their small parts glued on. The crane's mast and jib, the scaffolding, the barrier and the finger-post's arrows are flat because they are plane-shaped.
-- **Small stories, not scattered props:** the dog walker on the crossing, the couple at the model window, pigeons on the doormat side of the pavement, the painter at the drawing board, the forewoman shouting past the barrier, a guest asleep on the café terrace, a commuter by the taxi.
-- **Stops stand beside what they use,** in walking order, so the player never covers the object being played.
+- **Arrival:** the MRT exit stands at the left end: a head house with the stair going down under a teal canopy, and the line's roundel on a totem.
+- **Main space:** the square, paved in pale setts. It is wider and deeper than the Blibli street, so the camera stands further back (zoom .85) and pans further.
+- **The homes:** four folded houses under gabled roofs face the square behind picket fences. Each garden has a board on a stake that says what is on offer by picture alone: a yellow tag for sale, a lavender key for rent.
+- **Open surroundings:** a lane between the homes drops to the valley. Card one is the lower town: roofs, trees, a nearer row of cottages, then the lane's stone wall and hedge. Card two is the valley: far hills, a deeper hill dotted with houses, the far bank's town, the river. The CSS backdrop carries the sky, two layers of cut clouds and three ranges of hills.
+- **Enclosed surroundings:** a pair of terraced houses turned inward at each end, their porches, flower boxes, lanterns and steps carved in relief.
+- **Small stories:** a couple looking over the open house, a neighbour at her gate, a cat on a fence, moving day at the last home (a folded van, cartons, a mover, a child watching), someone dozing by the bench under the tree.
+- **Thin posts are flat strips.** A folded post has both side faces in view from this wide camera, and the browser tears the ground between two such planes. For the same reason both ground sheets ship as sixteen tiles.
 
 | Stop | What you do | What it stands for |
 |---|---|---|
-| Finger-post | Each A lifts the Moperty arrow one place up the pole, under the magnifier | SEO |
-| Listings window | The tabs filter the cards in the window: all, for sale (yellow ribbon), for rent (lavender ribbon) | Browsing local real estate |
-| Gallery door | The doors swing open; A visits moperty.id | The product |
-| Street poster | A turns the lit screen: the site in a browser, the neighbourhood map, then the icon on a home screen | A progressive web app |
-| Drawing board | A paints over the pencil wireframe of the listing page | Designing the UIs |
-| Site board | Opens the tech stack | Tech stack |
-| Tower crane | Each A sets the next module on the new block: backend base (Postgres, Laravel), two front-end floors (Vue, Sass), then the roof (Nginx, Google Cloud) and its lit sign | Building and running the whole product, front end and back end |
+| Flyer board | One flyer for each home on the square, with a fringe of tear-off tabs. Each A tears a tab off the next flyer, and that home's board lifts in its garden | Browsing the homes on offer nearby |
+| Open house | A swings the home's front away on its fold, like a doll's house: a living room, a kitchen, a bedroom and a study, with furniture carved in relief. A again closes it | Looking at one home |
+| Visit Moperty | The A-board by the exit carries the mark; A visits moperty.id | The product |
 
 ### Outside and inside match
 
@@ -187,7 +183,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Street (riverside promenade) | 210 (uses 209) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
-| Moperty downtown | 210 (uses 209) |
+| Moperty hometown square | 210 (uses 179) |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
@@ -203,6 +199,6 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Showcase phone | The chosen swatch chip rises |
 | Recommended shelf | Placeholder cards fold down |
 | Review board | The chosen filter tab rises |
-| Moperty gallery | Both door leaves swing inward |
-| Listings window | The chosen filter tab rises |
+| Flyer board | The torn tab's home lifts its board |
+| Open house | The front swings away on its left fold |
 | Any toy | A piece that appears drops into place in five stepped frames |

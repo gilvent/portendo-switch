@@ -18,7 +18,7 @@ export const content: Content = validateContent({ worlds: {
   crossroads: { id: 'crossroads', art: 'blockout', bounds: B, solid: [], title: 'Crossroads', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'road-blibli', label: 'Blibli.com', x: -660, z: 0, reach: 300, action: { kind: 'road', to: 'blibli', stop: 'mailbox' } },
-      { id: 'road-moperty', label: 'Moperty', x: 0, z: -220, reach: 120, action: { kind: 'road', to: 'moperty', stop: 'gallery-door' } },
+      { id: 'road-moperty', label: 'Moperty', x: 0, z: -220, reach: 120, action: { kind: 'road', to: 'moperty', stop: 'visit' } },
       { id: 'crossing', label: 'Crossroads', x: 0, z: 70, action: { kind: 'letter', letter: 'hello' } },
       { id: 'road-radjastone', label: 'Radjastone', x: 660, z: 0, reach: 300, action: { kind: 'road', to: 'radjastone', stop: 'quarry' } },
       { id: 'mailbox', label: 'Mailbox', x: 280, z: -90, action: { kind: 'letter', letter: 'contact' } } ],
@@ -89,27 +89,22 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'A few learnings...', at: ['camera', 'gallery'] },
       { fact: "Try our best to test on real device :). This time is my first encounter with an issue that uploaded image is rotated when uploaded using mobile web's camera capture (caused by EXIF orientation that needs to be handled).", at: ['camera'] },
       { fact: 'User generated images vary in ratio. Consider all possibilities when developing the UI components displaying these images!', at: ['gallery'] } ] },
-  // Moperty: a downtown corner where every listing, sign and screen is part of the product. Nothing is read; it is used.
-  moperty: { id: 'moperty', art: 'downtown', back: { world: 'crossroads', stop: 'road-moperty' }, camera: { zoom: 1, x0: -400, x1: 520 }, bounds: { x0: -720, x1: 880, z0: -30, z1: 180 },
-    solid: [{ x0: -50, x1: 130, z0: -60, z1: -22 }],
+  // Moperty: the square of a small hometown where a handful of homes are on offer. Only the product is shown, and by
+  // things you can touch: a board of flyers, signs in the gardens, a home that opens. No screens, no tech.
+  moperty: { id: 'moperty', art: 'hometown', back: { world: 'crossroads', stop: 'road-moperty' }, camera: { zoom: .85, x0: -420, x1: 380 }, bounds: { x0: -1000, x1: 900, z0: -40, z1: 240 },
+    solid: [{ x0: -1050, x1: -810, z0: -40, z1: 140 }, { x0: 660, x1: 880, z0: 40, z1: 150 }],
     title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
     stops: [
-      out('moperty'),
-      { id: 'signpost', label: 'Finger-post', x: -330, z: -10, focus: 1.5, look: -320, action: { kind: 'toy', toy: 'rank', states: 3 } },
-      { id: 'listings', label: 'Listings window', x: -52, z: -10, focus: 1.6, look: -140, action: { kind: 'toy', toy: 'filter', states: 3 } },
-      { id: 'gallery-door', label: 'Visit Moperty', x: 40, z: -6, reach: 90, action: { kind: 'link', href: 'https://moperty.id' } },
-      { id: 'kiosk', label: 'Street poster', x: 384, z: -10, focus: 1.8, look: 420, action: { kind: 'toy', toy: 'app', states: 3 } },
-      { id: 'easel', label: 'Drawing board', x: 482, z: -10, focus: 1.6, look: 556, action: { kind: 'toy', toy: 'paint', states: 2 } },
-      { id: 'site-board', label: 'Site board', x: 736, z: -10, action: { kind: 'letter', letter: 'stack' } },
-      { id: 'site', label: 'Tower crane', x: 866, z: 20, action: { kind: 'toy', toy: 'build', states: 4 } } ],
-    letters: [stack([T.vue, T.laravel, T.sass, T.postgres, T.nginx, T.gcloud])],
+      { id: 'way-out', label: 'Back to the crossroads', x: -930, z: 180, reach: 100, action: { kind: 'road', to: 'crossroads', stop: 'road-moperty' } },
+      { id: 'visit', label: 'Visit Moperty', x: -710, z: 160, action: { kind: 'link', href: 'https://moperty.id' } },
+      { id: 'board', label: 'Flyer board', x: -84, z: -10, focus: 1.5, look: -84, action: { kind: 'toy', toy: 'flyer', states: 5 } },
+      { id: 'home', label: 'Open house', x: 500, z: 10, focus: 1.45, look: 330, action: { kind: 'toy', toy: 'home', states: 2 } } ],
+    letters: [],
     encoded: [
-      { fact: 'A progressive web app', at: ['kiosk'] },
-      { fact: 'to browse available real estate in local area around my hometown.', at: ['listings', 'kiosk'] },
-      { fact: 'To boost confidence in web development, I feel the need to', at: ['site'] }, { fact: 'build and run a whole product', at: ['site'] },
-      { fact: '. So I came up with', at: ['gallery-door'] }, { fact: 'Moperty', at: ['gallery-door'] }, { fact: ': I', at: ['easel'] }, { fact: 'design', at: ['easel'] }, { fact: 'the UIs,', at: ['easel'] },
-      { fact: 'code', at: ['site'] }, { fact: 'frontends and backends, and also', at: ['site'] }, { fact: 'implement SEO', at: ['signpost'] }, { fact: 'techniques.', at: ['signpost'] } ] },
+      { fact: 'A progressive web app', at: ['visit'] },
+      { fact: 'to browse available real estate in local area around my hometown.', at: ['board', 'home'] },
+      { fact: 'Moperty', at: ['visit'] } ] },
   radjastone: { id: 'radjastone', art: 'blockout', back: { world: 'crossroads', stop: 'road-radjastone' }, bounds: B, solid: [], title: 'Radjastone', path: 'climb', url: 'https://radjastone.com', role: 'Build A Website For', color: '#9a883f', logo: 'brand/rj-limestone-white.svg',
     description: 'An Indonesian company providing services related to architecture / interior / exterior design made with natural stones.',
     stops: [

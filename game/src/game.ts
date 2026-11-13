@@ -28,14 +28,17 @@ export function pathOf(p: Place): string {
 }
 const isPlayable = (c: Content, id: string): id is WorldId => id in c.worlds && id !== 'intro';
 const firstLetter = (c: Content, w: WorldId) => c.worlds[w].stops.find(s => s.action.kind === 'letter');
+// Where an old /work/<project> URL lands: the project's first letter, or its first stop that is not a road when the
+// world tells everything by play and has no letter.
+const landing = (c: Content, w: WorldId) => firstLetter(c, w) ?? c.worlds[w].stops.find(s => s.action.kind !== 'road');
 export function parsePath(c: Content, path: string): Place {
   const seg = path.split('/').filter(Boolean);
   if (!seg.length) return INTRO;
   if (seg.length === 1 && seg[0] === 'route') return { k: 'routeSheet', back: HOME };
   if (seg[0] === 'work' && seg[1] && isPlayable(c, seg[1]) && seg[1] !== 'crossroads') {
-    const s = firstLetter(c, seg[1]);
+    const s = landing(c, seg[1]), l = firstLetter(c, seg[1]);
     if (seg.length === 2 && s) return { k: 'walk', world: seg[1], stop: s.id, near: true };
-    if (seg.length === 3 && seg[2] === 'highlight' && s) return { k: 'letter', world: seg[1], stop: s.id };
+    if (seg.length === 3 && seg[2] === 'highlight' && l) return { k: 'letter', world: seg[1], stop: l.id };
   }
   if (seg[0] === 'round' && seg[1] && isPlayable(c, seg[1])) {
     const world = seg[1], s = seg[2] ? stopOf(c, world, seg[2]) : undefined;

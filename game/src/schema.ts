@@ -25,7 +25,7 @@ export type StopAction =
 export type Stop = { id: string; label: string; x: number; z: number; reach?: number; focus?: number; look?: number; action: StopAction };
 export type Rect = { x0: number; x1: number; z0: number; z1: number };
 export type World = {
-  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom' | 'downtown'; back?: { world: WorldId; stop: string }; camera?: { zoom: number; x0: number; x1: number }; path: 'round' | 'street' | 'store' | 'climb'; bounds: Rect; solid: Rect[];
+  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom' | 'hometown'; back?: { world: WorldId; stop: string }; camera?: { zoom: number; x0: number; x1: number }; path: 'round' | 'street' | 'store' | 'climb'; bounds: Rect; solid: Rect[];
   url?: string; role?: string; description?: string; logo?: string; color: string;
   stops: Stop[]; letters: Letter[];
   // Facts this world shows by play instead of text: each names the stops where it is acted out. Never displayed.
