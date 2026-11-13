@@ -166,7 +166,8 @@ function home(h: Home, opens = false): Panel[] {
   const walls = box({ id: `${id}-body`, x, z: HZ - HD / 2, w, h: wall, d: HD, stock: 'cover', c, side: c, noTop: true }).filter(p => !p.id.endsWith('front')).map(p => ({ ...p, density: 1 }));
   const chimney = h.chimney ? box({ id: `${id}-chimney`, x: x + w * .26, z: HZ - 60, y: wall + peak * .2, w: 28, h: peak * .9, d: 28, stock: 'cover', c: BRICK, front: `<rect width="28" height="8" fill="${tone(BRICK, .3)}"/>`, density: 1 }) : [];
   // The inside of a front that opens: plain lining paper with the window and door openings, seen once it has swung round.
-  const inside: Panel[] = opens ? [{ id: `${id}-lining`, stock: 'cover', c: '#f6ecd8', w, h: H, o: [x0 + w, 0, HZ - .6], u: [-1, 0, 0], v: [0, 1, 0], density: 1.5, edge: 'cut',
+  // It is baked shut inside the house, where no light reaches, so it carries its own light like the rooms do.
+  const inside: Panel[] = opens ? [{ id: `${id}-lining`, stock: 'cover', c: '#f6ecd8', emit: .8, w, h: H, o: [x0 + w, 0, HZ - .6], u: [-1, 0, 0], v: [0, 1, 0], density: 1.5, edge: 'cut',
     mask: `<path d="M0 ${H}V${peak}L${w / 2} 0L${w} ${peak}V${H}Z" fill="#fff"/>`,
     print: `<rect width="${w}" height="${H}" fill="#f6ecd8"/>` + rows.flatMap((wy, k) => wx.map(a => [a, wy]).concat(k ? [[w / 2 - 23, wy]] : [])).map(([a, wy]) => `<rect x="${w - a - 51}" y="${H - wy - 61}" width="56" height="66" fill="#fff"/><rect x="${w - a - 46}" y="${H - wy - 56}" width="46" height="56" fill="#bfe0f2"/>`).join('') + `<rect x="${w / 2 - 30}" y="${H - 104}" width="60" height="104" fill="#fff"/><rect x="${w / 2 - 24}" y="${H - 98}" width="48" height="98" fill="${tone(door, .25)}"/><circle cx="${w / 2}" cy="${peak * .78}" r="14" fill="#bfe0f2"/>`,
     motion: { toy: 'home', at: [1], edge: 'right', deg: -112 } }] : [];
@@ -175,7 +176,7 @@ function home(h: Home, opens = false): Panel[] {
 // The rooms behind the front that opens: a lit back wall papered room by room, a floor between the storeys, and
 // furniture with real volume carved onto the wall. A cut frame at the opening shows the section, like a doll's house.
 function rooms(h: Home): Panel[] {
-  const { id, x, w, wall, peak } = h, x0 = x - w / 2, fh = wall / 2, H = wall + peak, bz = HZ - 64, lit = (p: Panel): Panel => ({ ...p, emit: .42 });
+  const { id, x, w, wall, peak } = h, x0 = x - w / 2, fh = wall / 2, H = wall + peak, bz = HZ - 64, lit = (p: Panel): Panel => ({ ...p, emit: .62 });
   const back: Panel = lit({ id: `${id}-rooms`, stock: 'cover', c: '#fff7e6', w, h: H, o: [x0, 0, bz], u: [1, 0, 0], v: [0, 1, 0], density: 1.6, edge: 'fold',
     mask: `<path d="M0 ${H}V${peak}L${w / 2} 0L${w} ${peak}V${H}Z" fill="#fff"/>`,
     print: `<rect width="${w}" height="${H}" fill="#8a6a4c"/>${Array.from({ length: 6 }, (_, i) => `<path d="M${w / 2 - i * 22} ${peak - i * 14}V${peak}M${w / 2 + i * 22} ${peak - i * 14}V${peak}" stroke="#6e523a" stroke-width="3"/>`).join('')}` +
@@ -203,7 +204,7 @@ function rooms(h: Home): Panel[] {
   // The floor between the storeys, and the ground floor's boards.
   const floor = (k: string, y: number, c: string): Panel => lit({ id: `${id}-${k}`, stock: 'cover', c, w: w - 4, h: 62, o: [x0 + 2, y, HZ - 2], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.2, print: Array.from({ length: 5 }, (_, i) => `<path d="M0 ${i * 13 + 6}H${w}" stroke="${tone(c, -.12)}" stroke-width="2"/>`).join('') });
   // The section: the walls' and floors' cut edges, seen at the opening.
-  const section: Panel = { id: `${id}-section`, stock: 'cover', c: '#fff', w, h: H, o: [x0, 0, HZ - 1], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.6,
+  const section: Panel = { id: `${id}-section`, stock: 'cover', c: '#fff', emit: .8, w, h: H, o: [x0, 0, HZ - 1], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.6,
     mask: `<path fill-rule="evenodd" d="M0 ${H}V${peak}L${w / 2} 0L${w} ${peak}V${H}Z M8 ${H - 4}V${peak + fh + 4}H${w / 2 - 4}V${H - 4}Z M${w / 2 + 4} ${H - 4}V${peak + fh + 4}H${w - 8}V${H - 4}Z M8 ${peak + fh - 4}V${peak + 6}H${w / 2 - 4}V${peak + fh - 4}Z M${w / 2 + 4} ${peak + fh - 4}V${peak + 6}H${w - 8}V${peak + fh - 4}Z M${w / 2 - 44} ${peak - 4}L${w / 2} ${peak * .38}L${w / 2 + 44} ${peak - 4}Z" fill="#fff"/>` };
   return [back, ...furniture, floor('floor-up', fh, '#c99a62'), floor('floor-down', 1, '#c99a62'), section];
 }
