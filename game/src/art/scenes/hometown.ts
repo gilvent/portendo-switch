@@ -338,7 +338,7 @@ function rooms(h: Home): Panel[] {
 }
 // A picket fence along a garden's front, cut from one sheet, with a gap where the path comes through.
 function fence(h: Home): Panel[] {
-  const W = h.w + 70, x0 = h.x - W / 2, n = Math.floor(W / 14);
+  const W = h.w + 30, x0 = h.x - W / 2, n = Math.floor(W / 14); // neighbours meet without overlapping
   const pales = Array.from({ length: n }, (_, i) => Math.abs(i * 14 + 5 - W / 2) < 30 ? '' : `<path d="M${i * 14} 46V10L5 2L10 10V46Z" fill="#fff"/>`).join('');
   const rails = `<rect y="16" width="${W / 2 - 30}" height="5" fill="#fff"/><rect x="${W / 2 + 30}" y="16" width="${W / 2 - 30}" height="5" fill="#fff"/><rect y="34" width="${W / 2 - 30}" height="5" fill="#fff"/><rect x="${W / 2 + 30}" y="34" width="${W / 2 - 30}" height="5" fill="#fff"/>`;
   const run: Panel = { id: `${h.id}-fence`, stock: 'cover', c: '#fffdf6', w: W, h: 46, o: [x0, 0, GARDEN + 2], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.6, mask: pales + rails };
