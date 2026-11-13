@@ -135,11 +135,12 @@ The Moperty space (`src/art/scenes/hometown.ts`) is the square of a small hometo
 - **The homes:** four folded houses under gabled roofs face the square behind picket fences. Each garden has a board on a stake that says what is on offer by picture alone: a yellow tag for sale, a lavender key for rent.
 - **Open surroundings:** a lane between the homes drops to the valley, built as about twenty-five cut layers. Layers differ in kind, not only in colour (faceted peaks, hills that sweep up from one side, rounded mounds, rolling bands), and alternate pale and deep.
   - *Card one, the lower town (five layers, about 30 units apart):* a back street of taller houses with a clock tower and poplars; garden trees; a near street of cottages with shutters, flower boxes and washing lines; back-garden hedges with fruit trees; the lane's coursed stone wall with gate posts and flowers.
-  - *Card two, the valley (eight layers, 30 to 50 apart):* a pale hill of terraced fields; a wood on its own sheet behind the next ridge; that ridge with hamlets; a bright hill with orchard rows and a winding road; the far bank's town; a stone quay under plane trees with a three-arch bridge; boats; the river in two blues.
+  - *Card two, the valley (nine layers, 30 to 50 apart):* a pale hill of terraced fields; a wood on its own sheet behind the next ridge; that ridge with hamlets; a bright hill with orchard rows and a winding road; the far town; the MRT line on slim concrete piers with a train on it; farmland with barns, a silo, haystacks and hedgerow trees; a pale meadow with allotments, a lane with a bus, sheep and a post-and-rail fence. There is no water in it: the Blibli street already has the river.
   - *The CSS backdrop:* sky, a pale sun, two layers of clouds, three ranges of faceted peaks with zigzag snow caps, then five hills (wooded band, terraced fields, a mound with a village, a deep sweep, rolling woods), each wood on its own sheet behind its hill.
   - *Detail on every sheet:* a pale strip along each crest where light catches the cut edge and darker contour lines below it; trees in three kinds (pine, oak, poplar), each cut in two tones; buildings that vary in roof (gable, hip, side-on, flat), chimneys, dormers, shutters, doors and flower boxes; fields as ploughed stripes lying on the slope.
 - **Enclosed surroundings:** a pair of terraced houses turned inward at each end, their porches, flower boxes, lanterns and steps carved in relief.
-- **Small stories:** a couple looking over the open house, a neighbour at her gate, a cat on a fence, moving day at the last home (a folded van, cartons, a mover, a child watching), someone dozing by the bench under the tree.
+- **The square's furniture:** the town clock stands in a low folded flower bed at the centre (a folded head with a cut face glued on, on a flat post); two long folded stone beds with layered bushes and cut blossoms frame the front edge, with a lamp at each end.
+- **Small stories:** a couple by the clock, a neighbour at her gate, a cat on a fence, moving day at the last home (a folded van, cartons, a mover, a child and a tent-folded dog watching), someone dozing by the bench under the tree with a bicycle beside it.
 - **Thin posts are flat strips.** A folded post has both side faces in view from this wide camera, and the browser tears the ground between two such planes. For the same reason both ground sheets ship as sixteen tiles.
 
 | Stop | What you do | What it stands for |
@@ -187,7 +188,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Street (riverside promenade) | 210 (uses 209) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
-| Moperty hometown square | 210 (uses 179) |
+| Moperty hometown square | 210 (uses 201) |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 

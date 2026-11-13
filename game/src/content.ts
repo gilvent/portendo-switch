@@ -97,7 +97,7 @@ export const content: Content = validateContent({ worlds: {
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
     stops: [
       { id: 'way-out', label: 'Back to the crossroads', x: -930, z: 180, reach: 100, action: { kind: 'road', to: 'crossroads', stop: 'road-moperty' } },
-      { id: 'visit', label: 'Visit Moperty', x: -590, z: 130, action: { kind: 'link', href: 'https://moperty.id' } },
+      { id: 'visit', label: 'Visit Moperty', x: -640, z: 110, action: { kind: 'link', href: 'https://moperty.id' } },
       { id: 'board', label: 'Flyer board', x: -84, z: -10, focus: 1.5, look: -84, action: { kind: 'toy', toy: 'flyer', states: 5 } },
       { id: 'home', label: 'Open house', x: 500, z: 10, focus: 1.45, look: 330, action: { kind: 'toy', toy: 'home', states: 2 } } ],
     letters: [],

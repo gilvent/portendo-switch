@@ -438,8 +438,9 @@ function longBed(id: string, x: number, z: number, w: number): Panel[] {
 // The square's centrepiece: a low folded bed of flowers with the town clock standing in it. The clock's head is a folded
 // box with a cut face glued on; its post is a flat strip.
 function clockBed(x: number, z: number): Panel[] {
+  s = 91;
   const side = (len: number) => `<rect width="${len}" height="26" fill="#d6c9b0"/><rect width="${len}" height="6" fill="#efe6d4"/>${Array.from({ length: Math.ceil(len / 34) }, (_, i) => `<rect x="${i * 34 + 2}" y="10" width="30" height="13" fill="#cdbfa4"/>`).join('')}`;
-  const bed = box({ id: 'clock-bed', x, z, w: 190, h: 26, d: 130, stock: 'cover', c: '#d6c9b0', front: side(190), left: side(130), right: side(130), top: `<rect width="190" height="130" fill="#efe6d4"/><rect x="8" y="8" width="174" height="114" fill="#8fc48a"/>${Array.from({ length: 26 }, (_, i) => `<circle cx="${20 + (i * 53) % 150}" cy="${20 + (i * 31) % 90}" r="5" fill="${[YEL, WHITE, '#e88ab0', LAV, '#e8552d'][i % 5]}"/>`).join('')}` });
+  const bed = box({ id: 'clock-bed', x, z, w: 190, h: 26, d: 130, stock: 'cover', c: '#d6c9b0', front: side(190), left: side(130), right: side(130), top: `<rect width="190" height="130" fill="#efe6d4"/><rect x="8" y="8" width="174" height="114" fill="#8fc48a"/>${Array.from({ length: 34 }, (_, i) => `<circle cx="${f(r(18, 172))}" cy="${f(r(18, 112))}" r="${f(r(4, 6.5))}" fill="${[YEL, WHITE, '#e88ab0', LAV, '#e8552d'][i % 5]}"/>`).join('')}` }).map(q => (q.id.endsWith('top') ? { ...q, density: 1.6 } : q));
   const post: Panel = { id: 'clock-post', stock: 'greyboard', c: STEEL, w: 9, h: 150, o: [x - 4.5, 26, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.8 };
   const head = box({ id: 'clock-head', x, z, y: 170, w: 54, h: 54, d: 16, stock: 'cover', c: tone(INDIGO, -.3), density: 2.4, front: `<rect width="54" height="54" fill="${tone(INDIGO, -.3)}"/>` });
   const face = on(head[0], 1.2, 6, 6, 42, 42, { id: 'clock-face', stock: 'cover', c: '#fffdf6', density: 2.4, mask: disc(21), print: `<circle cx="21" cy="21" r="21" fill="#fffdf6"/>${Array.from({ length: 12 }, (_, i) => `<rect x="20" y="2" width="2" height="${i % 3 ? 3 : 6}" fill="${STEEL}" transform="rotate(${i * 30} 21 21)"/>`).join('')}<path d="M21 21V9M21 21L29 25" stroke="${STEEL}" stroke-width="2.6" stroke-linecap="round"/><circle cx="21" cy="21" r="2.4" fill="${YEL}"/>` });
@@ -484,15 +485,14 @@ function surroundings(): Panel[] {
   return [...sides,
     ...HOMES.flatMap((h, i) => [...home(h, h === h3), ...fence(h), offerSign(h, i), ...bush(`${h.id}-bush`, h.x + h.w / 2 + 8, GARDEN - 22, 96, 50)]), ...rooms(h3),
     // The MRT exit at the left end of the square, with the way to the product beside it.
-    ...mrtExit(-930, 60), ...aBoard('visit', -640, 96, -10),
+    ...mrtExit(-930, 60), ...aBoard('visit', -716, 44, -8),
     // The flyer board stands at the mouth of the lane.
     ...flyerBoard(-84, -74, 0),
     // Small stories. A couple looking over the home that opens; a neighbour at her gate; a cat on the next fence.
-    ...shopper('viewer-a', h3.x - 270, 150, { coat: '#e88ab0', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'dress', face: 'surprised', carry: YEL }, true),
-    ...shopper('viewer-b', h3.x - 322, 140, { coat: '#2bb5b8', legs: '#3d444e', skin: '#f3c9a0', hair: '#4a2c1a', build: 'average', face: 'cool' }, false, 1, 0, false),
+    ...shopper('viewer-a', h3.x - 130, 196, { coat: '#e88ab0', legs: '#22324a', skin: '#c99a7a', hair: '#2b2622', style: 'dress', face: 'surprised', carry: YEL }, true),
+    ...shopper('viewer-b', h3.x - 182, 186, { coat: '#2bb5b8', legs: '#3d444e', skin: '#f3c9a0', hair: '#4a2c1a', build: 'average', face: 'cool' }, false, 1, 0, false),
     ...shopper('neighbour', h1.x + 70, -34, { coat: '#35b58a', legs: '#f4f1ea', skin: '#f3c9a0', hair: '#c9ccd1', style: 'dress', hat: '#f4e3c3', face: 'grumpy', carry: '#57b36f' }),
     cat('cat', h2.x - 80, 40, GARDEN + 3, '#3d444e'), ...letterBox('box-h2', h2.x + 62, GARDEN + 16, INDIGO), ...letterBox('box-h3', h3.x - 60, GARDEN + 16, BRICK),
-    ...bicycle('bike', h1.x - 86, GARDEN + 18, 4, INDIGO),
     // Moving day at the last home: the van, cartons on the paving, the mover carrying one in, a child watching.
     ...van('van', h4.x + 120, 96, 8), ...carton('carton-a', h4.x - 60, 70, 56, 44, 44, -8), ...carton('carton-b', h4.x - 66, 68, 44, 34, 36, 10, 44), ...carton('carton-c', h4.x - 2, 100, 46, 36, 40, 14),
     ...shopper('mover', h4.x - 6, -10, { coat: '#f4f1ea', legs: '#5b6bdc', skin: '#a8714f', hair: '#1d1a17', build: 'big', face: 'determined', carry: KRAFT, hat: INDIGO }),
@@ -500,7 +500,7 @@ function surroundings(): Panel[] {
     ...dog('dog', h4.x - 190, 176, -30, '#c98a4e'),
     ...pigeon('pigeon-a', 150, 250, -20, '#9aa3ad'), ...pigeon('pigeon-b', 198, 262, 16, '#b3bac3', true),
     // The right end: a shade tree over a bench, someone dozing beside it.
-    ...shadeTree('tree', 1010, 150, 300), ...planter('tree-bed', 1010, 150, 104), ...bench('bench', 880, 210, 150, -10),
+    ...shadeTree('tree', 1010, 150, 300), ...planter('tree-bed', 1010, 150, 104), ...bench('bench', 880, 210, 150, -10), ...bicycle('bike', 1090, 40, -8, INDIGO),
     ...shopper('dozer', 930, 250, { coat: LAV, legs: '#3d444e', skin: '#f3c9a0', hair: '#8a5a3a', build: 'average', face: 'sleepy', hat: '#f4f1ea' }, true, 1, 0, false),
     // The front edge: a lamp at each end and two low beds of bushes.
     ...streetLamp('lamp-a', -1060, 340, 250, '#ffe7a8'), ...streetLamp('lamp-b', 1150, 344, 250, '#ffe7a8'),
