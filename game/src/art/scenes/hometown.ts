@@ -57,76 +57,195 @@ const NEAR: Card = { id: 'lane-near', x0: -1300, z: -480, w: 2600, density: .95 
 const FAR: Card = { id: 'lane-far', x0: -1800, z: -740, w: 3600, density: .6 };
 const sheet = (card: Card, id: string, gap: number, y0: number, h: number, c: string, mask: string, print = '', stock: Panel['stock'] = 'sugar'): Panel =>
   ({ id, stock, c, w: card.w, h, o: [card.x0, y0, card.z + gap], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: card.density, decal: card.id, mask, print });
-// A row of cottages cut from one sheet: gabled or hipped, each its own colour, with lit windows.
-function cottages(W: number, H: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], roofs: string[], win: string, breaks: number) {
-  let mask = '', print = '';
+/* The landscape kit. Every layer of the view is one cut sheet whose top edge is a profile: a height above the sheet's
+   foot for each x. Layers differ in kind, not only in colour: faceted peaks, hills that sweep up from one side, rounded
+   mounds, rolling bands. Detail is cut from lighter and darker tones of the sheet's own colour. */
+type Prof = (x: number) => number;
+const clamp = (u: number) => Math.min(1, Math.max(0, u)), ease = (u: number) => u * u * (3 - 2 * u);
+const rolling = (hi: number, amp: number, len: number, ph: number): Prof => x => hi + amp * (.55 * Math.sin(x / len + ph) + .3 * Math.sin(x / len * 1.9 + ph * 2) + .15 * Math.sin(x / len * 3.3 + ph * 3));
+const sweep = (x0: number, x1: number, lo: number, hi: number, dir: 1 | -1, ph = 0): Prof => x => lo + (hi - lo) * ease(clamp(dir > 0 ? (x1 - x) / (x1 - x0) : (x - x0) / (x1 - x0))) + 7 * Math.sin(x / 90 + ph);
+const mound = (cx: number, hw: number, lo: number, hi: number): Prof => x => lo + (hi - lo) * Math.cos(clamp(Math.abs(x - cx) / hw) * Math.PI / 2) ** 1.5 + 5 * Math.sin(x / 70);
+type Peak = { x: number; h: number; s: number };
+const range = (pk: Peak[], floor: number): Prof => x => pk.reduce((y, p) => Math.max(y, p.h - Math.abs(x - p.x) * p.s), floor);
+const both = (a: Prof, b: Prof): Prof => x => Math.max(a(x), b(x));
+const line = (W: number, H: number, p: Prof, drop = 0, step = 12) => { let d = ''; for (let x = 0; x <= W; x += step) d += `${x ? 'L' : 'M'}${x} ${f(H - p(x) + drop)}`; return d; };
+const cut = (W: number, H: number, p: Prof) => `<path d="${line(W, H, p)}V${H}H0Z" fill="#fff"/>`;
+// The sheet's own detail: a pale strip along the crest where the light catches the cut edge, and darker contour lines
+// below it, the way stacked card reads.
+const crest = (W: number, H: number, p: Prof, c: string, contours = 2) => `<path d="${line(W, H, p, 5)}" stroke="${tone(c, .28)}" stroke-width="7" fill="none"/>` +
+  Array.from({ length: contours }, (_, i) => `<path d="${line(W, H, x => p(x) * (1 - (i + 1) * .26), 0)}" stroke="${tone(c, -.07)}" stroke-width="3" fill="none"/>`).join('');
+// A field: a patch of ploughed stripes lying on a slope.
+const field = (x: number, y: number, w: number, h: number, skew: number, a: string, b: string) => `<g transform="translate(${f(x)} ${f(y)}) skewX(${skew})"><rect width="${f(w)}" height="${f(h)}" fill="${a}"/>${Array.from({ length: Math.floor(w / 9) }, (_, i) => `<rect x="${i * 9 + 2}" width="3.4" height="${f(h)}" fill="${b}"/>`).join('')}</g>`;
+type Art = { m: string; p: string };
+const none: Art = { m: '', p: '' }, join = (a: Art[]): Art => ({ m: a.map(q => q.m).join(''), p: a.map(q => q.p).join('') });
+const shape = (d: string, c: string): Art => ({ m: `<path d="${d}" fill="#fff"/>`, p: `<path d="${d}" fill="${c}"/>` });
+// Three trees, each cut in two tones: the lit side lighter.
+function pine(x: number, base: number, h: number, c: string): Art {
+  const w = h * .46, t = h / 3.4; let full = `M${f(x - w * .08)} ${f(base)}V${f(base - t * .4)}`, half = `M${f(x)} ${f(base - t * .4)}`;
+  for (let k = 0; k < 3; k++) { const hw = w / 2 * (1 - k * .22), y = base - t * .4 - k * t; full += `L${f(x - hw)} ${f(y)}L${f(x - hw * .36)} ${f(y - t)}`; half += `L${f(x - hw)} ${f(y)}L${f(x - hw * .36)} ${f(y - t)}`; }
+  full += `L${f(x)} ${f(base - h)}`; half += `L${f(x)} ${f(base - h)}Z`;
+  for (let k = 2; k >= 0; k--) { const hw = w / 2 * (1 - k * .22), y = base - t * .4 - k * t; full += `L${f(x + hw * .36)} ${f(y - t)}L${f(x + hw)} ${f(y)}`; }
+  full += `L${f(x + w * .08)} ${f(base - t * .4)}V${f(base)}Z`;
+  return { m: `<path d="${full}" fill="#fff"/>`, p: `<path d="${full}" fill="${c}"/><path d="${half}" fill="${tone(c, .16)}"/>` };
+}
+function oak(x: number, base: number, h: number, c: string): Art {
+  const R = h * .36, cy = base - h + R, blobs: [number, number, number][] = [[0, 0, R], [R * .8, R * .34, R * .72], [-R * .76, R * .4, R * .66]];
+  const m = blobs.map(([dx, dy, rr]) => `<circle cx="${f(x + dx)}" cy="${f(cy + dy)}" r="${f(rr)}" fill="#fff"/>`).join('') + `<rect x="${f(x - R * .12)}" y="${f(cy)}" width="${f(R * .24)}" height="${f(base - cy)}" fill="#fff"/>`;
+  const p = `<rect x="${f(x - R * .12)}" y="${f(cy)}" width="${f(R * .24)}" height="${f(base - cy)}" fill="#7a5c42"/>` + blobs.map(([dx, dy, rr], i) => `<circle cx="${f(x + dx)}" cy="${f(cy + dy)}" r="${f(rr)}" fill="${[c, tone(c, -.12), tone(c, -.05)][i]}"/>`).join('') + `<circle cx="${f(x - R * .28)}" cy="${f(cy - R * .26)}" r="${f(R * .46)}" fill="${tone(c, .18)}"/>`;
+  return { m, p };
+}
+function poplar(x: number, base: number, h: number, c: string): Art {
+  const rx = h * .13, e = `cx="${f(x)}" cy="${f(base - h * .56)}" rx="${f(rx)}" ry="${f(h * .46)}"`;
+  return { m: `<ellipse ${e} fill="#fff"/><rect x="${f(x - 1.5)}" y="${f(base - h * .2)}" width="3" height="${f(h * .2)}" fill="#fff"/>`, p: `<rect x="${f(x - 1.5)}" y="${f(base - h * .2)}" width="3" height="${f(h * .2)}" fill="#7a5c42"/><ellipse ${e} fill="${c}"/><ellipse cx="${f(x - rx * .3)}" cy="${f(base - h * .6)}" rx="${f(rx * .5)}" ry="${f(h * .36)}" fill="${tone(c, .16)}"/>` };
+}
+const TREES = { pine, oak, poplar };
+// A treeline on its own sheet: trees standing on the crest of the hill in front of it, in a value that contrasts with that
+// hill. `runs` are [from, to] stretches, so a wood covers only part of a ridge.
+function woods(W: number, H: number, ground: Prof, runs: [number, number][], kinds: (keyof typeof TREES)[], cols: string[], lo: number, hi: number, every: number): Art {
+  const all: Art[] = [];
+  for (const [a, b] of runs) for (let x = a + r(0, every); x < b; x += r(every * .6, every * 1.3)) { const h = r(lo, hi); all.push(TREES[pick(kinds)](x, H - ground(x) + h * .16, h, pick(cols))); }
+  return join(all);
+}
+// One building, drawn standing on `base`. Roofs, chimneys, dormers, shutters and doors vary, so a row is a street, not a
+// repeat.
+function building(x: number, base: number, w: number, h: number, c: string, roofC: string, win: string, detail = 1): Art {
+  const kind = pick(['gable', 'gable', 'hip', 'side', 'flat']), top = base - h, pk = kind === 'flat' ? 5 : w * r(.3, .44), out: Art[] = [];
+  out.push({ m: `<rect x="${f(x)}" y="${f(top)}" width="${f(w)}" height="${f(h)}" fill="#fff"/>`, p: `<rect x="${f(x)}" y="${f(top)}" width="${f(w)}" height="${f(h)}" fill="${c}"/><rect x="${f(x + w * .62)}" y="${f(top)}" width="${f(w * .38)}" height="${f(h)}" fill="${tone(c, -.07)}"/><rect x="${f(x)}" y="${f(base - 5)}" width="${f(w)}" height="5" fill="${tone(c, -.2)}"/>` });
+  if (r(0, 1) < .5) { const cx = x + w * r(.18, .78), ch = pk * r(.7, 1.1) + 8; out.push({ m: `<rect x="${f(cx)}" y="${f(top - ch)}" width="8" height="${f(ch)}" fill="#fff"/>`, p: `<rect x="${f(cx)}" y="${f(top - ch)}" width="8" height="${f(ch)}" fill="${tone(roofC, -.25)}"/><rect x="${f(cx - 1.5)}" y="${f(top - ch)}" width="11" height="3" fill="${tone(roofC, .3)}"/>` }); }
+  const roof = kind === 'gable' ? `M${f(x - 5)} ${f(top)}L${f(x + w / 2)} ${f(top - pk)}L${f(x + w + 5)} ${f(top)}Z`
+    : kind === 'hip' ? `M${f(x - 5)} ${f(top)}L${f(x + w * .22)} ${f(top - pk * .7)}H${f(x + w * .78)}L${f(x + w + 5)} ${f(top)}Z`
+      : kind === 'side' ? `M${f(x - 5)} ${f(top)}L${f(x + 2)} ${f(top - pk * .62)}H${f(x + w - 2)}L${f(x + w + 5)} ${f(top)}Z` : `M${f(x - 3)} ${f(top)}V${f(top - 6)}H${f(x + w + 3)}V${f(top)}Z`;
+  out.push({ m: `<path d="${roof}" fill="#fff"/>`, p: `<path d="${roof}" fill="${roofC}"/>` + (kind === 'side' || kind === 'hip' ? Array.from({ length: 3 }, (_, i) => `<path d="M${f(x)} ${f(top - pk * .16 * (i + 1))}H${f(x + w)}" stroke="${tone(roofC, -.14)}" stroke-width="1.6"/>`).join('') : '') + (kind === 'gable' ? `<path d="M${f(x + w / 2)} ${f(top - pk)}L${f(x + w + 5)} ${f(top)}H${f(x + w * .62)}Z" fill="${tone(roofC, -.12)}"/>` : '') });
+  if (kind === 'side' && detail > .5 && w > 60) { const dx = x + w * .5 - 9; out.push({ m: `<path d="M${f(dx - 2)} ${f(top - pk * .2)}L${f(dx + 9)} ${f(top - pk * .2 - 14)}L${f(dx + 20)} ${f(top - pk * .2)}Z" fill="#fff"/>`, p: `<rect x="${f(dx)}" y="${f(top - pk * .2 - 4)}" width="18" height="${f(pk * .2 + 2)}" fill="${c}"/><path d="M${f(dx - 2)} ${f(top - pk * .2)}L${f(dx + 9)} ${f(top - pk * .2 - 14)}L${f(dx + 20)} ${f(top - pk * .2)}Z" fill="${tone(roofC, -.1)}"/><rect x="${f(dx + 5)}" y="${f(top - pk * .2 - 2)}" width="8" height="8" fill="${LIT}"/>` }); }
+  const cols = Math.max(1, Math.floor((w - 12) / 26)), rows = Math.max(1, Math.floor((h - 26) / 30)), sx = (w - cols * 13) / (cols + 1); let p = '';
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    const wx = x + sx + i * (13 + sx), wy = top + 9 + j * 30;
+    if (j === rows - 1 && i === Math.floor(cols / 2)) { p += `<rect x="${f(wx - 1)}" y="${f(base - 24)}" width="15" height="24" fill="${tone(roofC, -.15)}"/><rect x="${f(wx + 2)}" y="${f(base - 21)}" width="9" height="6" fill="${LIT}"/>`; continue; }
+    p += `<rect x="${f(wx - 1.5)}" y="${f(wy - 1.5)}" width="16" height="19" fill="${tone(c, .5)}"/><rect x="${f(wx)}" y="${f(wy)}" width="13" height="16" fill="${r(0, 1) > .62 ? LIT : win}"/>`;
+    if (detail > .5 && r(0, 1) < .35) p += `<rect x="${f(wx - 6)}" y="${f(wy)}" width="4.5" height="16" fill="${tone(roofC, .1)}"/><rect x="${f(wx + 14.5)}" y="${f(wy)}" width="4.5" height="16" fill="${tone(roofC, .1)}"/>`;
+    if (detail > .5 && r(0, 1) < .25) p += `<rect x="${f(wx - 2)}" y="${f(wy + 16)}" width="17" height="4" fill="#c8915a"/><circle cx="${f(wx + 3)}" cy="${f(wy + 15)}" r="2.6" fill="#e8552d"/><circle cx="${f(wx + 10)}" cy="${f(wy + 15)}" r="2.6" fill="${YEL}"/>`;
+  }
+  out.push({ m: '', p });
+  return join(out);
+}
+// A street of buildings on one sheet, with something between some of them: a tree, a clock tower, a washing line.
+function street(W: number, H: number, lo: number, hi: number, minW: number, maxW: number, cols: string[], roofs: string[], win: string, breaks: number, detail: number, extras: ('oak' | 'poplar' | 'tower' | 'line')[] = []): Art {
+  const all: Art[] = [];
   for (let x = r(-20, 10); x < W;) {
-    const bw = r(minW, maxW), bh = r(lo, hi), pk = bw * r(.3, .42), top = H - bh, c = pick(cols), rc = pick(roofs);
-    const body = `<rect x="${f(x)}" y="${f(top)}" width="${f(bw)}" height="${f(bh)}"`, gable = `<path d="M${f(x - 5)} ${f(top)}L${f(x + bw / 2)} ${f(top - pk)}L${f(x + bw + 5)} ${f(top)}Z"`;
-    mask += `${body} fill="#fff"/>${gable} fill="#fff"/>`; print += `${body} fill="${c}"/>${gable} fill="${rc}"/>`;
-    for (let wx = x + bw * .16; wx < x + bw - 12; wx += bw * .34) for (let wy = top + 10; wy < H - 20; wy += 30) print += `<rect x="${f(wx)}" y="${f(wy)}" width="${f(bw * .16)}" height="14" fill="${r(0, 1) > .6 ? LIT : win}"/>`;
-    if (r(0, 1) < .4) { mask += `<rect x="${f(x + bw * .7)}" y="${f(top - pk * .8)}" width="7" height="${f(pk * .6)}" fill="#fff"/>`; print += `<rect x="${f(x + bw * .7)}" y="${f(top - pk * .8)}" width="7" height="${f(pk * .6)}" fill="${tone(rc, -.2)}"/>`; }
-    x += bw + (r(0, 1) < breaks ? r(24, 70) : r(2, 10));
+    const bw = r(minW, maxW), bh = r(lo, hi);
+    all.push(building(x, H, bw, bh, pick(cols), pick(roofs), win, detail)); x += bw;
+    if (r(0, 1) < breaks) {
+      const gap = r(30, 80), k = extras.length ? pick(extras) : null;
+      if (k === 'oak') all.push(oak(x + gap / 2, H, r(lo * .7, lo * 1.1), pick(['#4aa067', '#3f8f5a', '#5fb07a'])));
+      else if (k === 'poplar') all.push(poplar(x + gap / 2, H, r(hi * .9, hi * 1.3), '#3f8f5a'));
+      else if (k === 'tower') { const tw = 30, th = hi * 1.5, tx = x + gap / 2 - tw / 2; all.push({ m: `<rect x="${f(tx)}" y="${f(H - th)}" width="${tw}" height="${f(th)}" fill="#fff"/><path d="M${f(tx - 4)} ${f(H - th)}L${f(tx + tw / 2)} ${f(H - th - 34)}L${f(tx + tw + 4)} ${f(H - th)}Z" fill="#fff"/>`, p: `<rect x="${f(tx)}" y="${f(H - th)}" width="${tw}" height="${f(th)}" fill="#f4ead8"/><rect x="${f(tx + tw * .62)}" y="${f(H - th)}" width="${f(tw * .38)}" height="${f(th)}" fill="#e2d5bb"/><path d="M${f(tx - 4)} ${f(H - th)}L${f(tx + tw / 2)} ${f(H - th - 34)}L${f(tx + tw + 4)} ${f(H - th)}Z" fill="${INDIGO}"/><circle cx="${f(tx + tw / 2)}" cy="${f(H - th + 18)}" r="9" fill="#fff"/><path d="M${f(tx + tw / 2)} ${f(H - th + 18)}v-6M${f(tx + tw / 2)} ${f(H - th + 18)}h4" stroke="${STEEL}" stroke-width="1.6"/><rect x="${f(tx + 9)}" y="${f(H - th + 40)}" width="12" height="18" fill="${GLASS}"/>` }); }
+      else if (k === 'line') all.push({ m: `<rect x="${f(x + 4)}" y="${f(H - lo * .7)}" width="3" height="${f(lo * .7)}" fill="#fff"/><rect x="${f(x + gap - 7)}" y="${f(H - lo * .7)}" width="3" height="${f(lo * .7)}" fill="#fff"/><rect x="${f(x + 4)}" y="${f(H - lo * .7)}" width="${f(gap - 8)}" height="2" fill="#fff"/>${[0, 1, 2].map(i => `<rect x="${f(x + 10 + i * (gap - 24) / 3)}" y="${f(H - lo * .7 + 2)}" width="${f((gap - 30) / 3)}" height="${14 + (i % 2) * 6}" fill="#fff"/>`).join('')}`, p: `<rect x="${f(x + 4)}" y="${f(H - lo * .7)}" width="${f(gap - 8)}" height="${f(lo * .7)}" fill="#7a5c42"/>${[0, 1, 2].map(i => `<rect x="${f(x + 10 + i * (gap - 24) / 3)}" y="${f(H - lo * .7 + 2)}" width="${f((gap - 30) / 3)}" height="${14 + (i % 2) * 6}" fill="${[WHITE, LAV, YEL][i]}"/>`).join('')}` });
+      x += gap;
+    } else x += r(2, 8);
   }
-  return { mask, print };
+  return join(all);
 }
-// A ridge line: a soft run of hills, y measured down from the sheet's top.
-function ridge(W: number, H: number, top: number, amp: number, len: number, phase: number) {
-  let d = `M0 ${H}V${f(top + amp * Math.sin(phase))}`;
-  for (let x = 0; x <= W; x += 20) d += `L${x} ${f(top + amp * Math.sin(x / len + phase) + amp * .4 * Math.sin(x / len * 2.7 + phase * 2))}`;
-  return `${d}V${H}Z`;
-}
-const treeRow = (W: number, H: number, c: string[], lo: number, hi: number) => {
-  let m = '', p = '';
-  for (let x = r(0, 30); x < W; x += r(40, 80)) {
-    const cr = r(lo, hi), cy = H - cr * 1.3 - r(0, 14), col = pick(c);
-    m += `<circle cx="${f(x)}" cy="${f(cy)}" r="${f(cr)}" fill="#fff"/><circle cx="${f(x + cr * .8)}" cy="${f(cy + 8)}" r="${f(cr * .7)}" fill="#fff"/><rect x="${f(x - cr)}" y="${f(cy)}" width="${f(cr * 2.5)}" height="${f(H - cy)}" fill="#fff"/>`;
-    p += `<circle cx="${f(x)}" cy="${f(cy)}" r="${f(cr)}" fill="${col}"/><circle cx="${f(x + cr * .8)}" cy="${f(cy + 8)}" r="${f(cr * .7)}" fill="${tone(col, -.12)}"/>`;
-  }
-  return { mask: m, print: p };
-};
+// A clump of tiny roofs for a far hillside village.
+const hamlet = (x: number, y: number, n: number): string => Array.from({ length: n }, () => { const hx = x + r(-60, 60), hy = y + r(-16, 16), k = r(.8, 1.3); return `<g transform="translate(${f(hx)} ${f(hy)}) scale(${f(k)})"><rect width="18" height="12" fill="${pick([WHITE, '#f0dcc0', LAV, '#fff'])}"/><rect x="11" width="7" height="12" fill="#00000014"/><path d="M-3 0L9 -9L21 0Z" fill="${pick([BRICK, INDIGO, TILE])}"/><rect x="3" y="4" width="4" height="4" fill="${LIT}"/></g>`; }).join('');
+
 function laneView(): Panel[] {
   s = 29;
-  const y0 = -70, W = NEAR.w;
-  // Card one, back to front: the lower town's roofs, trees among them, a nearer row of cottages, then the lane's wall.
-  const LH = 250, lower = cottages(W, LH, 120, 200, 70, 130, ['#f4ead8', STONE, '#e8c9a8', LAV, '#fff'], [INDIGO, BRICK, TILE, tone(INDIGO, -.3)], '#7c7f9c', .35);
-  const card: Panel = { id: NEAR.id, stock: 'sugar', c: STONE, w: W, h: LH, o: [NEAR.x0, y0, NEAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: NEAR.density, split: 2, mask: lower.mask, print: lower.print };
-  const TH = 170, trees = treeRow(W, TH, ['#3f8f5a', '#4aa067', '#347a4b'], 24, 38);
-  const CH = 150, near = cottages(W, CH, 70, 110, 90, 150, [WHITE, '#f0dcc0', '#e3b9a8', '#d9e6f2'], [TILE, BRICK, INDIGO], GLASS, .5);
-  // The wall at the foot of the lane: stone, with a hedge behind it and two gate posts where the lane goes through.
-  const WH = 96, mid = W / 2;
-  let wm = `<rect y="${WH - 46}" width="${W}" height="46" fill="#fff"/>`, wp = `<rect y="${WH - 46}" width="${W}" height="46" fill="#cfc2aa"/><rect y="${WH - 46}" width="${W}" height="7" fill="#e6dccb"/>${Array.from({ length: Math.floor(W / 40) }, (_, i) => `<path d="M${i * 40 + (i % 2) * 14} ${WH - 39}v39" stroke="#b9ab92" stroke-width="1.6"/>`).join('')}`;
-  for (let x = 0; x < W; x += 44) if (Math.abs(x + 22 - mid) > 130) { wm += `<circle cx="${x + 22}" cy="${WH - 52}" r="26" fill="#fff"/>`; wp = `<circle cx="${x + 22}" cy="${WH - 52}" r="26" fill="#8fc49a"/>` + wp; }
-  for (const gx of [mid - 96, mid + 78]) { wm += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#fff"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff"/>`; wp += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#e6dccb"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff4e2"/>`; }
-  // Card two: far hills, a deeper hill dotted with houses, the far bank's town, then the river.
+  const y0 = -70, W = NEAR.w, mid = W / 2;
+  // Card one, the lower town just below the square, back to front. Five layers, 26 to 36 units apart.
+  // 1. The back street: taller houses, a clock tower, poplars.
+  const LH = 200, back = street(W, LH, 100, 176, 70, 124, ['#f4ead8', STONE, '#e8c9a8', LAV, WHITE, '#d9e6f2'], [INDIGO, BRICK, TILE, tone(INDIGO, -.3), '#8a6a5c'], '#7c7f9c', .32, 1, ['poplar', 'tower', 'oak']);
+  const card: Panel = { id: NEAR.id, stock: 'sugar', c: STONE, w: W, h: LH, o: [NEAR.x0, y0 - 50, NEAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: NEAR.density, split: 2, mask: back.m, print: back.p };
+  // 2. Garden trees between the two streets, a deep green against the pale houses behind.
+  const TH = 190, flat: Prof = () => 20, trees = woods(W, TH, flat, [[0, W]], ['oak', 'oak', 'pine', 'poplar'], ['#3f8f5a', '#347a4b', '#4aa067'], 96, 150, 78);
+  // 3. The near street: cottages with shutters, flower boxes and washing lines.
+  const CH = 150, near = street(W, CH, 64, 104, 84, 140, [WHITE, '#f0dcc0', '#e3b9a8', '#d9e6f2', LAV], [TILE, BRICK, INDIGO, '#8a6a5c'], GLASS, .5, 1, ['line', 'oak', 'line']);
+  // 4. Back gardens: a clipped hedge with fruit trees and bean poles standing out of it.
+  const GH = 118; let gm = `<rect y="${GH - 30}" width="${W}" height="30" fill="#fff"/>`, gp = '';
+  for (let x = 0; x < W; x += 40) { gm += `<circle cx="${x + 20}" cy="${GH - 32}" r="24" fill="#fff"/>`; gp += `<circle cx="${x + 20}" cy="${GH - 32}" r="24" fill="${x % 80 ? '#7fbf86' : '#8fc994'}"/><circle cx="${x + 12}" cy="${GH - 40}" r="10" fill="#a3d6a3"/>`; }
+  const orchard = woods(W, GH, () => 30, [[0, mid - 200], [mid + 200, W]], ['oak'], ['#5fb07a', '#6fbf86'], 60, 84, 150);
+  // 5. The wall at the foot of the lane: stone, coped, with gate posts where the lane goes through and flowers along it.
+  const WH = 96;
+  let wm = `<rect y="${WH - 46}" width="${W}" height="46" fill="#fff"/>`, wp = `<rect y="${WH - 46}" width="${W}" height="46" fill="#cfc2aa"/><rect y="${WH - 46}" width="${W}" height="7" fill="#e6dccb"/>`;
+  for (let row = 0; row < 3; row++) for (let x = row % 2 ? -18 : 0; x < W; x += 36) wp += `<rect x="${x + 1}" y="${WH - 38 + row * 13}" width="34" height="11" fill="${pick(['#c6b89e', '#d6c9b0', '#bfb096'])}"/>`;
+  for (let x = 14; x < W; x += r(22, 60)) if (Math.abs(x - mid) > 120) { wm += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="#fff"/>`; wp += `<circle cx="${f(x)}" cy="${WH - 50}" r="6" fill="${pick(['#e8552d', YEL, '#e88ab0', WHITE])}"/><rect x="${f(x - 1)}" y="${WH - 46}" width="2" height="6" fill="#4aa067"/>`; }
+  for (const gx of [mid - 96, mid + 78]) { wm += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#fff"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff"/>`; wp += `<rect x="${gx}" y="14" width="18" height="${WH - 14}" fill="#e6dccb"/><rect x="${gx + 12}" y="14" width="6" height="${WH - 14}" fill="#d3c7b2"/><circle cx="${gx + 9}" cy="12" r="11" fill="#fff4e2"/>`; }
+
+  // Card two, the valley, back to front. Eight layers, 30 to 50 units apart, alternating pale and deep.
   s = 67;
-  const FW = FAR.w, fy = -90, BH = 440;
-  const far: Panel = { id: FAR.id, stock: 'sugar', c: '#dbe8ee', w: FW, h: BH, o: [FAR.x0, fy, FAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR.density, split: 2, mask: `<path d="${ridge(FW, BH, 90, 50, 210, .4)}" fill="#fff"/>` };
-  const MH = 400; let dots = '';
-  for (let i = 0; i < 40; i++) { const x = r(20, FW - 40), y = r(130, MH - 170); dots += `<rect x="${f(x)}" y="${f(y)}" width="16" height="11" fill="${pick([WHITE, '#f0dcc0', LAV])}"/><path d="M${f(x - 2)} ${f(y)}l10 -8l10 8Z" fill="${pick([BRICK, INDIGO, TILE])}"/>`; }
-  const hill = sheet(FAR, 'lane-hill', 60, fy, MH, '#8fbf96', `<path d="${ridge(FW, MH, 80, 40, 150, 2.1)}" fill="#fff"/>`, dots);
-  const TW = 300, bank = cottages(FW, TW, 50, 100, 50, 90, ['#f4ead8', STONE, '#e8c9a8', '#fff'], [BRICK, TILE, INDIGO], '#7c7f9c', .3);
-  const town = sheet(FAR, 'lane-town', 124, fy, TW, STONE, bank.mask, bank.print);
-  const RH = 190, river = sheet(FAR, 'lane-river', 184, fy, RH, '#8fcbe8', `<path d="${ridge(FW, RH, 8, 4, 40, 0)}" fill="#fff"/>`, Array.from({ length: 60 }, () => { const x = r(0, FW), y = r(20, RH - 10), l = r(20, 50); return `<path d="M${f(x)} ${f(y)}q${f(l / 4)} -3 ${f(l / 2)} 0t${f(l / 2)} 0" stroke="#d3eefa" stroke-width="2.4" fill="none"/>`; }).join(''));
-  return [card, sheet(NEAR, 'lane-trees', 44, y0, TH, '#3f8f5a', trees.mask, trees.print), sheet(NEAR, 'lane-cottages', 88, y0, CH, WHITE, near.mask, near.print), sheet(NEAR, 'lane-wall', 126, y0, WH, '#cfc2aa', wm, wp, 'greyboard'), far, hill, town, river];
+  const FW = FAR.w, fy = -90, fmid = FW / 2;
+  // 1. A pale hill of terraced fields.
+  const AH = 620, a: Prof = rolling(556, 34, 260, .4);
+  const far: Panel = { id: FAR.id, stock: 'sugar', c: '#c9dfb6', w: FW, h: AH, o: [FAR.x0, fy, FAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR.density, split: 2, mask: cut(FW, AH, a),
+    print: crest(FW, AH, a, '#c9dfb6', 3) + Array.from({ length: 22 }, (_, i) => field(40 + i * 166 + r(-20, 20), AH - a(40 + i * 166) + r(26, 70), r(70, 120), r(26, 44), pick([-24, -14, 16, 26]), pick(['#b6d39e', '#d6e6b8', '#e6dca0']), pick(['#a3c48c', '#c6d9a6', '#d6ca8a']))).join('') };
+  // 2. A wood on the next ridge, standing behind it.
+  const BHh = 550, b: Prof = sweep(0, FW * .62, 400, 520, 1, 1);
+  const wood1 = woods(FW, BHh + 60, b, [[0, FW * .34], [FW * .46, FW * .6]], ['pine', 'pine', 'oak'], ['#2f7453', '#3a8460', '#286a4a'], 50, 84, 36);
+  // 3. That ridge: a deep hill sweeping up to the left, with a hamlet on its shoulder.
+  const ridgeArt = crest(FW, BHh, b, '#5fa77a') + hamlet(FW * .2, BHh - b(FW * .2) + 46, 7) + hamlet(FW * .42, BHh - b(FW * .42) + 40, 5);
+  // 4. A bright hill sweeping up to the right, with orchards in rows and a road winding over it.
+  const CHh = 480, c2: Prof = sweep(FW * .3, FW, 330, 450, -1, 2);
+  let orch = ''; for (let i = 0; i < 9; i++) for (let j = 0; j < 3; j++) { const ox = FW * .62 + i * 54 + j * 16, oy = CHh - c2(ox) + 30 + j * 24; orch += `<circle cx="${f(ox)}" cy="${f(oy)}" r="9" fill="#5fa77a"/><circle cx="${f(ox - 3)}" cy="${f(oy - 3)}" r="4" fill="#86c494"/>`; }
+  let rd = ''; for (let k = 0; k <= 40; k++) { const t = k / 40, x = FW * (.5 + .46 * t) + 60 * Math.sin(t * 9); rd += `${k ? 'L' : 'M'}${f(x)} ${f(CHh - c2(x) * (.5 + .5 * t) + 8)}`; }
+  const road = `<path d="${rd}" stroke="#f4ead8" stroke-width="9" fill="none" stroke-linejoin="round"/>`;
+  // 5. The far bank's town: a street of houses with towers and poplars.
+  const DH = 220, town = street(FW, DH, 54, 110, 46, 88, ['#f4ead8', STONE, '#e8c9a8', WHITE, LAV], [BRICK, TILE, INDIGO, '#8a6a5c'], '#7c7f9c', .3, .4, ['poplar', 'tower', 'oak', 'oak']);
+  // 6. The quay: a stone wall under a row of plane trees, with a bridge of three arches crossing toward us.
+  const EH = 300, quay = woods(FW, EH, () => 236, [[0, fmid - 260], [fmid + 320, FW]], ['oak'], ['#3f8f5a', '#4aa067'], 54, 72, 64);
+  const bx = fmid - 220, bw = 500, arches = [0, 1, 2].map(i => `M${bx + 30 + i * 150} ${EH}V${EH - 190}a55 44 0 0 1 110 0V${EH}Z`).join(' ');
+  const qm = `<rect y="${EH - 240}" width="${FW}" height="240" fill="#fff"/>` + quay.m + `<path fill-rule="evenodd" d="M${bx} ${EH}V${EH - 262}H${bx + bw}V${EH}Z" fill="#fff"/>`;
+  const qp = `<rect y="${EH - 240}" width="${FW}" height="240" fill="#bfb39c"/><rect y="${EH - 240}" width="${FW}" height="8" fill="#e6dccb"/>${Array.from({ length: Math.floor(FW / 44) }, (_, i) => `<path d="M${i * 44 + 12} ${EH - 232}v40" stroke="#a89c86" stroke-width="2"/>`).join('')}` + quay.p +
+    `<rect x="${bx}" y="${EH - 262}" width="${bw}" height="262" fill="#e9dfcb"/><rect x="${bx}" y="${EH - 262}" width="${bw}" height="10" fill="#fff7e6"/><path d="${arches}" fill="#8fcbe8"/>${[0, 1, 2].map(i => `<path d="M${bx + 30 + i * 150} ${EH - 190}a55 44 0 0 1 110 0" stroke="#cfc2aa" stroke-width="7" fill="none"/>`).join('')}${Array.from({ length: 12 }, (_, i) => `<rect x="${bx + 10 + i * 42}" y="${EH - 276}" width="4" height="16" fill="#e9dfcb"/>`).join('')}<rect x="${bx}" y="${EH - 280}" width="${bw}" height="5" fill="#e9dfcb"/>`;
+  const qmFull = qm + Array.from({ length: 12 }, (_, i) => `<rect x="${bx + 10 + i * 42}" y="${EH - 276}" width="4" height="16" fill="#fff"/>`).join('') + `<rect x="${bx}" y="${EH - 280}" width="${bw}" height="5" fill="#fff"/>`;
+  // 7. Boats on the river: two rowing boats and a ferry, standing between the quay and the water.
+  const boat = (x: number, y: number, k: number, hull: string): Art => ({ m: `<g transform="translate(${x} ${y}) scale(${k})"><path d="M0 0H70L60 16H10Z" fill="#fff"/><rect x="20" y="-16" width="30" height="16" fill="#fff"/></g>`, p: `<g transform="translate(${x} ${y}) scale(${k})"><path d="M0 0H70L60 16H10Z" fill="${hull}"/><rect width="70" height="4" fill="#fff7e6"/><rect x="20" y="-16" width="30" height="16" fill="#fff7e6"/><rect x="24" y="-12" width="8" height="7" fill="${GLASS}"/><rect x="38" y="-12" width="8" height="7" fill="${GLASS}"/></g>` });
+  const BTH = 250, boats = join([boat(fmid - 520, BTH - 222, 1.3, INDIGO), boat(fmid + 420, BTH - 214, 1, BRICK), boat(fmid + 760, BTH - 226, 1.5, YEL), boat(fmid - 900, BTH - 216, 1.1, TEAL)]);
+  // 8. The river in front, in two tones of blue with cut ripples.
+  const RH = 232, river: Prof = rolling(224, 3, 40, 0);
+  const ripple = Array.from({ length: 120 }, () => { const x = r(0, FW), y = r(16, RH - 8), l = r(20, 60); return `<path d="M${f(x)} ${f(y)}q${f(l / 4)} -3 ${f(l / 2)} 0t${f(l / 2)} 0" stroke="${pick(['#d3eefa', '#bfe6f8', '#6fb6da'])}" stroke-width="2.6" fill="none"/>`; }).join('');
+  return [card, sheet(NEAR, 'lane-trees', 30, y0 - 40, TH, '#3f8f5a', trees.m, trees.p), sheet(NEAR, 'lane-cottages', 62, y0 - 30, CH, WHITE, near.m, near.p),
+    sheet(NEAR, 'lane-gardens', 96, y0 - 10, GH, '#7fbf86', gm + orchard.m, gp + orchard.p), sheet(NEAR, 'lane-wall', 128, y0, WH, '#cfc2aa', wm, wp, 'greyboard'),
+    far, sheet(FAR, 'lane-wood', 36, fy, BHh + 60, '#2f7453', wood1.m, wood1.p), sheet(FAR, 'lane-ridge', 52, fy, BHh, '#5fa77a', cut(FW, BHh, b), ridgeArt),
+    sheet(FAR, 'lane-orchard', 92, fy, CHh, '#a9d68f', cut(FW, CHh, c2), crest(FW, CHh, c2, '#a9d68f') + orch + road),
+    sheet(FAR, 'lane-town', 132, 138, DH, STONE, town.m, town.p), sheet(FAR, 'lane-quay', 170, fy, EH, '#bfb39c', qmFull, qp, 'greyboard'),
+    sheet(FAR, 'lane-boats', 196, fy, BTH, WHITE, boats.m, boats.p, 'cover'), sheet(FAR, 'lane-river', 222, fy, RH, '#8fcbe8', cut(FW, RH, river), `<rect y="${RH - 120}" width="${FW}" height="120" fill="#7fbfe0"/>` + ripple)];
 }
-// The far distance, in the CSS backdrop: sky, two layers of cut clouds, then three ranges of hills, pale to deep, the
-// nearest dotted with houses and pines. Only world heights of about 350 to 800 show above the homes.
+// The far distance, in the CSS backdrop: sky, a pale sun, two layers of cut clouds, then seven layers of land from snowy
+// peaks down to the wooded hills behind the valley. Kinds and values alternate, and each wood is its own sheet behind its
+// hill. Only world heights of about 350 to 800 show above the homes.
 function backdrop(): Panel[] {
   s = 13;
-  const D = .72, z = -780;
-  const gulls = [[2180, 600, 1.2], [2215, 582, 1], [2245, 610, .9], [3420, 660, 1], [3450, 646, .8]].map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#fdfcf8"/>`).join('');
-  const layer = (id: string, gap: number, h: number, c: string, mask: string, print = ''): Panel => ({ id, stock: 'sugar', c, w: 4400, h, o: [-2080, 0, z + gap], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: D, decal: 'sky', mask, print });
+  const D = .72, z = -780, BW = 4400, bx0 = -2080;
+  const gulls = [[2180, 560, 1.2], [2215, 542, 1], [2245, 570, .9], [3420, 620, 1], [3450, 606, .8], [900, 640, 1], [930, 626, .8]].map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#fdfcf8"/>`).join('');
+  const land = (id: string, gap: number, h: number, c: string, mask: string, print = ''): Panel => ({ id, stock: 'sugar', c, w: BW, h, o: [bx0, 0, z + gap], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: D, decal: 'sky', mask, print });
   const clouds = (id: string, gap: number, c: string, at: number[][]): Panel => ({ id, stock: 'sugar', c, w: 5200, h: 1500, o: [-2480, -160, z + gap], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: D, decal: 'sky', mask: at.map(([x, y, k]) => cloud(x, y, k, '#fff')).join('') });
-  let dots = '';
-  for (let i = 0; i < 60; i++) { const x = r(20, 4360), y = r(140, 330); dots += r(0, 1) > .5 ? `<rect x="${f(x)}" y="${f(y)}" width="20" height="14" fill="${pick([WHITE, '#f0dcc0', LAV])}"/><path d="M${f(x - 3)} ${f(y)}l13 -10l13 10Z" fill="${pick([BRICK, INDIGO, TILE])}"/>` : `<path d="M${f(x)} ${f(y)}l9 -26l9 26Z" fill="#4f8f62"/>`; }
+  // Faceted peaks: each a lit face and a shaded face, the tall ones capped with snow cut in a zigzag.
+  const peaksArt = (H: number, pk: Peak[], floor: number, c: string, snowAt: number) => pk.map(p => {
+    const run = (p.h - floor) / p.s, tx = p.x, ty = H - p.h;
+    let out = `<path d="M${f(tx)} ${f(ty)}L${f(tx + run)} ${f(H - floor)}H${f(tx + run * .22)}Z" fill="${tone(c, -.1)}"/><path d="M${f(tx)} ${f(ty)}L${f(tx - run * .5)} ${f(ty + run * .5 * p.s)}L${f(tx - run * .12)} ${f(H - floor)}H${f(tx + run * .22)}Z" fill="${tone(c, .2)}"/>`;
+    if (p.h > snowAt) { const d = (p.h - snowAt) * .8, wL = d / p.s; let zig = `M${f(tx)} ${f(ty - 2)}L${f(tx + wL)} ${f(ty + d)}`; for (let i = 1; i <= 6; i++) zig += `L${f(tx + wL - i * wL / 3)} ${f(ty + d + (i % 2 ? -d * .26 : d * .1))}`; out += `<path d="${zig}Z" fill="#fdfdf8"/><path d="M${f(tx)} ${f(ty - 2)}L${f(tx + wL)} ${f(ty + d)}L${f(tx + wL * .3)} ${f(ty + d * .8)}Z" fill="#dbe8ee"/>`; }
+    return out;
+  }).join('');
+  const mk = (n: number, x0: number, x1: number, lo: number, hi: number, sl: number): Peak[] => Array.from({ length: n }, (_, i) => ({ x: x0 + (i + .5) * (x1 - x0) / n + r(-.3, .3) * (x1 - x0) / n, h: r(lo, hi), s: sl * r(.85, 1.2) }));
+  const P1 = mk(9, 0, BW, 590, 740, .62), p1 = range(P1, 430), P2 = mk(6, BW * .28, BW, 520, 660, .7), p2 = range(P2, 380), P3 = mk(5, 0, BW * .6, 480, 600, .66), p3 = range(P3, 380);
+  // Hills: a deep wooded band, a pale sweep with fields, a mound with a village, a deep sweep, then rolling woods.
+  const h4 = rolling(470, 26, 200, 1.3), h5 = both(sweep(0, BW * .55, 330, 480, 1, 2), rolling(350, 14, 150, 4)), h6 = both(mound(BW * .64, 760, 300, 452), rolling(330, 16, 170, 2)), h7 = both(sweep(BW * .4, BW, 300, 430, -1, 5), rolling(318, 14, 120, 3)), h8 = rolling(366, 20, 110, 5);
+  const w4 = woods(BW, 560, h4, [[0, BW]], ['pine'], ['#3a7f66', '#2f7460', '#44896e'], 44, 70, 30);
+  const w6 = woods(BW, 520, h6, [[BW * .34, BW * .5], [BW * .72, BW * .9]], ['oak', 'pine'], ['#2f7453', '#3a8460'], 46, 74, 34);
+  const w8 = woods(BW, 470, h8, [[0, BW * .22], [BW * .3, BW * .58], [BW * .66, BW]], ['pine', 'oak', 'pine', 'poplar'], ['#286a4a', '#2f7453', '#3a8460'], 54, 92, 34);
+  const fields5 = Array.from({ length: 16 }, (_, i) => { const x = 60 + i * 150; return field(x, 560 - h5(x) + r(30, 80), r(70, 130), r(28, 46), pick([-22, -12, 14, 24]), pick(['#c3dba0', '#e2dc9c', '#d6e6b8']), pick(['#afc98c', '#cfc884', '#c3d6a3'])); }).join('');
   return [
     { id: 'sky', backdrop: true, stock: 'cover', c: '#a9d8f0', w: 5200, h: 1500, o: [-2480, -160, z], u: [1, 0, 0], v: [0, 1, 0], density: D, print: gulls },
-    clouds('clouds-far', 14, '#dcecf8', [[700, 560, 1.1], [2650, 520, 1.2], [4200, 620, 1]]),
-    clouds('clouds-near', 34, '#fffdf6', [[1050, 510, 1.6], [1900, 580, 1.2], [3150, 530, 1.5], [2350, 680, .8], [4500, 520, 1.1], [1500, 700, .7]]),
-    layer('hills-far', 40, 560, '#d6e6ee', `<path d="${ridge(4400, 560, 80, 50, 260, 1)}" fill="#fff"/>`),
-    layer('hills-mid', 100, 500, '#b4d3c0', `<path d="${ridge(4400, 500, 80, 44, 180, 3)}" fill="#fff"/>`),
-    layer('hills-near', 170, 470, '#8fc096', `<path d="${ridge(4400, 470, 80, 40, 130, 5)}" fill="#fff"/>`, dots)
+    { id: 'sun', stock: 'sugar', c: '#fff3c4', w: 5200, h: 1500, o: [-2480, -160, z + 8], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: D, decal: 'sky', mask: '<circle cx="2760" cy="650" r="66" fill="#fff"/>' },
+    clouds('clouds-far', 18, '#dcecf8', [[700, 500, 1.1], [2650, 470, 1.2], [4200, 560, 1], [1700, 430, .8], [3600, 420, .9]]),
+    clouds('clouds-near', 40, '#fffdf6', [[1050, 470, 1.6], [1900, 540, 1.2], [3150, 480, 1.5], [2350, 620, .8], [4500, 470, 1.1], [1500, 640, .7], [300, 600, 1]]),
+    land('peaks-far', 70, 760, '#cfdfe8', cut(BW, 760, p1), peaksArt(760, P1, 430, '#cfdfe8', 640)),
+    land('peaks-right', 104, 680, '#a9c6cf', cut(BW, 680, p2), peaksArt(680, P2, 380, '#a9c6cf', 600)),
+    land('peaks-left', 138, 620, '#bcd6d6', cut(BW, 620, p3), peaksArt(620, P3, 380, '#bcd6d6', 560)),
+    land('wood-high', 168, 560, '#3a7f66', w4.m, w4.p), land('hill-high', 184, 520, '#6fae8c', cut(BW, 520, h4), crest(BW, 520, h4, '#6fae8c')),
+    land('hill-fields', 222, 560, '#b9d996', cut(BW, 560, h5), crest(BW, 560, h5, '#b9d996') + fields5 + hamlet(BW * .12, 560 - 400, 6)),
+    land('wood-mound', 252, 520, '#2f7453', w6.m, w6.p), land('hill-mound', 268, 480, '#7fc08a', cut(BW, 480, h6), crest(BW, 480, h6, '#7fc08a') + hamlet(BW * .64, 480 - 400, 9) + hamlet(BW * .58, 480 - 372, 5)),
+    land('hill-deep', 304, 450, '#4f9a72', cut(BW, 450, h7), crest(BW, 450, h7, '#4f9a72') + hamlet(BW * .86, 450 - 380, 6)),
+    land('wood-low', 334, 470, '#286a4a', w8.m, w8.p), land('hill-low', 350, 400, '#9bd08c', cut(BW, 400, h8), crest(BW, 400, h8, '#9bd08c', 1))
   ];
 }
 
