@@ -134,9 +134,12 @@ The game opens inside the front car of an MRT train running underground (`scenes
 
 ![The front of the train](spaces/mrt-front.png)
 
-- **What is built.** The passenger car's inside; its underframe in section along the cut, with two bogies; and, past the right end wall, the driving cab seen from outside: nose, windscreen, headlight, the driver at the desk through the side window, and its own bogie. Nothing else of the train's outside is modelled.
+![The car behind](spaces/mrt-rear.png)
+
+- **What is built.** Three pieces of one train, standing at one height. In the middle, the passenger car, cut open along its near side: its inside, its underframe in section along the cut with two bogies, and its roof in section over the cove. To the right, the driving cab; to the left, past the gangway bellows, the next car. Those two are closed and seen from outside, 2.5D: a shell with glass windows that show nothing through them, a roof line seen side on with its housings, and a bogie.
+- **Closed pieces stay closed.** The camera stands level with the roofs, so a roof's top is edge on to it. What says "this has a roof" is the roof line card along the top of each shell; never leave a shell open at the top or show an interior through its glass.
 - **The tunnel is live, not baked** (`.bore`, `.bed` in `styles.css`). Behind the whole train stands the tunnel's far wall, nearly black, with rings, cable runs, work lamps and marker boards rushing back. Under it lies the track bed: two rails and sleepers streaking by. The headlight throws a beam down the tunnel ahead, and the lamps' light sweeps over the car floor.
-- **Everything that says "moving" runs at one speed.** The tunnel, the sleepers, the six wheels (their own sheets, turning), the car's sway and its knock over rail joints, and the swinging hand straps are looping animations whose rate `Scene.tsx` sets from the train's speed. The train pulls away as the scene opens, cruises, and brakes to a stand when it reaches the chosen stop. Reduced motion holds all of it still.
+- **Everything that says "moving" runs at one speed.** The tunnel, the sleepers, the eight wheels (their own sheets, turning), the car's sway and its knock over rail joints, and the swinging hand straps are looping animations whose rate `Scene.tsx` sets from the train's speed. The train pulls away as the scene opens, cruises, and brakes to a stand when it reaches the chosen stop. Reduced motion holds all of it still.
 - No sun reaches the car. It is lit by its own ceiling strips, baked as lamps.
 - The passengers and the driver are the street's cast (`shopper` in `promenade.ts`): same cut, builds and faces. Seated ones stand at the bench's front edge, lifted so the hips meet the cushion.
 - The destination sign over the door is the one piece of live type in a paper scene: the bake carries its dark casing, the game sets the amber text. Its arrows (or B at the doors) turn it between the stops the line serves, Blibli.com and Moperty. Pressing the name (or A at the doors) stops the train, brings the platform's light up behind the windows, opens the doors and walks the salaryman out, and the scene swaps.
@@ -179,7 +182,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Space | Quad limit, enforced by the journey test |
 |---|---|
 | Street (riverside promenade) | 210 (uses 209) |
-| MRT car | 110 (uses 87) |
+| MRT car | 125 (uses 109) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
 

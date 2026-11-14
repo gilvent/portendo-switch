@@ -16,7 +16,7 @@ export const content: Content = validateContent({ worlds: {
   intro: { id: 'intro', art: 'blockout', bounds: { x0: -420, x1: 420, z0: 0, z1: 0 }, solid: [], title: 'Handheld', path: 'round', color: '#8d95a0',
     stops: [{ id: 'road-end', label: 'Dock', x: 400, z: 0, reach: 300, action: { kind: 'dock' } }], letters: [] },
   // Home: the inside of an MRT car on its way. The sign over the door chooses the stop; the doors get off there.
-  mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -260, x1: 480, lift: 170, liftTall: 90, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [], title: 'MRT', path: 'round', color: '#8d95a0',
+  mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -320, x1: 480, lift: 186, liftTall: 90, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [], title: 'MRT', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
         { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },

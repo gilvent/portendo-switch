@@ -229,5 +229,8 @@ button { font:inherit; cursor:pointer; }
 .dest :focus-visible { outline-offset:-2px; }
 /* The doors' stop: its tap area ends below the sign, and its label says what A and B do there. */
 .art-train .sign.hit { height:150px; }
+/* The label and the A bubble hang outside the tap area. Among the train's live sheets the browser clips them to it at
+   high pixel ratios unless each is its own layer. */
+.art-train .sign.hit > span,.art-train .sign.hit .prompt { will-change:transform; }
 .sign.hit > span em { font-style:normal; display:inline-grid; place-items:center; width:18px; height:18px; margin:0 3px 0 8px; border-radius:50%; background:#2c3138; color:#fff; font-size:11px; line-height:18px; }
 @media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.pp.spins,.rush,.beam,.dest-go b { animation:none; } .platform-light { transition:none; } .floor-light { display:none; } }
