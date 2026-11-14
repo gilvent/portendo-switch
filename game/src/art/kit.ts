@@ -4,6 +4,8 @@ export type Panel = {
   id: string; stock: Stock; c: string; o: V3; u: V3; v: V3; w: number; h: number;
   mask?: string; print?: string; edge?: 'cut' | 'fold'; ghost?: boolean; density?: number; decal?: string;
   emit?: number; motion?: Motion; group?: string; backdrop?: boolean; show?: Show;
+  // Never culled by the bake's guess at what the game camera sees: for faces a scene knows its own view shows.
+  keep?: boolean;
   // Ship this sheet as `split` side-by-side tiles: browsers stop drawing one very wide plane seen edge-on.
   split?: number;
   // With `decal`: painted onto the parent as the game camera sees it, not straight along the parent's normal.

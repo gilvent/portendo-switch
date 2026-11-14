@@ -73,7 +73,7 @@ async function build(scene: Scene, samples: number) {
   await browser.close();
   const layout = {
     id: scene.id, atlas: { w: ATLAS_W, h: height }, sunToLight: SUN_TO_LIGHT, samples, light: scene.light, lamps: scene.lamps ?? [], camera: scene.camera, runs: scene.runs ?? [],
-    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, view: !!p.view, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, split: p.split ?? 1, x, y, pw, ph, n: normal(p) }))
+    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, view: !!p.view, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, keep: !!p.keep, split: p.split ?? 1, x, y, pw, ph, n: normal(p) }))
   };
   writeFileSync(join(WORK, 'layout.json'), JSON.stringify(layout));
   if (PREVIEW) execFileSync('python3', ['-c', `import numpy as n;n.save(${JSON.stringify(join(WORK, 'light.npy'))},n.full((${Math.round(height / 2)},${ATLAS_W / 2},3),.82,dtype=n.float32))`]);

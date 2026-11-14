@@ -64,12 +64,18 @@ export function train(): Scene {
     motion: { spin: .34 } });
   const wheels = [...BOGIES.flatMap((b, i) => [wheel(`wheel-${i}a`, b - 58), wheel(`wheel-${i}b`, b + 58)]), wheel('wheel-cab-a', CAB.x + 82), wheel('wheel-cab-b', CAB.x + 198)];
 
-  // A roof line seen side on, the way a 2.5D model shows it: the rounded edge of the roof standing along the top of a
-  // shell, with the air-conditioning housings (each [x, width]) rising from it. The camera stands level with the
-  // roofs, so this card is what says the car is closed on top.
-  const roofCap = (id: string, x0: number, w: number, units: [number, number][]): Panel => ({ id, stock: 'cover', c: '#c9d0d6', w, h: 26, o: [x0, CAB.h, FRONT], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.5, split: w > 400 ? Math.ceil(w / 160) : 1,
-    mask: `<path d="M0 26V22Q0 18 6 18H${w - 6}Q${w} 18 ${w} 22V26Z" fill="#fff"/>${units.map(([x, uw]) => `<rect x="${x}" width="${uw}" height="20" rx="4" fill="#fff"/>`).join('')}`,
-    print: `<rect width="${w}" height="26" fill="#c9d0d6"/><rect y="18" width="${w}" height="8" fill="#b3bcc5"/>${units.map(([x, uw]) => `<g fill="#8a939c">${Array.from({ length: Math.floor((uw - 12) / 12) }, (_, k) => `<rect x="${x + 9 + k * 12}" y="5" width="6" height="9" rx="1.5"/>`).join('')}</g>`).join('')}` });
+  // A closed piece of the train has its roof: a sheet lying across its full depth, from the near side's top edge back
+  // to the far side's, with rails along both edges and its housings standing on it as boxes ([x along the roof, width,
+  // depth]). The scene's camera looks down on it (styles.css raises the eye for this), so it is what closes the box.
+  const fans = (uw: number, ud: number) => { const n = Math.max(1, Math.round(uw / 100)), r = Math.min(ud, uw / n); return Array.from({ length: n }, (_, k) => `<circle cx="${uw * (k + .5) / n}" cy="${ud / 2}" r="${r * .34}" fill="#9aa4ae"/><circle cx="${uw * (k + .5) / n}" cy="${ud / 2}" r="${r * .22}" fill="#5b636d"/>`).join(''); };
+  const roofOn = (id: string, x0: number, w: number, units: [number, number, number][]): Panel[] => [
+    { id: `${id}-roof`, stock: 'cover', c: '#dfe4e8', w, h: D, o: [x0, CAB.h, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.2, split: Math.max(1, Math.ceil(w / 190)), keep: true,
+      print: `<rect width="${w}" height="${D}" fill="#dfe4e8"/><rect width="${w}" height="16" fill="#c9d0d6"/><rect y="${D - 16}" width="${w}" height="16" fill="#c9d0d6"/><path d="M0 16H${w}M0 ${D - 16}H${w}" stroke="#aab3bc" stroke-width="2"/>${Array.from({ length: Math.floor(w / 90) }, (_, k) => `<path d="M${(k + 1) * 90} 16V${D - 16}" stroke="#c3cad1" stroke-width="1.6"/>`).join('')}` },
+    ...units.flatMap(([x, uw, ud], k) => box({ id: `${id}-unit-${k}`, x: x0 + x + uw / 2, z: 0, y: CAB.h, w: uw, h: 22, d: ud, stock: 'cover', c: '#c9d0d6',
+      front: `<rect width="${uw}" height="22" fill="#c9d0d6"/><g fill="#8a939c">${Array.from({ length: Math.floor((uw - 12) / 12) }, (_, n) => `<rect x="${9 + n * 12}" y="6" width="6" height="10" rx="1.5"/>`).join('')}</g>`,
+      top: `<rect width="${uw}" height="${ud}" fill="#d4dbe1"/>${fans(uw, ud)}` })
+      .filter(q => /front|top|left|right/.test(q.id)).map(q => ({ ...q, keep: true })))
+  ];
 
   // The front of the train: past the right end wall is the driving cab, closed, seen from outside the way a model
   // shows it. A short shell with a nose sloping down to the headlight, a side window onto the desk and the driver,
@@ -90,16 +96,15 @@ export function train(): Scene {
       mask: `<path fill-rule="evenodd" d="M0 0H${CW - NOSE - 36}V${WIN_H + 8}H0Z ${rounded(4, 4, CW - NOSE - 44, WIN_H, 10)}" fill="#fff"/>` });
     // The headlight: a lit lens on the nose. Its beam is drawn live by Scene.tsx.
     const lamp = on(shell, 1.6, CW - 37, UNDER + CAB.light - 6, 24, 12, { id: 'cab-headlight', stock: 'vellum', c: '#fff6d8', emit: 3, density: 3, mask: '<rect width="24" height="12" rx="6" fill="#fff"/>' });
-    // Its roof, and the roof line seen side on with the radio housing on it.
-    const roof: Panel = { id: 'cab-roof', stock: 'cover', c: '#dfe4e8', w: CW - NOSE, h: D, o: [x0, NH, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1, print: `<rect width="${CW - NOSE}" height="${D}" fill="#dfe4e8"/><rect x="24" y="${D / 2 - 34}" width="68" height="68" rx="6" fill="#c9d0d6"/><circle cx="58" cy="${D / 2}" r="22" fill="#9aa4ae"/>` };
-    const cap = roofCap('cab-cap', x0, CW - NOSE + 6, [[18, 96]]);
+    // Its roof, and the radio housing standing on it.
+    const roof = roofOn('cab', x0, CW - NOSE + 4, [[22, 90, 130]]);
     // The sloping windscreen, from the roof edge down the nose: dark glass with a wiper.
     const dx = NOSE - 44, dy = 152, len = Math.hypot(dx, dy);
     const screenTop: Panel = { id: 'cab-windscreen', stock: 'cover', c: '#33404d', w: len, h: D, o: [x0 + CW - NOSE, NH, FRONT], u: [dx / len, -dy / len, 0], v: [0, 0, -1], edge: 'fold', density: 1,
       print: `<rect width="${len}" height="${D}" fill="${SHELL}"/><rect x="8" y="14" width="${len - 18}" height="${D - 28}" rx="12" fill="#33404d"/><rect x="14" y="20" width="${len - 30}" height="${D - 40}" rx="9" fill="#4f6578"/><path d="M${len * .62} ${D / 2}L${len * .2} ${D / 2 - 64}" stroke="${INK}" stroke-width="4"/>` };
     // The nose below the windscreen, front on: where the coupler sits.
     const noseFace: Panel = { id: 'cab-nose', stock: 'cover', c: SHELL_DARK, w: D, h: NH - 62 + 0, o: [x0 + CW, 0, FRONT], u: [0, 0, -1], v: [0, 1, 0], edge: 'fold', density: .9, ghost: true };
-    return [shell, frame, lamp, roof, cap, screenTop, noseFace];
+    return [shell, frame, lamp, ...roof, screenTop, noseFace];
   };
   // The car behind, past the left end wall: closed too, the same shell with glass windows, a door, its roof and the
   // bogie at its near end. Between the two cars hangs the gangway bellows.
@@ -113,19 +118,19 @@ export function train(): Scene {
         + `<rect y="${NH - 70}" width="232" height="9" fill="${LIVERY}"/><rect y="${NH - 61}" width="232" height="3" fill="${DEEP}"/><rect x="374" y="${NH - 70}" width="${NW - 374}" height="9" fill="${LIVERY}"/><rect x="374" y="${NH - 61}" width="${NW - 374}" height="3" fill="${DEEP}"/>`
         + Array.from({ length: 4 }, (_, k) => `<path d="M${(k + 1) * NW / 5} 26V${NH}" stroke="#c3cad1" stroke-width="1.2"/>`).join('')
         + `<rect y="${NH}" width="${NW}" height="${UNDER}" fill="#2f353d"/><rect y="${NH}" width="${NW}" height="6" fill="#7e8893"/>${bogie(bog, NH)}` };
-    const roof: Panel = { id: 'rear-roof', stock: 'cover', c: '#dfe4e8', w: NW, h: D, o: [x0, NH, FRONT], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1, split: 2,
-      print: `<rect width="${NW}" height="${D}" fill="#dfe4e8"/>${Array.from({ length: 5 }, (_, k) => `<path d="M${(k + 1) * NW / 6} 0V${D}" stroke="#c3cad1" stroke-width="1.4"/>`).join('')}` };
-    const cap = roofCap('rear-cap', x0, NW, [[60, 190], [NW - 290, 200]]);
+    const roof = roofOn('rear', x0, NW, [[70, 200, 150], [NW - 280, 200, 150]]);
     const bellows: Panel = { id: 'bellows', stock: 'greyboard', c: '#2b3037', w: 38, h: NH + 8, o: [-W / 2 - 36, -14, FRONT - 6], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 1.4, print: `<rect width="38" height="${NH + 8}" fill="#2b3037"/>${Array.from({ length: 6 }, (_, k) => `<rect x="${3 + k * 6}" width="3" height="${NH + 8}" fill="#4a5059"/>`).join('')}` };
-    return [shell, roof, cap, bellows, wheel('wheel-rear-a', x0 + bog - 58), wheel('wheel-rear-b', x0 + bog + 58)];
+    return [shell, ...roof, bellows, wheel('wheel-rear-a', x0 + bog - 58), wheel('wheel-rear-b', x0 + bog + 58)];
   };
   // Our own car is cut open along its near side, but it has its roof: it shows in section over the cove, and on it
   // the air-conditioning housings, so the three pieces of the train stand at one height.
   const ROOF_Z = BACK + COVE_IN;
   const roofCut: Panel = { id: 'roof-cut', stock: 'greyboard', c: '#9aa4ae', w: W, h: NH - CAR.CEIL, o: [-W / 2, CAR.CEIL, ROOF_Z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.5, split: 4,
     print: `<rect width="${W}" height="${NH - CAR.CEIL}" fill="#aab3bc"/><rect width="${W}" height="5" fill="#dfe4e8"/><rect y="8" width="${W}" height="9" fill="#c3b79c"/><rect y="${NH - CAR.CEIL - 6}" width="${W}" height="6" fill="#f4f6f8"/>${Array.from({ length: Math.floor(W / 50) }, (_, k) => `<rect x="${k * 50 + 20}" y="5" width="4" height="${NH - CAR.CEIL - 11}" fill="#8a939c"/>`).join('')}` };
-  const roofTop: Panel = { id: 'roof-top', stock: 'cover', c: '#dfe4e8', w: W, h: COVE_IN + 8, o: [-W / 2, NH, ROOF_Z], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.1, split: 4, print: `<rect width="${W}" height="${COVE_IN + 8}" fill="#dfe4e8"/>${Array.from({ length: 8 }, (_, k) => `<path d="M${(k + 1) * W / 9} 0V${COVE_IN + 8}" stroke="#c3cad1" stroke-width="1.4"/>`).join('')}` };
-  const ownCap = { ...roofCap('roof-cap', -W / 2, W, [[W / 2 - 345, 190], [W / 2 + 155, 190]]), o: [-W / 2, NH, ROOF_Z] as V3 };
+  const roofTop: Panel = { id: 'roof-top', keep: true, stock: 'cover', c: '#dfe4e8', w: W, h: COVE_IN + 8, o: [-W / 2, NH, ROOF_Z], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 1.1, split: 4, print: `<rect width="${W}" height="${COVE_IN + 8}" fill="#dfe4e8"/>${Array.from({ length: 8 }, (_, k) => `<path d="M${(k + 1) * W / 9} 0V${COVE_IN + 8}" stroke="#c3cad1" stroke-width="1.4"/>`).join('')}` };
+  const ownCap: Panel = { id: 'roof-cap', stock: 'cover', c: '#c9d0d6', w: W, h: 22, o: [-W / 2, NH, ROOF_Z - 20], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.5, split: 6,
+    mask: [-250, 250].map(x => `<rect x="${bx(x) - 95}" width="190" height="22" rx="4" fill="#fff"/>`).join(''),
+    print: `<rect width="${W}" height="22" fill="#c9d0d6"/>${[-250, 250].map(x => `<g fill="#8a939c">${Array.from({ length: 15 }, (_, k) => `<rect x="${bx(x) - 86 + k * 12}" y="6" width="6" height="10" rx="1.5"/>`).join('')}</g>`).join('')}` };
   const ownRoof = [roofCut, roofTop, ownCap];
 
   // The ceiling, facing down: plain panels and two recessed grilles. The light strip sits where it meets the cove.

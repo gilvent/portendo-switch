@@ -182,7 +182,7 @@ button { font:inherit; cursor:pointer; }
 
 /* ---------- the MRT car: a close-up of its inside, running underground ---------- */
 .car { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; }
-.art-train { background:#040506; perspective-origin:50% 46%; }
+.art-train { background:#040506; perspective-origin:50% 18%; }
 /* The car rocks on its springs and knocks over each rail joint for as long as it runs. Scene.tsx sets the rate of
    every one of these loops from the train's speed, so they pull away and brake together. */
 .art-train .car { transform-origin:0 0; animation:car-sway 2.7s ease-in-out infinite alternate,car-jolt .92s linear infinite; }
