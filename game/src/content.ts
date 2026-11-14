@@ -11,28 +11,28 @@ const stack = (items: Tech[]) => ({ id: 'stack', title: 'Tech Stack', surface: '
 const B = { x0: -700, x1: 700, z0: -220, z1: 170 };
 const STORE = { x0: -1100, x1: 1100, z0: -150, z1: 190 };
 const foot = (x: number, z: number, w: number) => ({ x0: x - w / 2, x1: x + w / 2, z0: z - 145, z1: z - 35 });
-const out = (world: string): Stop => ({ id: 'way-out', label: 'Back to the crossroads', x: -700, z: 120, reach: 100, action: { kind: 'road', to: 'crossroads', stop: `road-${world}` } });
+const out = (): Stop => ({ id: 'way-out', label: 'Back to the MRT', x: -700, z: 120, reach: 100, action: { kind: 'road', to: 'mrt', stop: 'door' } });
 export const content: Content = validateContent({ worlds: {
   intro: { id: 'intro', art: 'blockout', bounds: { x0: -420, x1: 420, z0: 0, z1: 0 }, solid: [], title: 'Handheld', path: 'round', color: '#8d95a0',
     stops: [{ id: 'road-end', label: 'Dock', x: 400, z: 0, reach: 300, action: { kind: 'dock' } }], letters: [] },
-  crossroads: { id: 'crossroads', art: 'blockout', bounds: B, solid: [], title: 'Crossroads', path: 'round', color: '#8d95a0',
+  // Home: the inside of an MRT car on its way. The sign over the door chooses the stop; the doors get off there.
+  mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.36, x0: -330, x1: 330, lift: 215, liftTall: 120 }, bounds: { x0: -500, x1: 500, z0: -40, z1: 110 }, solid: [], title: 'MRT', path: 'round', color: '#8d95a0',
     stops: [
-      { id: 'road-blibli', label: 'Blibli.com', x: -660, z: 0, reach: 300, action: { kind: 'road', to: 'blibli', stop: 'mailbox' } },
-      { id: 'road-moperty', label: 'Moperty', x: 0, z: -220, reach: 120, action: { kind: 'road', to: 'moperty', stop: 'first-house' } },
-      { id: 'crossing', label: 'Crossroads', x: 0, z: 70, action: { kind: 'letter', letter: 'hello' } },
-      { id: 'road-radjastone', label: 'Radjastone', x: 660, z: 0, reach: 300, action: { kind: 'road', to: 'radjastone', stop: 'quarry' } },
-      { id: 'mailbox', label: 'Mailbox', x: 280, z: -90, action: { kind: 'letter', letter: 'contact' } } ],
+      { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
+        { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },
+      { id: 'poster', label: 'Poster', x: -290, z: -40, action: { kind: 'letter', letter: 'hello' } },
+      { id: 'help-point', label: 'Help point', x: -470, z: -40, action: { kind: 'letter', letter: 'contact' } } ],
     letters: [
       { id: 'hello', title: 'Hey there!', surface: 'note', blocks: [{ kind: 'heading', text: 'I am Alvaro.' }, { kind: 'heading', text: 'I develop Web Frontends.' }] },
       { id: 'contact', title: 'Mailbox', surface: 'note', blocks: [{ kind: 'links', items: [
         { label: 'Email', href: 'mailto:alvarolukmanto@gmail.com', icon: 'brand/gmail.png' }, { label: 'LinkedIn', href: 'https://linkedin.com/in/alvaro-lukmanto', icon: 'brand/linkedin.png' },
         { label: 'Twitter', href: 'https://twitter.com/alfonsiusalvaro', icon: 'brand/twitter.png' }, { label: 'GitHub', href: 'https://github.com/gilvent', icon: 'brand/github.png' } ] }] } ] },
-  blibli: { id: 'blibli', art: 'street', back: { world: 'crossroads', stop: 'road-blibli' }, camera: { zoom: 1, x0: -300, x1: 300 }, bounds: { x0: -700, x1: 620, z0: -30, z1: 180 },
+  blibli: { id: 'blibli', art: 'street', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -300, x1: 300 }, bounds: { x0: -700, x1: 620, z0: -30, z1: 180 },
     solid: [{ x0: -520, x1: -300, z0: -150, z1: 12 }, { x0: -310, x1: -210, z0: -90, z1: -8 }, { x0: -130, x1: -50, z0: -110, z1: -30 }],
     title: 'Blibli.com', path: 'store', url: 'https://blibli.com', role: 'Front-end Developer @', color: '#0092da', logo: 'brand/blibli-white.svg',
     description: 'An indonesian e-commerce with wide range of products from both offline business to online.',
     stops: [
-      out('blibli'),
+      out(),
       { id: 'parcels', label: 'Delivery boxes', x: -410, z: 60, action: { kind: 'letter', letter: 'stack' } },
       { id: 'mailbox', label: 'Mailbox', x: -260, z: 30, action: { kind: 'letter', letter: 'about' } },
       { id: 'shop-door', label: 'Enter the store', x: 150, z: -30, reach: 110, action: { kind: 'road', to: 'blibli-shop', stop: 'street-door' } },
@@ -89,20 +89,20 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'A few learnings...', at: ['camera', 'gallery'] },
       { fact: "Try our best to test on real device :). This time is my first encounter with an issue that uploaded image is rotated when uploaded using mobile web's camera capture (caused by EXIF orientation that needs to be handled).", at: ['camera'] },
       { fact: 'User generated images vary in ratio. Consider all possibilities when developing the UI components displaying these images!', at: ['gallery'] } ] },
-  moperty: { id: 'moperty', art: 'blockout', back: { world: 'crossroads', stop: 'road-moperty' }, bounds: B, solid: [], title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
+  moperty: { id: 'moperty', art: 'blockout', back: { world: 'mrt', stop: 'door' }, bounds: B, solid: [], title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
     stops: [
-      out('moperty'),
+      out(),
       { id: 'first-house', label: 'Moperty', x: -420, z: 0, action: { kind: 'letter', letter: 'summary' } },
       { id: 'workshop', label: 'Tech Stack', x: 0, z: -100, action: { kind: 'letter', letter: 'stack' } },
       { id: 'for-sale', label: 'Visit Moperty', x: 420, z: 0, action: { kind: 'link', href: 'https://moperty.id' } } ],
     letters: [
       { id: 'summary', title: 'Moperty', surface: 'note', blocks: [{ kind: 'paragraph', text: [s('To boost confidence in web development, I feel the need to '), b('build and run a whole product'), s('. So I came up with '), b('Moperty'), s(': I '), b('design'), s(' the UIs, '), b('code'), s(' frontends and backends, and also '), b('implement SEO'), s(' techniques.')] }] },
       stack([T.vue, T.laravel, T.sass, T.postgres, T.nginx, T.gcloud]) ] },
-  radjastone: { id: 'radjastone', art: 'blockout', back: { world: 'crossroads', stop: 'road-radjastone' }, bounds: B, solid: [], title: 'Radjastone', path: 'climb', url: 'https://radjastone.com', role: 'Build A Website For', color: '#9a883f', logo: 'brand/rj-limestone-white.svg',
+  radjastone: { id: 'radjastone', offLine: true, art: 'blockout', back: { world: 'mrt', stop: 'door' }, bounds: B, solid: [], title: 'Radjastone', path: 'climb', url: 'https://radjastone.com', role: 'Build A Website For', color: '#9a883f', logo: 'brand/rj-limestone-white.svg',
     description: 'An Indonesian company providing services related to architecture / interior / exterior design made with natural stones.',
     stops: [
-      out('radjastone'),
+      out(),
       { id: 'quarry', label: 'Radjastone', x: -420, z: 60, action: { kind: 'letter', letter: 'summary' } },
       { id: 'stone-yard', label: 'Tech Stack', x: 0, z: -40, action: { kind: 'letter', letter: 'stack' } },
       { id: 'stone-house', label: 'Visit Radjastone', x: 420, z: -130, action: { kind: 'link', href: 'https://radjastone.com' } } ],

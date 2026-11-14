@@ -24,6 +24,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | Space | Base | Accents | Neutral |
 |---|---|---|---|
 | Riverside promenade (street) | Sky `#8fd3f4`, brick paving `#dba38b`, river `#4fa9d6`, palm `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
+| MRT car | Shell `#e9edf1`, floor vinyl `#9aa3ad`, seats `#2f6f9f` | Sun `#f6b73c`, coral `#e8552d` | Steel `#3d444e`, tunnel black `#07090c` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
 
@@ -125,6 +126,16 @@ Neither floor carries a written account of the work. Each part of the work is an
 
 Stops carry `focus` and `look`: the camera leans in on the object being used while the courier stands beside it, not in front of it.
 
+### The MRT car: the home space
+
+The game opens inside one MRT car running underground (`scenes/train.ts`). It is a close-up: the near side is cut away, the camera stands close enough that the car fills the view, and nothing of the car's outside is built.
+
+- Past the cut there is only black. Past the windows there is only the tunnel: a dark sheet behind the back wall on which ribs and work lamps rush by (`.tunnel` in `styles.css`). The car rocks a little and its hand straps swing. Reduced motion holds all of it still.
+- No sun reaches the car. It is lit by its own ceiling strips, baked as lamps.
+- The passengers are the street's cast (`shopper` in `promenade.ts`): same cut, builds and faces. Seated ones stand at the bench's front edge, lifted so the hips meet the cushion.
+- The destination sign over the door is the one piece of live type in a paper scene: the bake carries its dark casing, the game sets the amber text. Its arrows (or B at the doors) turn it between the stops the line serves, Blibli.com and Moperty. Pressing the name (or A at the doors) stops the train, opens the doors onto the platform's light and walks the salaryman out, and the scene swaps.
+- The floor is cut into narrow tiles. In a tall, narrow view the browser can drop the part of a wide floor quad that crosses the left edge of the screen; narrow tiles keep that to a hairline.
+
 ### Outside and inside match
 
 A room diorama is the building seen from the street, cut open. Every room's outline must match the exterior that holds it.
@@ -137,7 +148,7 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all three spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds all four spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
 1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
@@ -162,6 +173,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Space | Quad limit, enforced by the journey test |
 |---|---|
 | Street (riverside promenade) | 210 (uses 209) |
+| MRT car | 90 (uses 75) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
 

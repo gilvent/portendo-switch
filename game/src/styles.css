@@ -179,3 +179,41 @@ button { font:inherit; cursor:pointer; }
 .pp.pop { animation:pop .42s steps(5,end) both; }
 @keyframes pop { from { translate:0 -18px; } }
 @media (prefers-reduced-motion:reduce) { .pp.pop { animation:none; } }
+
+/* ---------- the MRT car: a close-up of its inside, running underground ---------- */
+.car { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; }
+.art-train { background:#050607; perspective-origin:50% 46%; }
+/* The car rocks a little on its springs for as long as it runs. */
+.art-train .car { transform-origin:0 0; animation:car-sway 2.7s ease-in-out infinite alternate; }
+.art-train[data-arrival] .car { animation-play-state:paused; }
+@keyframes car-sway { from { transform:translate3d(-1.6px,.8px,0) rotateZ(-.16deg); } 50% { transform:translate3d(.6px,-.9px,0) rotateZ(.05deg); } to { transform:translate3d(1.6px,.6px,0) rotateZ(.16deg); } }
+.pp.swings { animation:strap-swing 1.4s ease-in-out infinite alternate; }
+.art-train[data-arrival] .pp.swings { animation-play-state:paused; }
+@keyframes strap-swing { from { transform:var(--a); } to { transform:var(--b); } }
+/* Past the windows: the dark tunnel wall. Ribs and cable brackets rush by; a row of work lamps streaks past. */
+.tunnel { position:absolute; left:0; top:0; overflow:hidden; background:#07090c; pointer-events:none; }
+.tunnel i { position:absolute; left:0; top:0; height:100%; will-change:transform; transition:opacity .45s ease-out; }
+.tunnel-ribs { width:calc(100% + 240px); background:repeating-linear-gradient(90deg,transparent 0 150px,rgba(134,146,162,.13) 150px 162px,rgba(134,146,162,.05) 162px 200px,transparent 200px 240px); animation:tunnel-rush .16s linear infinite; }
+.tunnel-cables { width:100%; background:linear-gradient(180deg,transparent 0 23%,rgba(120,132,148,.2) 23% 24.5%,transparent 24.5% 30%,rgba(120,132,148,.14) 30% 31%,transparent 31% 78%,rgba(120,132,148,.12) 78% 80%,transparent 80%); }
+.tunnel-lamps { width:calc(100% + 1500px); --rush:-1500px; background:repeating-linear-gradient(90deg,transparent 0 420px,rgba(255,221,160,0) 420px,rgba(255,221,160,.95) 520px,rgba(255,244,214,1) 600px,rgba(255,221,160,0) 760px,transparent 760px 1500px) 0 38% / 100% 7px no-repeat,repeating-linear-gradient(90deg,transparent 0 380px,rgba(255,205,130,0) 380px,rgba(255,205,130,.16) 590px,rgba(255,205,130,0) 800px,transparent 800px 1500px) 0 38% / 100% 70px no-repeat; animation:tunnel-rush .62s linear infinite; }
+.tunnel-ribs { --rush:-240px; }
+@keyframes tunnel-rush { to { transform:translate3d(var(--rush),0,0); } }
+/* Arriving: the tunnel gives way to the even light of a platform, which is all of the station the car shows. */
+.tunnel-platform { width:100%; opacity:0; background:linear-gradient(180deg,#fff3d6,#f3dcae 62%,#c9b58c); }
+[data-arrival] .tunnel-ribs,[data-arrival] .tunnel-lamps,[data-arrival] .tunnel-cables { opacity:0; animation-play-state:paused; }
+[data-arrival] .tunnel-platform { opacity:1; }
+/* The destination sign over the doors: amber LEDs in a dark case. */
+.dest { position:absolute; left:0; top:0; display:flex; align-items:stretch; transform-style:preserve-3d; font-family:Fredoka,system-ui,sans-serif; }
+.dest button { border:0; padding:0; background:transparent; color:#ffb648; text-shadow:0 0 6px rgba(255,160,40,.75); }
+.dest-turn { width:44px; font-size:30px; line-height:36px; }
+.dest-turn:hover,.dest-go:hover b { color:#ffe0a6; }
+.dest-turn:active { transform:scale(.86); }
+.dest-go { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#1b1408 !important; box-shadow:inset 0 0 0 1px #3a2a10; border-radius:2px; overflow:hidden; }
+.dest-go small { font-size:8px; line-height:9px; letter-spacing:.14em; text-transform:uppercase; opacity:.72; }
+.dest-go b { display:block; font-size:19px; line-height:22px; font-weight:600; white-space:nowrap; animation:dest-roll .28s steps(4,end); }
+@keyframes dest-roll { from { transform:translateY(-110%); } }
+.dest :focus-visible { outline-offset:-2px; }
+/* The doors' stop: its tap area ends below the sign, and its label says what A and B do there. */
+.art-train .sign.hit { height:150px; }
+.sign.hit > span em { font-style:normal; display:inline-grid; place-items:center; width:18px; height:18px; margin:0 3px 0 8px; border-radius:50%; background:#2c3138; color:#fff; font-size:11px; line-height:18px; }
+@media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.tunnel-ribs,.tunnel-lamps,.dest-go b { animation:none; } .tunnel i { transition:none; } }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { content } from './content.ts';
-import { pathOf, parsePath, reduce, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
+import { lineOf, pathOf, parsePath, reduce, rideIn, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
 import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
 import { reducedMotion } from './light.ts';
@@ -17,8 +17,32 @@ export default function App() {
   const [game, setGame] = useState<Game>(() => start(content, location.pathname));
   const gameRef = useRef(game);
   gameRef.current = game;
+  // Getting off the train plays out before the scene swaps: the tunnel stops, the doors open, the salaryman walks out.
+  // `stage` is 1 once the train has stopped and 2 once the doors are open. Input waits while it plays.
+  const [arrival, setArrival] = useState(0);
+  const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
+  const busy = useRef(false);
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const dispatch = useCallback((x: Action) => {
+    if (busy.current && x.a !== 'toggleController') return;
     if (x.a === 'confirm' && gameRef.current.place.k === 'letter') { dispatchEvent(new Event('letter-confirm')); return; }
+    const here = gameRef.current.place;
+    if (x.a === 'confirm' && here.k === 'walk' && here.near && gameRef.current.controller.mode === 'docked' && !reducedMotion()) {
+      const door = stopOf(content, here.world, here.stop);
+      if (door?.action.kind === 'ride') {
+        const later = (ms: number, f: () => void) => { timers.current.push(window.setTimeout(f, ms)); };
+        busy.current = true; held.current.clear(); target.current = null;
+        setArrival(1);
+        later(450, () => setArrival(2));
+        later(950, () => { exit.current = { x: door.x, z: -205, then: () => {
+          busy.current = false; exit.current = null; timers.current = []; setArrival(0);
+          const [next] = reduce(content, gameRef.current, { a: 'confirm' });
+          gameRef.current = next; setGame(next);
+        } }; });
+        return;
+      }
+    }
     const [next, effect] = reduce(content, gameRef.current, x);
     gameRef.current = next;
     setGame(next);
@@ -27,7 +51,7 @@ export default function App() {
 
   const spot = spotOf(game);
   const mode = game.controller.mode;
-  const world: WorldId | null = spot.k === 'lost' ? null : spot.world === 'intro' ? 'crossroads' : spot.world;
+  const world: WorldId | null = spot.k === 'lost' ? null : spot.world === 'intro' ? 'mrt' : spot.world;
   const reading = game.place.k !== 'walk' || mode !== game.controller.mode;
 
   const path = pathOf(game.place);
@@ -59,13 +83,15 @@ export default function App() {
   const rig = useRef({ x: 0, y: 0 });
   const letterRef = useRef<HTMLElement>(null);
   const lastNear = useRef<string | null>(null);
-  const cam = useRef({ x: 0, z: 0, scale: 1, lift: 150, focus: 1 });
+  const cam = useRef({ x: 0, z: 0, scale: 1, lift: 150, focus: 1, tall: false });
   const facing = useRef(1);
   const phase = useRef(0);
   const wasWalking = useRef(false);
   const framed = useRef<WorldId | null>(null);
 
-  const measure = useCallback(() => { const tall = innerHeight > innerWidth; cam.current.scale = tall ? Math.min(.86, innerWidth / 480) : Math.max(.5, Math.min(innerWidth / 1100, innerHeight / 620, 1.1)); cam.current.lift = tall ? -40 : 150; }, []);
+  const measure = useCallback(() => { const tall = innerHeight > innerWidth; cam.current.scale = tall ? Math.min(.86, innerWidth / 480) : Math.max(.5, Math.min(innerWidth / 1100, innerHeight / 620, 1.1)); cam.current.lift = tall ? -40 : 150; cam.current.tall = tall; }, []);
+  // A world may set its own camera height (the train stands close, so it is framed lower).
+  const liftOf = (w: WorldId) => { const c = cam.current, k = content.worlds[w].camera; return (c.tall ? k?.liftTall : k?.lift) ?? c.lift; };
   useEffect(() => { measure(); addEventListener('resize', measure); return () => removeEventListener('resize', measure); }, [measure]);
 
   const worldRef = useRef(world);
@@ -112,11 +138,22 @@ export default function App() {
       if (p.k === 'letter' && p.world !== framed.current) {
         framed.current = p.world;
         const c = cam.current, z = c.scale * (content.worlds[p.world].camera?.zoom ?? 1);
-        if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${c.lift * c.scale}px,-260px) scale3d(${z},${z},${z}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,0)`;
+        if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${liftOf(p.world) * c.scale}px,-260px) scale3d(${z},${z},${z}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,0)`;
       }
       if (p.k === 'letter') { if (iz0 && letterRef.current) letterRef.current.scrollTop += iz0 * 900 * dt; return; }
       if (p.k !== 'walk' || g.controller.mode === 'docking') return;
       const w = content.worlds[p.world];
+      // Walking out through the open doors: straight to the doorway, past the walkable bounds, then the scene swaps.
+      if (exit.current) {
+        const e = exit.current, o = walker.current, dx = e.x - o.x, dz = e.z - o.z, d = Math.hypot(dx, dz), go = Math.min(d, 300 * dt);
+        if (d < 4) { e.then(); return; }
+        walker.current = { x: o.x + dx / d * go, z: o.z + dz / d * go, vx: 0, vz: 0 };
+        phase.current += dt * 11;
+        if (!wasWalking.current) { wasWalking.current = true; courierRef.current?.toggleAttribute('data-walking', true); }
+        if (courierRef.current) courierRef.current.style.transform = `translate3d(${walker.current.x}px,${-Math.abs(Math.sin(phase.current)) * 6}px,${walker.current.z}px)`;
+        return;
+      }
+      if (busy.current) return;
       let ix = ix0, iz = iz0;
       if (ix || iz) target.current = null;
       else if (target.current) [ix, iz] = seek(walker.current, target.current.stop.x, target.current.stop.z);
@@ -157,7 +194,7 @@ export default function App() {
       if (walking !== wasWalking.current) { wasWalking.current = walking; courierRef.current?.toggleAttribute('data-walking', walking); }
       if (courierRef.current) courierRef.current.style.transform = `translate3d(${n.x}px,${-bob}px,${n.z}px) rotateZ(${lean}deg)`;
       const zs = (c.scale * (w.camera?.zoom ?? 1) * c.focus).toFixed(4);
-      if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${(c.lift * c.scale * (1 + (c.focus - 1) * 1.6)).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
+      if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${(liftOf(p.world) * c.scale * (1 + (c.focus - 1) * 1.6)).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
     };
     gsap.ticker.add(tick);
     return () => gsap.ticker.remove(tick);
@@ -186,10 +223,11 @@ export default function App() {
   }, [dispatch]);
 
   const onDockDone = useCallback(() => {
-    const s = stopOf(content, 'crossroads', 'crossing');
-    if (!s) throw new Error('crossroads has no crossing stop');
-    teleport('crossroads', s);
-    walker.current = reducedMotion() ? { x: s.x, z: s.z, vx: 0, vz: 0 } : { x: s.x, z: 170, vx: 0, vz: 0 };
+    const s = rideIn(content, 'mrt')?.stop;
+    if (!s) throw new Error('the MRT has no doors');
+    teleport('mrt', s);
+    // He comes up the aisle from the left and stops at the doors.
+    walker.current = reducedMotion() ? { x: s.x, z: s.z, vx: 0, vz: 0 } : { x: s.x - 260, z: 50, vx: 0, vz: 0 };
     dispatch({ a: 'dockDone' });
     if (!reducedMotion()) target.current = { stop: s, open: false };
   }, [dispatch, teleport]);
@@ -200,7 +238,7 @@ export default function App() {
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {world && <Scene key={world} world={content.worlds[world]} nearStop={nearStop} toys={toysOf(game, world)} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} onStop={onStop} />}
+      {world && <Scene key={world} world={content.worlds[world]} nearStop={arrival ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, world), doors: 1 } : toysOf(game, world)} line={lineOf(content, game, world)} arrival={arrival} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} atDock={spot.k === 'walk' && spot.world === 'intro' && spot.near} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       <div className="corner">
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
@@ -209,7 +247,7 @@ export default function App() {
       {game.stamps.length > 0 && <div className="stamps" key={game.stamps.length} data-testid="stamps">{game.stamps.length} {game.stamps.length === 1 ? 'stamp' : 'stamps'}</div>}
       {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}
-      {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Return to sender</h1><p>Nothing is delivered to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Go to the crossroads</button></section>}
+      {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Wrong stop</h1><p>No line runs to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Back on the train</button></section>}
     </div>
   );
 }
