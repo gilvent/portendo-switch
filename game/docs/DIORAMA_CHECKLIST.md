@@ -1,6 +1,6 @@
 # Paper diorama checklist
 
-What the owner of this project likes and dislikes in a paper diorama scene, taken from their own words across ten sessions and their answers of 14 Nov, turned into 81 checks. Run a scene through every check before calling it done.
+The standard for a paper diorama scene in this project, for reference when creating or refining any scene. It holds 74 checks taken from the owner's own words (sections 1 to 9) and two procedures: how to plan a scene (10) and how to create a papercraft object (11).
 
 Each check is marked by where it comes from: **Said** (stated by the owner), **Approved** (the owner accepted a result that shows it), **Reading** (an interpretation that still needs the owner's confirmation).
 
@@ -1116,7 +1116,7 @@ The scene says what the project is through a place and things to do in it. It is
 
 ### 7.1 The project is told by the scene and by interaction, not by text or screenshots.
 
-- [ ] **Said.** No paragraph describing the project, no screenshot of it and no written note in the scene. The note about your role in the Blibli mailbox is still there and is to be removed.
+- [ ] **Said.** No paragraph describing the project, no screenshot of it and no written note in the scene. That includes a note about your role, such as the one in the Blibli mailbox.
 - Passes:
   - For Sale and For Rent signs on properties.
   - A catalog leaflet beside the showcased phone that opens to the product spec.
@@ -1208,7 +1208,7 @@ The scene says what the project is through a place and things to do in it. It is
 
 ### 7.6 Only the product is shown; the technology is left out.
 
-- [ ] **Said.** Nothing about the tech stack or how it was built: no tech labels, no crane building "backend" and "frontend" floors, no drawing board for the UI design. First said for Moperty. On 14 Nov you extended it to the tech parcels in the Blibli street, which are still in the scene and are to be removed.
+- [ ] **Said.** Nothing about the tech stack or how it was built: no tech labels, no crane building "backend" and "frontend" floors, no drawing board for the UI design. First said for Moperty. It applies to every scene, including the tech parcels in the Blibli street.
 - Fails:
   - A site board listing Vue, Laravel and Postgres.
   - The tech parcels in the Blibli street.
@@ -1461,85 +1461,72 @@ Fewer of these are in your own words. Where a point comes from a standard I wrot
 > (Joy-Con portfolio TV game, 31 Oct, in the prompt you adopted)
 
 
-## 10. How you want the work done
+## 10. How to plan a scene
 
-These are about how I should work with you on a scene, taken from what you asked for or stopped me doing.
+The order in which a scene is planned before anything is built. Steps 1 to 4 are yours and are illustrative; steps 5 to 9 are my completion, for you to correct.
 
-### 10.1 Before building, I restate your standard or feedback in my own words.
+1. **Determine the diorama container.** *Said.* A shoebox, a Paper Mario style room, curved or circular walls, or another form. Choose the one that suits the place, and make it as deep and wide as the scene needs (2.9, 2.11).
+2. **Create the 2D layout plan of the main structures.** *Said.* Draw the scene from above: the main space and every main structure. Mark each structure as background (flat layers for an open or distant view), full freestanding, or relief on an enclosed bound (2.1 to 2.6). Compare the plan with every existing scene and change it if it repeats one (1.8). The spacing of the structures and the flow between them must look organised in the plan (5.2).
+3. **Create a low-fidelity 3D plan of the ground.** *Said.* Block out the elevation, inclination and levels of the ground (2.12), and show how the main space continues into the background (3.9).
+4. **Plan the freestanding paper objects.** *Said.* List the objects. For each one, give the reason it is found in this place (1.2), its spot and facing against what stands beside it (5.5), and how it will be made (section 11). Richness comes from detail, not from quantity (4.6).
+5. **Plan the open-view background.** *Proposed.* List the layers from front to back. There are many of them, they differ in kind, each carries its own detail, and everything on them belongs to the place (section 3).
+6. **Plan the relief on the enclosed bounds.** *Proposed.* For each bound marked as enclosed in step 2, list the relief pieces that tie the freestanding objects to it (2.4, 5.6). An indoor scene uses its walls, floor and ceiling to pack the space (2.10).
+7. **Place the characters and check the sight lines.** *Proposed.* Put the player and the passers-by into the plan (section 6). From the game camera, nothing may block a sign, a face or an interactive object (5.3, 6.6).
+8. **Plan how the scene tells the project.** *Proposed.* Decide what the place as a whole stands for, then give each interactive object one micro interaction that carries one fact. No text, no screenshots, no literal product, no technology, a sparing logo (section 7).
+9. **Check the plan against sections 1 to 9, then build.** *Proposed.* Run the plan through the checks while it is still a sketch. Changing a plan is cheaper than changing a built and lit scene.
 
-- [ ] **Said.** You ask for this at the start of almost every session, and you correct the restatement when it is wrong.
+## 11. How to create a papercraft object
 
-> Before proceeding, restate my feedback using your own words
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+How one freestanding object is made. Steps 1 to 4 are yours; steps 5 and 6 are my addition.
 
-> The intent is quite inaccurate.
->
-> (MRT scene 2, 7 Nov, correcting a restatement)
+1. **Check the references.** *Said.* Look through the fold, glue and cut techniques and the samples below, and pick the ones that suit the object.
+2. **Determine the perspective from which the object is viewed.** *Said.* Decide where the game camera sees it from, and which faces and folds must show from there (4.9).
+3. **Start with the 2D pieces on a blank sheet of paper.** *Said.* Draw every piece flat. Mark the parts to be folded with lines: a dashed line for a hard fold, a marked area for a soft fold or curl. Mark where pieces are glued. Detail on a flat piece is made with colour tones (4.5).
+4. **Fold, attach and arrange.** *Said.* Fold the pieces, glue the smaller parts onto the body, and stand the object in the scene turned to the perspective chosen in step 2.
+5. **Check it from the game camera.** *Proposed.* The object must read as a folded volume with variety of shape, depth and detail (4.1, 4.3), and never as a flat sticker (4.2).
+6. **Keep the good ones.** *Proposed.* An object that works is added to the samples below, with the technique it uses, so that later objects can start from it.
 
-### 10.2 Options are shown as pictures, in low fidelity, before anything is built.
+### Techniques
 
-- [ ] **Said.** Ideas are shown, not described. A rough sketch of each option comes first.
-- Fails:
-  - Describing three concepts in text only.
+| Technique | Good for | Sample |
+|---|---|---|
+| Sheet folded over the spine | four-legged animals, tents, roofs | the fox |
+| Box body with legs cut out of its sides | heavy animals, furniture, vehicles | the moose, the elephant |
+| Wedge or flap glued on | heads, ears, trunks, tails | the moose's head, the elephant's ears and trunk |
+| Flaps folded outwards from one sheet | limbs and feet | the frog |
+| Strip curled into a body (soft fold) | rounded bodies | the duck |
+| Two identical cards slotted crosswise | trees and bushes | the Paper Grove pine |
+| Single flat card | people, plane-shaped things, things against a surface (4.4) | the Blibli cast |
 
-> Propose to me few options. show me lower fidelity version of each of those scenes
->
-> (Moperty session, 12-13 Nov)
+### Samples
 
-> Show me your design concept
->
-> (Moperty session, 12-13 Nov)
+References and samples to check in step 1. Objects built for this project are added here as they turn out well.
 
-### 10.3 I stop and wait for your verdict; I do not keep adding while you are looking.
+*Reference. The fox: one sheet folded over the spine, stood at an angle. (Your photo; shown in the published checklist only.)*
 
-- [ ] **Said.** Under a loop goal I keep refining against this checklist without asking for a verdict after every pass. I stop adding when you say you are looking, or when you interrupt.
-- Fails:
-  - Building a v6 draft with more pieces after "Let me take a look first".
+*Reference. The same fox as flat pieces before folding. (Your photo; shown in the published checklist only.)*
 
-> Let me take a look first
->
-> (Pinewood Valley session, 5 Nov)
+*Reference. Box body with cut-out legs, wedge head; dashed lines mark the hard folds. (Your photo; shown in the published checklist only.)*
 
-### 10.4 I act on what you mean, not on the most literal reading of one phrase.
+*Reference. Box body; ears and trunk are flaps folded outwards. (Your photo; shown in the published checklist only.)*
 
-- [ ] **Said.** An instruction is an example of an intent. Apply the intent; do not maximise the phrase.
-- Fails:
-  - Reading "increase the variety of objects" as "add as many kinds of object as possible".
+*Reference. Legs folded forward from one sheet. (Your photo; shown in the published checklist only.)*
 
-> That is overfitting to the task, not generalizing my intent.
->
-> (Pinewood Valley session, 5 Nov)
+*Reference. A strip curled into the body. (Your photo; shown in the published checklist only.)*
 
-### 10.5 A scene, and the standard with it, is refined in a loop until you accept it.
+![Reference. Paper Grove: the fox and the slotted pines.](checklist/grove.jpg)
 
-- [ ] **Said.** You set a looping goal in nearly every session. One pass followed by a request for review is not what you ask for.
+*Reference. Paper Grove: the fox and the slotted pines.*
 
-> keep looping to refine the scene until it achieves my standards. keep and maintain the standards in previous sessions too
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+![Diagram. How the fox and the pine are cut and folded.](checklist/fold-recipes.svg)
 
-> keep looping to refine the scene and standards until it achieved my standards
->
-> (Start of Downtown 2, 7 Nov)
+*Diagram. How the fox and the pine are cut and folded.*
 
-### 10.6 Standards from earlier sessions still apply.
+![Built for this project. The Blibli street objects, made by the fox and pine recipe. Not judged by you on their own.](checklist/street-objects.jpg)
 
-- [ ] **Said.** A new session inherits every earlier standard unless you change it.
+*Built for this project. The Blibli street objects, made by the fox and pine recipe. Not judged by you on their own.*
 
-> keep and maintain the standards in previous sessions too
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-### 10.7 Drafts and stray versions are cleaned up.
-
-- [ ] **Said.** Abandoned artifacts and drafts are removed when you say so.
-
-> remove the Jungle Camp and Shoebox Camp v6 artifacts
->
-> (Pinewood Valley session, 5 Nov)
-
-## 11. Open questions for the owner
+## 12. Not yet settled
 
 1. **The hometown layout.** You said the background looks much better and that the link between the green and the valley is not visible yet. You did not say whether the layout is now different enough from Blibli.
 2. **Tying the ground to the background.** What would make the continuation visible for you: a road or path that runs on into the valley, a slope, or something else? Check 3.9 holds my guess.
@@ -1547,23 +1534,3 @@ These are about how I should work with you on a scene, taken from what you asked
 4. **The reference photos.** The seven photos you attached on 14 Nov are in 2.12 and 4.9. I still do not have the photos from earlier sessions (the trees example, the layered landscape, the cities and road, the riverside centre); the diagrams marked "stands in for" are my reconstruction. If you attach them again, I will replace the diagrams.
 5. **What I have not covered.** Twice you introduced a list of faults with "including, but not limited to". This checklist holds only what you have said or accepted so far, so a scene that passes every check may still fall short. What is missing?
 
-### Answered on 14 Nov
-
-- **Relief at the sides.** "Your reading is correct. I want to emphasize uniqueness between two scenes. This comes down to uniqueness of scene plan as mentioned in 2.1. The main space itself can even include inclined or multi-level grounds, not only flat. Refer to first image" Now in 1.8, 2.6, 2.12.
-- **What "badly designed objects" meant.** "Most spacing & flow of downtown 2 building structures, e.g construction field with its crane and the building on sight behind them. I don't even know if that space is 3d or a flat paper" Now in 4.8.
-- **What "a mess" meant.** "Same as (2). If you put it in scene plan view like 2.1 , you will know it is not well organized." Now in 5.2.
-- **The hometown green.** "background looks much better. The main space continuation or relation to the background is not quite visible yet" Now in 3.3, 3.9.
-- **The MRT structure.** "Both were out of place" Now in 1.7.
-- **Daytime.** "I will add day and night time adjustment but not now" Now in 1.4.
-- **Product only.** "it should go" Now in 7.6.
-- **Richness against frame rate.** "Performance is measured later. Make the scene rich in details, not quantity" Now in 4.6, 9.5.
-- **The folded dog and pigeons.** "fold and rotate them into perspective. Look at the folded and original (fox), as well as other folding techniques examples" Now in 4.9.
-- **The ceiling canopy.** "that was only scene-specific" Now in 2.8.
-- **What "layer depth" meant.** "number of layers" Now in 3.4.
-- **The bench in the foreground.** "out of place. No bench will be put there and facing that direction when there is a store on the left side like in the scene" Now in 1.7, 5.5.
-- **The role note in the mailbox.** "Remove it" Now in 7.1.
-- **Interaction against game.** "Paper Salaryman is a game in Portendo Switch, but you were trying to create a full gamification in Paper Salaryman. Create micro interactions instead" Now in 7.5.
-- **The moving train.** "the moving train is probably for the home screen when the nintendo is still handheld" Now in 7.8.
-- **A map for Moperty.** "Yes paper map is acceptable" Now in 7.8.
-- **The Moperty logo.** "The principle is don't overuse logo. Placing logo stickers everywhere reduce its uniqueness. For example, only use the building resembling the logo and a single logo in viewed paper map" Now in 7.12, 8.3.
-- **Simple flat objects.** "folded" Now in 4.2.
