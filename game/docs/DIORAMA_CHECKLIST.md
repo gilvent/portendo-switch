@@ -695,49 +695,147 @@ The order in which a scene is planned before anything is built. The steps are il
 
 How one freestanding object is made.
 
-1. **Check the references.** Look through the fold, glue and cut techniques and the samples below, and pick the ones that suit the object.
+1. **Check the references.** Look through the fold, glue and cut techniques and the examples below, and pick the ones that suit the object.
 2. **Determine the perspective from which the object is viewed.** Decide where the game camera sees it from, and which faces and folds must show from there (4.9).
 3. **Start with the 2D pieces on a blank sheet of paper.** Draw every piece flat. Mark the parts to be folded with lines: a dashed line for a hard fold, a marked area for a soft fold or curl. Mark where pieces are glued. Detail on a flat piece is made with colour tones (4.5).
 4. **Fold, attach and arrange.** Fold the pieces, glue the smaller parts onto the body, and stand the object in the scene turned to the perspective chosen in step 2.
 5. **Check it from the game camera.** The object must read as a folded volume with variety of shape, depth and detail (4.1, 4.3), and never as a flat sticker (4.2).
-6. **Keep the good ones.** An object that works is added to the samples below, with the technique it uses, so that later objects can start from it.
+6. **Keep the good ones.** An object that works is added to the examples below, with the technique it uses, so that later objects can start from it.
 
 ### Techniques
 
-| Technique | Good for | Sample |
+| Technique | Good for | Example |
 |---|---|---|
-| Sheet folded over the spine | four-legged animals, tents, roofs | the fox |
-| Box body with legs cut out of its sides | heavy animals, furniture, vehicles | the moose, the elephant |
-| Wedge or flap glued on | heads, ears, trunks, tails | the moose's head, the elephant's ears and trunk |
-| Flaps folded outwards from one sheet | limbs and feet | the frog |
-| Strip curled into a body (soft fold) | rounded bodies | the duck |
-| Two identical cards slotted crosswise | trees and bushes | the Paper Grove pine |
+| Back strip with a flank folded forward on each side; the head halves creased inward to meet at the nose | sitting animals | Fox |
+| Spine strip with a whole side profile glued to each edge; a separate head folded into a hollow wedge | standing four-legged animals | Moose |
+| Closed box with a leg at each corner; a separate head with folded flaps; glued panels curled outward | heavy, round animals | Elephant |
+| Upright face leaning on a panel folded down behind it; flaps folded forward | squat animals seen from the front | Frog |
+| Strip curled into a loop (soft fold) | rounded bodies | Duck |
+| Two cards slotted crosswise | trees and bushes | Pine |
+| Strip rolled into a tube, part-circles rolled into cones (soft folds) | round trees, posts, cones | Fir |
+| One sheet folded over the spine like a tent, with flat cards glued on | simple four-legged animals | Paper Grove fox |
+| Flat cut pieces with glued layers, a tent fold and a folded box | vehicles | Scooter |
 | Single flat card | people, plane-shaped things, things against a surface (4.4) | the flat characters |
 
-### Samples
+### Examples
 
-References and samples to check in step 1. Objects that turn out well are added here.
+Each example was made by the steps above. The first image is step 3: the flat pieces on the sheet, where a grey line is a cut, a dashed line is a hard fold, hatching is a soft fold or curl, and blue dots mark a glue area. The second is step 4: the same pieces folded, attached and arranged.
 
-*The fox: one sheet folded over the spine, stood at an angle. (Reference photo, in the published checklist only.)*
+On the showcase page each example can be turned, and folded and unfolded with a slider. [Folded Paper Objects](https://claude.ai/artifact/BTaXGJhLHCzibpqA5wkk8G)
 
-*The same fox as flat pieces before folding. (Reference photo, in the published checklist only.)*
+#### Fox
 
-*Box body with cut-out legs and a wedge head; dashed lines mark the hard folds. (Reference photo, in the published checklist only.)*
+- Technique: Seven pieces. The body is a back strip with a flank folded forward on each side. Each flank carries half of the head beyond a crease at the neck: the crease turns the two halves inward so they meet at the nose, and the back strip carries on between them, over the head and down the snout, so the head closes into a wedge. An ear folds outward from the top of each half. The belly is a strip glued between the flanks that curls gently outward. The arms and hind legs are glued onto the flanks: each arm bends out from its shoulder, one further than the other, and each hind leg sits far enough forward that the lower leg and foot stick out past the belly. The tail lies flat on the ground.
+- Viewed from: From the side and slightly in front, so one flank, the head halves meeting at the nose and the leg sticking out in front all show.
 
-*Box body; the ears and trunk are flaps folded outwards. (Reference photo, in the published checklist only.)*
+![Fox: the flat pieces on the sheet.](checklist/ex-fox-sheet.jpg)
 
-*Legs folded forward from one sheet. (Reference photo, in the published checklist only.)*
+*Step 3. The flat pieces on the sheet.*
 
-*A strip curled into the body. (Reference photo, in the published checklist only.)*
+![Fox: folded, attached and arranged.](checklist/ex-fox-model.jpg)
 
-![Paper Grove: the fox and the slotted pines.](checklist/grove.jpg)
+*Step 4. Folded, attached and arranged.*
 
-*Paper Grove: the fox and the slotted pines.*
+#### Moose
 
-![How the fox and the pine are cut and folded.](checklist/fold-recipes.svg)
+- Technique: Four pieces. The spine piece is one strip folded over the rump, the back and the shoulder hump, ending in the tail, with glue tabs folded down along its edges. Each side is a whole profile cut from one piece (legs, flank, shoulder hump and neck) with a crease at the shoulder that turns the neck inward, and each is cut with its legs in a different pose. The head is detached so it can have volume of its own: one piece folded into a hollow wedge, with a forehead that bends back over the neck, two cheeks, a chin tucked under with a dewlap hanging from it, and the antlers folded up from the rear edge of the forehead as one spreading piece. It is glued over the ends of the two necks.
+- Viewed from: From the front quarter, so the near side, the folded head and both antlers show.
 
-*How the fox and the pine are cut and folded.*
+![Moose: the flat pieces on the sheet.](checklist/ex-moose-sheet.jpg)
 
-![Street objects built by the fox and pine recipe.](checklist/street-objects.jpg)
+*Step 3. The flat pieces on the sheet.*
 
-*Street objects built by the fox and pine recipe.*
+![Moose: folded, attached and arranged.](checklist/ex-moose-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
+
+#### Elephant
+
+- Technique: The body is a closed box: the top folds down into two sides, a front and a back, with a leg at each corner, and the tail is a strip cut free from the back face. The head is its own piece, glued to the front by a tab that bends back onto the body. It carries the detail: two ears cupped forward, two tusks, and a trunk that starts with one hard fold and then curls in a soft curve, down and forward at the tip. A flank panel is glued over each side and curls outward so the body bulges, and a round pad is glued under each foot. The head sits at a tilt, one ear is cupped further than the other, and the folds of the trunk are cut askew so it veers to one side.
+- Viewed from: Three-quarter front, so the face, both ears, the trunk and one bulging flank show.
+
+![Elephant: the flat pieces on the sheet.](checklist/ex-elephant-sheet.jpg)
+
+*Step 3. The flat pieces on the sheet.*
+
+![Elephant: folded, attached and arranged.](checklist/ex-elephant-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
+
+#### Frog
+
+- Technique: The body is one sheet: the face leans back on a panel folded down behind it, the eyes are creased forward so they pop, and the arms fold forward from the sides of the belly. The hind legs are separate pieces that stand beside the body with the knee up, each with a webbed foot folded out flat on the lily pad. The frog is posed off-centre: the body is turned and tilted, one arm reaches out further than the other, and one leg sits ahead of the other.
+- Viewed from: From the front and a little above, so the face is square to the viewer and the legs show on the pad.
+
+![Frog: the flat pieces on the sheet.](checklist/ex-frog-sheet.jpg)
+
+*Step 3. The flat pieces on the sheet.*
+
+![Frog: folded, attached and arranged.](checklist/ex-frog-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
+
+#### Duck
+
+- Technique: A strip curled into a teardrop loop, a soft fold with no crease, with its two ends glued together at the tail. The zigzag end sticks out and shows the brown inside. The head is a small box: a back strip with a cheek folded forward on each side and a cap folded over the top. The beak is two creased pieces, open in a quack. Each wing is its own piece: a tab glued on top of the loop and a blade folded down over the side. The head is glued on turned to one side, and one wing is lifted while the other lies folded.
+- Viewed from: From the front quarter, so the cream breast faces the viewer and the brown inside shows through the loop.
+
+![Duck: the flat pieces on the sheet.](checklist/ex-duck-sheet.jpg)
+
+*Step 3. The flat pieces on the sheet.*
+
+![Duck: folded, attached and arranged.](checklist/ex-duck-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
+
+#### Pine
+
+- Technique: Two cards. One is slit from the tip down to the middle, the other from the base up to the middle, and they slide into each other at right angles. Each card has eight folds: the six branch tips are creased alternately forward and back so the tiers have depth, and two feet fold out under the trunk and are glued down.
+- Viewed from: From any side: the crossed cards give the same tree from every angle.
+
+![Pine: the flat pieces on the sheet.](checklist/ex-pine-sheet.jpg)
+
+*Step 3. The flat pieces on the sheet.*
+
+![Pine: folded, attached and arranged.](checklist/ex-pine-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
+
+#### Fir
+
+- Technique: Three pieces, all curled with no crease. The trunk is a strip rolled into a tube. Each tier is a part-circle with a zigzag rim, rolled into a cone and glued along its seam; the cones sit over the trunk, the smaller one on top.
+- Viewed from: From any side and a little above, so the round tiers and their zigzag rims show.
+
+![Fir: the flat pieces on the sheet.](checklist/ex-fir-sheet.jpg)
+
+*Step 3. The flat pieces on the sheet.*
+
+![Fir: folded, attached and arranged.](checklist/ex-fir-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
+
+#### Paper Grove fox
+
+- Technique: Three pieces. The body is one sheet folded once over the spine so it stands like a tent, with the four legs and the curve of the belly cut out of its lower edges. The head is a flat card glued across the front of the tent, and the tail is a flat card glued behind.
+- Viewed from: From the front quarter, so the face card, one side of the tent and the tail all show.
+
+![Paper Grove fox: the flat pieces on the sheet.](checklist/ex-paper-grove-fox-sheet.jpg)
+
+*Step 3. The flat pieces on the sheet.*
+
+![Paper Grove fox: folded, attached and arranged.](checklist/ex-paper-grove-fox-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
+
+#### Scooter
+
+- Technique: The wheels are flat discs with a rim and a hub glued on as layers. The floorboard is one piece with a skirt folded down along each edge. The rear cowl is folded over a ridge like a tent, and the seat is a second piece folded over the same ridge and glued on top. The leg shield, its neck and the handlebar are cut as one flat piece that leans back, with the headlamp glued on. The cargo box is folded from one sheet and sits on the cowl.
+- Viewed from: From the front quarter on the near side, as it stands in the Blibli street.
+
+![Scooter: the flat pieces on the sheet.](checklist/ex-scooter-sheet.jpg)
+
+*Step 3. The flat pieces on the sheet.*
+
+![Scooter: folded, attached and arranged.](checklist/ex-scooter-model.jpg)
+
+*Step 4. Folded, attached and arranged.*
