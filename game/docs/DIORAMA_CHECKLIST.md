@@ -1,12 +1,6 @@
 # Paper diorama checklist
 
-The standard for a paper diorama scene in this project, for reference when creating or refining any scene. It holds 74 checks taken from the owner's own words (sections 1 to 9) and two procedures: how to plan a scene (10) and how to create a papercraft object (11).
-
-Each check is marked by where it comes from: **Said** (stated by the owner), **Approved** (the owner accepted a result that shows it), **Reading** (an interpretation that still needs the owner's confirmation).
-
-This is not the whole standard: the owner twice listed faults with "including, but not limited to", so passing every check does not prove a scene meets it.
-
-Screenshots come from the scenes themselves and from the two reference pages, Pinewood Valley and Paper Grove. Diagrams stand in for attached photos that could not be retrieved. The reference photos the owner attached on 14 Nov (2.12, 3.9, 4.9) are shown in the published checklist only and are described here in words.
+The standard for a paper diorama scene, for reference when creating or refining any scene. Sections 1 to 8 are checks, each with its rule, examples that pass and fail, and a reference image where one exists. Sections 9 and 10 are procedures: how to plan a scene and how to create a papercraft object.
 
 ## 1. One coherent place
 
@@ -14,249 +8,123 @@ The scene is one real place with one theme. Everything in it belongs there, agre
 
 ### 1.1 The scene follows one theme taken from one reference.
 
-- [ ] **Said.** Pick one setting and keep every part of the scene inside it. Two references are two scenes, never one blend.
+- [ ] Pick one setting and keep every part of the scene inside it. Two references are two scenes, never one blend.
 - Passes:
-  - Pinewood Valley: pines, a camp, a river, snowy peaks. Every piece is from a pine valley.
+  - A pine valley: pines, a camp, a river, snowy peaks. Every piece is from a pine valley.
 - Fails:
-  - Hanging foliage in the pine valley: fronds, vines, ivy and a leafy canopy that came from a jungle-camp reference.
-- *Reading, to be confirmed:* In response I also turned two broadleaf trees into pines and removed a rope swing. You did not name those.
+  - Hanging jungle foliage (fronds, vines, ivy, a leafy canopy) in a pine valley.
 
-> You should remove those hanging foliage because that belongs to jungle, which is not really this scene. You mixed up the original pinewood landscape reference with jungle camp reference. Choose one
->
-> (Pinewood Valley session, 5 Nov)
+![Pinewood Valley: one theme throughout.](checklist/pinewood-full.jpg)
 
-![Pinewood Valley as published: one theme throughout.](checklist/pinewood-full.jpg)
-
-*Do. Pinewood Valley as published: one theme throughout.*
+*Do. Pinewood Valley: one theme throughout.*
 
 ### 1.2 Every object has a reason to be in this particular place.
 
-- [ ] **Said.** For each object, I must be able to say why it would be found here. If the only reason is "it fills the space" or "it adds variety", it comes out.
+- [ ] For each object it must be possible to say why it would be found here. "It fills the space" and "it adds variety" are not reasons.
 - Passes:
-  - A shopping promenade: stalls, kiosks, palms, planters, café tables, flags, string lights, shoppers (the Blibli street you accepted).
+  - A shopping promenade: stalls, kiosks, palms, planters, café tables, flags, string lights, shoppers.
 - Fails:
   - Hot-air balloons in the sky and snow-capped mountains behind a shopping street.
-- Attempts the owner has not judged yet:
-  - The hometown green: picket fences, letter boxes, a town clock, a moving van.
 
-> Consistency of objects to the theme and spaces, e.g baloon and mountains does not match a shopping district theme
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+![Balloons and mountains behind a shopping street.](checklist/street-balloons.jpg)
 
-![Rejected: balloons and mountains behind a shopping street.](checklist/street-balloons.jpg)
+*Don't. Balloons and mountains behind a shopping street.*
 
-*Don't. Rejected: balloons and mountains behind a shopping street.*
+![Everything belongs to a riverside promenade.](checklist/blibli-final.jpg)
 
-![Accepted ("Yes, meets it"): everything belongs to a riverside promenade.](checklist/blibli-final.jpg)
+*Do. Everything belongs to a riverside promenade.*
 
-*Do. Accepted ("Yes, meets it"): everything belongs to a riverside promenade.*
+### 1.3 Richness comes from things that belong, not from more kinds of things.
 
-### 1.3 Richness comes from things that belong, not from adding more kinds of things.
-
-- [ ] **Said.** "Make it richer" never means "add anything". When asked for more variety, add more of what the place really has, and stop when the next addition would not make sense there.
+- [ ] Making a scene richer never means adding anything at all. Add more of what the place really has, and stop when the next addition would not make sense there.
 - Passes:
-  - Pinewood background at the version you called rich enough: peaks, a glacier, hills, partial pine woods, mist.
+  - A pine valley background of peaks, a glacier, hills, partial pine woods and mist.
 - Fails:
-  - A bank of cloud behind the far mountains.
-  - A canopy of pine boughs across the ceiling.
-  - A strip of pine boughs across the top front edge.
-- *Reading, to be confirmed:* You did not list the day-scene objects; I removed the hanging stars, the fireflies and the day/dusk/night switch. One thing I cannot explain: the cloud bank was already in the version you called "rich enough", and you had it removed later.
+  - A bank of cloud behind the far mountains, a canopy of pine boughs across the ceiling, a strip of boughs across the top front edge: added only for variety.
 
-> you are taking "increase the variety of objects" too far and add objects that does not make sense at all. That is overfitting to the task, not generalizing my intent.
->
-> (Pinewood Valley session, 5 Nov)
+### 1.4 An outdoor scene is a day scene.
 
-> Here are some objects that should be removed: Cloud bank; Focus on day scene. Remove objects that shouldn't be on day scene; ceiling pine canopy; pine bough valance
->
-> (Pinewood Valley session, 5 Nov)
-
-### 1.4 For now every outdoor scene is a day scene; a day and night adjustment comes later.
-
-- [ ] **Said.** Build outdoor scenes in daylight and leave out night-only objects. You plan a day and night adjustment, but not now, so I do not build one until you ask. Indoor and underground scenes have no time of day.
+- [ ] Outdoor scenes are in daylight and hold no night-only objects. Indoor and underground scenes have no time of day.
 - Fails:
-  - Night-only objects in Pinewood Valley. You did not name them; I removed hanging stars, fireflies and the mood switch.
-
-> Focus on day scene. Remove objects that shouldn't be on day scene
->
-> (Pinewood Valley session, 5 Nov)
-
-> I will add day and night time adjustment but not now
->
-> (Answers to the open questions, 14 Nov)
-
+  - Hanging stars, fireflies or a day and night mood switch in a day scene.
 
 ### 1.5 What is seen through any opening matches what really stands outside it.
 
-- [ ] **Said.** Windows, doors, gaps and the far background must all show the same world.
+- [ ] Windows, doors, gaps and the far background all show the same world. The inside and the outside of a building agree in outline and floors.
 - Passes:
-  - The MRT car in the station you accepted: its windows show the screen doors and the platform wall exactly where they stand.
+  - A train car in a station: its windows show the screen doors and the platform wall exactly where they stand.
 - Fails:
   - Train windows showing a city skyline while another train stands right beside the car.
-  - Stairs on the second (top) floor that go up.
-- Attempts the owner has not judged yet:
-  - The Blibli shop's upstairs windows showing the store-room that is upstairs.
-  - The store-room stairs turned to go down.
-- *Reading, to be confirmed:* I extend this to buildings: inside and outside match in outline and floors. "Stairs on second floor goes up" I read as: the second floor is the top floor, so its stairs must go down.
+  - Stairs on the top floor that go up.
 
-> visual consistency of objects, structures and spaces, e.g train windows show the cities while another train is actually besides it.
->
-> (MRT scene 2, 7 Nov)
+![The windows show a city although other things stand beside the car.](checklist/mrt-elevated.jpg)
 
-> stairs on second floor goes up
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+*Don't. The windows show a city although other things stand beside the car.*
 
-![Rejected: the first MRT. The windows show a city although the car stands in the open with other things beside it.](checklist/mrt-elevated.jpg)
+![The car in an underground station: windows and surroundings agree.](checklist/mrt-final.jpg)
 
-*Don't. Rejected: the first MRT. The windows show a city although the car stands in the open with other things beside it.*
+*Do. The car in an underground station: windows and surroundings agree.*
 
-![Accepted ("Looks good"): the car in an underground station; windows and surroundings agree.](checklist/mrt-final.jpg)
+### 1.6 Nothing is left half-built.
 
-*Do. Accepted ("Looks good"): the car in an underground station; windows and surroundings agree.*
-
-### 1.6 Nothing in the scene is left half-built.
-
-- [ ] **Said.** Every structure that starts somewhere ends somewhere. No stairs that stop in mid-air, no wall without its other side, no object missing a part the camera can see.
+- [ ] Every structure that starts somewhere ends somewhere. No stairs that stop in mid-air, no wall without its other side, no object missing a part the camera can see.
 - Fails:
-  - The stairs on the first floor of the outlet, which were left unfinished.
-- Attempts the owner has not judged yet:
-  - The outlet stairs after my fix: a full flight with a handrail up to a landing and a lit doorway.
+  - A flight of stairs left unfinished.
 
-> Unfinished scene, e.g the stairs in outlet first floor
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+![A shop with its stairs unfinished.](checklist/outlet-before.jpg)
 
-![Before: the outlet with its stairs unfinished.](checklist/outlet-before.jpg)
+*Don't. A shop with its stairs unfinished.*
 
-*Don't. Before: the outlet with its stairs unfinished.*
+### 1.7 Nothing is misplaced or oddly positioned.
 
-![My fix, not yet judged by you: the flight is complete.](checklist/outlet-after.jpg)
-
-*Reference. My fix, not yet judged by you: the flight is complete.*
-
-### 1.7 Nothing in the scene is misplaced or oddly positioned.
-
-- [ ] **Said.** You have named things as misplaced or oddly positioned three times. For the bench you gave the reason: nobody would put a bench in that spot, facing that way, with a store on its left. An object's spot and facing must make sense against what stands next to it (see 5.5).
+- [ ] Every object would really be in its spot, at its size, facing its way, given what stands next to it.
 - Passes:
-  - The one tour boat left in the river view after the others were removed (the street was later accepted).
+  - One tour boat on a river.
 - Fails:
-  - A sailing boat and a second boat in the river view ("misplaced").
-  - The MRT line across the hometown valley and the MRT exit building on the green. Both were out of place.
-  - The buildings of the first street ("building placements in street").
-  - The bench near the foreground of the Blibli promenade.
-- *Reading, to be confirmed:* My test, which your bench answer supports: would this thing really be here, at this size, facing this way, given what is next to it?
+  - A sailing boat and extra small boats crowded into the same stretch of river.
+  - A transit line across a farm valley and a station exit on a village green.
+  - A bench in a spot and facing a direction nobody would choose, with a store right beside it.
 
-> yes, it meets. but remove the sailing boat and another misplaced boat. also remove the bench near foreground
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+![A sailing boat and small boats misplaced beside the tour boat.](checklist/river-boats.jpg)
 
-> Remove the MRT structure. Its positioning looks weird.
->
-> (Moperty session, 12-13 Nov)
+*Don't. A sailing boat and small boats misplaced beside the tour boat.*
 
-> Both were out of place
->
-> (Answers to the open questions, 14 Nov, on the MRT line and the exit building)
+![A transit line out of place across a valley.](checklist/hometown-viaduct.jpg)
 
-> Objects placement and scene organization, e.g building placements in street
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+*Don't. A transit line out of place across a valley.*
 
-![Removed at your request: the sailing boat and the small boats beside the tour boat.](checklist/river-boats.jpg)
+### 1.8 Each scene has a plan of its own.
 
-*Don't. Removed at your request: the sailing boat and the small boats beside the tour boat.*
-
-![Removed at your request: the MRT line across the valley.](checklist/hometown-viaduct.jpg)
-
-*Don't. Removed at your request: the MRT line across the valley.*
-
-
-### 1.8 The scene has a plan of its own and does not repeat another scene's arrangement or signature feature.
-
-- [ ] **Said.** Each scene is unique in its plan. You named two likenesses between the first hometown and the Blibli street: relief structures on the left and right bounds, and the open view in the same position as Blibli's gate. You also said not to use a river like Blibli's. Before building, I draw the plan of the new scene as in 2.1 and compare it with every existing scene: where it is enclosed, where it opens, what the open view shows, how the ground lies (2.12). If it matches, I change it.
+- [ ] No two scenes share an arrangement or a signature feature. Draw the plan of a new scene (2.1) and compare it with every existing scene: where it is enclosed, where it opens, what the open view shows, how the ground lies. If it matches, change it.
 - Fails:
-  - Hometown, first version: relief buildings left and right, and the open view at the back left, as in Blibli.
-  - A river in the hometown valley.
-- Attempts the owner has not judged yet:
-  - Hometown, current version: homes close the middle of the back, the valley opens at both ends, nothing at the sides but trees. You have judged its background, not yet its layout.
-- *Reading, to be confirmed:* Whether a river treated differently would be acceptable in another scene is not settled.
+  - Two scenes both closed by relief buildings on the left and right, with the open view through a gap in the same position.
+  - A second scene built around a river like the first one's.
 
-> the hometown square layout is very similar with Blibli, particularly: relief structure on left and right bounds; visible view position is exactly the same as blibli's docking gate
->
-> (Moperty session, 12-13 Nov)
+![Plan views of three scenes.](checklist/layouts.svg)
 
-> Don't use river like blibli scene.
->
-> (Moperty session, 12-13 Nov)
+*Reference. Plan views of three scenes.*
 
-> Your reading is correct. I want to emphasize uniqueness between two scenes. This comes down to uniqueness of scene plan as mentioned in 2.1.
->
-> (Answers to the open questions, 14 Nov)
+![Too like the shopping promenade: buildings left and right, the view through one gap at the back left.](checklist/hometown-v1.jpg)
 
-![Plan view of the three layouts.](checklist/layouts.svg)
+*Don't. Too like the shopping promenade: buildings left and right, the view through one gap at the back left.*
 
-*Reference. Plan view of the three layouts.*
+### 1.9 The scene is realistic as a place.
 
-![Rejected for being too like Blibli: buildings left and right, view through one gap at the back left.](checklist/hometown-v1.jpg)
-
-*Don't. Rejected for being too like Blibli: buildings left and right, view through one gap at the back left.*
-
-![Current version, layout not yet judged by you: homes in the middle, valley open at both ends.](checklist/hometown-v3.jpg)
-
-*Reference. Current version, layout not yet judged by you: homes in the middle, valley open at both ends.*
-
-
-### 1.9 The concept chosen for the scene is not a boring one.
-
-- [ ] **Reading.** You asked for the downtown block yourself, then judged that it "might be a boring concept" for Moperty and asked for creative options instead. You did not say what made it boring.
-- Passes:
-  - Blibli as a shopping place (accepted).
-- Fails:
-  - A downtown block with a sales gallery, for Moperty.
-- *Reading, to be confirmed:* My test: a setting is boring when it could stand for any business. Your own first idea for Moperty, on 31 Oct, was "maps or towns". You accepted the hometown as a concept with "build it", but have not judged the built scene.
-
-> After reviewing this, downtown might be a boring concept to represent moperty project.
->
-> (Moperty session, 12-13 Nov)
-
-> shopping-themed scene for blibli, maps or towns for moperty, nature and architectures for radjastone.
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-![Judged a boring concept for Moperty: the rebuilt downtown block.](checklist/downtown3.jpg)
-
-*Don't. Judged a boring concept for Moperty: the rebuilt downtown block.*
-
-### 1.10 The scene is realistic as a place.
-
-- [ ] **Said.** You name realism as one axis of your standard, beside details, scene organisation and object richness. You have not defined it further.
-- *Reading, to be confirmed:* Checks 1.2, 1.5, 1.6 and 1.7 are how I test it: things belong, agree with each other, are finished and sit where they would be.
-
-> (3) realistic-ness of a scene
->
-> (Papercraft Game Scene, 6 Nov)
-
-> keep looping to build and refine the scene until it achieves my standards on details, scene organization, object richness, scene realisticness, etc
->
-> (MRT scene, 6 Nov)
+- [ ] Things belong (1.2), agree with each other (1.5), are finished (1.6) and sit where they would be (1.7).
 
 ## 2. The right technique in the right zone
 
-A scene has a main space and surroundings. Each part is built with a different paper technique, chosen by what that part is, not by which side of the box it sits on.
+A scene has a main space and surroundings. Each part is built with a different paper technique, chosen by what that part is, not by which side of the container it sits on.
 
 ### 2.1 The scene is divided into a main space and its surroundings, and each part of the surroundings is judged open or enclosed from inside the main space.
 
-- [ ] **Said.** Stand in the main space and look outward. Where the eye travels far, the surroundings are open. Where something tall and close blocks the view, they are enclosed. The side of the box does not decide it.
+- [ ] Stand in the main space and look outward. Where the eye travels far, the surroundings are open. Where something tall and close blocks the view, they are enclosed. The side of the container does not decide it.
 - Passes:
   - Dense trees around a clearing enclose it, on any side.
   - A forest canopy encloses the ceiling.
   - A wall, a hill or a row of near buildings encloses a street.
 - Fails:
-  - Calling the back wall "open" and the side walls "enclosed" just because of where they are in the box.
-
-> Enclosed views are about the scene surrounding the main space, not the diorama layout. Examples are dense trees surrounding the main space, high structures like walls, hills, buildings. Those can be anywhere in the diorama layout, e.g canopies of dense forest can enclose the ceiling.
->
-> (Papercraft Game Scene, 6 Nov)
+  - Calling the back wall "open" and the side walls "enclosed" just because of where they are in the container.
 
 ![Which technique goes where.](checklist/zones.svg)
 
@@ -264,19 +132,11 @@ A scene has a main space and surroundings. Each part is built with a different p
 
 ### 2.2 The main space is filled mostly with freestanding 3D papercraft.
 
-- [ ] **Said.** Where the player walks, objects stand on their own and have real volume: folded, cut and glued (see section 4). Flat layers are not the main technique here.
+- [ ] Where the player walks, objects stand on their own and have real volume: folded, cut and glued (section 4). Flat layers are not the main technique here.
 - Passes:
-  - Pinewood Valley's camp: tents folded like tents, slotted pines, a log pile, a canoe, a picnic table.
+  - A camp: tents folded like tents, slotted pines, a log pile, a canoe, a picnic table.
 - Fails:
   - A main space furnished with upright flat cut-outs only.
-
-> more paper 3d papercraft on main space, layered shadow box for open-wide views, 3d papercraft that attaches to surfaces for enclosed views
->
-> (Papercraft Game Scene, 6 Nov)
-
-> I want a shoebox or container paper diorama scene, where rich combination of freestanding folded pop-up objects blends well to dense layered shadow box scene as the background
->
-> (Pinewood Valley session, 5 Nov)
 
 ![Freestanding folded objects in front, layered flat sheets behind.](checklist/pinewood-full.jpg)
 
@@ -284,216 +144,113 @@ A scene has a main space and surroundings. Each part is built with a different p
 
 ### 2.3 Open and distant views are built as a layered shadow box of flat cut sheets.
 
-- [ ] **Said.** Anything the eye travels far into (a valley, a far bank, a skyline, the sky) is made of flat sheets stood one behind another. For a near part of the view, such as the river and a ship, you allowed a second route: deepen the box so it becomes real 3D space. You asked me to try both and keep the better-looking one; the layered route won and you accepted it.
+- [ ] Anything the eye travels far into (a valley, a far bank, a skyline, the sky) is made of flat sheets stood one behind another. A near part of the view, such as a river and a ship, may instead be brought into real 3D space by deepening the container; use whichever looks better.
 - Passes:
-  - The Blibli river view: water bands, a boat, the far bank, shops, trees, towers, each on its own sheet.
+  - A river view: water bands, a boat, the far bank, shops, trees, towers, each on its own sheet.
 - Fails:
   - A far bank, a city and a river printed together on one card.
 
-> Objects near enclosed views are shown in relief papercraft. Open and distant backgrounds are shown with layered flat objects (see reference)
->
-> (MRT scene 2, 7 Nov)
+![One printed card (before) against layered sheets with shadows between them (after).](checklist/river-before-after.jpg)
 
-> Lack of layered flat objects to show open and distant views
->
-> (Start of Downtown 2, 7 Nov, about the first downtown build)
-
-> container box depth increased so river and ship become part of 3d space; or include the river and ship as layered flat backgrounds; select better-looking one
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-![The Blibli river view before (one printed card) and after (layered sheets with shadows between them). You accepted the after.](checklist/river-before-after.jpg)
-
-*Do. The Blibli river view before (one printed card) and after (layered sheets with shadows between them). You accepted the after.*
+*Do. One printed card (before) against layered sheets with shadows between them (after).*
 
 ### 2.4 Enclosed surroundings carry relief papercraft attached to their surface.
 
-- [ ] **Said.** A wall, a facade or any close bounding surface is dressed with pieces that have real depth and stick out toward the main space: awnings, balconies, shelves, cabinets, signs, lamps, half-objects against the wall. This ties the objects to the box.
+- [ ] A wall, a facade or any close bounding surface is dressed with pieces that have real depth and stick out toward the main space: awnings, balconies, shelves, cabinets, signs, lamps, half-objects against the wall. This ties the objects to the container.
 - Passes:
-  - Blibli promenade: the white waterfront building, the red café and the shop front, with awnings, balconies, window boxes and lanterns ("now much better").
+  - Promenade buildings with awnings, balconies, window boxes and lanterns.
 - Fails:
   - A street whose buildings are flat fronts with nothing standing off them.
-  - The first MRT box: no relief on any side.
-- Attempts the owner has not judged yet:
-  - The store-room after my fix: steel racking stocked with cartons, totes, crates and rolls on the side walls.
+  - A container with no relief on any side.
 
-> Minimum use of relief papercraft object to add cohesiveness with bounding container / box surfaces, especially if boundings are designed for enclosed views like walls, near-structures, etc, e.g none in any side of current scene's box
->
-> (MRT scene 2, 7 Nov)
+![Relief buildings with awnings, balconies and lanterns.](checklist/blibli-final.jpg)
 
-> Relieved papercraft usage on container sides are now much better.
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-![My fix, not yet judged by you: racking with real depth on the store-room side walls.](checklist/storeroom-after.jpg)
-
-*Reference. My fix, not yet judged by you: racking with real depth on the store-room side walls.*
+*Do. Relief buildings with awnings, balconies and lanterns.*
 
 ### 2.5 Flat layered cards are never used for objects with depth on an indoor wall, above all a side wall.
 
-- [ ] **Said.** Layering flat cards is for things that are flat (posters, boards, frames) and for distant views. Shelves, cabinets, racks and anything with volume on an indoor wall are relief with real depth.
+- [ ] Layering flat cards is for things that are flat (posters, boards, frames) and for distant views. Shelves, cabinets, racks and anything with volume on an indoor wall are relief with real depth.
 - Passes:
   - Posters, a pegboard, a clock and a framed print as flat layers on a shop wall.
 - Fails:
   - Store-room side walls built as stacked flat cards standing in for shelving.
 
-> side walls in outlet stockroom apply layered shadow box rather than relief papercraft. Layered shadow box diorama is for flat objects or emphasize distant backgrounds, not for indoor especially for side walls.
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+![Side-wall shelving as flat layered cards.](checklist/storeroom-before.jpg)
 
-![Rejected: side-wall shelving as flat layered cards, and too few, too similar objects.](checklist/storeroom-before.jpg)
-
-*Don't. Rejected: side-wall shelving as flat layered cards, and too few, too similar objects.*
+*Don't. Side-wall shelving as flat layered cards.*
 
 ### 2.6 A side gets relief where the place really is enclosed there, and no two scenes are enclosed the same way.
 
-- [ ] **Said.** If a scene is enclosed on a side, that side gets relief: a street enclosed by buildings has relief buildings on its left and right, not only a back wall. A side that is open in the real place stays open. Two scenes never share the same enclosure (1.8). Relief at the sides is not enough on its own: Downtown 2 added it on both sides and the back and was still rejected, for the spacing and flow of its structures (4.8, 5.2).
+- [ ] If a scene is enclosed on a side, that side gets relief: a street enclosed by buildings has relief buildings on its left and right, not only a back wall. A side that is open in the real place stays open. Two scenes never share the same enclosure (1.8). Relief at the sides is not enough on its own; the structures must also be well spaced (4.8, 5.2).
 - Passes:
-  - Blibli promenade: relief buildings on the left, the right and the back right.
+  - A promenade with relief buildings on the left, the right and the back right.
 - Fails:
   - A street with relief only on the back.
-  - The first downtown build, whose left, right and back bounds lacked relief.
-  - The first hometown: relief buildings left and right, the same enclosure as Blibli.
-
-> shopping street scene can be designed with relief papercraft structures on left and right bounding surfaces too, not just on the back.
->
-> (Papercraft Game Scene 2, 6-7 Nov)
-
-> Lack of relief papercraft objects to blend with container left, right and background bounding boxes
->
-> (Start of Downtown 2, 7 Nov, about the first downtown build)
-
-> Your reading is correct. I want to emphasize uniqueness between two scenes.
->
-> (Answers to the open questions, 14 Nov, on enclosing the sides only where the place is enclosed, and never two scenes the same way)
-
-![Relief buildings close the Blibli promenade on the left and right.](checklist/blibli-final.jpg)
-
-*Do. Relief buildings close the Blibli promenade on the left and right.*
-
+  - A second scene given the same left and right relief buildings as the first.
 
 ### 2.7 The share of freestanding objects, relief and flat layers fits the kind of scene.
 
-- [ ] **Said.** There is no fixed ratio. It depends on the scene: indoor or outdoor, enclosed outdoor or open-wide landscape.
+- [ ] There is no fixed ratio. As a guide: an indoor room is mostly relief and freestanding objects, an enclosed outdoor place mixes all three, and a wide-open landscape is mostly flat layers.
 - Passes:
-  - Pinewood Valley: a deep layered valley, pines against the side walls, a folded camp in front.
-- *Reading, to be confirmed:* How I apply it: an indoor room is mostly relief and freestanding objects; an enclosed outdoor place mixes all three; a wide-open landscape is mostly flat layers.
-
-> The ratio between using folded pop-up objects and layered shadow box background depends on the scene itself, e.g indoor or outdoor, enclosed outdoor or open-wide landscape, etc.
->
-> (Pinewood Valley session, 5 Nov)
+  - A pine valley: a deep layered valley, pines against the side walls, a folded camp in front.
 
 ### 2.8 The background continues onto the side and top surfaces of the container.
 
-- [ ] **Said.** The back, the sides and the top are one surrounding. Enclosed sides get more folded pop-up objects, some with parts attached or flattened against the wall. Open sides get more flat layers. An open sky on top is flat layered clouds. Removing Pinewood's ceiling canopy was specific to that scene; a canopy may enclose the top of another one.
+- [ ] The back, the sides and the top are one surrounding. Enclosed sides get more folded pop-up objects, some with parts attached or flattened against the wall. Open sides get more flat layers. An open sky on top is flat layered clouds; a canopy encloses the top only where the place has one.
 - Passes:
-  - Pinewood Valley: the valley wraps round the corners; pines stand against the side walls; the ceiling is open sky with flat clouds.
+  - The valley wraps round the corners; pines stand against the side walls; the ceiling is open sky with flat clouds.
 - Fails:
   - Side walls and ceiling left as plain painted card.
 
-> In a shoebox scene like this, background spans and continue to sides and top surface of the shoebox scene.
->
-> (Pinewood Valley session, 5 Nov)
+![Tall pines against the side walls, flat clouds across the open sky.](checklist/pinewood-back.jpg)
 
-> if the scene sides are enclosed with trees and grasses, then more folded pop-up objects should be added on the sides. Some objects typically have parts attached or flatten on the shoebox side surface. If sides are like an open field, then layered shadow box should be used more to emphasize wide background. The same goes with top surface. If it is an open sky, then layer it with flat clouds
->
-> (Pinewood Valley session, 5 Nov)
+*Do. Tall pines against the side walls, flat clouds across the open sky.*
 
-> that was only scene-specific
->
-> (Answers to the open questions, 14 Nov, on removing Pinewood's ceiling canopy)
+### 2.9 The container is as deep and wide as the scene needs.
 
-![Pinewood Valley: tall pines against the side walls, flat clouds across the open sky.](checklist/pinewood-back.jpg)
-
-*Do. Pinewood Valley: tall pines against the side walls, flat clouds across the open sky.*
-
-### 2.9 The container is as deep and wide as the scene needs, even when the playable area stays the same.
-
-- [ ] **Said.** If relief or structures do not fit, make the box deeper or wider behind and beside the walk area. For Moperty you also allowed a larger playable space and a camera that stands further back.
+- [ ] If relief or structures do not fit, make the container deeper or wider behind and beside the walk area. The playable area can stay the same, or be enlarged when the scene calls for it.
 - Passes:
-  - A deeper MRT platform so the escalator and the lift fit behind the car (accepted).
+  - A deeper station platform so that an escalator and a lift fit behind the train car.
 - Fails:
-  - Squeezing relief into a shallow box, or leaving it out for lack of room.
-- Attempts the owner has not judged yet:
-  - The hometown green: wider and deeper, with the camera pulled back.
-- *Reading, to be confirmed:* "Further camera zoom is allowed" I took to mean the camera may show more of a larger space. It could also mean closer in.
-
-> If space is insufficient, depth and width of the scene container can be added too without increasing the playable area, e.g to add more relief structures in shopping street scene.
->
-> (Papercraft Game Scene 2, 6-7 Nov)
-
-> add more depth to the container so the platform is wide enough and can contain structures like the escalator and elevators for exit
->
-> (MRT scene 2, 7 Nov)
-
-> The playable space can be enlarged and further camera zoom is allowed.
->
-> (Moperty session, 12-13 Nov)
+  - Squeezing relief into a shallow container, or leaving it out for lack of room.
 
 ### 2.10 An indoor scene uses its walls, floor and ceiling to pack the space densely.
 
-- [ ] **Said.** Rooms are bounded on purpose. The walls carry relief, things hang from the ceiling, and objects stand close together the way a real shop or store-room is stocked.
+- [ ] Rooms are bounded on purpose. The walls carry relief, things hang from the ceiling, and objects stand close together the way a real shop or store-room is stocked.
 - Fails:
   - A room drawn as an open floor with a few props far apart.
-- Attempts the owner has not judged yet:
-  - The outlet: pegboard, shelves, bunting, a showcase, a basket and a price stand within one room.
-
-> Use bounds for indoor scenes like this store to increase spatial density. Examples from Paper Mario
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-![The outlet as it stands, not yet judged by you.](checklist/outlet-after.jpg)
-
-*Reference. The outlet as it stands, not yet judged by you.*
 
 ### 2.11 The container shape suits the scene; it does not have to be a shoebox.
 
-- [ ] **Said.** A playable scene may use other diorama forms, such as curved or circular walls, when they serve the place.
-
-> Because papercraft-game branch is playable, different types of diorama like circular walls can be used, not just shoebox diorama.
->
-> (Papercraft Game Scene, 6 Nov)
+- [ ] A playable scene may use other diorama forms, such as curved or circular walls, when they serve the place.
 
 ### 2.12 The ground of the main space may be inclined or on several levels; it does not have to be flat.
 
-- [ ] **Said.** The main space is part of the scene plan, so it can differ between scenes as much as the surroundings do: a slope, a road that climbs, a raised terrace.
+- [ ] The main space is part of the scene plan, so it can differ between scenes as much as the surroundings do: a slope, a road that climbs, a raised terrace.
 - Passes:
-  - Your reference: a road climbs from a riverside meadow to a rock terrace that carries a rescue station.
+  - A road climbs from a riverside meadow to a rock terrace that carries a rescue station.
 
-> The main space itself can even include inclined or multi-level grounds, not only flat. Refer to first image
->
-> (Answers to the open questions, 14 Nov)
-
-*Do. Your reference: the ground climbs from the meadow, up a road, to a rock terrace. (Your photo; shown in the published checklist only.)*
-
+*Do. The ground climbs from the meadow, up a road, to a rock terrace. (Reference photo, in the published checklist only.)*
 
 ## 3. The layered open-view background
 
-This is the part you have corrected most often. A good background is layered, varied, detailed, visibly deep and on theme.
+A good background is layered, varied, detailed, visibly deep and on theme.
 
 ### 3.1 The open view is many separate cut sheets, never one printed picture.
 
-- [ ] **Approved.** Each band of the view (water, a bank, a row of buildings, a tree line, a ridge, clouds) is its own sheet with its own cut outline along the top.
+- [ ] Each band of the view (water, a bank, a row of buildings, a tree line, a ridge, clouds) is its own sheet with its own cut outline along the top.
 - Passes:
-  - Blibli river view after the rebuild: five water bands, the far bank, shops, trees, flats, towers, three city rows, two cloud rows.
+  - A river view of five water bands, the far bank, shops, trees, flats, towers, three city rows and two cloud rows.
 - Fails:
   - The far bank as one strip of printed buildings with one blue band for the river: it reads as a poster pinned to the back.
 
-> Flat objects for open and distant views, like structures across river, should have some layered depth to improve scene richness. See the example image
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+![One printed card (before) against separate layered sheets (after).](checklist/river-before-after.jpg)
 
-> yes, it meets.
->
-> (Papercraft Game Scene 3, 7-12 Nov, on the layered river view)
-
-![Before and after. You accepted the layered version.](checklist/river-before-after.jpg)
-
-*Do. Before and after. You accepted the layered version.*
+*Do. One printed card (before) against separate layered sheets (after).*
 
 ### 3.2 The layers differ in kind, not only in distance.
 
-- [ ] **Said.** Depth alone is not richness: the layers must have variety.
+- [ ] Depth alone is not richness: the layers must have variety.
 - Passes:
   - Faceted mountains with a lit face, a shaded face and jagged snow caps.
   - A hill that sweeps in from one side and stops.
@@ -502,159 +259,77 @@ This is the part you have corrected most often. A good background is layered, va
   - A pale glacier winding between two ranges.
 - Fails:
   - Fourteen rolling ridges of the same shape, each a step darker.
-- *Reading, to be confirmed:* What variety meant in practice comes from my reading of your landscape photo, built into the version you then called "rich enough": the examples under Passes, with bright and deep values alternating instead of fading steadily.
-
-> The variation of foreground objects are sufficient, but the layered shadow box in the background is only deep, without variety. Look at the example of layered shadowbox landscape to see what I mean by rich variety.
->
-> (Pinewood Valley session, 5 Nov)
-
-> This version is already rich enough
->
-> (Pinewood Valley session, 5 Nov, on the rebuilt background)
 
 ![Only deep, against varied.](checklist/bg-variety.svg)
 
 *Reference. Only deep, against varied.*
 
-![Pinewood Valley's background as published: peaks, a glacier, sweeping hills, partial woods, a mound.](checklist/pinewood-back.jpg)
+![Peaks, a glacier, sweeping hills, partial woods, a mound.](checklist/pinewood-back.jpg)
 
-*Do. Pinewood Valley's background as published: peaks, a glacier, sweeping hills, partial woods, a mound.*
+*Do. Peaks, a glacier, sweeping hills, partial woods, a mound.*
 
 ### 3.3 Every flat piece in the background carries its own detail and differs from its neighbours.
 
-- [ ] **Said.** A flat sheet is not a plain silhouette. It carries cut and toned detail, and repeated things on it vary. Without that the background looks unfinished.
+- [ ] A flat sheet is not a plain silhouette. It carries cut and toned detail, and repeated things on it vary. Without that the background looks unfinished.
 - Passes:
-  - The rebuilt hometown valley, which you said "looks much better": trees in more than one kind, each cut in two tones; buildings that differ in roof, chimney, windows and colour; fields as striped patches on a slope; a hamlet on a hillside; a road winding over a hill.
+  - Trees in more than one kind, each cut in two tones.
+  - Buildings that differ in roof, chimney, windows and colour.
+  - Fields as striped patches on a slope; a hamlet on a hillside; a road winding over a hill.
 - Fails:
-  - The first hometown valley: plain ridge shapes dotted with identical tiny houses and triangles.
+  - Plain ridge shapes dotted with identical tiny houses and triangles.
 
-> The flat papercraft objects for the open view background are lacking details and variations. The layer depth is also very minimum. This makes it look half-baked and not polished
->
-> (Moperty session, 12-13 Nov)
+![Plain ridges, identical dots, almost no depth.](checklist/hometown-v1-bg.jpg)
 
-> background looks much better.
->
-> (Answers to the open questions, 14 Nov, on the rebuilt hometown valley)
+*Don't. Plain ridges, identical dots, almost no depth.*
 
-![Rejected as half-baked: plain ridges, identical dots, almost no depth.](checklist/hometown-v1-bg.jpg)
+![Varied layers with detail on each.](checklist/hometown-v3-bg.jpg)
 
-*Don't. Rejected as half-baked: plain ridges, identical dots, almost no depth.*
-
-![The rebuild: varied layers with detail on each. Your verdict: "background looks much better".](checklist/hometown-v3-bg.jpg)
-
-*Do. The rebuild: varied layers with detail on each. Your verdict: "background looks much better".*
-
+*Do. Varied layers with detail on each.*
 
 ### 3.4 The open view has many layers, not a minimal few.
 
-- [ ] **Said.** By "layer depth" you mean the number of layers. The first hometown valley had too few. The Blibli river view you accepted has more than ten.
+- [ ] Layer depth means the number of layers. A rich view has more than ten. Stand them far enough apart that each casts a visible shadow on the next.
 - Passes:
-  - Blibli river view: more than ten layers.
+  - A river view of more than ten layers.
 - Fails:
-  - The first hometown valley, whose layer depth you called "very minimum".
-- *Reading, to be confirmed:* I also keep the layers far enough apart for each to cast a visible shadow on the next. That is my practice from the accepted river view, not something you asked for.
+  - A valley made of a handful of ridges.
 
-> The layer depth is also very minimum.
->
-> (Moperty session, 12-13 Nov)
+![The gap between layers.](checklist/layer-gaps.svg)
 
-> number of layers
->
-> (Answers to the open questions, 14 Nov, on what "layer depth" meant)
-
-> yes, it meets.
->
-> (Papercraft Game Scene 3, 7-12 Nov, on the layered river view)
-
-![My practice on the gap between layers.](checklist/layer-gaps.svg)
-
-*Reference. My practice on the gap between layers.*
-
+*Reference. The gap between layers.*
 
 ### 3.5 Things that sit in the view stand between layers, on their own sheets.
 
-- [ ] **Approved.** A boat, a bridge, a train: each is its own piece standing between two layers, not printed onto one of them.
+- [ ] A boat, a bridge, a train: each is its own piece standing between two layers, not printed onto one of them.
 - Passes:
-  - The tour boat riding between two water bands (accepted).
+  - A tour boat riding between two water bands.
 - Fails:
   - Boats, trees or buildings printed onto the water or the hill sheet.
-- *Reading, to be confirmed:* From the standard I wrote from Pinewood Valley, which you adopted: a tree line is its own sheet just behind the ridge it grows on, in a value that contrasts with that ridge.
-
-> yes, it meets.
->
-> (Papercraft Game Scene 3, 7-12 Nov, on the layered river view)
 
 ### 3.6 The background is rich and still entirely on theme.
 
-- [ ] **Said.** You asked for a richer distant background and then rejected the balloons and mountains that were added to it. Both hold: the background must be full, and everything in it must belong to the place (items 1.2 and 1.3).
+- [ ] The background must be full, and everything in it must belong to the place (1.2, 1.3).
 - Passes:
   - Behind a riverside promenade: the far bank, waterfront shops, a footbridge, city offices.
 - Fails:
   - A thin, empty distance.
   - A full distance padded with things from elsewhere.
 
-> distant background on outdoor scene is not rich enough
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+### 3.7 A reference shows a quality, not a design to copy.
 
-> baloon and mountains does not match a shopping district theme
->
-> (Papercraft Game Scene 2, 6-7 Nov)
-
-### 3.7 When you give a reference "to see what I mean", I take the quality from it and do not copy its design.
-
-- [ ] **Said.** Said about the Pinewood Valley background as a reference for the hometown. Elsewhere you have asked for a scene "like in the picture", so this is about that kind of reference, not every one.
+- [ ] When a reference is given to show a quality, take the quality from it and leave its design.
 - Passes:
-  - Learning from Pinewood Valley that layers should vary in kind, then drawing a farm valley for the hometown.
+  - Learning from a pine valley that layers should vary in kind, then drawing a farm valley.
 - Fails:
-  - Rebuilding Pinewood Valley's peaks, glacier and pine woods behind the hometown.
+  - Rebuilding the pine valley's peaks, glacier and woods behind a different scene.
 
-> refer to background of https://claude.ai/artifact/3PivfiN1j2qNZq2DVAuX5c to see what I mean, but don't copy that design
->
-> (Moperty session, 12-13 Nov)
+### 3.8 The main space visibly continues into the background.
 
-### 3.8 The background holds what the brief names: nothing more, and nothing you asked for is taken out.
-
-- [ ] **Said.** The MRT station changed three times. First you asked for a rich composition with elevators, vending machines "or another platform in the distant background". Then: keep it simple "for initial design", one platform with a concrete wall, not another platform. Then: more depth so the escalator and elevators for the exit fit.
-- Passes:
-  - MRT: one platform with a concrete wall; later a deeper platform with an escalator and a lift.
+- [ ] The ground the player walks on visibly connects or relates to the open view behind it, for example through a road, a path, a fence line or a slope that starts in the main space and carries on into the layers.
 - Fails:
-  - A far platform, a gallery, a concourse and a mural after you said simple.
-  - Taking out the escalator and lift to make it simple, when you had named them.
+  - A green that stops at its back edge, with a valley behind it that nothing leads into.
 
-> show rich composition of objects and structures in the train, like elevators, vending machines or another platform in the distant background.
->
-> (MRT scene 2, 7 Nov)
-
-> lets keep the station background simple for initial design, one platform with concrete wall in the background, not another platform. the train is the last / first car
->
-> (MRT scene 2, 7 Nov)
-
-> add more depth to the container so the platform is wide enough and can contain structures like the escalator and elevators for exit
->
-> (MRT scene 2, 7 Nov)
-
-![The accepted station: one platform, a concrete wall, exit structures behind.](checklist/mrt-final.jpg)
-
-*Do. The accepted station: one platform, a concrete wall, exit structures behind.*
-
-### 3.9 The main space visibly continues into the background.
-
-- [ ] **Said.** The ground the player walks on must visibly connect or relate to the open view behind it.
-- Fails:
-  - The current hometown green: the background "looks much better", but how the green continues into the valley is "not quite visible yet".
-- *Reading, to be confirmed:* How I would show it: something that starts in the main space and carries on into the layers, such as a road, a path, a fence line or a slope, as the road does in your mountain reference. You have not said which.
-
-> background looks much better. The main space continuation or relation to the background is not quite visible yet
->
-> (Answers to the open questions, 14 Nov)
-
-![The current hometown green: the link between the green and the valley is not visible yet.](checklist/hometown-v3.jpg)
-
-*Don't. The current hometown green: the link between the green and the valley is not visible yet.*
-
-*Reference. Your reference for 2.12. I read its road as one way to tie the ground to the background. (Your photo; shown in the published checklist only.)*
-
+*Reference. A road ties the ground to the mountains behind. (Reference photo, in the published checklist only.)*
 
 ## 4. Freestanding objects
 
@@ -662,61 +337,32 @@ Objects standing in the main space are paper models: a folded body with cut piec
 
 ### 4.1 Each freestanding object is a folded volume with cut pieces glued onto it.
 
-- [ ] **Said.** Build the object the way a paper kit does. The body is folded (a tent fold, a box, a tube, two slotted cards). Smaller parts are separate cut pieces glued on.
+- [ ] Build the object the way a paper kit does. The body is folded (a tent fold, a box, a tube, two slotted cards). Smaller parts are separate cut pieces glued on. See section 10.
 - Passes:
-  - Fox: the body is one sheet folded over the spine with the legs cut from its lower edge; the head is a card glued across the front; the tail is a card glued behind.
-  - Pine: two identical die-cut cards crossed at right angles.
+  - A fox: the body is one sheet folded over the spine with the legs cut from its lower edge; the head is a card glued across the front; the tail is a card glued behind.
+  - A pine: two identical die-cut cards crossed at right angles.
 - Fails:
   - A bicycle, a scooter, a bush or a pigeon as one upright flat cut-out standing in the open.
-- *Reading, to be confirmed:* Your complaint about Downtown 2's objects was about its building structures (4.8), not its folded props. Small folded animals such as the dog and pigeons are to be turned into perspective (4.9). The Blibli scooter, bicycle, pigeons, bushes and chairs were rebuilt this way, and you never judged them on their own.
-
-> Freestanding objects that I typically like is combination of folded and arrangement of cut papers glued together, like the fox and pine trees in https://claude.ai/artifact/D52gc9dtiTQWzgPrxe88nv . Flat objects are allowed too if the objects are placed near surfaces, structures, or the object naturally plane-shaped, or intentional (humans). details of flat objects emphasized through color tones.
->
-> (Papercraft Game Scene 3, 7-12 Nov; repeated in Downtown, 6-7 Nov and Downtown 2, 7 Nov)
-
-> keep looping to refine the objects like the bicycle on the walkable scene
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-> keep looping and refining the paper objects (apply folding + cutting + gluing techniques for freestanding objects, colors for flat objects), object placements and organization, and enrich the layered open-view background
->
-> (Moperty session, 12-13 Nov)
 
 ![How the fox and the pine are made.](checklist/fold-recipes.svg)
 
 *Reference. How the fox and the pine are made.*
 
-![Paper Grove: the fox and the pines you pointed to. The other animals are on the same page; you did not name them.](checklist/grove.jpg)
+![Paper Grove: the fox and the pines.](checklist/grove.jpg)
 
-*Do. Paper Grove: the fox and the pines you pointed to. The other animals are on the same page; you did not name them.*
-
-![The Blibli street objects rebuilt by the recipe. Not judged by you on their own.](checklist/street-objects.jpg)
-
-*Reference. The Blibli street objects rebuilt by the recipe. Not judged by you on their own.*
+*Do. Paper Grove: the fox and the pines.*
 
 ### 4.2 The scene is not made of single flat stickers.
 
-- [ ] **Said.** Paper diorama objects have depth: real faces, thickness and folds. On 31 Oct you allowed a single flat piece for "simple objects and the playable character". On 7 Nov you gave the three cases in 4.4, and on 14 Nov you confirmed that a simple object standing in the open is folded.
+- [ ] Paper diorama objects have depth: real faces, thickness and folds. A simple object standing in the open is folded too.
 - Passes:
   - A folded storefront, folded parcels, a mailbox with a flap that lifts.
 - Fails:
   - Shelves, a conveyor and banners all drawn as flat cards.
 
-> Papercraft diorama objects have depth, not just a single paper sticker for everything
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-> A single papercraft piece is for simple objects and the playable character, adopting Paper Mario.
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-> folded
->
-> (Answers to the open questions, 14 Nov, on a simple object standing in the open)
-
 ### 4.3 Each freestanding object has variety of shape, depth and detail.
 
-- [ ] **Said.** An object is more than its simplest outline. It has several parts at different depths, and those parts differ in shape and tone.
+- [ ] An object is more than its simplest outline. It has several parts at different depths, and those parts differ in shape and tone.
 - Passes:
   - A tree with a trunk that forks into branches and leaf clusters cut separately, set at different depths and in different greens.
   - A palm with a ringed trunk and fans of fronds at different headings.
@@ -724,32 +370,19 @@ Objects standing in the main space are paper models: a folded body with cut piec
   - A tree as one trunk and one round blob.
   - A row of identical plain boxes.
 
-> Standing paper-folded / cut 3d objects lacks variety of shape, depth and detail. Look at trees in referenced image to see what I mean.
->
-> (Papercraft Game Scene 2, 6-7 Nov)
+![Variety of shape, depth and detail in a tree.](checklist/tree-example.svg)
 
-> Freestanding paper-folded / cut 3d objects lacks variety of shape, depth and detail. Look at trees example for reference
->
-> (MRT scene 2, 7 Nov)
+*Reference. Variety of shape, depth and detail in a tree.*
 
-![What the trees example asks for.](checklist/tree-example.svg)
+### 4.4 A flat card is used only in three cases.
 
-*Reference. What the trees example asks for.*
-
-### 4.4 A flat card is used only where one of your three cases applies.
-
-- [ ] **Said.** Flat is allowed when the object (a) is placed near a surface or structure, (b) is naturally plane-shaped, or (c) is flat on purpose, which means people. Anything else standing in open space is folded.
+- [ ] Flat is allowed when the object (a) is placed near a surface or structure, (b) is naturally plane-shaped, or (c) is flat on purpose, which means people. Anything else standing in open space is folded.
 - Passes:
   - A bench against a shop wall; birds on a roof ridge.
   - A sign, a flag, a wheel, a table top, a fence, a poster.
   - Every person, including the player.
 - Fails:
   - A lone flat tree, bush, vehicle or animal in the middle of the walk area.
-- *Reading, to be confirmed:* "Near" I take to mean touching or overlapping a wall, a facade or a larger object as seen from the game camera. Anything with clear ground all round it is folded.
-
-> Freestanding objects that I typically like is combination of folded and arrangement of cut papers glued together, like the fox and pine trees in https://claude.ai/artifact/D52gc9dtiTQWzgPrxe88nv . Flat objects are allowed too if the objects are placed near surfaces, structures, or the object naturally plane-shaped, or intentional (humans). details of flat objects emphasized through color tones.
->
-> (Papercraft Game Scene 3, 7-12 Nov)
 
 ![The three allowed cases and the one that is not.](checklist/flat-cases.svg)
 
@@ -757,119 +390,52 @@ Objects standing in the main space are paper models: a folded body with cut piec
 
 ### 4.5 Detail on flat pieces is made with colour tones.
 
-- [ ] **Said.** Details on a flat object are brought out with colour tones. Your latest wording: "colors for flat objects".
-- Passes:
-  - The accepted Blibli cast.
-- *Reading, to be confirmed:* How I apply it: separate pieces in lighter and darker tones of the object's own colour, no drawn outlines, no see-through printed shading. You have not judged that treatment itself.
+- [ ] Details on a flat object are brought out with tones of colour.
 
-> details of flat objects emphasized through color tones.
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+![Flat characters with detail from tones.](checklist/cast.jpg)
 
-> keep looping and refining the paper objects (apply folding + cutting + gluing techniques for freestanding objects, colors for flat objects), object placements and organization, and enrich the layered open-view background
->
-> (Moperty session, 12-13 Nov)
-
-![Outlines against tones.](checklist/tones.svg)
-
-*Reference. Outlines against tones.*
-
-![The accepted Blibli cast: detail from tones.](checklist/cast.jpg)
-
-*Do. The accepted Blibli cast: detail from tones.*
+*Do. Flat characters with detail from tones.*
 
 ### 4.6 There are enough objects, and objects of one kind vary.
 
-- [ ] **Said.** A space must not look sparse, and the objects in it must vary. Richness comes from detail, not from the number of objects.
-- Passes:
-  - Pinewood Valley's foreground, which you called sufficient.
+- [ ] A space must not look sparse, and the objects in it must vary. Richness comes from detail, not from the number of objects.
 - Fails:
-  - The first store-room: a few similar cartons with empty floor between them.
-- Attempts the owner has not judged yet:
-  - The store-room after my fix: cartons, totes, crates, phone boxes, binders, tape rolls and label rolls on the racks.
-- *Reading, to be confirmed:* From the standard I wrote and you adopted: one base design per kind of object, varied in size, proportion, colour within a narrow family, pose and small add-ons.
-
-> outlet stockroom objects are not variative enough and too sparse
->
-> (Papercraft Game Scene 2, 6-7 Nov)
-
-> The variation of foreground objects are sufficient
->
-> (Pinewood Valley session, 5 Nov)
-
-> Make the scene rich in details, not quantity
->
-> (Answers to the open questions, 14 Nov)
+  - A store-room with a few similar cartons and empty floor between them.
 
 ![Too sparse, too similar.](checklist/storeroom-before.jpg)
 
 *Don't. Too sparse, too similar.*
 
-![My fix, not yet judged by you: more kinds, more of them.](checklist/storeroom-after.jpg)
+### 4.7 The paper objects are ambitious: each interactive one has a moving paper part of its own.
 
-*Reference. My fix, not yet judged by you: more kinds, more of them.*
-
-### 4.7 The paper objects are ambitious: none is a flat sticker, and each interactive one has a moving paper part of its own.
-
-- [ ] **Said.** Said about the first Blibli world, where everything was a flat card.
+- [ ] No object is a flat sticker, and an interactive object does something a paper model could do.
 - Passes:
-  - Your examples: a letter pulled out of the mailbox and shown close up; a computer that rates the product in its tray with stars.
+  - A letter pulled out of a mailbox and shown close up.
+  - A computer that rates the product in its tray with stars.
 - Fails:
   - Shelves, a conveyor and banners drawn as flat cards.
-- Attempts the owner has not judged yet:
-  - Drawers that slide, flaps that hinge, a home whose front swings open.
-
-> Direction is correct but be more ambitious in creating the papercraft objects in the environment.
->
-> (Joy-Con portfolio TV game, 31 Oct)
 
 ### 4.8 Structures are spaced and connected so that every space reads clearly, as real 3D or as a flat sheet.
 
-- [ ] **Said.** What you called badly designed in Downtown 2 was most of the spacing and flow of its building structures. Your example: the construction field with its crane and the building behind them, where you could not tell whether that space was 3D or a flat sheet.
+- [ ] Each structure has room around it and a clear relation to its neighbours. From the game camera it is always plain whether a space is real depth or a flat layer.
 - Fails:
-  - Downtown 2: the construction field, its crane and the building behind them.
-- *Reading, to be confirmed:* How I test it: each structure has room around it and a clear relation to its neighbours, and from the game camera I can say of every space whether it is real depth or a flat layer.
+  - A construction field, its crane and the building behind them, set so that it is unclear whether the space is 3D or a flat sheet.
 
-> "Paper Salaryman - Downtown 2" does not meet the standard at all. Scene organization is a mess and objects are badly designed.
->
-> (Moperty session, 12-13 Nov)
+![Structures whose spacing and flow do not read.](checklist/downtown2-a.jpg)
 
-> Most spacing & flow of downtown 2 building structures, e.g construction field with its crane and the building on sight behind them. I don't even know if that space is 3d or a flat paper
->
-> (Answers to the open questions, 14 Nov)
-
-![Downtown 2, judged a mess with badly designed objects.](checklist/downtown2-a.jpg)
-
-*Don't. Downtown 2, judged a mess with badly designed objects.*
-
+*Don't. Structures whose spacing and flow do not read.*
 
 ### 4.9 Folded objects are turned at an angle to the camera, so their folds and faces show.
 
-- [ ] **Said.** A folded object seen square-on reads as flat. Fold it, then rotate it into perspective so the camera sees more than one face. Choose the fold that suits the object; your examples show several.
+- [ ] A folded object seen square-on reads as flat. Fold it, then rotate it into perspective so the camera sees more than one face. Choose the fold that suits the object (section 10).
 - Passes:
-  - The fox: one flat cut piece, folded over its spine and stood at an angle.
-  - The moose and the elephant: a box body with legs cut out of its sides.
-  - The frog and the duck: flaps folded outwards, a strip curled into a body.
+  - A fox: one flat cut piece, folded over its spine and stood at an angle.
 - Fails:
-  - The folded dog and pigeons seen square-on from the game's low camera, where they are hard to read.
-- *Reading, to be confirmed:* The names of the folds are my descriptions of your photos.
+  - A folded dog and pigeons seen square-on from a low camera, where they are hard to read.
 
-> fold and rotate them into perspective. Look at the folded and original (fox), as well as other folding techniques examples
->
-> (Answers to the open questions, 14 Nov)
+*Do. The fox, folded and stood at an angle. (Reference photo, in the published checklist only.)*
 
-*Do. The fox, folded and stood at an angle. (Your photo; shown in the published checklist only.)*
-
-*Reference. The same fox before folding: one flat cut piece. (Your photo; shown in the published checklist only.)*
-
-*Do. A box body with cut-out legs and a wedge head hung over the front. (Your photo; shown in the published checklist only.)*
-
-*Do. A box body; the ears and trunk are flaps folded outwards. (Your photo; shown in the published checklist only.)*
-
-*Do. Legs folded forward onto the lily pad. (Your photo; shown in the published checklist only.)*
-
-*Do. A strip curled into the body. (Your photo; shown in the published checklist only.)*
-
+*Reference. The same fox before folding: one flat cut piece. (Reference photo, in the published checklist only.)*
 
 ## 5. Placement and organisation
 
@@ -877,127 +443,71 @@ Objects are placed for a reason, form one scene with the container, and never ge
 
 ### 5.1 No object is placed at random, and the scene holds together as one.
 
-- [ ] **Said.** Every object is where it is because of something next to it. The scene reads as one place, not a collection of items.
+- [ ] Every object is where it is because of something next to it. The scene reads as one place, not a collection of items.
 - Passes:
-  - A café table with its chairs under a parasol beside the café (Blibli, accepted).
+  - A café table with its chairs under a parasol beside the café.
 - Fails:
-  - The first downtown build: "Objects randomly placed", "Lack of cohesion".
-  - Downtown 2, which regrouped the props into small scenes and was still "a mess".
-- Attempts the owner has not judged yet:
-  - Moving day at the last home on the hometown green: a van, cartons, a mover, a child watching.
+  - Props scattered with no relation to each other.
 
-> Lack of cohesion in the scene
->
-> (Start of Downtown 2, 7 Nov, about the first downtown build)
+![Objects grouped around the shop, the gate and the café.](checklist/blibli-final.jpg)
 
-> Objects randomly placed
->
-> (Start of Downtown 2, 7 Nov, about the first downtown build)
-
-> Scene organization is a mess
->
-> (Moperty session, 12-13 Nov)
-
-![Downtown 2: "Scene organization is a mess".](checklist/downtown2-b.jpg)
-
-*Don't. Downtown 2: "Scene organization is a mess".*
-
-![Blibli promenade, accepted: objects grouped around the shop, the gate and the café.](checklist/blibli-final.jpg)
-
-*Do. Blibli promenade, accepted: objects grouped around the shop, the gate and the café.*
+*Do. Objects grouped around the shop, the gate and the café.*
 
 ### 5.2 Drawn as a plan, the scene is well organised.
 
-- [ ] **Said.** Draw the scene from above as in 2.1: the main space, each structure, the surroundings. The spacing of the structures and the flow between them must look organised in that plan. Downtown 2 fails this test.
+- [ ] Draw the scene from above as in 2.1: the main space, each structure, the surroundings. The spacing of the structures and the flow between them must look organised in that plan. Look for one anchor, a few groups around it, and clear ground to walk between them.
 - Passes:
-  - "A brick plaza closed by shops on three sides, the Blibli shop as its anchor, the river through a gate at the back left."
+  - "A brick plaza closed by shops on three sides, the shop as its anchor, the river through a gate at the back left."
 - Fails:
-  - Downtown 2: the construction field, the crane and the building behind them.
-- *Reading, to be confirmed:* What I look for in the plan: one anchor, a few groups around it, and clear ground to walk between them. You have not confirmed these three.
+  - A plan in which structures crowd each other with no clear route between them.
 
-> Scene organization is a mess
->
-> (Moperty session, 12-13 Nov)
+![A scene plan.](checklist/zones.svg)
 
-> Same as (2). If you put it in scene plan view like 2.1 , you will know it is not well organized.
->
-> (Answers to the open questions, 14 Nov)
+*Reference. A scene plan.*
 
-![The plan view of 2.1.](checklist/zones.svg)
+![A scene whose organisation is a mess.](checklist/downtown2-b.jpg)
 
-*Reference. The plan view of 2.1.*
-
-![Downtown 2: "Scene organization is a mess".](checklist/downtown2-b.jpg)
-
-*Don't. Downtown 2: "Scene organization is a mess".*
-
+*Don't. A scene whose organisation is a mess.*
 
 ### 5.3 Nothing blocks a thing that is meant to be seen or read.
 
-- [ ] **Said.** Check every sign, face and interactive object from the game camera. Nothing may cross in front of it.
+- [ ] Check every sign, face and interactive object from the game camera. Nothing may cross in front of it.
 - Passes:
-  - Short grab straps hung only in the gaps between the car's signs.
-  - The kiosk hawker standing on a step so his head and shoulders clear the counter.
+  - Short grab straps hung only in the gaps between a train car's signs.
+  - A kiosk seller standing on a step so that head and shoulders clear the counter.
 - Fails:
-  - Long grab handles hanging across the text of the car's posters and line map.
-  - A hawker hidden behind his own counter.
+  - Long grab handles hanging across the text of posters and the line map.
   - A kiosk post crossing a face.
 
-> I want the handlebars on the MRT to be shorter because it is obstructing the text.
->
-> (MRT scene 2, 7 Nov)
+![Straps hang across the signs.](checklist/mrt-straps.jpg)
 
-> Also the hawker merchant cannot be seen now
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+*Don't. Straps hang across the signs.*
 
-![Before: straps hang across the signs.](checklist/mrt-straps.jpg)
+![Straps shortened and moved clear.](checklist/mrt-final.jpg)
 
-*Don't. Before: straps hang across the signs.*
-
-![After: straps shortened and moved clear.](checklist/mrt-final.jpg)
-
-*Do. After: straps shortened and moved clear.*
+*Do. Straps shortened and moved clear.*
 
 ### 5.4 Unnecessary posters and duplicated ones are removed.
 
-- [ ] **Said.** Said about the MRT car and platform.
+- [ ] A poster or sign that serves no purpose comes out, and no design appears twice in one view.
 - Passes:
-  - The MRT you accepted with "Looks good": one exit sign over the exit, one line map, no adverts.
+  - One exit sign over the exit, one line map, no adverts.
 - Fails:
-  - Phone and coffee adverts repeated in the car; two exit signs; the same lightbox on two walls.
-- *Reading, to be confirmed:* My test: a poster or sign stays only if it names the place, directs the player or tells the project, and no design appears twice in one view.
-
-> Reduce unnecessary posters and duplicated one.
->
-> (MRT scene 2, 7 Nov)
+  - Adverts repeated along a train car; two exit signs; the same lightbox on two walls.
 
 ### 5.5 An object's spot and facing make sense against what stands beside it.
 
-- [ ] **Said.** The bench near the foreground of the promenade was out of place: nobody would put a bench there, facing that way, with a store on its left.
+- [ ] Place and turn each object the way someone would really set it there.
 - Fails:
-  - The bench in the foreground of the Blibli promenade.
+  - A bench in the foreground, facing a direction nobody would choose, with a store on its left.
 
-> also remove the bench near foreground
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+### 5.6 The objects and the container blend.
 
-> out of place. No bench will be put there and facing that direction when there is a store on the left side like in the scene
->
-> (Answers to the open questions, 14 Nov)
-
-
-### 5.6 The objects and the container blend: relief ties what stands in the scene to the bounds.
-
-- [ ] **Said.** Freestanding objects, relief and the box surfaces look like one build. Relief on the bounds is what joins them (items 2.4 and 2.6).
+- [ ] Freestanding objects, relief and the container surfaces look like one build. Relief on the bounds is what joins them (2.4, 2.6).
 - Passes:
   - A bench under a shop window; a stall built out from a facade.
 - Fails:
   - Objects standing in front of blank walls.
-
-> minimum use of relief papercraft object to add cohesiveness with bound surfaces, especially if the bounds are designed for enclosed views like walls, near-buildings, etc
->
-> (Papercraft Game Scene 2, 6-7 Nov)
 
 ## 6. Characters
 
@@ -1005,486 +515,198 @@ People are flat on purpose: one cut sheet each, in one family, funny and short, 
 
 ### 6.1 Every person is one cut sheet at short, funny, Paper-Mario-like proportions.
 
-- [ ] **Said.** Passers-by are drawn like the player: single sheets, shorter than before, funny, Paper-Mario-like.
-- Passes:
-  - The Blibli cast.
+- [ ] Passers-by are drawn like the player: single sheets, short, funny, with a big round head, a short body and stubby legs.
 - Fails:
   - Tall, thin, realistic figures.
   - Passers-by in a different style from the player.
-- *Reading, to be confirmed:* The design you then accepted has a big round head close to half the figure's height, a short body, stubby legs and the white paper edge all round.
 
-> The single-sheet humans or characters design should be similar to the playable character. Shorter than current model, and funny Paper-Mario-like.
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+![The player and passers-by.](checklist/salaryman.jpg)
 
-![The accepted player and passers-by.](checklist/salaryman.jpg)
-
-*Do. The accepted player and passers-by.*
+*Do. The player and passers-by.*
 
 ### 6.2 The player is a bored salaryman with a clean short Japanese haircut, and is not cute.
 
-- [ ] **Approved.** A suit, a loosened tie, a briefcase, heavy lids, a flat mouth, a clean short side-parted cut. He is a salaryman, not a mailman or courier.
-- Passes:
-  - The player as accepted on 7 Nov ("Yes, meets it").
+- [ ] A suit, a loosened tie, a briefcase, heavy lids, a flat mouth, a clean short side-parted cut.
 - Fails:
   - A cheerful courier with a mail bag.
   - A cute face with big sparkling eyes.
 
-> I want to redesign the playable character as salaryman with Japanese clean short hairstyle
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-> The main character shouldn't be cute. It should be bored salaryman
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-> I want to reframe the character as salaryman, not mailman.
->
-> (MRT scene, 6 Nov)
-
 ### 6.3 Faces are in the Gaia Online avatar style, drawn crisply, with small eyes.
 
-- [ ] **Approved.** You first asked for the Pico World face style, then changed to Gaia Online "in paper mario higher resolution". Your one correction to the result was the eye size; after that, "Yes, meets it".
-- Passes:
-  - Eyes at about 70% of the first attempt.
+- [ ] The face style is Gaia Online at Paper Mario crispness. Eyes stay small.
 - Fails:
   - Large eyes.
 
-> Changed my mind. Use gaia online face style, but in paper mario higher resolution
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-> Make the eyes smaller
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
 ### 6.4 There are three builds, and the player is the average one.
 
-- [ ] **Said.** Short is the base. Average has slightly longer legs and body. Big is slightly taller and broader than average, for big, energetic characters.
+- [ ] Short is the base. Average has slightly longer legs and body. Big is slightly taller and broader than average, for big, energetic characters.
 - Passes:
-  - The child and the sun-hat lady short; the player average; the father and the hawker big.
+  - A child and an old lady short; the player average; a father and a hawker big.
 - Fails:
   - Everyone the same height.
-
-> Support 3 character height. Short: current height, (2) average: Slightly lengthen the leg and body. (3) big characters: slightly taller and bigger than average, for big and energetic characters.
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
-> The playable character is average height
->
-> (Papercraft Game Scene 3, 7-12 Nov)
 
 ![The three builds.](checklist/builds.jpg)
 
 *Do. The three builds.*
 
-### 6.5 Each passer-by has their own expression; nobody shares one stock cheeky smile.
+### 6.5 Each passer-by has their own expression.
 
-- [ ] **Approved.** A cast, the way Paper Mario has one: grumpy, determined, surprised, cool, sleepy, shouting. Blush only where it suits the face.
-- Passes:
-  - The seven expressions on the Blibli street, accepted with "Yes, meets it".
+- [ ] A cast, the way Paper Mario has one: grumpy, determined, surprised, cool, sleepy, shouting. Blush only where it suits the face.
 - Fails:
-  - Every passer-by with the same open eyes, small smile and blush.
+  - Every passer-by with the same open eyes, small cheeky smile and blush.
 
-> I personally don't like the cheeky facials of NPC. Add more facial expressions like Paper Mario.
->
-> (Papercraft Game Scene 3, 7-12 Nov)
+![One cheerful face on everyone.](checklist/npcs-cheerful.jpg)
 
-![Before: one cheerful face on everyone.](checklist/npcs-cheerful.jpg)
+*Don't. One cheerful face on everyone.*
 
-*Don't. Before: one cheerful face on everyone.*
+![Each has their own expression.](checklist/cast.jpg)
 
-![After: each has their own expression.](checklist/cast.jpg)
-
-*Do. After: each has their own expression.*
+*Do. Each has their own expression.*
 
 ### 6.6 No character is hidden by the furniture they stand behind.
 
-- [ ] **Said.** Anyone behind a counter or a rail is raised or moved until their head and shoulders show.
+- [ ] Anyone behind a counter or a rail is raised or moved until their head and shoulders show.
 - Passes:
-  - The hawker on a step behind his kiosk counter.
+  - A hawker on a step behind his kiosk counter.
 - Fails:
   - A seller shorter than his counter.
 
-> Also the hawker merchant cannot be seen now
->
-> (Papercraft Game Scene 3, 7-12 Nov)
-
 ## 7. Telling the project
 
-The scene says what the project is through a place and things to do in it. It is not written out, not shown on a screen, not turned into a puzzle, and not hidden in a far-fetched metaphor.
+The scene says what the project is through a place and things to do in it. It is not written out, not shown on a screen, not turned into a game, and not hidden in a far-fetched metaphor.
 
 ### 7.1 The project is told by the scene and by interaction, not by text or screenshots.
 
-- [ ] **Said.** No paragraph describing the project, no screenshot of it and no written note in the scene. That includes a note about your role, such as the one in the Blibli mailbox.
+- [ ] No paragraph describing the project, no screenshot of it and no written note in the scene.
 - Passes:
   - For Sale and For Rent signs on properties.
-  - A catalog leaflet beside the showcased phone that opens to the product spec.
+  - A catalog leaflet beside a showcased phone that opens to the product spec.
 - Fails:
   - A panel of text explaining the project.
   - Screenshots of the website on a wall.
-
-> Tell the story from scene and interaction, not by text description, e.g by adding For Sale / For Rent posters on some properties in the scene
->
-> (Downtown, 6-7 Nov)
-
-> Remove textual description and screenshots about the projects. Encode them in the scene and interactions, e.g view product spec by clicking on catalog paper beside showcased smartphone
->
-> (Papercraft Game Scene, 6 Nov)
-
-> Remove it
->
-> (Answers to the open questions, 14 Nov, on the role note in the Blibli mailbox)
+  - A note describing a role, left in a mailbox.
 
 ### 7.2 Each interactive object has its own interaction, and that interaction carries one fact.
 
-- [ ] **Said.** Different objects do different things, and what each does stands for something true about the project.
+- [ ] Different objects do different things, and what each does stands for something true about the project.
 - Passes:
-  - Your examples: a computer that rates the product in the tray with stars; a mailbox whose letter pulls out and is shown close up; a catalog paper that shows the product detail.
+  - A computer that rates the product in its tray with stars.
+  - A mailbox whose letter pulls out and is shown close up.
+  - A catalog paper that shows the product detail.
 - Fails:
   - Every stop opening the same kind of letter.
-- Attempts the owner has not judged yet:
-  - A home whose front swings open to show its rooms.
 
-> Come up with unique interactions for different papercraft objects to convey or represent the message.
->
-> (Joy-Con portfolio TV game, 31 Oct)
+### 7.3 The product is not shown literally.
 
-### 7.3 The product is not shown literally, such as its website on a phone or a screen.
-
-- [ ] **Said.** A device showing the app would work for any project, so it says nothing particular and is not creative.
+- [ ] A device showing the app or the website would work for any project, so it says nothing particular.
 - Passes:
   - Homes with sale and rent signs for a property app.
 - Fails:
-  - The salaryman holding up a phone that shows the Moperty app.
+  - A character holding up a phone that shows the app.
   - A street poster with a lit screen showing the website.
 
-> In scene interaction is allowed, but don't express it literally, e.g opening moperty website in a phone. If we go this way, then this apply to all project and it is not creative
->
-> (Moperty session, 12-13 Nov)
+![The app on a phone.](checklist/sketch-literal.jpg)
 
-![Rejected sketch: the app on a phone.](checklist/sketch-literal.jpg)
-
-*Don't. Rejected sketch: the app on a phone.*
+*Don't. The app on a phone.*
 
 ### 7.4 The metaphor is not so far from the product that it has to be explained.
 
-- [ ] **Said.** The scene should still plainly be about the project's subject. Animals and their homes standing in for people and property is too far.
+- [ ] The scene is still plainly about the project's subject, and that subject is physically present: homes for a property app, goods for a shop.
 - Fails:
-  - A tree of birdhouses with birds looking for a home.
-- Attempts the owner has not judged yet:
-  - Real homes on a hometown green.
-- *Reading, to be confirmed:* I rule out other stand-ins of the same kind too, such as shells and hermit crabs. My test: the project's real subject is physically present in the scene (homes for a property app, goods for a shop).
+  - A tree of birdhouses with birds looking for a home, standing in for a property app.
 
-> Bird tree metaphor is too far
->
-> (Moperty session, 12-13 Nov)
+![A birdhouse tree: too far.](checklist/sketch-far.jpg)
 
-![Rejected sketch: the birdhouse tree.](checklist/sketch-far.jpg)
+*Don't. A birdhouse tree: too far.*
 
-*Don't. Rejected sketch: the birdhouse tree.*
+![Between too literal and too far.](checklist/metaphor-scale.svg)
 
-![Where the accepted ideas sit between too literal and too far.](checklist/metaphor-scale.svg)
-
-*Reference. Where the accepted ideas sit between too literal and too far.*
+*Reference. Between too literal and too far.*
 
 ### 7.5 Interactions are micro interactions; the scene is not gamified.
 
-- [ ] **Said.** Paper Salaryman is already a game inside Portendo Switch. A scene inside it does not get game mechanics of its own. Each interaction is small.
+- [ ] The scene sits inside a game already and gets no game mechanics of its own. Each interaction is small: one press, one visible result, nothing to remember or combine.
+- Passes:
+  - Pressing once to swing a home open.
 - Fails:
   - Raising a phone to reveal pins over homes and filtering them by sale or rent.
-- Attempts the owner has not judged yet:
-  - Pressing A once to swing a home open.
-- *Reading, to be confirmed:* My test for "micro": one press, one visible result, nothing to remember or combine. On 31 Oct you wrote "treat each work page as a game in itself"; I take the later sentences as the rule.
-
-> You shouldn't work out a game in game
->
-> (Moperty session, 12-13 Nov)
-
-> Paper Salaryman is a game in Portendo Switch, but you were trying to create a full gamification in Paper Salaryman. Create micro interactions instead
->
-> (Answers to the open questions, 14 Nov)
-
 
 ### 7.6 Only the product is shown; the technology is left out.
 
-- [ ] **Said.** Nothing about the tech stack or how it was built: no tech labels, no crane building "backend" and "frontend" floors, no drawing board for the UI design. First said for Moperty. It applies to every scene, including the tech parcels in the Blibli street.
+- [ ] Nothing about the tech stack or how the product was built.
 - Fails:
-  - A site board listing Vue, Laravel and Postgres.
-  - The tech parcels in the Blibli street.
-- Attempts the owner has not judged yet:
-  - Homes, signs and a flyer board, with no tech labels.
+  - A site board listing frameworks and databases.
+  - A crane building "backend" and "frontend" floors.
+  - Parcels labelled with technologies.
 
-> I only want to encode the product onto the scene. Leave out encoding tech details, they are not necessary.
->
-> (Moperty session, 12-13 Nov)
+### 7.7 All text in the scene is in English.
 
-> it should go
->
-> (Answers to the open questions, 14 Nov, on the tech parcels in the Blibli street)
-
-
-### 7.7 For Moperty, the scene is a single space, either indoor or outdoor.
-
-- [ ] **Said.** One space, not a street plus rooms.
-- Fails:
-  - A street with a sales gallery you enter.
-- Attempts the owner has not judged yet:
-  - One outdoor green.
-
-> I want only a single space, either indoor or outdoor, no need both.
->
-> (Moperty session, 12-13 Nov)
-
-### 7.8 The game starts in the MRT; each project is a stop the salaryman walks out at.
-
-- [ ] **Said.** Home is the character inside the train. A project scene is the destination of the chosen stop. A project can be the scene itself (as Blibli is) or an interaction within a scene, such as viewing a paper map; a phone is ruled out by 7.3. The MRT scene stands in its station. The moving train is probably for the home screen, while the console is still handheld.
-- Passes:
-  - Choosing a station on the line map, the doors opening, walking out (the MRT you accepted).
-
-> The landing / home scene is the character inside a moving train or MRT. The destination is the specific work scenes. Character walk out of MRT when arriving at destination (selected stop)
->
-> (MRT scene, 6 Nov)
-
-> The concept of the game starts from MRT scene... Then we can go to many destinations. Moperty either can be expressed as the scene itself (like blibli in papercraft game scene 3 session), or interaction within a scene (like viewing a phone or map). Regardless, an initial scene is needed as the MRT train destination
->
-> (Moperty session, 12-13 Nov)
-
-> the moving train is probably for the home screen when the nintendo is still handheld
->
-> (Answers to the open questions, 14 Nov)
-
-> Yes paper map is acceptable
->
-> (Answers to the open questions, 14 Nov)
-
-### 7.9 All text in the scene is in English.
-
-- [ ] **Said.** Signs, maps and labels use English only.
+- [ ] Signs, maps and labels use English only.
 - Passes:
   - "Exit".
 - Fails:
   - "Exit · Keluar".
 
-> Use only English language.
->
-> (MRT scene 2, 7 Nov)
+### 7.8 The place as a whole stands for the work.
 
-### 7.10 The MRT platform carries a complete network map.
-
-- [ ] **Said.** Said about the MRT platform.
-- Passes:
-  - The map in the MRT you accepted: four lines, interchanges and fifteen named stations including Blibli.com, Moperty and Radjastone.
-
-> Also put More complete version of MRT map on the platform walls.
->
-> (MRT scene 2, 7 Nov)
-
-### 7.11 The place as a whole stands for the work, and not every section of the old page is carried into it.
-
-- [ ] **Said.** The environment and its objects represent the overall work. A scene does not need a stop for every section of the existing work page.
+- [ ] The environment and its objects represent the overall work. Not every section of the source material needs a counterpart in the scene.
 - Fails:
-  - Porting every paragraph and screenshot of the old page into stops.
+  - Porting every paragraph and screenshot of a work page into the scene.
 
-> The indoor environment and its objects represent the overall work.
->
-> (Joy-Con portfolio TV game, 31 Oct)
+### 7.9 A logo is used sparingly.
 
-> Showing the screenshots are not required, they can be removed. Not every section in existing work page should be ported
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-### 7.12 A logo is used sparingly.
-
-- [ ] **Said.** A logo placed everywhere loses its uniqueness. For Moperty: one building that resembles the logo, and a single logo on the paper map the player views.
+- [ ] A logo placed everywhere loses its uniqueness. Use it once or twice, for example as one building that resembles it and a single logo on a map the player views.
 - Fails:
   - Logo stickers on many objects in one scene.
 
-> The principle is don't overuse logo. Placing logo stickers everywhere reduce its uniqueness. For example, only use the building resembling the logo and a single logo in viewed paper map
->
-> (Answers to the open questions, 14 Nov)
+## 8. Paper look
 
+What makes the scene read as paper.
 
-## 8. Scene briefs you have given
+### 8.1 The look is inspired by Paper Mario, with original art.
 
-What you have asked each scene to be. A scene is checked against its own brief as well as the general checks.
-
-### 8.1 Blibli: a store in a walkable riverside shopping centre, with the river visible.
-
-- [ ] **Said.** Outdoors: a riverside or bayside shopping centre with a rich mix of structures such as hawker stalls, trees and another store; a mailbox and stacked delivery boxes outside the store. Indoors: the first floor is a smartphone showcase standing for the product detail project; the second floor is a storage room standing for the product review project.
-- Passes:
-  - The Blibli promenade you accepted on 12 Nov.
-- Attempts the owner has not judged yet:
-  - The outlet and the store-room as they stand.
-
-> I want the scene to be located in a walkable outdoor bayside / riverside shopping center like in the picture, with rich combination of structures and objects like hawker stalls, trees, another store, etc. The river should be visible.
->
-> (Papercraft Game Scene 2, 6-7 Nov)
-
-> The store building is located in shopping street. The first floor is smartphone showcase, representing the product detail project. The second floor is storage room, representing product review project.
->
-> (Papercraft Game Scene, 6 Nov)
-
-> Blibli work scene have a mailbox and delivery package boxes stacked outside the store.
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-![The accepted Blibli promenade.](checklist/blibli-final.jpg)
-
-*Do. The accepted Blibli promenade.*
-
-### 8.2 MRT: an end car of the train, cut open, standing in an underground station that surrounds it.
-
-- [ ] **Said.** The playable area is inside the car. The view is the same train perspective as before. The station is all around the car, not only seen through its windows. The strip at the bottom of the frame is the car's wheels, not a full-width track. The car is the last or first car. The platform is deep enough for the escalator and elevators to the exit.
-- Passes:
-  - The MRT you accepted with "Looks good".
-- Fails:
-  - A station that exists only as a view through the car's windows.
-  - A band of rails and sleepers across the whole bottom of the frame.
-
-> I want to put the train in an underground station. The playable area is inside the train
->
-> (MRT scene 2, 7 Nov)
-
-> I want to keep the same train perspective as in current box scene, but put the train in a station inside. The station is not only visible through the train windows.
->
-> (MRT scene 2, 7 Nov)
-
-> Then it should be the wheels. The tracks are visible on both sides of the car anyway.
->
-> (MRT scene 2, 7 Nov)
-
-> the train is the last / first car
->
-> (MRT scene 2, 7 Nov)
-
-![The accepted MRT.](checklist/mrt-final.jpg)
-
-*Do. The accepted MRT.*
-
-### 8.3 Moperty: one space that shows only the product, reached as an MRT destination.
-
-- [ ] **Said.** See 7.3 to 7.8. The logo appears twice only: as a building that resembles it, and once on the paper map the player views (7.12).
-- Attempts the owner has not judged yet:
-  - The hometown green. It has no logo building and no paper map yet.
-- *Reading, to be confirmed:* You asked earlier for colours that "reflect the logo, but add depth and details". I have kept the logo's indigo, lavender and yellow as accent colours; you have not said whether that still holds.
-
-> Also add a building resembling the Moperty logo.
->
-> (Downtown, 6-7 Nov)
-
-> colors should reflect the logo, but add depth and details.
->
-> (Downtown, 6-7 Nov)
-
-> only use the building resembling the logo and a single logo in viewed paper map
->
-> (Answers to the open questions, 14 Nov)
-
-
-### 8.4 Radjastone: starts from nature and architecture.
-
-- [ ] **Said.** Your starting idea, given with "Replace these if you have stronger ones" in the prompt you adopted. Not built yet.
-
-> shopping-themed scene for blibli, maps or towns for moperty, nature and architectures for radjastone.
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-### 8.5 Every scene is the TV layer of a console, under a controller layer that can be hidden, and the player moves freely in it.
-
-- [ ] **Said.** The scene fills the screen as the TV. The controller sits on its own layer and can be shown or hidden, so the scene must read with it in either state. Movement is free, not along fixed roads.
-
-> I imagine the full screen background as a TV screen, while the controller is on different layer. there is a toggle to hide or show the controller layer. Both layers are 2.5d style.
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-> You can obviously do free movement.
->
-> (Joy-Con portfolio TV game, 31 Oct)
-
-## 9. Paper look, light and performance
-
-Fewer of these are in your own words. Where a point comes from a standard I wrote and you adopted, it says so.
-
-### 9.1 The look is inspired by Paper Mario, with original art.
-
-- [ ] **Said.** A 2.5D paper world. "No Nintendo assets" comes from the prompt I drafted and you adopted on 31 Oct.
+- [ ] A 2.5D paper world with original figures, marks and sounds. No Nintendo assets.
 - Passes:
   - Original figures at Paper Mario proportions.
 - Fails:
   - Copied sprites.
 
-> papercraft objects for my 2.5d interactive portfolio site that is inspired by Paper Mario design
->
-> (Pinewood Valley session, 4 Nov)
+### 8.2 The scene is clearly paper: grain, cut edges, folds; never photographic.
 
-> Use original art, marks and sounds, with no Nintendo assets.
->
-> (Joy-Con portfolio TV game, 31 Oct, in the prompt you adopted)
-
-### 9.2 Lighting is really computed, so shadows are real.
-
-- [ ] **Reading.** Twice the real light bake needed a download, and both times you allowed it instead of settling for an evenly lit preview. That was a tooling choice. I read it as wanting real shadows.
-
-### 9.3 The scene is clearly paper: grain, cut edges, folds; never photographic.
-
-- [ ] **Reading.** From the standard I wrote and you adopted on 6 Nov ("I want to use this standard"). You have not restated it in your own words.
+- [ ] Every surface reads as paper or card.
 - Passes:
   - White core edges on coated card; same-colour edges on dyed paper.
 - Fails:
   - Photo textures; printed gradients standing in for light.
 
-> I want to use this standard when building scenes for papercraft-game branch.
->
-> (Papercraft Game Scene, 6 Nov)
+### 8.3 The scene loads and shows.
 
-### 9.4 The scene loads and shows.
+- [ ] A scene that shows nothing fails everything else.
 
-- [ ] **Said.** A published scene that shows nothing fails everything else.
-- Fails:
-  - The last Pinewood Valley version, which you reported as blank.
+## 9. How to plan a scene
 
-> Nothing is loaded on the Pinewood valley artifact
->
-> (Pinewood Valley session, 5 Nov)
+The order in which a scene is planned before anything is built. The steps are illustrative.
 
-### 9.5 Performance is measured later; until then the scene is made rich in detail, not in quantity.
+1. **Determine the diorama container.** A shoebox, a Paper Mario style room, curved or circular walls, or another form. Choose the one that suits the place, and make it as deep and wide as the scene needs (2.9, 2.11).
+2. **Create the 2D layout plan of the main structures.** Draw the scene from above: the main space and every main structure. Mark each structure as background (flat layers for an open or distant view), full freestanding, or relief on an enclosed bound (2.1 to 2.6). Compare the plan with every existing scene and change it if it repeats one (1.8). The spacing of the structures and the flow between them must look organised in the plan (5.2).
+3. **Create a low-fidelity 3D plan of the ground.** Block out the elevation, inclination and levels of the ground (2.12), and show how the main space continues into the background (3.8).
+4. **Plan the freestanding paper objects.** List the objects. For each one, give the reason it is found in this place (1.2), its spot and facing against what stands beside it (5.5), and how it will be made (section 10). Richness comes from detail, not from quantity (4.6).
+5. **Plan the open-view background.** List the layers from front to back. There are many of them, they differ in kind, each carries its own detail, and everything on them belongs to the place (section 3).
+6. **Plan the relief on the enclosed bounds.** For each bound marked as enclosed in step 2, list the relief pieces that tie the freestanding objects to it (2.4, 5.6). An indoor scene uses its walls, floor and ceiling to pack the space (2.10).
+7. **Place the characters and check the sight lines.** Put the player and the passers-by into the plan (section 6). From the game camera, nothing may block a sign, a face or an interactive object (5.3, 6.6).
+8. **Plan how the scene tells the project.** Decide what the place as a whole stands for, then give each interactive object one micro interaction that carries one fact (section 7).
+9. **Check the plan against sections 1 to 8, then build.** Run the plan through the checks while it is still a sketch. Changing a plan is cheaper than changing a built and lit scene.
 
-- [ ] **Said.** I do not trade detail away for frame rate now. Richness means detail on what is there, not a higher count of objects. The prompt you adopted on 31 Oct asks for 60 fps on a mid-range phone; no scene has been measured on a real phone yet.
+## 10. How to create a papercraft object
 
-> Performance is measured later. Make the scene rich in details, not quantity
->
-> (Answers to the open questions, 14 Nov)
+How one freestanding object is made.
 
-> Motion holds 60fps on a throttled mid-range Android profile, with no layout shift.
->
-> (Joy-Con portfolio TV game, 31 Oct, in the prompt you adopted)
-
-
-## 10. How to plan a scene
-
-The order in which a scene is planned before anything is built. Steps 1 to 4 are yours and are illustrative; steps 5 to 9 are my completion, for you to correct.
-
-1. **Determine the diorama container.** *Said.* A shoebox, a Paper Mario style room, curved or circular walls, or another form. Choose the one that suits the place, and make it as deep and wide as the scene needs (2.9, 2.11).
-2. **Create the 2D layout plan of the main structures.** *Said.* Draw the scene from above: the main space and every main structure. Mark each structure as background (flat layers for an open or distant view), full freestanding, or relief on an enclosed bound (2.1 to 2.6). Compare the plan with every existing scene and change it if it repeats one (1.8). The spacing of the structures and the flow between them must look organised in the plan (5.2).
-3. **Create a low-fidelity 3D plan of the ground.** *Said.* Block out the elevation, inclination and levels of the ground (2.12), and show how the main space continues into the background (3.9).
-4. **Plan the freestanding paper objects.** *Said.* List the objects. For each one, give the reason it is found in this place (1.2), its spot and facing against what stands beside it (5.5), and how it will be made (section 11). Richness comes from detail, not from quantity (4.6).
-5. **Plan the open-view background.** *Proposed.* List the layers from front to back. There are many of them, they differ in kind, each carries its own detail, and everything on them belongs to the place (section 3).
-6. **Plan the relief on the enclosed bounds.** *Proposed.* For each bound marked as enclosed in step 2, list the relief pieces that tie the freestanding objects to it (2.4, 5.6). An indoor scene uses its walls, floor and ceiling to pack the space (2.10).
-7. **Place the characters and check the sight lines.** *Proposed.* Put the player and the passers-by into the plan (section 6). From the game camera, nothing may block a sign, a face or an interactive object (5.3, 6.6).
-8. **Plan how the scene tells the project.** *Proposed.* Decide what the place as a whole stands for, then give each interactive object one micro interaction that carries one fact. No text, no screenshots, no literal product, no technology, a sparing logo (section 7).
-9. **Check the plan against sections 1 to 9, then build.** *Proposed.* Run the plan through the checks while it is still a sketch. Changing a plan is cheaper than changing a built and lit scene.
-
-## 11. How to create a papercraft object
-
-How one freestanding object is made. Steps 1 to 4 are yours; steps 5 and 6 are my addition.
-
-1. **Check the references.** *Said.* Look through the fold, glue and cut techniques and the samples below, and pick the ones that suit the object.
-2. **Determine the perspective from which the object is viewed.** *Said.* Decide where the game camera sees it from, and which faces and folds must show from there (4.9).
-3. **Start with the 2D pieces on a blank sheet of paper.** *Said.* Draw every piece flat. Mark the parts to be folded with lines: a dashed line for a hard fold, a marked area for a soft fold or curl. Mark where pieces are glued. Detail on a flat piece is made with colour tones (4.5).
-4. **Fold, attach and arrange.** *Said.* Fold the pieces, glue the smaller parts onto the body, and stand the object in the scene turned to the perspective chosen in step 2.
-5. **Check it from the game camera.** *Proposed.* The object must read as a folded volume with variety of shape, depth and detail (4.1, 4.3), and never as a flat sticker (4.2).
-6. **Keep the good ones.** *Proposed.* An object that works is added to the samples below, with the technique it uses, so that later objects can start from it.
+1. **Check the references.** Look through the fold, glue and cut techniques and the samples below, and pick the ones that suit the object.
+2. **Determine the perspective from which the object is viewed.** Decide where the game camera sees it from, and which faces and folds must show from there (4.9).
+3. **Start with the 2D pieces on a blank sheet of paper.** Draw every piece flat. Mark the parts to be folded with lines: a dashed line for a hard fold, a marked area for a soft fold or curl. Mark where pieces are glued. Detail on a flat piece is made with colour tones (4.5).
+4. **Fold, attach and arrange.** Fold the pieces, glue the smaller parts onto the body, and stand the object in the scene turned to the perspective chosen in step 2.
+5. **Check it from the game camera.** The object must read as a folded volume with variety of shape, depth and detail (4.1, 4.3), and never as a flat sticker (4.2).
+6. **Keep the good ones.** An object that works is added to the samples below, with the technique it uses, so that later objects can start from it.
 
 ### Techniques
 
@@ -1496,41 +718,32 @@ How one freestanding object is made. Steps 1 to 4 are yours; steps 5 and 6 are m
 | Flaps folded outwards from one sheet | limbs and feet | the frog |
 | Strip curled into a body (soft fold) | rounded bodies | the duck |
 | Two identical cards slotted crosswise | trees and bushes | the Paper Grove pine |
-| Single flat card | people, plane-shaped things, things against a surface (4.4) | the Blibli cast |
+| Single flat card | people, plane-shaped things, things against a surface (4.4) | the flat characters |
 
 ### Samples
 
-References and samples to check in step 1. Objects built for this project are added here as they turn out well.
+References and samples to check in step 1. Objects that turn out well are added here.
 
-*Reference. The fox: one sheet folded over the spine, stood at an angle. (Your photo; shown in the published checklist only.)*
+*The fox: one sheet folded over the spine, stood at an angle. (Reference photo, in the published checklist only.)*
 
-*Reference. The same fox as flat pieces before folding. (Your photo; shown in the published checklist only.)*
+*The same fox as flat pieces before folding. (Reference photo, in the published checklist only.)*
 
-*Reference. Box body with cut-out legs, wedge head; dashed lines mark the hard folds. (Your photo; shown in the published checklist only.)*
+*Box body with cut-out legs and a wedge head; dashed lines mark the hard folds. (Reference photo, in the published checklist only.)*
 
-*Reference. Box body; ears and trunk are flaps folded outwards. (Your photo; shown in the published checklist only.)*
+*Box body; the ears and trunk are flaps folded outwards. (Reference photo, in the published checklist only.)*
 
-*Reference. Legs folded forward from one sheet. (Your photo; shown in the published checklist only.)*
+*Legs folded forward from one sheet. (Reference photo, in the published checklist only.)*
 
-*Reference. A strip curled into the body. (Your photo; shown in the published checklist only.)*
+*A strip curled into the body. (Reference photo, in the published checklist only.)*
 
-![Reference. Paper Grove: the fox and the slotted pines.](checklist/grove.jpg)
+![Paper Grove: the fox and the slotted pines.](checklist/grove.jpg)
 
-*Reference. Paper Grove: the fox and the slotted pines.*
+*Paper Grove: the fox and the slotted pines.*
 
-![Diagram. How the fox and the pine are cut and folded.](checklist/fold-recipes.svg)
+![How the fox and the pine are cut and folded.](checklist/fold-recipes.svg)
 
-*Diagram. How the fox and the pine are cut and folded.*
+*How the fox and the pine are cut and folded.*
 
-![Built for this project. The Blibli street objects, made by the fox and pine recipe. Not judged by you on their own.](checklist/street-objects.jpg)
+![Street objects built by the fox and pine recipe.](checklist/street-objects.jpg)
 
-*Built for this project. The Blibli street objects, made by the fox and pine recipe. Not judged by you on their own.*
-
-## 12. Not yet settled
-
-1. **The hometown layout.** You said the background looks much better and that the link between the green and the valley is not visible yet. You did not say whether the layout is now different enough from Blibli.
-2. **Tying the ground to the background.** What would make the continuation visible for you: a road or path that runs on into the valley, a slope, or something else? Check 3.9 holds my guess.
-3. **The logo colours.** Should the Moperty scene still take its accent colours from the logo, now that the logo itself appears only on one building and one map?
-4. **The reference photos.** The seven photos you attached on 14 Nov are in 2.12 and 4.9. I still do not have the photos from earlier sessions (the trees example, the layered landscape, the cities and road, the riverside centre); the diagrams marked "stands in for" are my reconstruction. If you attach them again, I will replace the diagrams.
-5. **What I have not covered.** Twice you introduced a list of faults with "including, but not limited to". This checklist holds only what you have said or accepted so far, so a scene that passes every check may still fall short. What is missing?
-
+*Street objects built by the fox and pine recipe.*
