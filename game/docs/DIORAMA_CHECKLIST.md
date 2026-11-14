@@ -288,15 +288,11 @@ A good background is layered, varied, detailed, visibly deep and on theme.
 
 ### 3.4 The open view has many layers, not a minimal few.
 
-- [ ] Layer depth means the number of layers. A rich view has more than ten. Stand them far enough apart that each casts a visible shadow on the next.
+- [ ] Layer depth means the number of layers. A view made of only a few layers looks minimal and unfinished.
 - Passes:
   - A river view of more than ten layers.
 - Fails:
   - A valley made of a handful of ridges.
-
-![The gap between layers.](checklist/layer-gaps.svg)
-
-*Reference. The gap between layers.*
 
 ### 3.5 Things that sit in the view stand between layers, on their own sheets.
 
@@ -611,7 +607,7 @@ The scene says what the project is through a place and things to do in it. It is
 
 ### 7.4 The metaphor is not so far from the product that it has to be explained.
 
-- [ ] The scene is still plainly about the project's subject, and that subject is physically present: homes for a property app, goods for a shop.
+- [ ] The scene is still plainly about the project's subject.
 - Fails:
   - A tree of birdhouses with birds looking for a home, standing in for a property app.
 
@@ -625,9 +621,7 @@ The scene says what the project is through a place and things to do in it. It is
 
 ### 7.5 Interactions are micro interactions; the scene is not gamified.
 
-- [ ] The scene sits inside a game already and gets no game mechanics of its own. Each interaction is small: one press, one visible result, nothing to remember or combine.
-- Passes:
-  - Pressing once to swing a home open.
+- [ ] The scene sits inside a game already and gets no game mechanics of its own. Each interaction is small.
 - Fails:
   - Raising a phone to reveal pins over homes and filtering them by sale or rent.
 
