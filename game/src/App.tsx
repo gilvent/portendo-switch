@@ -109,7 +109,7 @@ export default function App() {
     if (!s) throw new Error(`no stop ${spot.stop} in ${spot.world}`);
     walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 };
     lastNear.current = s.id;
-    cam.current.x = content.worlds[world].camera ? 0 : s.x; cam.current.z = 0;
+    const k = content.worlds[world].camera; cam.current.x = k ? Math.min(k.x1, Math.max(k.x0, k.ahead === undefined ? 0 : s.x + (cam.current.tall ? 0 : k.ahead))) : s.x; cam.current.z = 0;
   }, [spawnKey]);
 
   const teleport = useCallback((w: WorldId, s: Stop) => {
@@ -187,7 +187,7 @@ export default function App() {
       const c = cam.current, k = calm ? 1 : 1 - Math.exp(-4.5 * dt);
       // A stop with `focus` pulls the camera in on itself while the courier stands there.
       const spotted = p.near ? stopOf(content, p.world, p.stop) : undefined, zoomIn = spotted?.focus ?? 1;
-      const frame = w.camera, want = spotted && zoomIn !== 1 ? (spotted.look ?? spotted.x) * .8 + n.x * .2 : n.x + n.vx * .22;
+      const frame = w.camera, want = spotted && zoomIn !== 1 ? (spotted.look ?? spotted.x) * .8 + n.x * .2 : n.x + n.vx * .22 + (c.tall ? 0 : w.camera?.ahead ?? 0);
       c.x += ((frame && zoomIn === 1 ? Math.min(frame.x1, Math.max(frame.x0, want)) : want) - c.x) * k; c.z += ((frame ? n.z * .4 : n.z) - c.z) * k;
       c.focus += (zoomIn - c.focus) * (calm ? 1 : 1 - Math.exp(-3 * dt));
       const walking = speed > .08;

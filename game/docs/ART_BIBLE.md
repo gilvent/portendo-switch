@@ -128,12 +128,18 @@ Stops carry `focus` and `look`: the camera leans in on the object being used whi
 
 ### The MRT car: the home space
 
-The game opens inside one MRT car running underground (`scenes/train.ts`). It is a close-up: the near side is cut away, the camera stands close enough that the car fills the view, and nothing of the car's outside is built.
+The game opens inside the front car of an MRT train running underground (`scenes/train.ts`). It is a close-up: the near side of the passenger car is cut away and the camera stands close, looking a little toward the front of the train.
 
-- Past the cut there is only black. Past the windows there is only the tunnel: a dark sheet behind the back wall on which ribs and work lamps rush by (`.tunnel` in `styles.css`). The car rocks a little and its hand straps swing. Reduced motion holds all of it still.
+![The MRT car](spaces/mrt.png)
+
+![The front of the train](spaces/mrt-front.png)
+
+- **What is built.** The passenger car's inside; its underframe in section along the cut, with two bogies; and, past the right end wall, the driving cab seen from outside: nose, windscreen, headlight, the driver at the desk through the side window, and its own bogie. Nothing else of the train's outside is modelled.
+- **The tunnel is live, not baked** (`.bore`, `.bed` in `styles.css`). Behind the whole train stands the tunnel's far wall, nearly black, with rings, cable runs, work lamps and marker boards rushing back. Under it lies the track bed: two rails and sleepers streaking by. The headlight throws a beam down the tunnel ahead, and the lamps' light sweeps over the car floor.
+- **Everything that says "moving" runs at one speed.** The tunnel, the sleepers, the six wheels (their own sheets, turning), the car's sway and its knock over rail joints, and the swinging hand straps are looping animations whose rate `Scene.tsx` sets from the train's speed. The train pulls away as the scene opens, cruises, and brakes to a stand when it reaches the chosen stop. Reduced motion holds all of it still.
 - No sun reaches the car. It is lit by its own ceiling strips, baked as lamps.
-- The passengers are the street's cast (`shopper` in `promenade.ts`): same cut, builds and faces. Seated ones stand at the bench's front edge, lifted so the hips meet the cushion.
-- The destination sign over the door is the one piece of live type in a paper scene: the bake carries its dark casing, the game sets the amber text. Its arrows (or B at the doors) turn it between the stops the line serves, Blibli.com and Moperty. Pressing the name (or A at the doors) stops the train, opens the doors onto the platform's light and walks the salaryman out, and the scene swaps.
+- The passengers and the driver are the street's cast (`shopper` in `promenade.ts`): same cut, builds and faces. Seated ones stand at the bench's front edge, lifted so the hips meet the cushion.
+- The destination sign over the door is the one piece of live type in a paper scene: the bake carries its dark casing, the game sets the amber text. Its arrows (or B at the doors) turn it between the stops the line serves, Blibli.com and Moperty. Pressing the name (or A at the doors) stops the train, brings the platform's light up behind the windows, opens the doors and walks the salaryman out, and the scene swaps.
 - The floor is cut into narrow tiles. In a tall, narrow view the browser can drop the part of a wide floor quad that crosses the left edge of the screen; narrow tiles keep that to a hairline.
 
 ### Outside and inside match
@@ -173,7 +179,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Space | Quad limit, enforced by the journey test |
 |---|---|
 | Street (riverside promenade) | 210 (uses 209) |
-| MRT car | 90 (uses 75) |
+| MRT car | 110 (uses 87) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
 

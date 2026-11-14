@@ -182,26 +182,40 @@ button { font:inherit; cursor:pointer; }
 
 /* ---------- the MRT car: a close-up of its inside, running underground ---------- */
 .car { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; }
-.art-train { background:#050607; perspective-origin:50% 46%; }
-/* The car rocks a little on its springs for as long as it runs. */
-.art-train .car { transform-origin:0 0; animation:car-sway 2.7s ease-in-out infinite alternate; }
-.art-train[data-arrival] .car { animation-play-state:paused; }
-@keyframes car-sway { from { transform:translate3d(-1.6px,.8px,0) rotateZ(-.16deg); } 50% { transform:translate3d(.6px,-.9px,0) rotateZ(.05deg); } to { transform:translate3d(1.6px,.6px,0) rotateZ(.16deg); } }
+.art-train { background:#040506; perspective-origin:50% 46%; }
+/* The car rocks on its springs and knocks over each rail joint for as long as it runs. Scene.tsx sets the rate of
+   every one of these loops from the train's speed, so they pull away and brake together. */
+.art-train .car { transform-origin:0 0; animation:car-sway 2.7s ease-in-out infinite alternate,car-jolt .92s linear infinite; }
+@keyframes car-sway { from { transform:translate3d(-2px,.8px,0) rotateZ(-.2deg); } 50% { transform:translate3d(.8px,-.9px,0) rotateZ(.06deg); } to { transform:translate3d(2px,.6px,0) rotateZ(.2deg); } }
+@keyframes car-jolt { 0%,38%,100% { translate:0 0; } 42% { translate:0 2.2px; } 47% { translate:0 -.8px; } 52% { translate:0 0; } 56% { translate:0 1.8px; } 61% { translate:0 -.6px; } 66% { translate:0 0; } }
 .pp.swings { animation:strap-swing 1.4s ease-in-out infinite alternate; }
-.art-train[data-arrival] .pp.swings { animation-play-state:paused; }
 @keyframes strap-swing { from { transform:var(--a); } to { transform:var(--b); } }
-/* Past the windows: the dark tunnel wall. Ribs and cable brackets rush by; a row of work lamps streaks past. */
-.tunnel { position:absolute; left:0; top:0; overflow:hidden; background:#07090c; pointer-events:none; }
-.tunnel i { position:absolute; left:0; top:0; height:100%; will-change:transform; transition:opacity .45s ease-out; }
-.tunnel-ribs { width:calc(100% + 240px); background:repeating-linear-gradient(90deg,transparent 0 150px,rgba(134,146,162,.13) 150px 162px,rgba(134,146,162,.05) 162px 200px,transparent 200px 240px); animation:tunnel-rush .16s linear infinite; }
-.tunnel-cables { width:100%; background:linear-gradient(180deg,transparent 0 23%,rgba(120,132,148,.2) 23% 24.5%,transparent 24.5% 30%,rgba(120,132,148,.14) 30% 31%,transparent 31% 78%,rgba(120,132,148,.12) 78% 80%,transparent 80%); }
-.tunnel-lamps { width:calc(100% + 1500px); --rush:-1500px; background:repeating-linear-gradient(90deg,transparent 0 420px,rgba(255,221,160,0) 420px,rgba(255,221,160,.95) 520px,rgba(255,244,214,1) 600px,rgba(255,221,160,0) 760px,transparent 760px 1500px) 0 38% / 100% 7px no-repeat,repeating-linear-gradient(90deg,transparent 0 380px,rgba(255,205,130,0) 380px,rgba(255,205,130,.16) 590px,rgba(255,205,130,0) 800px,transparent 800px 1500px) 0 38% / 100% 70px no-repeat; animation:tunnel-rush .62s linear infinite; }
-.tunnel-ribs { --rush:-240px; }
-@keyframes tunnel-rush { to { transform:translate3d(var(--rush),0,0); } }
-/* Arriving: the tunnel gives way to the even light of a platform, which is all of the station the car shows. */
-.tunnel-platform { width:100%; opacity:0; background:linear-gradient(180deg,#fff3d6,#f3dcae 62%,#c9b58c); }
-[data-arrival] .tunnel-ribs,[data-arrival] .tunnel-lamps,[data-arrival] .tunnel-cables { opacity:0; animation-play-state:paused; }
-[data-arrival] .tunnel-platform { opacity:1; }
+.pp.spins { animation:wheel-spin .34s linear infinite; }
+@keyframes wheel-spin { from { transform:var(--a); } to { transform:var(--b); } }
+/* Everything that rushes back past the train slides by one period of its own pattern (--rush), endlessly. */
+.rush { animation:bore-rush var(--t) linear infinite; will-change:transform; }
+@keyframes bore-rush { to { transform:translate3d(calc(var(--rush) * -1),0,0); } }
+/* The tunnel's far wall: concrete rings, cable runs, a row of work lamps and the odd marker board. */
+.bore,.bed,.platform-light,.floor-light,.beam { position:absolute; left:0; top:0; pointer-events:none; transform-origin:0 0; }
+.bore { overflow:hidden; background:linear-gradient(180deg,#030405 0,#0a0d11 30%,#0c1015 62%,#07090c 88%,#050607); }
+.bore i,.bed i,.floor-light i { position:absolute; left:0; top:0; height:100%; width:calc(100% + var(--rush)); }
+.bore-ribs { --rush:260px; --t:.17s; background:repeating-linear-gradient(90deg,transparent 0 150px,rgba(150,162,178,.11) 150px 162px,rgba(150,162,178,.04) 162px 214px,transparent 214px 260px); }
+.bore-cables { width:100% !important; background:linear-gradient(180deg,transparent 0 50%,rgba(128,140,156,.26) 50% 50.8%,transparent 50.8% 54%,rgba(128,140,156,.18) 54% 54.6%,transparent 54.6% 83%,rgba(128,140,156,.14) 83% 84.2%,transparent 84.2%); }
+.bore-lamps { --rush:1700px; --t:.66s; background:repeating-linear-gradient(90deg,transparent 0 460px,rgba(255,221,160,0) 460px,rgba(255,221,160,.95) 580px,#fff4d6 660px,rgba(255,221,160,0) 840px,transparent 840px 1700px) 0 68% / 100% 8px no-repeat,repeating-linear-gradient(90deg,transparent 0 380px,rgba(255,205,130,0) 380px,rgba(255,205,130,.2) 650px,rgba(255,205,130,0) 920px,transparent 920px 1700px) 0 70% / 100% 150px no-repeat; }
+.bore-signs { --rush:2900px; --t:1.12s; background:repeating-linear-gradient(90deg,transparent 0 1300px,rgba(246,183,60,.5) 1300px 1420px,transparent 1420px 2900px) 0 60% / 100% 26px no-repeat; }
+/* The track bed under the train: ballast, sleepers streaking by, and the two rails it runs on. */
+.bed { overflow:hidden; background:linear-gradient(180deg,#07090b,#14171b 40%,#1b1f24); }
+.bed-sleepers { --rush:150px; --t:.098s; background:repeating-linear-gradient(90deg,transparent 0 44px,rgba(120,104,86,.34) 52px 92px,transparent 96px 150px) 0 18% / 100% 74% no-repeat; }
+.bed-rails { width:100% !important; background:linear-gradient(180deg,transparent 0 22%,#59616b 22% 24.5%,transparent 24.5% 69.5%,#8a939d 69.5% 72%,transparent 72%); }
+/* The lamps' light through the windows, sweeping over the car floor. */
+.floor-light { overflow:hidden; opacity:calc(.5 + var(--speed,1) * .5); }
+.floor-light i { --rush:1700px; --t:.66s; background:repeating-linear-gradient(90deg,transparent 0 380px,rgba(255,226,170,0) 380px,rgba(255,226,170,.2) 620px,rgba(255,226,170,0) 900px,transparent 900px 1700px); }
+/* The headlight's beam down the tunnel ahead. */
+.beam { background:linear-gradient(90deg,rgba(255,240,205,.5),rgba(255,236,190,.16) 45%,transparent 92%); clip-path:polygon(0 47%,100% 0,100% 100%,0 53%); animation:beam-flicker .9s steps(3,end) infinite alternate; }
+@keyframes beam-flicker { from { opacity:.82; } to { opacity:1; } }
+/* Arriving: the even light of a platform comes up behind the windows, which is all of the station the car shows. */
+.platform-light { opacity:0; background:linear-gradient(180deg,#fff3d6,#f3dcae 62%,#c9b58c); transition:opacity .5s ease-out .2s; }
+[data-arrival] .platform-light { opacity:1; }
 /* The destination sign over the doors: amber LEDs in a dark case. */
 .dest { position:absolute; left:0; top:0; display:flex; align-items:stretch; transform-style:preserve-3d; font-family:Fredoka,system-ui,sans-serif; }
 .dest button { border:0; padding:0; background:transparent; color:#ffb648; text-shadow:0 0 6px rgba(255,160,40,.75); }
@@ -216,4 +230,4 @@ button { font:inherit; cursor:pointer; }
 /* The doors' stop: its tap area ends below the sign, and its label says what A and B do there. */
 .art-train .sign.hit { height:150px; }
 .sign.hit > span em { font-style:normal; display:inline-grid; place-items:center; width:18px; height:18px; margin:0 3px 0 8px; border-radius:50%; background:#2c3138; color:#fff; font-size:11px; line-height:18px; }
-@media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.tunnel-ribs,.tunnel-lamps,.dest-go b { animation:none; } .tunnel i { transition:none; } }
+@media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.pp.spins,.rush,.beam,.dest-go b { animation:none; } .platform-light { transition:none; } .floor-light { display:none; } }
