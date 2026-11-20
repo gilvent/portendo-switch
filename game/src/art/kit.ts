@@ -3,15 +3,29 @@ export type Stock = 'cover' | 'kraft' | 'greyboard' | 'bond' | 'vellum' | 'sugar
 export type Panel = {
   id: string; stock: Stock; c: string; o: V3; u: V3; v: V3; w: number; h: number;
   mask?: string; print?: string; edge?: 'cut' | 'fold'; ghost?: boolean; density?: number; decal?: string;
-  emit?: number; motion?: Motion; group?: string; backdrop?: boolean;
+  emit?: number; motion?: Motion; group?: string; backdrop?: boolean; show?: Show;
+  // Never culled by the bake's guess at what the game camera sees: for faces a scene knows its own view shows.
+  keep?: boolean;
+  // Ship this sheet as `split` side-by-side tiles: browsers stop drawing one very wide plane seen edge-on.
+  split?: number;
+  // With `decal`: painted onto the parent as the game camera sees it, not straight along the parent's normal.
+  view?: boolean;
 };
-export type Motion = { when: string; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3 };
+// A panel with `show` exists only while its toy is in one of the listed states. Such panels are baked as phantoms:
+// lit like everything else, but they cast no shadow, so the variants that share one spot never shade each other.
+export type Show = { toy: string; at: number[] };
+// A motion plays while the courier stands at stop `when`, or while toy `toy` is in one of the states `at`.
+// `spin` turns the sheet about its centre once every `spin` seconds, for as long as it is shown.
+// `swing` is different: the sheet hangs from its top edge and rocks `swing` degrees each way for as long as it is shown.
+export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3; swing?: number; spin?: number };
 export type Lamp = { at: V3; color: readonly [number, number, number]; energy: number };
 export type Run = { group: string; from: V3; to: V3; count: number; seconds: number };
 export type Scene = {
   id: string; panels: Panel[]; runs?: Run[]; lamps?: Lamp[];
   light: { sun: number; sky: number; skyColor: readonly [number, number, number] };
   camera: { zoom: number; x0: number; x1: number };
+  // Texture density for panels that set none (texels per unit). Lower it where a scene's many quads cost too much.
+  density?: number;
 };
 
 export const add = (a: V3, b: V3, k = 1): V3 => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
@@ -29,8 +43,8 @@ export const backOf = (p: Panel, c = p.c): Panel => ({
   mask: p.mask ? `<g transform="translate(${p.w} 0) scale(-1 1)">${p.mask}</g>` : undefined
 });
 
-export type BoxSpec = { id: string; x: number; z: number; y?: number; w: number; h: number; d: number; rot?: number; stock: Stock; c: string; side?: string; front?: string; left?: string; right?: string; top?: string; noTop?: boolean };
-export function box({ id, x, z, y = 0, w, h, d, rot = 0, stock, c, side, front, left, right, top, noTop }: BoxSpec): Panel[] {
+export type BoxSpec = { id: string; x: number; z: number; y?: number; w: number; h: number; d: number; rot?: number; stock: Stock; c: string; side?: string; front?: string; left?: string; right?: string; top?: string; noTop?: boolean; density?: number };
+export function box({ id, x, z, y = 0, w, h, d, rot = 0, stock, c, side, front, left, right, top, noTop, density }: BoxSpec): Panel[] {
   const r = yaw(rot), at = (lx: number, ly: number, lz: number) => add([x, y, z], r([lx, ly, lz])), up: V3 = [0, 1, 0], s = side ?? c;
   const faces: Panel[] = [
     { id: `${id}-front`, stock, c, w, h, o: at(-w / 2, 0, d / 2), u: r([1, 0, 0]), v: up, print: front, edge: 'fold' },
@@ -40,7 +54,7 @@ export function box({ id, x, z, y = 0, w, h, d, rot = 0, stock, c, side, front, 
     { id: `${id}-under`, stock, c: s, w, h: d, o: at(-w / 2, 0, -d / 2), u: r([1, 0, 0]), v: r([0, 0, 1]), ghost: true, density: .1 }
   ];
   if (!noTop) faces.push({ id: `${id}-top`, stock, c, w, h: d, o: at(-w / 2, h, d / 2), u: r([1, 0, 0]), v: r([0, 0, -1]), print: top, edge: 'fold' });
-  return faces;
+  return density === undefined ? faces : faces.map(p => (p.ghost ? p : { ...p, density }));
 }
 export const on = (p: Panel, gap: number, x: number, y: number, w: number, h: number, rest: Partial<Panel> & Pick<Panel, 'id' | 'stock' | 'c'>): Panel => ({
   o: add(add(add(p.o, p.u, x / Math.hypot(...p.u)), p.v, y / Math.hypot(...p.v)), normal(p), gap), u: p.u, v: p.v, w, h, edge: 'cut', decal: p.id, ...rest
@@ -65,3 +79,8 @@ export function relief(parent: Panel, panels: Panel[]): Panel[] {
   const n = normal(parent);
   return panels.map(p => (normal(p)[0] * n[0] + normal(p)[1] * n[1] + normal(p)[2] * n[2] > .5 ? { ...p, decal: parent.id } : { ...p, ghost: true }));
 }
+
+// Relief that keeps its volume: every piece is real in the bake (it lights and shades the wall), then each face that turns
+// toward the camera is painted onto the wall where the camera sees it. Boxes keep their ends and tops; no quad is added.
+// Pieces are painted at the parent's resolution in the end, so they are cut no finer than it.
+export const carved = (parent: Panel, panels: Panel[]): Panel[] => panels.map(p => ({ ...p, decal: parent.id, view: true, density: Math.min(p.density ?? 3, (parent.density ?? 3) * 1.25) }));

@@ -16,11 +16,14 @@ button { font:inherit; cursor:pointer; }
 .sign.road { background:#5a626d; color:#fff; }
 .sign.near { background:#fff; }
 .prompt { position:absolute; left:50%; top:-44px; margin-left:-18px; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; background:var(--signal); color:#fff; font-size:18px; animation:pulse 1.1s ease-in-out infinite; }
-.flip { position:absolute; left:-40px; bottom:-2px; width:80px; height:124px; transform-style:preserve-3d; }
+.flip { position:absolute; left:-40px; bottom:-2px; width:80px; height:137px; transform-style:preserve-3d; }
 .courier-art { position:absolute; left:0; top:0; display:block; }
 .defs { position:absolute; }
-.leg { position:absolute; top:88px; width:11px; height:32px; border-radius:4px; background:#1f3a5f; transform-origin:50% 0; }
-.leg-b { left:28px; } .leg-f { left:42px; background:#27496f; }
+/* Stubby suit legs with rounded shoes; only the shoes stand clear of the jacket, so only they carry the white rim. */
+/* The player is average build (Salaryman.tsx): legs start 6 lower and run 7 longer than the short build's. */
+.leg { position:absolute; top:108px; width:11px; height:22px; border-radius:2px; background:#263350; transform-origin:50% 0; }
+.leg::after { content:''; position:absolute; left:-4px; bottom:-6px; width:15px; height:7px; border:2.5px solid #fff; border-radius:8px 8px 5px 5px; background:#1d1f24; box-shadow:inset 0 2px 0 #3a3e46; }
+.leg-b { left:29px; } .leg-f { left:41px; background:#2f3e5c; }
 [data-walking] .leg-f { animation:stride .32s ease-in-out infinite alternate; }
 [data-walking] .leg-b { animation:stride .32s ease-in-out infinite alternate-reverse; }
 @keyframes stride { from { transform:rotate(-24deg); } to { transform:rotate(24deg); } }
@@ -168,3 +171,80 @@ button { font:inherit; cursor:pointer; }
 .pp.moves.on { transform:var(--on); }
 .art-street { background:#6f5a44 no-repeat 50% calc(42vh - 562px) / 2400px auto; }
 @media (prefers-reduced-motion:reduce) { .pp.moves { transition:none; } }
+/* catalog leaflet: a printed, folded paper close-up of the sheet beside the showcased phone */
+.letter.surface-catalog { background:#fbf7ee; border:0; border-radius:2px; box-shadow:var(--shadow-lg, 0 14px 30px rgba(0,0,0,.4)); background-image:linear-gradient(90deg,transparent calc(50% - 1px),rgba(90,60,30,.18) 50%,transparent calc(50% + 1px)); }
+.letter.surface-catalog h2 { color:#0a6aa8; }
+.leaflet .tabs { flex-wrap:wrap; }
+.leaflet .tabs button { min-height:38px; border-radius:18px 18px 4px 4px; border-color:#0a6aa8; color:#0a6aa8; background:#fff; }
+.leaf { min-height:220px; padding:14px; background:#fff; border:2px solid #e3d9c6; animation:leaf .42s steps(5,end); transform-origin:0 50%; }
+@keyframes leaf { from { transform:perspective(600px) rotateY(-70deg); } }
+@media (prefers-reduced-motion:reduce) { .leaf { animation:none; } }
+.leaf-specs { display:grid; grid-template-columns:auto 1fr; gap:10px 22px; align-items:center; }
+.leaf-specs dl { display:grid; grid-template-columns:auto 1fr; gap:4px 14px; margin:0; } .leaf-specs dt { color:#8b929c; } .leaf-specs dd { margin:0; font-weight:600; display:flex; align-items:center; gap:6px; }
+.dot { width:14px; height:14px; border-radius:50%; display:inline-block; }
+.swatches { grid-column:1 / -1; display:flex; gap:8px; } .swatches i { width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 2px #e3d9c6; } .swatches i.on { box-shadow:0 0 0 3px #23272d; }
+.bars { display:grid; gap:7px; flex:1; } .bars i { display:block; height:9px; border-radius:5px; background:#d8dde3; }
+.leaf-promo { display:grid; gap:12px; } .price { font-size:22px; font-weight:600; display:flex; gap:12px; align-items:baseline; } .price s { text-decoration:none; } .price.cut s { text-decoration:line-through; color:#8b929c; font-size:16px; } .price b { color:#e8552d; }
+.coupon { display:flex; gap:12px; align-items:center; padding:10px; border:2px dashed #e8552d; background:#fff4e2; } .coupon span { width:40px; height:40px; display:grid; place-items:center; background:#e8552d; color:#fff; border-radius:50%; font-weight:700; } .coupon[data-torn="true"] { opacity:.45; transform:rotate(-3deg) translateY(4px); }
+.leaf-ship { display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .route { flex:1; min-width:60px; border-top:3px dashed #0092da; }
+.leaf-talk { display:grid; gap:10px; } .bubble { width:70%; padding:12px; border-radius:14px 14px 14px 2px; background:#eef6fb; display:flex; } .bubble.me { justify-self:end; border-radius:14px 14px 2px 14px; background:#fff4e2; }
+.leaf-desc { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; }
+/* A piece a toy brings in drops into place in five stepped frames, like the hinges. */
+.pp.pop { animation:pop .42s steps(5,end) both; }
+@keyframes pop { from { translate:0 -18px; } }
+@media (prefers-reduced-motion:reduce) { .pp.pop { animation:none; } }
+
+/* ---------- the MRT car: a close-up of its inside, running underground ---------- */
+.car { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; }
+.art-train { background:#040506; perspective-origin:50% 18%; }
+/* The car rocks on its springs and knocks over each rail joint for as long as it runs. Scene.tsx sets the rate of
+   every one of these loops from the train's speed, so they pull away and brake together. */
+.art-train .car { transform-origin:0 0; animation:car-sway 2.7s ease-in-out infinite alternate,car-jolt .92s linear infinite; }
+@keyframes car-sway { from { transform:translate3d(-2px,.8px,0) rotateZ(-.2deg); } 50% { transform:translate3d(.8px,-.9px,0) rotateZ(.06deg); } to { transform:translate3d(2px,.6px,0) rotateZ(.2deg); } }
+@keyframes car-jolt { 0%,38%,100% { translate:0 0; } 42% { translate:0 2.2px; } 47% { translate:0 -.8px; } 52% { translate:0 0; } 56% { translate:0 1.8px; } 61% { translate:0 -.6px; } 66% { translate:0 0; } }
+.pp.swings { animation:strap-swing 1.4s ease-in-out infinite alternate; }
+@keyframes strap-swing { from { transform:var(--a); } to { transform:var(--b); } }
+.pp.spins { animation:wheel-spin .34s linear infinite; }
+@keyframes wheel-spin { from { transform:var(--a); } to { transform:var(--b); } }
+/* Everything that rushes back past the train slides by one period of its own pattern (--rush), endlessly. */
+.rush { animation:bore-rush var(--t) linear infinite; will-change:transform; }
+@keyframes bore-rush { to { transform:translate3d(calc(var(--rush) * -1),0,0); } }
+/* The tunnel's far wall: concrete rings, cable runs, a row of work lamps and the odd marker board. */
+.bore,.bed,.platform-light,.floor-light,.beam { position:absolute; left:0; top:0; pointer-events:none; transform-origin:0 0; }
+.bore { overflow:hidden; background:linear-gradient(180deg,#030405 0,#0a0d11 30%,#0c1015 62%,#07090c 88%,#050607); }
+.bore i,.bed i,.floor-light i { position:absolute; left:0; top:0; height:100%; width:calc(100% + var(--rush)); }
+.bore-ribs { --rush:260px; --t:.17s; background:repeating-linear-gradient(90deg,transparent 0 150px,rgba(150,162,178,.11) 150px 162px,rgba(150,162,178,.04) 162px 214px,transparent 214px 260px); }
+.bore-cables { width:100% !important; background:linear-gradient(180deg,transparent 0 50%,rgba(128,140,156,.26) 50% 50.8%,transparent 50.8% 54%,rgba(128,140,156,.18) 54% 54.6%,transparent 54.6% 83%,rgba(128,140,156,.14) 83% 84.2%,transparent 84.2%); }
+.bore-lamps { --rush:1700px; --t:.66s; background:repeating-linear-gradient(90deg,transparent 0 460px,rgba(255,221,160,0) 460px,rgba(255,221,160,.95) 580px,#fff4d6 660px,rgba(255,221,160,0) 840px,transparent 840px 1700px) 0 68% / 100% 8px no-repeat,repeating-linear-gradient(90deg,transparent 0 380px,rgba(255,205,130,0) 380px,rgba(255,205,130,.2) 650px,rgba(255,205,130,0) 920px,transparent 920px 1700px) 0 70% / 100% 150px no-repeat; }
+.bore-signs { --rush:2900px; --t:1.12s; background:repeating-linear-gradient(90deg,transparent 0 1300px,rgba(246,183,60,.5) 1300px 1420px,transparent 1420px 2900px) 0 60% / 100% 26px no-repeat; }
+/* The track bed under the train: ballast, sleepers streaking by, and the two rails it runs on. */
+.bed { overflow:hidden; background:linear-gradient(180deg,#07090b,#14171b 40%,#1b1f24); }
+.bed-sleepers { --rush:150px; --t:.098s; background:repeating-linear-gradient(90deg,transparent 0 44px,rgba(120,104,86,.34) 52px 92px,transparent 96px 150px) 0 18% / 100% 74% no-repeat; }
+.bed-rails { width:100% !important; background:linear-gradient(180deg,transparent 0 22%,#59616b 22% 24.5%,transparent 24.5% 69.5%,#8a939d 69.5% 72%,transparent 72%); }
+/* The lamps' light through the windows, sweeping over the car floor. */
+.floor-light { overflow:hidden; opacity:calc(.5 + var(--speed,1) * .5); }
+.floor-light i { --rush:1700px; --t:.66s; background:repeating-linear-gradient(90deg,transparent 0 380px,rgba(255,226,170,0) 380px,rgba(255,226,170,.2) 620px,rgba(255,226,170,0) 900px,transparent 900px 1700px); }
+/* The headlight's beam down the tunnel ahead. */
+.beam { background:linear-gradient(90deg,rgba(255,240,205,.5),rgba(255,236,190,.16) 45%,transparent 92%); clip-path:polygon(0 47%,100% 0,100% 100%,0 53%); animation:beam-flicker .9s steps(3,end) infinite alternate; }
+@keyframes beam-flicker { from { opacity:.82; } to { opacity:1; } }
+/* Arriving: the even light of a platform comes up behind the windows, which is all of the station the car shows. */
+.platform-light { opacity:0; background:linear-gradient(180deg,#fff3d6,#f3dcae 62%,#c9b58c); transition:opacity .5s ease-out .2s; }
+[data-arrival] .platform-light { opacity:1; }
+/* The destination sign over the doors: amber LEDs in a dark case. */
+.dest { position:absolute; left:0; top:0; display:flex; align-items:stretch; transform-style:preserve-3d; font-family:Fredoka,system-ui,sans-serif; }
+.dest button { border:0; padding:0; background:transparent; color:#ffb648; text-shadow:0 0 6px rgba(255,160,40,.75); }
+.dest-turn { width:44px; font-size:30px; line-height:36px; }
+.dest-turn:hover,.dest-go:hover b { color:#ffe0a6; }
+.dest-turn:active { transform:scale(.86); }
+.dest-go { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#1b1408 !important; box-shadow:inset 0 0 0 1px #3a2a10; border-radius:2px; overflow:hidden; }
+.dest-go small { font-size:8px; line-height:9px; letter-spacing:.14em; text-transform:uppercase; opacity:.72; }
+.dest-go b { display:block; font-size:19px; line-height:22px; font-weight:600; white-space:nowrap; animation:dest-roll .28s steps(4,end); }
+@keyframes dest-roll { from { transform:translateY(-110%); } }
+.dest :focus-visible { outline-offset:-2px; }
+/* The doors' stop: its tap area ends below the sign, and its label says what A and B do there. */
+.art-train .sign.hit { height:150px; }
+/* The label and the A bubble hang outside the tap area. Among the train's live sheets the browser clips them to it at
+   high pixel ratios unless each is its own layer. */
+.art-train .sign.hit > span,.art-train .sign.hit .prompt { will-change:transform; }
+.sign.hit > span em { font-style:normal; display:inline-grid; place-items:center; width:18px; height:18px; margin:0 3px 0 8px; border-radius:50%; background:#2c3138; color:#fff; font-size:11px; line-height:18px; }
+@media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.pp.spins,.rush,.beam,.dest-go b { animation:none; } .platform-light { transition:none; } .floor-light { display:none; } }
