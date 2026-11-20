@@ -11,7 +11,8 @@ import Controller from './Controller.tsx';
 import LetterView from './LetterView.tsx';
 import RouteSheet from './RouteSheet.tsx';
 
-const KEYS: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1], a: [-1, 0], d: [1, 0], w: [0, -1], s: [0, 1] };
+// The arrow keys walk. The letters on the controller's buttons are those buttons: a first-time player presses what he sees.
+const KEYS: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
 const spotOf = (g: Game): Spot => (g.place.k === 'routeSheet' ? g.place.back : g.place);
 // How the salaryman moves. He is a card, but he squashes and stretches like a toy: a crouch before he sets off or
 // jumps, a stretch as he goes, a squash when he lands or pulls up. `sy` is his height (1 at rest) on a springy return.
@@ -274,8 +275,9 @@ export default function App() {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const place = gameRef.current.place, k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       if (k === 'c') { dispatch({ a: 'toggleController' }); return; }
-      if (k === 'm') { dispatch({ a: 'map' }); return; }
-      if (k === 'Escape' || k === 'Backspace') { dispatch({ a: 'back' }); e.preventDefault(); return; }
+      if (k === 'm' || k === 'x') { dispatch({ a: 'map' }); return; }
+      if (k === 'Escape' || k === 'Backspace' || k === 'b') { dispatch({ a: 'back' }); e.preventDefault(); return; }
+      if (k === 'a') { dispatch({ a: 'confirm' }); return; }
       if (k === 'Enter' || k === ' ') {
         if (document.activeElement instanceof HTMLButtonElement || document.activeElement instanceof HTMLAnchorElement) return;
         if (place.k === 'letter') return;
@@ -314,6 +316,7 @@ export default function App() {
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
         <button data-testid="toggle-controller" aria-pressed={!game.controller.visible} onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'toggleController' }); }}>{game.controller.visible ? 'Hide controller' : 'Show controller'}</button>
       </div>
+      {game.stamps.length === 0 && game.place.k === 'walk' && <p className="keys" data-testid="keys"><b>← →</b> walk <b>A</b> or <b>Enter</b> use <b>B</b> or <b>Esc</b> back</p>}
       {game.stamps.length > 0 && <div className="stamps" key={game.stamps.length} data-testid="stamps">{game.stamps.length} {game.stamps.length === 1 ? 'stamp' : 'stamps'}</div>}
       {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}

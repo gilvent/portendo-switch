@@ -16,15 +16,15 @@ export const content: Content = validateContent({ worlds: {
   intro: { id: 'intro', art: 'blockout', bounds: { x0: -420, x1: 420, z0: 0, z1: 0 }, solid: [], title: 'Handheld', path: 'round', color: '#8d95a0',
     stops: [{ id: 'road-end', label: 'Dock', x: 400, z: 0, reach: 300, action: { kind: 'dock' } }], letters: [] },
   // Home: the inside of an MRT car on its way. The sign over the door chooses the stop; the doors get off there.
-  mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -320, x1: 480, lift: 210, liftTall: 130, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [], title: 'MRT', path: 'round', color: '#8d95a0',
+  mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -320, x1: 480, lift: 210, liftTall: 130, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [{ x0: -470, x1: -420, z0: -80, z1: -28 }, { x0: 418, x1: 470, z0: -90, z1: -46 }], title: 'MRT', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
         { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },
       { id: 'poster', label: 'Poster', x: -260, z: -40, mark: 236, action: { kind: 'letter', letter: 'hello' } },
-      { id: 'help-point', label: 'Help point', x: -420, z: -40, mark: 226, action: { kind: 'letter', letter: 'contact' } } ],
+      { id: 'help-point', label: 'Help point', x: -385, z: -30, look: -420, mark: 226, action: { kind: 'letter', letter: 'contact' } } ],
     letters: [
       { id: 'hello', title: 'Hey there!', surface: 'note', blocks: [{ kind: 'heading', text: 'I am Alvaro.' }, { kind: 'heading', text: 'I develop Web Frontends.' }] },
-      { id: 'contact', title: 'Mailbox', surface: 'note', blocks: [{ kind: 'links', items: [
+      { id: 'contact', title: 'Get in touch', surface: 'note', blocks: [{ kind: 'links', items: [
         { label: 'Email', href: 'mailto:alvarolukmanto@gmail.com', icon: 'brand/gmail.png' }, { label: 'LinkedIn', href: 'https://linkedin.com/in/alvaro-lukmanto', icon: 'brand/linkedin.png' },
         { label: 'Twitter', href: 'https://twitter.com/alfonsiusalvaro', icon: 'brand/twitter.png' }, { label: 'GitHub', href: 'https://github.com/gilvent', icon: 'brand/github.png' } ] }] } ] },
   blibli: { id: 'blibli', art: 'street', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -300, x1: 300 }, bounds: { x0: -700, x1: 620, z0: -30, z1: 180 },
@@ -34,8 +34,8 @@ export const content: Content = validateContent({ worlds: {
     stops: [
       out(),
       { id: 'parcels', label: 'Delivery boxes', x: -410, z: 60, action: { kind: 'letter', letter: 'stack' } },
-      { id: 'mailbox', label: 'Mailbox', x: -318, z: 44, look: -260, action: { kind: 'letter', letter: 'about' } },
-      { id: 'shop-door', label: 'Enter the store', x: 150, z: -30, reach: 110, action: { kind: 'road', to: 'blibli-shop', stop: 'street-door' } },
+      { id: 'mailbox', label: 'Mailbox', x: -305, z: 44, look: -260, action: { kind: 'letter', letter: 'about' } },
+      { id: 'shop-door', label: 'Enter the store', x: 150, z: -30, reach: 140, action: { kind: 'road', to: 'blibli-shop', stop: 'street-door' } },
       { id: 'site-board', label: 'Visit Blibli.com', x: 585, z: 20, action: { kind: 'link', href: 'https://blibli.com' } } ],
     letters: [
       { id: 'about', title: 'Blibli.com', surface: 'note', blocks: [

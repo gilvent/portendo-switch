@@ -301,3 +301,8 @@ button { font:inherit; cursor:pointer; }
 .probing .pp { pointer-events:auto; }
 /* ?fps on the address shows the frame rate, for checking a device against the 60fps target. */
 .fps { position:fixed; z-index:40; left:8px; bottom:8px; padding:2px 8px; border-radius:3px; background:#14181d; color:#58e08a; font:600 13px/18px ui-monospace,monospace; pointer-events:none; }
+/* Which keys are the buttons, for a first-time player at a keyboard: shown until the first stamp, where the stamp count then sits. */
+.keys { display:none; position:fixed; z-index:30; top:12px; left:12px; margin:0; padding:5px 12px; background:#fffaf0; color:#23272d; border-radius:3px; font-size:14px; line-height:20px; box-shadow:var(--shadow-sm); pointer-events:none; }
+.keys b { display:inline-block; min-width:22px; margin:0 3px 0 10px; padding:0 6px; border-radius:4px; background:#23272d; color:#fff; text-align:center; font-weight:600; }
+.keys b:first-child { margin-left:0; }
+@media (hover:hover) and (pointer:fine) { .keys { display:block; } }
