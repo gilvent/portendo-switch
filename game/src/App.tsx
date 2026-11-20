@@ -45,7 +45,7 @@ export default function App() {
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const dispatch = useCallback((x: Action) => {
     if (busy.current && x.a !== 'toggleController') return;
-    if (turning.current && (x.a === 'confirm' || x.a === 'back' || x.a === 'arrive' || x.a === 'line')) return;
+    if (turning.current && gameRef.current.place.k === 'walk' && (x.a === 'confirm' || x.a === 'back' || x.a === 'arrive' || x.a === 'line')) return;
     const here = gameRef.current.place;
     if (x.a === 'confirm' && here.k === 'letter') {
       // A turns the catalog's leaves; on any other letter it puts the letter down, like B.
@@ -136,7 +136,7 @@ export default function App() {
   const facing = useRef(1);
   const phase = useRef(0);
   const wasWalking = useRef(false);
-  const airborne = useRef(0);
+  const airborne = useRef(0), wasUnseen = useRef(false);
   const fpsRef = useRef<HTMLElement>(null), meter = useRef({ n: 0, ms: 0, worst: 0 }), [showFps] = useState(() => new URLSearchParams(location.search).has('fps'));
   const framed = useRef<WorldId | null>(null);
 
@@ -153,7 +153,7 @@ export default function App() {
   useEffect(() => {
     if (!world || world === prevWorld.current || spot.k === 'lost') return;
     prevWorld.current = world;
-    facing.current = 1; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0 });
+    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0 });
     held.current.clear();
     stickSpent.current = true;
     target.current = null;
@@ -276,6 +276,8 @@ export default function App() {
       c.focus += (zoomIn - c.focus) * (calm ? 1 : 1 - Math.exp(-3 * dt));
       const walking = speed > .08;
       if (walking !== wasWalking.current) { wasWalking.current = walking; courierRef.current?.toggleAttribute('data-walking', walking); }
+      const unseen = !!w.hidden?.some(r => n.x > r.x0 && n.x < r.x1 && n.z > r.z0 && n.z < r.z1);
+      if (unseen !== wasUnseen.current) { wasUnseen.current = unseen; courierRef.current?.toggleAttribute('data-unseen', unseen); }
       if (courierRef.current) { courierRef.current.style.transform = `translate3d(${n.x}px,0,${n.z}px)`; if (h.y !== airborne.current) { airborne.current = h.y; const cs = courierRef.current.style; cs.setProperty('--air', (h.y / 90).toFixed(2)); cs.setProperty('--jx', `${(h.y * LIGHT.dx).toFixed(1)}px`); cs.setProperty('--jz', `${(-h.y * LIGHT.dy).toFixed(1)}px`); } }
       if (poseRef.current) poseRef.current.style.transform = `translate3d(0,${(-bob - h.y).toFixed(1)}px,0) rotateZ(${lean.toFixed(2)}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
       // The far backdrop slides a little against the scene: the furthest layer of the parallax.

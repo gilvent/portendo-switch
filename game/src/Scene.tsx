@@ -99,6 +99,7 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
         </div>}
         <div className="courier" ref={courierRef} data-testid="courier">
           <i className="ground-shadow small" />
+          <i className="here" />
           <div className="pose" ref={poseRef}><div className="flip" ref={flipRef}><Salaryman /></div></div>
         </div>
         <div className="fx" ref={bits} aria-hidden="true" />

@@ -31,6 +31,9 @@ export type World = {
   id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom' | 'train'; back?: { world: WorldId; stop: string }; // ahead: on a wide screen the view leads the walker by this much along x (the train's camera looks toward its front).
   // zoomWide: the zoom on a landscape screen, where a room has space to fill the frame; stops' `focus` close-ups stay as framed for `zoom`.
   camera?: { zoom: number; zoomWide?: number; x0: number; x1: number; lift?: number; liftTall?: number; ahead?: number }; path: 'round' | 'street' | 'store' | 'climb'; bounds: Rect; solid: Rect[];
+  // Floor the camera cannot see because something tall stands in front of it. While the salaryman is there, a marker
+  // hangs over him, clear of whatever hides him.
+  hidden?: Rect[];
   // No train stops here: the world keeps its content and its deep links, but the route sheet leaves it out.
   offLine?: boolean;
   url?: string; role?: string; description?: string; logo?: string; color: string;

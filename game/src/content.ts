@@ -46,7 +46,7 @@ export const content: Content = validateContent({ worlds: {
   // First floor: the product detail page, played instead of read. Every stop is one part of the page.
   'blibli-shop': { id: 'blibli-shop', art: 'shop', back: { world: 'blibli', stop: 'shop-door' }, camera: { zoom: .8, zoomWide: .96, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -170, z1: 190 },
     solid: [{ x0: -75, x1: 75, z0: -165, z1: -60 }, { x0: -220, x1: -130, z0: -165, z1: -95 }, { x0: 130, x1: 220, z0: -165, z1: -95 }, { x0: -440, x1: -350, z0: 70, z1: 150 }, { x0: 325, x1: 480, z0: -15, z1: 85 }],
-    title: 'First floor: smartphones', path: 'store', color: '#0092da',
+    title: 'First floor: smartphones', path: 'store', color: '#0092da', hidden: [{ x0: 296, x1: 460, z0: -170, z1: -30 }],
     stops: [
       { id: 'street-door', label: 'Back to the street', x: 0, z: 190, reach: 60, action: { kind: 'road', to: 'blibli', stop: 'shop-door' } },
       { id: 'showcase', label: 'Showcase phone', x: 80, z: -35, focus: 1.6, look: 0, action: { kind: 'toy', toy: 'variant', states: 3 } },
@@ -75,7 +75,7 @@ export const content: Content = validateContent({ worlds: {
       { id: 'stairs-down', label: 'Downstairs', x: -387, z: 58, reach: 80, action: { kind: 'road', to: 'blibli-shop', stop: 'stairs-up' } },
       { id: 'camera', label: 'Instant camera', x: -88, z: -40, focus: 1.8, look: -140, action: { kind: 'toy', toy: 'photo', states: 3 } },
       { id: 'stars', label: 'Review card', x: 112, z: -40, focus: 1.8, look: 15, action: { kind: 'toy', toy: 'rating', states: 5 } },
-      { id: 'gallery', label: 'Photo gallery', x: -120, z: -110, focus: 1.6, look: -190, mark: 270, action: { kind: 'toy', toy: 'gallery', states: 2 } },
+      { id: 'gallery', label: 'Photo gallery', x: -215, z: -115, focus: 1.6, look: -190, mark: 270, action: { kind: 'toy', toy: 'gallery', states: 2 } },
       { id: 'board', label: 'Review board', x: 250, z: -110, focus: 1.6, look: 280, mark: 270, action: { kind: 'toy', toy: 'filter', states: 3 } } ],
     letters: [],
     encoded: [
