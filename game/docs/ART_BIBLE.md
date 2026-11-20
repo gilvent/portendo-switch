@@ -253,3 +253,15 @@ A space opens like a gatefold card: two paper leaves swing out from the middle, 
 ### Depth
 
 The street's far backdrop is its own sheet and slides at a tenth of the camera's travel, behind the river view, the buildings, the plaza and the kerb planting, which keep their true parallax in the 3D scene. On a landscape screen the two rooms are framed to fill it (`zoomWide`); close-ups at stops are unchanged.
+
+### What a first-time player is told
+
+Three blind playtests (a fresh player given only the address) set these rules; the third reached all four spaces on foot.
+
+- A legend stays top-left on a keyboard device: the four arrows walk, A or Enter uses and jumps, B or Esc closes and leaves. The letters A, B and X on the keyboard are the buttons.
+- The handheld screen says what to do: walk right to the dock, then press A.
+- A door or way out works both ways: walking into it, or A when its prompt shows. The shop door reaches the lane a player walks along from the train.
+- A puts a letter down as B does (on the catalog it turns the leaves).
+- B with nothing open asks before it leaves a space: the second press goes.
+- The stamp count shows its total.
+- A stop's tap area and marker stand on the thing used, never on the spot the salaryman stands at.

@@ -28,7 +28,7 @@ export const content: Content = validateContent({ worlds: {
         { label: 'Email', href: 'mailto:alvarolukmanto@gmail.com', icon: 'brand/gmail.png' }, { label: 'LinkedIn', href: 'https://linkedin.com/in/alvaro-lukmanto', icon: 'brand/linkedin.png' },
         { label: 'Twitter', href: 'https://twitter.com/alfonsiusalvaro', icon: 'brand/twitter.png' }, { label: 'GitHub', href: 'https://github.com/gilvent', icon: 'brand/github.png' } ] }] } ] },
   blibli: { id: 'blibli', art: 'street', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -300, x1: 300 }, bounds: { x0: -700, x1: 620, z0: -30, z1: 180 },
-    solid: [{ x0: -520, x1: -300, z0: -150, z1: 12 }, { x0: -310, x1: -210, z0: -90, z1: -8 }, { x0: -130, x1: -50, z0: -110, z1: -30 }],
+    solid: [{ x0: -520, x1: -300, z0: -150, z1: 12 }, { x0: -310, x1: -128, z0: -150, z1: -8 }, { x0: -130, x1: -50, z0: -110, z1: -30 }],
     title: 'Blibli.com', path: 'store', url: 'https://blibli.com', role: 'Front-end Developer @', color: '#0092da', logo: 'brand/blibli-white.svg',
     description: 'An indonesian e-commerce with wide range of products from both offline business to online.',
     stops: [

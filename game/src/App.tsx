@@ -35,6 +35,8 @@ export default function App() {
   const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
   const busy = useRef(false);
   const turning = useRef(false);
+  const leaveAsked = useRef(-1e9), [leaving, setLeaving] = useState(0);
+  useEffect(() => { if (!leaving) return; const t = window.setTimeout(() => setLeaving(0), 3000); return () => clearTimeout(t); }, [leaving]);
   const fxRef = useRef<Fx | null>(null);
   const skyRef = useRef<HTMLDivElement>(null);
   const poseRef = useRef<HTMLDivElement>(null);
@@ -44,8 +46,19 @@ export default function App() {
   const dispatch = useCallback((x: Action) => {
     if (busy.current && x.a !== 'toggleController') return;
     if (turning.current && (x.a === 'confirm' || x.a === 'back' || x.a === 'arrive' || x.a === 'line')) return;
-    if (x.a === 'confirm' && gameRef.current.place.k === 'letter') { dispatchEvent(new Event('letter-confirm')); return; }
     const here = gameRef.current.place;
+    if (x.a === 'confirm' && here.k === 'letter') {
+      // A turns the catalog's leaves; on any other letter it puts the letter down, like B.
+      const l = stopOf(content, here.world, here.stop)?.action, turns = l?.kind === 'letter' && content.worlds[here.world].letters.find(k => k.id === l.letter)?.blocks.some(k => k.kind === 'specSheet');
+      if (turns) { dispatchEvent(new Event('letter-confirm')); return; }
+      x = { a: 'back' };
+    }
+    // B with nothing open leaves the whole space, so it asks first: the second press within three seconds goes.
+    if (x.a === 'back' && here.k === 'walk' && content.worlds[here.world].back && !(here.near && stopOf(content, here.world, here.stop)?.action.kind === 'ride')) {
+      const now = performance.now();
+      if (now - leaveAsked.current > 3000) { leaveAsked.current = now; setLeaving(n => n + 1); return; }
+      leaveAsked.current = -1e9; setLeaving(0);
+    }
     if (x.a === 'confirm' && here.k === 'walk' && here.world !== 'intro' && gameRef.current.controller.mode === 'docked') {
       // A with nothing in reach is a jump. A at a stop uses it: the paper answers at once, before anything opens.
       if (!here.near) { hero.current.jump = true; return; }
@@ -246,7 +259,7 @@ export default function App() {
         if (rigRef.current) rigRef.current.style.transform = `rotateX(${rig.current.x.toFixed(3)}deg) rotateY(${rig.current.y.toFixed(3)}deg)`;
       }
       if (p.world === 'intro') {
-        if (introRef.current) introRef.current.style.transform = `translate3d(${(n.x + 420) / 840 * 100}cqw,${-bob}px,0)`;
+        if (introRef.current) introRef.current.style.transform = `translate3d(${4 + (n.x + 420) / 840 * 90}cqw,${-bob}px,0)`;
         return;
       }
       // Soft follow: the camera leads the way he faces (further while he walks), eases after him, and lets him move a
@@ -315,6 +328,7 @@ export default function App() {
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
       {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} atDock={spot.k === 'walk' && spot.world === 'intro' && spot.near} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
+      {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={leaving} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
       {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}
       <div className="corner">
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>

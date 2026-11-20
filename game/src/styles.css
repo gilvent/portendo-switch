@@ -308,3 +308,5 @@ button { font:inherit; cursor:pointer; }
 @media (hover:hover) and (pointer:fine) { .keys { display:block; } }
 .mini-hint { position:absolute; left:50%; top:9%; transform:translateX(-50%); padding:3px 12px; background:#fffaf0; color:#23272d; border-radius:3px; font-size:clamp(11px,2.2cqw,18px); line-height:1.5; white-space:nowrap; box-shadow:var(--shadow-sm); }
 @media (hover:hover) and (pointer:fine) { .stamps { top:46px; } }
+.leave { position:fixed; z-index:30; left:50%; top:64px; transform:translateX(-50%); margin:0; padding:6px 16px; background:#fffaf0; color:#23272d; border-radius:3px; font-size:16px; line-height:24px; box-shadow:var(--shadow-md); pointer-events:none; animation:tag-in .3s steps(4,end); }
+.leave b { display:inline-block; min-width:22px; padding:0 6px; border-radius:50%; background:#23272d; color:#fff; text-align:center; }
