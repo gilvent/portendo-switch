@@ -326,8 +326,8 @@ button { font:inherit; cursor:pointer; }
 .art-blockout .floor { background:repeating-linear-gradient(0deg,rgba(255,255,255,.2) 0 2px,transparent 2px 60px),repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 2px,transparent 2px 60px),repeating-linear-gradient(0deg,rgba(255,255,255,.34) 0 3px,transparent 3px 300px),repeating-linear-gradient(90deg,rgba(255,255,255,.34) 0 3px,transparent 3px 300px),#2f7d5b; }
 .art-blockout .card { background:#f6efe2 !important; border-radius:2px; box-shadow:var(--shadow-md),inset 0 0 0 2px #fffaf0,inset 0 -10px 0 rgba(120,90,50,.08); }
 .art-blockout .prop:nth-child(3n) > .card { background:#e6c9a0 !important; } .art-blockout .prop:nth-child(5n) > .card { background:#ead9bd !important; }
-.art-blockout .sign { bottom:128px; height:84px; background:#fffaf0; border-radius:3px; box-shadow:var(--shadow-md),inset 0 0 0 3px #fff; font-weight:600; }
+.art-blockout .sign { bottom:128px; height:84px; background:#fffaf0; border-radius:3px; border:3px solid #fff; box-shadow:var(--shadow-md); font-weight:600; }
 .art-blockout .sign::after { content:""; position:absolute; left:calc(50% - 4px); top:100%; width:8px; height:128px; background:#b5ada2; }
 .art-blockout .sign.road { background:#f0a51e; color:#23272d; }
-.art-blockout .sign.near { background:#fff; box-shadow:var(--shadow-md),inset 0 0 0 3px #e8552d; }
+.art-blockout .sign.near { background:#fff; border-color:#e8552d; }
 .art-blockout .ground-shadow { background:rgba(8,30,20,.3); box-shadow:0 0 12px 8px rgba(8,30,20,.14); }
