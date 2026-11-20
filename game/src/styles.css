@@ -61,13 +61,23 @@ button { font:inherit; cursor:pointer; }
 .pc-screen { position:absolute; inset:8px; }
 .sign.hit { left:-74px; width:148px; height:200px; padding:0; background:transparent; box-shadow:none; color:transparent; transform:translateZ(70px); }
 .sign.hit:focus-visible { outline-offset:-4px; }
-.sign.hit > span { position:absolute; left:50%; top:-8px; transform:translateX(-50%); white-space:nowrap; padding:2px 10px; background:#fff; color:#123a5a; border-radius:3px; font-size:15px; line-height:20px; opacity:0; }
+.sign.hit > span { position:absolute; left:50%; top:-30px; transform:translateX(-50%); white-space:nowrap; padding:2px 10px; background:#fff; color:#123a5a; border-radius:3px; font-size:15px; line-height:20px; opacity:0; }
 .sign.hit.near > span { opacity:1; }
-.sign.hit::after { content:""; position:absolute; left:calc(50% - 6px); top:0; width:12px; height:12px; background:#fff; transform:rotate(45deg); box-shadow:0 0 0 2px #e8552d; }
-.sign.hit.road::after { background:#f6b73c; }
-.sign.hit.near::after { display:none; }
-.sign.hit .prompt { top:-52px; }
-.art-shop,.art-storeroom { background:#0e0a08; }
+/* The marker over anything that can be used: a cut paper pennant, white core showing round its colour, bobbing in
+   stepped frames. Each one starts at its own point in the bob (--d), so no two move together. Ways out are sun yellow. */
+.sign.hit::before,.sign.hit::after { content:""; position:absolute; clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%); animation:pin-bob .8s steps(4,jump-none) var(--d,0s) infinite alternate; }
+.sign.hit::before { left:calc(50% - 15px); bottom:var(--pin,calc(100% - 14px)); width:30px; height:36px; background:#fffaf0; }
+.sign.hit::after { left:calc(50% - 11px); bottom:calc(var(--pin,calc(100% - 14px)) + 5px); width:22px; height:27px; background:radial-gradient(circle at 50% 36%,#fffaf0 0 3.4px,transparent 4px),#e8552d; }
+.sign.hit.road::after { background:radial-gradient(circle at 50% 36%,#fffaf0 0 3.4px,transparent 4px),#f0a51e; }
+/* The marker hangs at the top of the tap area unless the stop says how high it belongs (`mark`, as --pin). A way out
+   is marked at door height, not over the lintel. */
+.sign.hit.road { --pin:92px; }
+.sign.hit.near::before,.sign.hit.near::after { display:none; }
+@keyframes pin-bob { to { translate:0 -8px; } }
+.sign.hit .prompt { top:-76px; }
+.sign.hit.near > span { animation:tag-in .3s steps(4,end); }
+@keyframes tag-in { from { translate:0 10px; scale:.6; } 60% { scale:1.1; } }
+.art-shop,.art-storeroom { background:radial-gradient(110% 80% at 50% 64%,#3b2d23 0,#211813 55%,#0c0908 100%); }
 .letter.surface-note,.letter.surface-label { top:64px; bottom:auto; max-height:calc(100vh - 80px); left:auto; right:calc(98px + 2vw); margin:0; width:min(520px,calc(100vw - 16px)); padding:30px 30px 24px 58px; line-height:28px; background:repeating-linear-gradient(transparent 0 27px,#bcd2e6 27px 28px) local,linear-gradient(90deg,transparent 40px,#e58a84 40px 42px,transparent 42px),#f7e7b6; }
 .letter.surface-note h2,.letter.surface-label h2 { font:700 44px/56px Caveat,cursive; margin:0; }
 .letter.surface-note h3,.letter.surface-label h3 { color:#c2553b; font:700 26px/28px Caveat,cursive; margin:0 0 14px; }
@@ -85,9 +95,19 @@ button { font:inherit; cursor:pointer; }
 .rotated i { width:64px; height:64px; background:#bfe6f8; position:relative; transition:transform .26s cubic-bezier(.3,1.3,.5,1); } .rotated b { position:absolute; left:18px; top:8px; width:28px; height:28px; border-radius:50%; background:#e8552d; }
 .stamps { animation:thunk .3s cubic-bezier(.3,1.6,.5,1); } @keyframes thunk { from { transform:scale(1.8) rotate(-12deg); } }
 
-.wipe { position:absolute; inset:0; display:flex; pointer-events:none; }
-.wipe i { flex:1; background:var(--paper); transform:scaleX(0); transform-origin:0 50%; will-change:transform; }
-.wipe i:last-child { transform-origin:100% 50%; }
+/* The page turn between spaces. A space opens like a gatefold card: two paper leaves swing out toward you from the
+   middle, and as they clear, the standing paper pops up from flat. Leaving, the paper folds flat and the leaves shut. */
+.wipe { position:absolute; inset:0; display:flex; pointer-events:none; perspective:1500px; }
+.wipe i { flex:1; opacity:0; transform-origin:0 50%; --turn:-90deg; background:linear-gradient(90deg,#efe3cd,#f8f0e0 70%,#e2d3b8 98%,#b9a888); animation:leaf-open .46s steps(6,end) both; will-change:transform; }
+.wipe i:last-child { transform-origin:100% 50%; --turn:90deg; background:linear-gradient(270deg,#efe3cd,#f8f0e0 70%,#e2d3b8 98%,#b9a888); }
+@keyframes leaf-open { from { transform:none; opacity:1; filter:none; } 99% { opacity:1; } to { transform:rotateY(var(--turn)); opacity:0; filter:brightness(.8); } }
+@keyframes leaf-shut { from { transform:rotateY(var(--turn)); opacity:1; filter:brightness(.8); } to { transform:none; opacity:1; filter:none; } }
+[data-fold="out"] .wipe i { animation:leaf-shut .34s steps(5,end) both; }
+.page { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; transform-origin:0 0; animation:pop-up .62s steps(9,end) both; }
+@keyframes pop-up { 0%,22% { scale:1 .03 1; } 64% { scale:1 1.07 1; } 84% { scale:1 .98 1; } 100% { scale:1 1 1; } }
+@keyframes fold-flat { to { scale:1 .03 1; } }
+[data-fold="out"] .page { animation:fold-flat .3s steps(5,end) both; }
+@media (prefers-reduced-motion:reduce) { .wipe i,.page,[data-fold="out"] .wipe i,[data-fold="out"] .page { animation:none; } }
 
 .controller { position:fixed; inset:0; pointer-events:none; contain:layout; perspective:1100px; }
 .rig { position:absolute; inset:0; transform-style:preserve-3d; will-change:transform; }
@@ -169,7 +189,15 @@ button { font:inherit; cursor:pointer; }
 .pp-shadow { position:absolute; display:block; pointer-events:none; }
 .pp.moves { transform:var(--rest); transition:transform .42s steps(5,end); }
 .pp.moves.on { transform:var(--on); }
-.art-street { background:#6f5a44 no-repeat 50% calc(42vh - 562px) / 2400px auto; }
+.art-street { background:#6f5a44; }
+/* The far backdrop: its own sheet, a little wider than the screen, sliding slowly against the scene as the camera moves. */
+.sky { position:absolute; inset:0 -140px; background:no-repeat 50% calc(42vh - 562px) / 2400px auto; will-change:transform; }
+/* Two cut-paper gulls cross the sky, far apart, flapping in two frames. */
+.gull { position:absolute; left:0; top:11vh; width:26px; height:12px; background:#fffaf0; clip-path:polygon(0 30%,22% 0,50% 55%,78% 0,100% 30%,76% 34%,50% 100%,24% 34%); animation:gull-cross 52s steps(260,end) infinite,gull-flap .5s steps(1,end) infinite; }
+.gull-b { top:19vh; scale:.7; animation-duration:71s,.62s; animation-delay:-38s,0s; animation-direction:reverse,normal; }
+@keyframes gull-cross { from { transform:translate3d(-40px,0,0); } 50% { transform:translate3d(60vw,-5vh,0); } to { transform:translate3d(calc(100vw + 320px),1vh,0); } }
+@keyframes gull-flap { 50% { clip-path:polygon(0 70%,22% 50%,50% 40%,78% 50%,100% 70%,76% 62%,50% 86%,24% 62%); } }
+@media (prefers-reduced-motion:reduce) { .gull { display:none; } }
 @media (prefers-reduced-motion:reduce) { .pp.moves { transition:none; } }
 /* catalog leaflet: a printed, folded paper close-up of the sheet beside the showcased phone */
 .letter.surface-catalog { background:#fbf7ee; border:0; border-radius:2px; box-shadow:var(--shadow-lg, 0 14px 30px rgba(0,0,0,.4)); background-image:linear-gradient(90deg,transparent calc(50% - 1px),rgba(90,60,30,.18) 50%,transparent calc(50% + 1px)); }
@@ -243,8 +271,26 @@ button { font:inherit; cursor:pointer; }
 .dest :focus-visible { outline-offset:-2px; }
 /* The doors' stop: its tap area ends below the sign, and its label says what A and B do there. */
 .art-train .sign.hit { height:150px; }
-/* The label and the A bubble hang outside the tap area. Among the train's live sheets the browser clips them to it at
-   high pixel ratios unless each is its own layer. */
-.art-train .sign.hit > span,.art-train .sign.hit .prompt { will-change:transform; }
+/* The label and the A bubble hang outside the tap area. Among live sheets (the train's, and every space's ambient
+   loops) the browser clips them to it unless each is its own layer. */
+.sign.hit > span,.sign.hit .prompt { will-change:transform; }
 .sign.hit > span em { font-style:normal; display:inline-grid; place-items:center; width:18px; height:18px; margin:0 3px 0 8px; border-radius:50%; background:#2c3138; color:#fff; font-size:11px; line-height:18px; }
 @media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.pp.spins,.rush,.beam,.dest-go b { animation:none; } .platform-light { transition:none; } .floor-light { display:none; } }
+
+/* ---------- the salaryman's pose, and the live paper bits (fx.ts) ---------- */
+/* `.pose` stands at his feet: the jump, the lean and the squash all turn about that point, while his shadow stays on
+   the ground, slides away from the sun as he rises (--jx, --jz) and thins (--air). */
+.pose { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; transform-origin:0 0; will-change:transform; }
+.courier .ground-shadow { transform:translate3d(calc(var(--ground-dx) + var(--jx,0px)),0,calc(var(--ground-dz) + var(--jz,0px))) rotateX(90deg) scale(calc(1 - var(--air,0) * .3)); opacity:calc(1 - var(--air,0) * .45); }
+.fx { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; }
+.bit { position:absolute; left:0; top:0; display:block; opacity:0; pointer-events:none; }
+.bit.dust { border-radius:50%; }
+.bit.scrap { border-radius:1px; box-shadow:inset 0 0 0 1.5px rgba(255,250,240,.9); }
+.bit.scrap.tri { clip-path:polygon(0 100%,50% 0,100% 100%); box-shadow:none; }
+.bit.say { width:36px; height:36px; margin:-36px 0 0 -18px; display:grid; place-items:center; background:#fffaf0; color:#23272d; border-radius:50% 50% 50% 5px; font:600 21px/1 Fredoka,system-ui,sans-serif; box-shadow:var(--shadow-sm); }
+/* Ambient loops (art/ambient.ts): a sheet rocks between two poses in stepped frames, at its own period and offset. */
+.pp.amb { animation:amb var(--t) steps(4,jump-none) var(--d) infinite alternate; }
+@keyframes amb { from { transform:var(--a); } to { transform:var(--b); } }
+.pp.amb-peck { animation:amb-peck var(--t) steps(1,end) var(--d) infinite; }
+@keyframes amb-peck { 0%,10%,20%,100% { transform:var(--a); } 5%,15% { transform:var(--b); } }
+@media (prefers-reduced-motion:reduce) { .pp.amb,.sign.hit::before,.sign.hit::after,.sign.hit.near > span { animation:none; } }

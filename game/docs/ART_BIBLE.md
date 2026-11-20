@@ -202,3 +202,50 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Recommended shelf | Placeholder cards fold down |
 | Review board | The chosen filter tab rises |
 | Any toy | A piece that appears drops into place in five stepped frames |
+
+## Life
+
+Everything below is drawn live by the game, not baked. A baked sheet keeps its baked light and its baked shadow, so live motion stays small enough that the shadow still belongs to it: a few degrees, a few units, and a touched piece always lands back where it stood. Under reduced motion none of it plays.
+
+### Ambient loops (`src/art/ambient.ts`)
+
+A loop rocks one sheet between two poses in four stepped frames. Each sheet takes its period and its starting point from its own id, so no two flags, fronds or lamps ever move in step. Sheets of one object that must move together (the river's two halves) share a key.
+
+| Space | What moves on its own |
+|---|---|
+| Street | Flags and gate bunting, festoon lights, palm fronds and tree leaves, bushes and tufts, the clothes rail, the river and its boat, shoppers breathing, the hawker bouncing as he shouts, pigeons and roof birds pecking, two cut gulls crossing the sky |
+| MRT car | Passengers breathing (the sleeper deeper and slower), on top of the train's own motion |
+| Outlet | Bunting, pendant lamps, the plant, the clerk, the promo burst |
+| Store-room | Pendant lamps, the packer, the roller, on top of the belts |
+
+A new loop is one line: a pattern over sheet ids and a kind (`sway`, `skew`, `rustle`, `breathe`, `bob`, `peck`). `tests/model.test.ts` fails if a pattern matches nothing in the bake.
+
+### Touch
+
+Anything listed as a touchable hops when the salaryman walks or jumps within its reach: the whole object rises together and lands again in stepped frames, with a puff of dust. People answer with a paper tag over their head instead (♪, …, !, ?, z), in keeping with their face. A touchable must be within reach of the walkable floor; the test checks that too.
+
+### Using a stop
+
+Pressing A at a stop answers in the same frame, before anything opens: paper scraps in the space's colour burst from the object and the salaryman dips. The stop's own baked motion (flap, door, chip) follows as before.
+
+### The salaryman
+
+- **Sets off** with a dip of 60ms before his feet go, then stretches into the walk and kicks dust behind him.
+- **Turns** like a playing card flipped over in five stepped frames, with a small skip.
+- **Jumps** on A when nothing is in reach: a crouch, a stretch on the way up, a squash and dust on landing. His shadow stays on the ground, slides away from the sun by `SUN_TO_LIGHT` as he rises, and thins.
+- **Pulls up** from a run with a squash and dust ahead of him.
+- Every other stride leaves a dot of dust.
+
+The camera leads the way he faces (further while he walks), eases after him, and lets him move 16 units inside a dead zone before it follows.
+
+### Markers
+
+Anything that can be used carries a cut paper pennant, coral with its white core showing, bobbing in stepped frames at its own offset. Ways out are sun yellow and hang at door height. A stop sets `mark` when its object is higher or lower than the top of its tap area (the MRT poster, the help point).
+
+### Changing space
+
+A space opens like a gatefold card: two paper leaves swing out from the middle, and as they clear, the standing paper pops up from flat with a small overshoot. Leaving, the paper folds flat and the leaves shut. The game's state changes at once; what is drawn lags it by the fold (`shown` in `App.tsx`).
+
+### Depth
+
+The street's far backdrop is its own sheet and slides at a tenth of the camera's travel, behind the river view, the buildings, the plaza and the kerb planting, which keep their true parallax in the 3D scene. On a landscape screen the two rooms are framed to fill it (`zoomWide`); close-ups at stops are unchanged.

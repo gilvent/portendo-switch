@@ -20,8 +20,8 @@ export const content: Content = validateContent({ worlds: {
     stops: [
       { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
         { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },
-      { id: 'poster', label: 'Poster', x: -260, z: -40, action: { kind: 'letter', letter: 'hello' } },
-      { id: 'help-point', label: 'Help point', x: -420, z: -40, action: { kind: 'letter', letter: 'contact' } } ],
+      { id: 'poster', label: 'Poster', x: -260, z: -40, mark: 236, action: { kind: 'letter', letter: 'hello' } },
+      { id: 'help-point', label: 'Help point', x: -420, z: -40, mark: 226, action: { kind: 'letter', letter: 'contact' } } ],
     letters: [
       { id: 'hello', title: 'Hey there!', surface: 'note', blocks: [{ kind: 'heading', text: 'I am Alvaro.' }, { kind: 'heading', text: 'I develop Web Frontends.' }] },
       { id: 'contact', title: 'Mailbox', surface: 'note', blocks: [{ kind: 'links', items: [
@@ -34,7 +34,7 @@ export const content: Content = validateContent({ worlds: {
     stops: [
       out(),
       { id: 'parcels', label: 'Delivery boxes', x: -410, z: 60, action: { kind: 'letter', letter: 'stack' } },
-      { id: 'mailbox', label: 'Mailbox', x: -260, z: 30, action: { kind: 'letter', letter: 'about' } },
+      { id: 'mailbox', label: 'Mailbox', x: -318, z: 44, look: -260, action: { kind: 'letter', letter: 'about' } },
       { id: 'shop-door', label: 'Enter the store', x: 150, z: -30, reach: 110, action: { kind: 'road', to: 'blibli-shop', stop: 'street-door' } },
       { id: 'site-board', label: 'Visit Blibli.com', x: 585, z: 20, action: { kind: 'link', href: 'https://blibli.com' } } ],
     letters: [
@@ -44,7 +44,7 @@ export const content: Content = validateContent({ worlds: {
         { kind: 'paragraph', text: [s('Being a '), b('front end developer'), s(', I worked in '), b('Customer Experience'), s(' team. Developed any client side features related to product detail and product review in '), b('Blibli.com’s'), s(' web application.')] }] },
       stack([T.playwright, T.vue, T.nginx, T.sass]) ] },
   // First floor: the product detail page, played instead of read. Every stop is one part of the page.
-  'blibli-shop': { id: 'blibli-shop', art: 'shop', back: { world: 'blibli', stop: 'shop-door' }, camera: { zoom: .8, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -170, z1: 190 },
+  'blibli-shop': { id: 'blibli-shop', art: 'shop', back: { world: 'blibli', stop: 'shop-door' }, camera: { zoom: .8, zoomWide: .96, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -170, z1: 190 },
     solid: [{ x0: -75, x1: 75, z0: -165, z1: -60 }, { x0: -220, x1: -130, z0: -165, z1: -95 }, { x0: 130, x1: 220, z0: -165, z1: -95 }, { x0: -440, x1: -350, z0: 70, z1: 150 }, { x0: 325, x1: 480, z0: -15, z1: 85 }],
     title: 'First floor: smartphones', path: 'store', color: '#0092da',
     stops: [
@@ -68,7 +68,7 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'Get work on more JS and browser APIs: Lazy load techniques, datalayer, service worker, intersection observer, etc...', at: ['recs'] },
       { fact: "High volume of traffic puts continuous attention to this page's performance, pushing me to learn many web optimization techniques", at: ['recs', 'street-door'] } ] },
   // Second floor: product reviews, from writing one to browsing everyone's.
-  'blibli-storeroom': { id: 'blibli-storeroom', art: 'storeroom', back: { world: 'blibli-shop', stop: 'stairs-up' }, camera: { zoom: .8, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -150, z1: 190 },
+  'blibli-storeroom': { id: 'blibli-storeroom', art: 'storeroom', back: { world: 'blibli-shop', stop: 'stairs-up' }, camera: { zoom: .8, zoomWide: .96, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -150, z1: 190 },
     solid: [{ x0: -360, x1: 420, z0: -235, z1: -165 }, { x0: 120, x1: 420, z0: 83, z1: 153 }, { x0: -190, x1: 70, z0: 15, z1: 105 }, { x0: -277, x1: -193, z0: 143, z1: 207 }, { x0: 370, x1: 430, z0: -165, z1: -138 }, { x0: -487, x1: -287, z0: 85, z1: 260 }, { x0: 52, x1: 108, z0: 156, z1: 200 }, { x0: 420, x1: 470, z0: 0, z1: 48 }, { x0: 446, x1: 470, z0: -50, z1: -10 }],
     title: 'Second floor: store-room', path: 'store', color: '#0092da',
     stops: [

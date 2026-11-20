@@ -42,3 +42,19 @@ test('one sun: ground shadows fall right and back, the same way as the drop shad
 
 test('mrt: the sign over the doors chooses where they open; only Blibli and Moperty are served', () => { const door = content.worlds.mrt.stops.find(x => x.action.kind === 'ride')!; assert.ok(door.action.kind === 'ride'); assert.deepEqual(door.action.kind === 'ride' && door.action.to.map(d => d.world), ['blibli', 'moperty']); let g = start(content, '/round/mrt/door'); const off = (gg: Game) => pathOf(reduce(content, gg, { a: 'confirm' })[0].place); assert.equal(off(g), '/round/blibli/mailbox'); g = reduce(content, g, { a: 'line', step: 1 })[0]; assert.equal(off(g), '/round/moperty/first-house'); g = reduce(content, g, { a: 'back' })[0]; assert.equal(g.place.k === 'walk' && g.place.world, 'mrt'); assert.equal(off(g), '/round/blibli/mailbox'); g = reduce(content, g, { a: 'line', step: -1 })[0]; assert.equal(off(g), '/round/moperty/first-house'); const away = reduce(content, { ...g, place: { k: 'walk', world: 'mrt', stop: 'poster', near: true } }, { a: 'line', step: 1 })[0]; assert.equal(away.toys['mrt/line'], 0); });
 test('mrt: docking lands on the train at the doors, and every work world leads back to them', () => { const g = reduce(content, { ...start(content, '/'), controller: { mode: 'docking', visible: true } }, { a: 'dockDone' })[0]; assert.deepEqual(g.place, { k: 'walk', world: 'mrt', stop: 'door', near: true }); for (const w of ['blibli', 'moperty', 'radjastone'] as const) { const s = content.worlds[w].stops.find(x => x.action.kind === 'road' && x.action.to === 'mrt'); assert.ok(s, w); assert.deepEqual(reduce(content, start(content, `/round/${w}/${content.worlds[w].stops[1].id}`), { a: 'back' })[0].place, { k: 'walk', world: 'mrt', stop: 'door', near: true }); } });
+import { AMBIENT } from '../src/art/ambient.ts';
+import { readFileSync } from 'node:fs';
+test('ambient: every loop and every touchable names paper that is in the bake, and every touchable can be reached', () => {
+  const worldOf: Record<string, keyof typeof content.worlds> = { street: 'blibli', shop: 'blibli-shop', storeroom: 'blibli-storeroom', train: 'mrt' };
+  for (const [art, amb] of Object.entries(AMBIENT)) {
+    const ids: string[] = JSON.parse(readFileSync(new URL(`../src/art/baked/${art}/manifest.json`, import.meta.url), 'utf8')).quads.map((q: { id: string }) => q.id);
+    for (const [m] of amb.loops) assert.ok(ids.some(i => m.test(i)), `${art}: loop ${m} matches no sheet`);
+    const b = content.worlds[worldOf[art]].bounds, names = new Set<string>();
+    for (const t of amb.touch) {
+      assert.ok(ids.some(i => t.match.test(i)), `${art}: touchable ${t.name} matches no sheet`);
+      assert.ok(!names.has(t.name), `${art}: duplicate touchable ${t.name}`); names.add(t.name);
+      const r = t.r ?? 62, dx = Math.max(b.x0 - t.x, 0, t.x - b.x1), dz = Math.max(b.z0 - t.z, 0, t.z - b.z1);
+      assert.ok(Math.hypot(dx, dz) < r, `${art}: touchable ${t.name} is out of the salaryman's reach`);
+    }
+  }
+});

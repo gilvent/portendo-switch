@@ -1,5 +1,6 @@
 import { memo, useEffect, type CSSProperties } from 'react';
 import type { Motion, Run, Show, V3 } from './kit.ts';
+import { ambientOf, hash, type Ambient, type Loop } from './ambient.ts';
 
 export const at = (x: number, z: number, y = 0, rot = 0) => ({ transform: `translate3d(${x}px,${-y}px,${z}px)${rot ? ` rotateY(${rot}deg)` : ''}` });
 
@@ -35,8 +36,27 @@ function quadStyle(q: Quad, url: string, atlas: Manifest['atlas'], origin?: numb
   };
 }
 
-const StaticQuads = memo(function StaticQuads({ m, url }: { m: Manifest; url: string }) {
-  return <>{m.quads.filter(q => !q.motion && !q.group && !q.show).map(q => <i key={q.id} className="pp" style={quadStyle(q, url, m.atlas)} />)}</>;
+// An ambient loop (ambient.ts): the two poses the sheet rocks between, and its own period and start offset.
+function looped(q: Quad, l: Loop, rest: string): CSSProperties {
+  const about = (x: number, y: number, t: string) => `translate(${x}px,${y}px) ${t} translate(${-x}px,${-y}px)`, py = l.pivot === 'top' ? 0 : q.ph, k = q.pw / q.w;
+  const [a, b] = l.kind === 'sway' ? [about(q.pw / 2, py, `rotate(${-l.amp}deg)`), about(q.pw / 2, py, `rotate(${l.amp}deg)`)]
+    : l.kind === 'skew' ? [`skewX(${-l.amp}deg)`, `skewX(${l.amp}deg)`]
+    : l.kind === 'rustle' ? [spun(q, -l.amp), spun(q, l.amp)]
+    : l.kind === 'breathe' ? ['', about(q.pw / 2, q.ph, `scale(${1 - l.amp * .5},${1 + l.amp})`)]
+    : l.kind === 'bob' ? [`translate(0,${-l.amp * k}px)`, `translate(0,${l.amp * k}px)`]
+    : ['', about(q.pw / 2, q.ph, `rotate(${l.amp}deg)`)];
+  // Sheets of one object (the river's two halves) must move as one, so they share the object's name, not their own id.
+  const key = l.kind === 'bob' ? 'bob' : q.id, secs = l.secs * (.82 + hash(key) * .4);
+  return { '--a': `${rest} ${a}`, '--b': `${rest} ${b}`, '--t': `${secs.toFixed(2)}s`, '--d': `${(-hash(key, 7) * secs * 2).toFixed(2)}s` } as CSSProperties;
+}
+const loopOf = (q: Quad, amb: Ambient) => amb.loops.find(([m]) => m.test(q.id))?.[1];
+const groupOf = (q: Quad, amb: Ambient) => amb.touch.find(t => t.match.test(q.id))?.name;
+
+const StaticQuads = memo(function StaticQuads({ m, url, amb }: { m: Manifest; url: string; amb: Ambient }) {
+  return <>{m.quads.filter(q => !q.motion && !q.group && !q.show).map(q => {
+    const l = loopOf(q, amb), base = quadStyle(q, url, m.atlas);
+    return <i key={q.id} className={l ? `pp amb${l.kind === 'peck' ? ' amb-peck' : ''}` : 'pp'} data-g={groupOf(q, amb)} style={l ? { ...base, ...looped(q, l, base.transform as string) } : base} />;
+  })}</>;
 });
 const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
   return <>{m.runs.flatMap(r => {
@@ -49,15 +69,16 @@ const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
   })}</>;
 });
 
-export function PaperScene({ manifest, url, near, toys }: { manifest: Manifest; url: string; near: string | null; toys: Toys }) {
+export function PaperScene({ manifest, url, near, toys, art }: { manifest: Manifest; url: string; near: string | null; toys: Toys; art: string }) {
+  const amb = ambientOf(art);
   useEffect(() => { const i = new Image(); i.src = url; }, [url]);
   return (
     <div className="prop" data-testid="paper-scene">
-      <StaticQuads m={manifest} url={url} />
-      {manifest.quads.filter(q => !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" style={quadStyle(q, url, manifest.atlas)} data-testid={`show-${q.id}`} />)}
+      <StaticQuads m={manifest} url={url} amb={amb} />
+      {manifest.quads.filter(q => !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" data-g={groupOf(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`show-${q.id}`} />)}
       {manifest.quads.filter(q => q.motion?.swing).map((q, i) => <i key={q.id} className="pp swings" style={{ ...quadStyle(q, url, manifest.atlas), animationDelay: `${-(i * 0.37 % 1.4).toFixed(2)}s` }} />)}
       {manifest.quads.filter(q => q.motion?.spin).map(q => <i key={q.id} className="pp spins" style={quadStyle(q, url, manifest.atlas)} />)}
-      {manifest.quads.filter(q => q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
+      {manifest.quads.filter(q => q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} data-g={groupOf(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
       <Runs m={manifest} url={url} />
     </div>
   );

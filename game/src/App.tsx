@@ -4,7 +4,8 @@ import { content } from './content.ts';
 import { lineOf, pathOf, parsePath, reduce, rideIn, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
 import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
-import { reducedMotion } from './light.ts';
+import { LIGHT, reducedMotion } from './light.ts';
+import type { Fx } from './fx.ts';
 import Scene from './Scene.tsx';
 import Controller from './Controller.tsx';
 import LetterView from './LetterView.tsx';
@@ -12,6 +13,14 @@ import RouteSheet from './RouteSheet.tsx';
 
 const KEYS: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1], a: [-1, 0], d: [1, 0], w: [0, -1], s: [0, 1] };
 const spotOf = (g: Game): Spot => (g.place.k === 'routeSheet' ? g.place.back : g.place);
+// How the salaryman moves. He is a card, but he squashes and stretches like a toy: a crouch before he sets off or
+// jumps, a stretch as he goes, a squash when he lands or pulls up. `sy` is his height (1 at rest) on a springy return.
+const WINDUP = .06, CROUCH = .07, JUMP = 560, FALL = 1900, SPRING = 420, DAMP = 21, DEAD = 16;
+const SCRAPS = ['#e8552d', '#fff4e2', '#f6b73c'];
+// Changing space: the standing paper folds flat and the page closes (FOLD_OUT), then the next page opens and its
+// paper pops up (FOLD_IN).
+const FOLD_OUT = 360, FOLD_IN = 620;
+type Fold = 'out' | 'in' | null;
 
 export default function App() {
   const [game, setGame] = useState<Game>(() => start(content, location.pathname));
@@ -22,12 +31,24 @@ export default function App() {
   const [arrival, setArrival] = useState(0);
   const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
   const busy = useRef(false);
+  const turning = useRef(false);
+  const fxRef = useRef<Fx | null>(null);
+  const skyRef = useRef<HTMLDivElement>(null);
+  const poseRef = useRef<HTMLDivElement>(null);
+  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0 });
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const dispatch = useCallback((x: Action) => {
     if (busy.current && x.a !== 'toggleController') return;
+    if (turning.current && (x.a === 'confirm' || x.a === 'back' || x.a === 'arrive' || x.a === 'line')) return;
     if (x.a === 'confirm' && gameRef.current.place.k === 'letter') { dispatchEvent(new Event('letter-confirm')); return; }
     const here = gameRef.current.place;
+    if (x.a === 'confirm' && here.k === 'walk' && here.world !== 'intro' && gameRef.current.controller.mode === 'docked') {
+      // A with nothing in reach is a jump. A at a stop uses it: the paper answers at once, before anything opens.
+      if (!here.near) { hero.current.jump = true; return; }
+      const s = stopOf(content, here.world, here.stop);
+      if (s) { fxRef.current?.scraps(s.look ?? s.x, 96, s.z - 26, [content.worlds[here.world].color, ...SCRAPS]); hero.current.sy = .84; hero.current.vs = 3; }
+    }
     if (x.a === 'confirm' && here.k === 'walk' && here.near && gameRef.current.controller.mode === 'docked' && !reducedMotion()) {
       const door = stopOf(content, here.world, here.stop);
       if (door?.action.kind === 'ride') {
@@ -52,6 +73,18 @@ export default function App() {
   const spot = spotOf(game);
   const mode = game.controller.mode;
   const world: WorldId | null = spot.k === 'lost' ? null : spot.world === 'intro' ? 'mrt' : spot.world;
+  // The space on show lags the game by one page turn: `shown` is what is drawn, `fold` is where the turn has got to.
+  const [shown, setShown] = useState(world);
+  const [fold, setFold] = useState<Fold>(null);
+  const shownRef = useRef(shown);
+  shownRef.current = shown;
+  useEffect(() => {
+    if (world === shown) { setFold(null); return; }
+    if (reducedMotion() || !world || !shown) { setShown(world); return; }
+    turning.current = true; setFold('out');
+    const a = window.setTimeout(() => { turning.current = false; setShown(world); setFold('in'); }, FOLD_OUT), b = window.setTimeout(() => setFold(null), FOLD_OUT + FOLD_IN);
+    return () => { clearTimeout(a); clearTimeout(b); turning.current = false; };
+  }, [world]);
   const reading = game.place.k !== 'walk' || mode !== game.controller.mode;
 
   const path = pathOf(game.place);
@@ -87,10 +120,12 @@ export default function App() {
   const facing = useRef(1);
   const phase = useRef(0);
   const wasWalking = useRef(false);
+  const airborne = useRef(0);
   const framed = useRef<WorldId | null>(null);
 
   const measure = useCallback(() => { const tall = innerHeight > innerWidth; cam.current.scale = tall ? Math.min(.86, innerWidth / 480) : Math.max(.5, Math.min(innerWidth / 1100, innerHeight / 620, 1.1)); cam.current.lift = tall ? -40 : 150; cam.current.tall = tall; }, []);
   // A world may set its own camera height (the train stands close, so it is framed lower).
+  const zoomOf = (w: WorldId) => { const k = content.worlds[w].camera; return (cam.current.tall ? k?.zoom : k?.zoomWide ?? k?.zoom) ?? 1; };
   const liftOf = (w: WorldId) => { const c = cam.current, k = content.worlds[w].camera; return (c.tall ? k?.liftTall : k?.lift) ?? c.lift; };
   useEffect(() => { measure(); addEventListener('resize', measure); return () => removeEventListener('resize', measure); }, [measure]);
 
@@ -101,6 +136,7 @@ export default function App() {
   useEffect(() => {
     if (!world || world === prevWorld.current || spot.k === 'lost') return;
     prevWorld.current = world;
+    facing.current = 1; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0 });
     held.current.clear();
     stickSpent.current = true;
     target.current = null;
@@ -137,12 +173,12 @@ export default function App() {
       const iz0 = [...held.current].reduce((n, k) => n + (KEYS[k]?.[1] ?? 0), 0) + (stickSpent.current ? 0 : stick.current.z);
       if (p.k === 'letter' && p.world !== framed.current) {
         framed.current = p.world;
-        const c = cam.current, z = c.scale * (content.worlds[p.world].camera?.zoom ?? 1);
+        const c = cam.current, z = c.scale * zoomOf(p.world);
         if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${liftOf(p.world) * c.scale}px,-260px) scale3d(${z},${z},${z}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,0)`;
       }
       if (p.k === 'letter') { if (iz0 && letterRef.current) letterRef.current.scrollTop += iz0 * 900 * dt; return; }
       if (p.k !== 'walk' || g.controller.mode === 'docking') return;
-      const w = content.worlds[p.world];
+      const w = content.worlds[p.world], c0 = cam.current;
       // Walking out through the open doors: straight to the doorway, past the walkable bounds, then the scene swaps.
       if (exit.current) {
         const e = exit.current, o = walker.current, dx = e.x - o.x, dz = e.z - o.z, d = Math.hypot(dx, dz), go = Math.min(d, 300 * dt);
@@ -150,14 +186,22 @@ export default function App() {
         walker.current = { x: o.x + dx / d * go, z: o.z + dz / d * go, vx: 0, vz: 0 };
         phase.current += dt * 11;
         if (!wasWalking.current) { wasWalking.current = true; courierRef.current?.toggleAttribute('data-walking', true); }
-        if (courierRef.current) courierRef.current.style.transform = `translate3d(${walker.current.x}px,${-Math.abs(Math.sin(phase.current)) * 6}px,${walker.current.z}px)`;
+        if (courierRef.current) courierRef.current.style.transform = `translate3d(${walker.current.x}px,0,${walker.current.z}px)`;
+        if (poseRef.current) poseRef.current.style.transform = `translate3d(0,${-Math.abs(Math.sin(phase.current)) * 6}px,0)`;
         return;
       }
-      if (busy.current) return;
+      if (busy.current || turning.current || shownRef.current !== (p.world === 'intro' ? 'mrt' : p.world)) return;
       let ix = ix0, iz = iz0;
       if (ix || iz) target.current = null;
       else if (target.current) [ix, iz] = seek(walker.current, target.current.stop.x, target.current.stop.z);
-      const n = step(walker.current, ix, iz, dt, w);
+      const h = hero.current, calm = reducedMotion(), fx = p.world === 'intro' ? null : fxRef.current, o = walker.current, pushing = Math.hypot(ix, iz) > .2;
+      // Anticipation: setting off from a stand, he dips for a moment before his feet go.
+      if (pushing && !h.moved && !calm && Math.hypot(o.vx, o.vz) < 40 && !h.air) h.windup = WINDUP;
+      if (!pushing && h.moved && !calm && !h.air && Math.hypot(o.vx, o.vz) > MAX_SPEED * .6) { h.sy = .9; h.vs = -1.5; fx?.dust(o.x + facing.current * 14, o.z, facing.current, 2); }
+      h.moved = pushing;
+      const held0 = h.windup > 0;
+      if (held0) { h.windup -= dt; h.sy += (.86 - h.sy) * Math.min(1, dt * 40); h.vs = 0; if (h.windup <= 0) { h.vs = 3.4; fx?.dust(o.x, o.z, -Math.sign(ix || facing.current), 2); } }
+      const n = step(o, held0 ? 0 : ix, held0 ? 0 : iz, dt, w);
       walker.current = n;
       const near = nearest(w, n.x, n.z)?.id ?? null;
       if (near !== lastNear.current) {
@@ -168,13 +212,27 @@ export default function App() {
         const t = target.current; target.current = null;
         if (t.open) dispatch({ a: 'confirm' });
       }
-      const speed = Math.hypot(n.vx, n.vz) / MAX_SPEED, calm = reducedMotion();
-      if (Math.abs(n.vx) > 25 && Math.sign(n.vx) !== facing.current) {
-        facing.current = Math.sign(n.vx);
-        if (flipRef.current) gsap.to(flipRef.current, { rotationY: facing.current > 0 ? 0 : 180, duration: calm ? 0 : .16, ease: 'power2.out', overwrite: true });
+      const speed = Math.hypot(n.vx, n.vz) / MAX_SPEED;
+      // The card flip: he turns over like a playing card, in stepped frames, with a little skip as he does.
+      const turn = pushing && Math.abs(ix) > .3 ? Math.sign(ix) : Math.abs(n.vx) > 25 ? Math.sign(n.vx) : facing.current;
+      if (turn !== facing.current) {
+        facing.current = turn;
+        if (flipRef.current) gsap.to(flipRef.current, { rotationY: turn > 0 ? 0 : 180, duration: calm ? 0 : .2, ease: 'steps(5)', overwrite: true });
+        if (!calm && !h.air && p.world !== 'intro') { h.air = true; h.vy = 210; h.vs = 2.2; fx?.dust(n.x, n.z, 0, 2); }
       }
+      // Jump: a crouch, then up with a stretch; down with a squash and dust.
+      if (h.jump) { h.jump = false; if (!h.air && h.crouch <= 0 && !calm) h.crouch = CROUCH; }
+      if (h.crouch > 0) { h.crouch -= dt; h.sy += (.76 - h.sy) * Math.min(1, dt * 45); h.vs = 0; if (h.crouch <= 0) { h.air = true; h.vy = JUMP; h.sy = 1.14; h.vs = 2; fx?.dust(n.x, n.z, 0, 2); } }
+      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); } }
+      h.vs += (-(h.sy - 1) * SPRING - h.vs * DAMP) * dt; h.sy = Math.min(1.3, Math.max(.6, h.sy + h.vs * dt));
+      const before = phase.current;
       phase.current += speed * dt * 16;
-      const bob = calm ? 0 : Math.abs(Math.sin(phase.current)) * 9 * speed, lean = calm ? 0 : (n.vx / MAX_SPEED) * 5;
+      // Footsteps: every other stride kicks a dot of dust out behind him.
+      if (!h.air && speed > .6 && Math.floor(phase.current / Math.PI) !== Math.floor(before / Math.PI) && ++h.steps % 2 === 0) fx?.dust(n.x - facing.current * 10, n.z, -facing.current, 1);
+      fx?.touch(n.x, n.z, speed > .2 || h.air);
+      const bob = calm || h.air ? 0 : Math.abs(Math.sin(phase.current)) * 9 * speed;
+      h.lean += ((calm ? 0 : held0 ? -Math.sign(ix || 1) * 7 : (n.vx / MAX_SPEED) * 6) - h.lean) * Math.min(1, dt * 18);
+      const lean = h.lean, sy = calm ? 1 : h.sy, sx = 1 + (1 - sy) * .55;
       const rx = calm ? 0 : -n.vz / MAX_SPEED * 1.4, ry = calm ? 0 : n.vx / MAX_SPEED * 2.2, rk = 1 - Math.exp(-6 * dt);
       if (Math.abs(rx - rig.current.x) + Math.abs(ry - rig.current.y) > .004) {
         rig.current.x += (rx - rig.current.x) * rk; rig.current.y += (ry - rig.current.y) * rk;
@@ -184,16 +242,24 @@ export default function App() {
         if (introRef.current) introRef.current.style.transform = `translate3d(${(n.x + 420) / 840 * 100}cqw,${-bob}px,0)`;
         return;
       }
-      const c = cam.current, k = calm ? 1 : 1 - Math.exp(-4.5 * dt);
+      // Soft follow: the camera leads the way he faces (further while he walks), eases after him, and lets him move a
+      // little inside a dead zone before it follows at all.
+      h.look += ((c0.tall ? 0 : facing.current * (speed > .2 ? 84 : 26)) - h.look) * (calm ? 1 : 1 - Math.exp(-2.4 * dt));
+      const c = c0, k = calm ? 1 : 1 - Math.exp(-5 * dt);
       // A stop with `focus` pulls the camera in on itself while the courier stands there.
-      const spotted = p.near ? stopOf(content, p.world, p.stop) : undefined, zoomIn = spotted?.focus ?? 1;
-      const frame = w.camera, want = spotted && zoomIn !== 1 ? (spotted.look ?? spotted.x) * .8 + n.x * .2 : n.x + n.vx * .22 + (c.tall ? 0 : w.camera?.ahead ?? 0);
-      c.x += ((frame && zoomIn === 1 ? Math.min(frame.x1, Math.max(frame.x0, want)) : want) - c.x) * k; c.z += ((frame ? n.z * .4 : n.z) - c.z) * k;
+      const spotted = p.near ? stopOf(content, p.world, p.stop) : undefined, zoomIn = spotted?.focus ? spotted.focus * (w.camera?.zoom ?? 1) / zoomOf(p.world) : 1;
+      const frame = w.camera, leaning = !!spotted && zoomIn !== 1, want = leaning ? (spotted.look ?? spotted.x) * .8 + n.x * .2 : n.x + h.look + (c.tall ? 0 : w.camera?.ahead ?? 0);
+      const err = (frame && !leaning ? Math.min(frame.x1, Math.max(frame.x0, want)) : want) - c.x, slack = leaning || calm ? 0 : DEAD;
+      if (Math.abs(err) > slack) c.x += (err - Math.sign(err) * slack) * k;
+      c.z += ((frame ? n.z * .4 : n.z) - c.z) * k;
       c.focus += (zoomIn - c.focus) * (calm ? 1 : 1 - Math.exp(-3 * dt));
       const walking = speed > .08;
       if (walking !== wasWalking.current) { wasWalking.current = walking; courierRef.current?.toggleAttribute('data-walking', walking); }
-      if (courierRef.current) courierRef.current.style.transform = `translate3d(${n.x}px,${-bob}px,${n.z}px) rotateZ(${lean}deg)`;
-      const zs = (c.scale * (w.camera?.zoom ?? 1) * c.focus).toFixed(4);
+      if (courierRef.current) { courierRef.current.style.transform = `translate3d(${n.x}px,0,${n.z}px)`; if (h.y !== airborne.current) { airborne.current = h.y; const cs = courierRef.current.style; cs.setProperty('--air', (h.y / 90).toFixed(2)); cs.setProperty('--jx', `${(h.y * LIGHT.dx).toFixed(1)}px`); cs.setProperty('--jz', `${(-h.y * LIGHT.dy).toFixed(1)}px`); } }
+      if (poseRef.current) poseRef.current.style.transform = `translate3d(0,${(-bob - h.y).toFixed(1)}px,0) rotateZ(${lean.toFixed(2)}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
+      // The far backdrop slides a little against the scene: the furthest layer of the parallax.
+      if (skyRef.current) skyRef.current.style.transform = `translate3d(${(-c.x * .1 * c.scale).toFixed(1)}px,0,0)`;
+      const zs = (c.scale * zoomOf(p.world) * c.focus).toFixed(4);
       if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${(liftOf(p.world) * c.scale * (1 + (c.focus - 1) * 1.6)).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
     };
     gsap.ticker.add(tick);
@@ -238,7 +304,7 @@ export default function App() {
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {world && <Scene key={world} world={content.worlds[world]} nearStop={arrival ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, world), doors: 1 } : toysOf(game, world)} line={lineOf(content, game, world)} arrival={arrival} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} onStop={onStop} />}
+      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} atDock={spot.k === 'walk' && spot.world === 'intro' && spot.near} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       <div className="corner">
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
