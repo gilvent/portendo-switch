@@ -46,7 +46,7 @@ export const content: Content = validateContent({ worlds: {
   // First floor: the product detail page, played instead of read. Every stop is one part of the page.
   'blibli-shop': { id: 'blibli-shop', art: 'shop', back: { world: 'blibli', stop: 'shop-door' }, camera: { zoom: .8, zoomWide: .96, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -170, z1: 190 },
     solid: [{ x0: -75, x1: 75, z0: -165, z1: -60 }, { x0: -220, x1: -130, z0: -165, z1: -95 }, { x0: 130, x1: 220, z0: -165, z1: -95 }, { x0: -440, x1: -350, z0: 70, z1: 150 }, { x0: 325, x1: 480, z0: -15, z1: 85 }],
-    title: 'First floor: smartphones', path: 'store', color: '#0092da', hidden: [{ x0: 296, x1: 460, z0: -170, z1: -30 }],
+    title: 'First floor: smartphones', path: 'store', color: '#0092da', hidden: [{ x0: 296, x1: 460, z0: -170, z1: -30 }, { x0: -262, x1: -100, z0: -170, z1: -80 }, { x0: -460, x1: -330, z0: 0, z1: 68 }, { x0: 395, x1: 460, z0: 120, z1: 190 }],
     stops: [
       { id: 'street-door', label: 'Back to the street', x: 0, z: 190, reach: 60, action: { kind: 'road', to: 'blibli', stop: 'shop-door' } },
       { id: 'showcase', label: 'Showcase phone', x: 80, z: -35, focus: 1.6, look: 0, action: { kind: 'toy', toy: 'variant', states: 3 } },
