@@ -59,7 +59,7 @@ button { font:inherit; cursor:pointer; }
 .belt { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; animation:belt 15s steps(60,end) infinite; }
 @keyframes belt { from { transform:translate3d(var(--from)); } to { transform:translate3d(var(--to)); } }
 .pc-screen { position:absolute; inset:8px; }
-.sign.hit { left:-74px; width:148px; height:200px; padding:0; background:transparent; box-shadow:none; color:transparent; transform:translateZ(70px); }
+.sign.hit { --hit:200px; bottom:max(0px,calc(var(--mark,0px) - var(--hit))); left:-74px; width:148px; height:var(--hit); padding:0; background:transparent; box-shadow:none; color:transparent; transform:translateZ(70px); }
 .sign.hit:focus-visible { outline-offset:-4px; }
 .sign.hit > span { position:absolute; left:50%; top:-30px; transform:translateX(-50%); white-space:nowrap; padding:2px 10px; background:#fff; color:#123a5a; border-radius:3px; font-size:15px; line-height:20px; opacity:0; }
 .sign.hit.near > span { opacity:1; }
@@ -69,8 +69,8 @@ button { font:inherit; cursor:pointer; }
 .sign.hit::before { left:calc(50% - 15px); bottom:var(--pin,calc(100% - 14px)); width:30px; height:36px; background:#fffaf0; }
 .sign.hit::after { left:calc(50% - 11px); bottom:calc(var(--pin,calc(100% - 14px)) + 5px); width:22px; height:27px; background:radial-gradient(circle at 50% 36%,#fffaf0 0 3.4px,transparent 4px),#e8552d; }
 .sign.hit.road::after { background:radial-gradient(circle at 50% 36%,#fffaf0 0 3.4px,transparent 4px),#f0a51e; }
-/* The marker hangs at the top of the tap area unless the stop says how high it belongs (`mark`, as --pin). A way out
-   is marked at door height, not over the lintel. */
+/* The marker hangs at the top of the tap area; a stop on a wall lifts the whole area to it (`mark`). A way out is
+   marked at door height, not over the lintel. */
 .sign.hit.road { --pin:92px; }
 .sign.hit.near::before,.sign.hit.near::after { display:none; }
 @keyframes pin-bob { to { translate:0 -8px; } }
@@ -270,10 +270,14 @@ button { font:inherit; cursor:pointer; }
 @keyframes dest-roll { from { transform:translateY(-110%); } }
 .dest :focus-visible { outline-offset:-2px; }
 /* The doors' stop: its tap area ends below the sign, and its label says what A and B do there. */
-.art-train .sign.hit { height:150px; }
+.art-train .sign.hit { --hit:150px; }
+/* Indoors things stand close together: a lower tap area keeps one stop from covering the one behind it. */
+.art-shop .sign.hit,.art-storeroom .sign.hit { --hit:140px; }
 /* The label and the A bubble hang outside the tap area. Among live sheets (the train's, and every space's ambient
    loops) the browser clips them to it unless each is its own layer. */
-.sign.hit > span,.sign.hit .prompt { will-change:transform; }
+.sign.hit > span,.sign.hit .prompt { will-change:transform; pointer-events:none; }
+/* In the car the label stays under the destination sign, clear of its arrows. */
+.art-train .sign.hit > span { top:-8px; } .art-train .sign.hit .prompt { top:-52px; }
 .sign.hit > span em { font-style:normal; display:inline-grid; place-items:center; width:18px; height:18px; margin:0 3px 0 8px; border-radius:50%; background:#2c3138; color:#fff; font-size:11px; line-height:18px; }
 @media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.pp.spins,.rush,.beam,.dest-go b { animation:none; } .platform-light { transition:none; } .floor-light { display:none; } }
 

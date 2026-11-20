@@ -75,8 +75,8 @@ export const content: Content = validateContent({ worlds: {
       { id: 'stairs-down', label: 'Downstairs', x: -387, z: 58, reach: 80, action: { kind: 'road', to: 'blibli-shop', stop: 'stairs-up' } },
       { id: 'camera', label: 'Instant camera', x: -88, z: -40, focus: 1.8, look: -140, action: { kind: 'toy', toy: 'photo', states: 3 } },
       { id: 'stars', label: 'Review card', x: 112, z: -40, focus: 1.8, look: 15, action: { kind: 'toy', toy: 'rating', states: 5 } },
-      { id: 'gallery', label: 'Photo gallery', x: -120, z: -110, focus: 1.6, look: -190, action: { kind: 'toy', toy: 'gallery', states: 2 } },
-      { id: 'board', label: 'Review board', x: 250, z: -110, focus: 1.6, look: 280, action: { kind: 'toy', toy: 'filter', states: 3 } } ],
+      { id: 'gallery', label: 'Photo gallery', x: -120, z: -110, focus: 1.6, look: -190, mark: 270, action: { kind: 'toy', toy: 'gallery', states: 2 } },
+      { id: 'board', label: 'Review board', x: 250, z: -110, focus: 1.6, look: 280, mark: 270, action: { kind: 'toy', toy: 'filter', states: 3 } } ],
     letters: [],
     encoded: [
       { fact: 'Redesign the journey', at: ['board'] }, { fact: 'Worked on:', at: ['board'] }, { fact: 'Product Review', at: ['board'] },

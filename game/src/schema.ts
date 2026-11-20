@@ -24,7 +24,7 @@ export type StopAction =
   | { kind: 'ride'; toy: string; to: { world: WorldId; stop: string; label: string }[] };
 // focus: the camera leans in while the courier stands at this stop (zoom multiplies the world zoom), centred on
 // `look`, the x of the thing being used, so the courier can stand beside it rather than in front of it.
-// mark: how high above the ground the stop's marker hangs, when the thing to use is not at the top of the tap area.
+// mark: how high above the ground the thing to use reaches, when it hangs on a wall: the tap area and its marker rise to it.
 export type Stop = { id: string; label: string; x: number; z: number; reach?: number; focus?: number; look?: number; mark?: number; action: StopAction };
 export type Rect = { x0: number; x1: number; z0: number; z1: number };
 export type World = {
