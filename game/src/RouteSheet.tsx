@@ -9,7 +9,7 @@ export default function RouteSheet({ onGo, onClose }: { onGo: (p: Spot) => void;
   return (
     <section className="sheet" tabIndex={-1} ref={ref} data-testid="route-sheet">
       <h1>Route sheet</h1>
-      {WORLD_IDS.filter(w => w !== 'intro' && !content.worlds[w].offLine).map(w => {
+      {WORLD_IDS.filter(w => w !== 'intro').map(w => {
         const world = content.worlds[w];
         return (
           <div key={w}>

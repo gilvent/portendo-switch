@@ -4,11 +4,9 @@ const T: Record<string, Tech> = {
   playwright: { name: 'PLAYWRIGHT', logo: 'tech/playwright.svg', color: '#d65348' }, sass: { name: 'SASS', logo: 'tech/sass.svg', color: '#cf649a' },
   vue: { name: 'VUE', logo: 'tech/vue.svg', color: '#42b884' }, nginx: { name: 'NGINX', logo: 'tech/nginx.svg', color: '#22963a' },
   laravel: { name: 'LARAVEL', logo: 'tech/laravel.svg', color: '#F9322C' }, postgres: { name: 'POSTGRES', logo: 'tech/postgres.png', color: '#336791' },
-  gcloud: { name: 'GOOGLE CLOUD', logo: 'tech/gcloud.png', color: '#fbbd05' }, gsap: { name: 'GSAP', logo: 'tech/gsap.svg', color: '#0ae448' },
-  react: { name: 'REACT', logo: 'tech/react.svg', color: '#61D9FA' }, strapi: { name: 'STRAPI CMS', logo: 'tech/strapi.svg', color: '#4945ff' }
+  gcloud: { name: 'GOOGLE CLOUD', logo: 'tech/gcloud.png', color: '#fbbd05' }
 };
 const stack = (items: Tech[]) => ({ id: 'stack', title: 'Tech Stack', surface: 'label' as const, blocks: [{ kind: 'tech' as const, items }] });
-const B = { x0: -700, x1: 700, z0: -220, z1: 170 };
 const STORE = { x0: -1100, x1: 1100, z0: -150, z1: 190 };
 const foot = (x: number, z: number, w: number) => ({ x0: x - w / 2, x1: x + w / 2, z0: z - 145, z1: z - 35 });
 const out = (): Stop => ({ id: 'way-out', label: 'Back to the MRT', x: -700, z: 120, reach: 100, action: { kind: 'road', to: 'mrt', stop: 'door' } });
@@ -19,7 +17,7 @@ export const content: Content = validateContent({ worlds: {
   mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -320, x1: 480, lift: 210, liftTall: 130, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [], title: 'MRT', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
-        { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },
+        { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'board', label: 'Moperty' } ] } },
       { id: 'poster', label: 'Poster', x: -260, z: -40, action: { kind: 'letter', letter: 'hello' } },
       { id: 'help-point', label: 'Help point', x: -420, z: -40, action: { kind: 'letter', letter: 'contact' } } ],
     letters: [
@@ -89,24 +87,20 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'A few learnings...', at: ['camera', 'gallery'] },
       { fact: "Try our best to test on real device :). This time is my first encounter with an issue that uploaded image is rotated when uploaded using mobile web's camera capture (caused by EXIF orientation that needs to be handled).", at: ['camera'] },
       { fact: 'User generated images vary in ratio. Consider all possibilities when developing the UI components displaying these images!', at: ['gallery'] } ] },
-  moperty: { id: 'moperty', art: 'blockout', back: { world: 'mrt', stop: 'door' }, bounds: B, solid: [], title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
+  // Moperty: a green on a ridge in a small hometown, where a handful of homes are on offer. Only the product is shown, and
+  // by things you can touch: a board of flyers, signs in the gardens, a home that opens. No screens, no tech.
+  moperty: { id: 'moperty', art: 'hometown', back: { world: 'mrt', stop: 'door' }, camera: { zoom: .85, x0: -400, x1: 340 }, bounds: { x0: -1060, x1: 900, z0: -40, z1: 240 },
+    solid: [{ x0: 430, x1: 660, z0: 40, z1: 150 }, { x0: -100, x1: 100, z0: 106, z1: 240 }],
+    title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
     stops: [
-      out(),
-      { id: 'first-house', label: 'Moperty', x: -420, z: 0, action: { kind: 'letter', letter: 'summary' } },
-      { id: 'workshop', label: 'Tech Stack', x: 0, z: -100, action: { kind: 'letter', letter: 'stack' } },
-      { id: 'for-sale', label: 'Visit Moperty', x: 420, z: 0, action: { kind: 'link', href: 'https://moperty.id' } } ],
-    letters: [
-      { id: 'summary', title: 'Moperty', surface: 'note', blocks: [{ kind: 'paragraph', text: [s('To boost confidence in web development, I feel the need to '), b('build and run a whole product'), s('. So I came up with '), b('Moperty'), s(': I '), b('design'), s(' the UIs, '), b('code'), s(' frontends and backends, and also '), b('implement SEO'), s(' techniques.')] }] },
-      stack([T.vue, T.laravel, T.sass, T.postgres, T.nginx, T.gcloud]) ] },
-  radjastone: { id: 'radjastone', offLine: true, art: 'blockout', back: { world: 'mrt', stop: 'door' }, bounds: B, solid: [], title: 'Radjastone', path: 'climb', url: 'https://radjastone.com', role: 'Build A Website For', color: '#9a883f', logo: 'brand/rj-limestone-white.svg',
-    description: 'An Indonesian company providing services related to architecture / interior / exterior design made with natural stones.',
-    stops: [
-      out(),
-      { id: 'quarry', label: 'Radjastone', x: -420, z: 60, action: { kind: 'letter', letter: 'summary' } },
-      { id: 'stone-yard', label: 'Tech Stack', x: 0, z: -40, action: { kind: 'letter', letter: 'stack' } },
-      { id: 'stone-house', label: 'Visit Radjastone', x: 420, z: -130, action: { kind: 'link', href: 'https://radjastone.com' } } ],
-    letters: [
-      { id: 'summary', title: 'Radjastone', surface: 'note', blocks: [{ kind: 'paragraph', text: [s('I build '), b('Radjastone\'s'), s(' company website from scratch. Starting with UI / UX design, to web app development using '), b('GSAP'), s(' animation library and '), b('Strapi CMS'), s('.')] }] },
-      stack([T.react, T.gsap, T.sass, T.strapi, T.nginx, T.gcloud]) ] }
+      { id: 'way-out', label: 'Back to the MRT', x: -1010, z: 110, reach: 90, action: { kind: 'road', to: 'mrt', stop: 'door' } },
+      { id: 'board', label: 'Flyer board', x: -800, z: -10, focus: 1.5, look: -800, action: { kind: 'toy', toy: 'flyer', states: 5 } },
+      { id: 'visit', label: 'Visit Moperty', x: -540, z: 70, action: { kind: 'link', href: 'https://moperty.id' } },
+      { id: 'home', label: 'Open house', x: 280, z: 10, focus: 1.45, look: 110, action: { kind: 'toy', toy: 'home', states: 2 } } ],
+    letters: [],
+    encoded: [
+      { fact: 'A progressive web app', at: ['visit'] },
+      { fact: 'to browse available real estate in local area around my hometown.', at: ['board', 'home'] },
+      { fact: 'Moperty', at: ['visit'] } ] },
 } });

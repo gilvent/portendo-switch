@@ -27,6 +27,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | MRT car | Shell `#e9edf1`, floor vinyl `#9aa3ad`, seats `#2f6f9f` | Sun `#f6b73c`, coral `#e8552d` | Steel `#3d444e`, tunnel black `#07090c` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
+| Moperty hometown green | Sky `#a9d8f0`, setts `#f1e4cc`, grass `#a9d3a2`, stone `#e3c9a0` | Moperty indigo `#5b6bdc` with lavender `#a3adf2`, window yellow `#f5b400` | Cream `#fff4e2`, steel `#2f343c` |
 
 Tech colours from `content.ts` appear only as small label bars.
 
@@ -146,6 +147,28 @@ The game opens inside the front car of an MRT train running underground (`scenes
 - The destination sign over the door is the one piece of live type in a paper scene: the bake carries its dark casing, the game sets the amber text. Its arrows (or B at the doors) turn it between the stops the line serves, Blibli.com and Moperty. Pressing the name (or A at the doors) stops the train, brings the platform's light up behind the windows, opens the doors and walks the salaryman out, and the scene swaps.
 - The floor is cut into narrow tiles. In a tall, narrow view the browser can drop the part of a wide floor quad that crosses the left edge of the screen; narrow tiles keep that to a hairline.
 
+### Moperty: the hometown green
+
+The Moperty space (`src/art/scenes/hometown.ts`) is a green on a ridge in a small hometown where a handful of homes are on offer. It shows only the product, an app for browsing homes for sale or rent around a hometown, and shows it without a screen: you look around the way people did before the app. Nothing about how it was made or what it was made with is in the scene.
+
+- **A layout of its own.** The Blibli street is closed at both sides by relief facades and opens through one gate at the back. This space is the reverse: the homes close the middle of the back, the valley opens at both ends, and nothing stands at the sides but trees. There is no river and no MRT structure in it.
+- **Main space:** the green, paved in pale setts, wider and deeper than the Blibli street, so the camera stands further back (zoom .85) and pans further.
+- **The homes:** four folded houses under gabled roofs stand shoulder to shoulder behind picket fences. Each garden has a board on a stake that says what is on offer by picture alone: a yellow tag for sale, a lavender key for rent.
+- **Open surroundings:** at both ends of the green the ridge falls away to the valley, built as about twenty-five cut layers. Layers differ in kind, not only in colour (faceted peaks, hills that sweep up from one side, rounded mounds, rolling bands), and alternate pale and deep.
+  - *Card one, the lower town (five layers, about 30 units apart):* a back street of taller houses with a clock tower and poplars; garden trees; a near street of cottages with shutters, flower boxes and washing lines; back-garden hedges with fruit trees; the coursed stone wall along the back of the green, with piers and flowers.
+  - *Card two, the valley (nine layers, 30 to 50 apart):* a pale hill of terraced fields; a wood on its own sheet behind the next ridge; that ridge with hamlets; a bright hill with orchard rows and a winding road; the far town; an avenue of poplars with telegraph poles; farmland with barns, a silo, haystacks and hedgerow trees; a pale meadow with allotments, a lane with a bus, sheep and a post-and-rail fence.
+  - *The CSS backdrop:* sky, a pale sun, two layers of clouds, three ranges of faceted peaks with zigzag snow caps, then five hills (wooded band, terraced fields, a mound with a village, a deep sweep, rolling woods), each wood on its own sheet behind its hill.
+  - *Detail on every sheet:* a pale strip along each crest where light catches the cut edge and darker contour lines below it; trees in three kinds (pine, oak, poplar), each cut in two tones; buildings that vary in roof (gable, hip, side-on, flat), chimneys, dormers, shutters, doors and flower boxes; fields as ploughed stripes lying on the slope.
+- **The green's furniture:** the town clock stands in a low folded flower bed at the centre (a folded head with a cut face glued on, on a flat post); two long folded stone beds with layered bushes and cut blossoms frame the front edge, with a lamp at each end; a shade tree stands at each end of the green.
+- **Small stories:** a couple by the clock, a neighbour at her gate, a cat on a fence, moving day at the last home (a folded van, cartons, a mover, a child and a tent-folded dog watching), someone dozing by the bench under the tree with a bicycle beside it.
+- **Thin posts are flat strips.** A folded post has both side faces in view from this wide camera, and the browser tears the ground between two such planes. For the same reason both ground sheets ship as sixteen tiles.
+
+| Stop | What you do | What it stands for |
+|---|---|---|
+| Flyer board | One flyer for each home on the green, with a fringe of tear-off tabs. Each A tears a tab off the next flyer, and that home's board lifts in its garden | Browsing the homes on offer nearby |
+| Open house | A swings the home's front away on its fold, like a doll's house: a living room, a kitchen, a bedroom and a study, with furniture carved in relief. A again closes it | Looking at one home |
+| Visit Moperty | The A-board near the flyer board carries the mark; A visits moperty.id | The product |
+
 ### Outside and inside match
 
 A room diorama is the building seen from the street, cut open. Every room's outline must match the exterior that holds it.
@@ -158,9 +181,9 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all four spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds every space. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
-1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
+1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
 3. Blender Cycles bakes light only, at half the atlas size (`LIGHT_SCALE`): each surface sees itself as white while bounce rays still take on the colours around it. Light is smooth by nature, so a low sample count is enough once `finish.py` smooths it within each panel.
 4. `finish.py` multiplies the crisp print back over the light, lights the far backdrop evenly (nothing near can shade it) apart from the shadows its own cut layers throw on each other, worked out from `SUN_TO_LIGHT`, the sun's soft edge and each layer's gap, flattens decals and flat relief into their parents along the parent's normal, paints carved relief onto its wall along the game camera's rays (nearest piece wins), culls faces no game camera can see, and writes the atlas, backdrop and manifest. Far layers are packed last and cropped off the shipped atlas, so the backdrop can be cut at high resolution for free.
@@ -186,6 +209,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | MRT car | 140 (uses 124) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
+| Moperty hometown green | 210 (uses 203) |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
@@ -201,4 +225,6 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Showcase phone | The chosen swatch chip rises |
 | Recommended shelf | Placeholder cards fold down |
 | Review board | The chosen filter tab rises |
+| Flyer board | The torn tab's home lifts its board |
+| Open house | The front swings away on its left fold |
 | Any toy | A piece that appears drops into place in five stepped frames |

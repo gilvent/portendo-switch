@@ -485,16 +485,16 @@ export function bench(id: string, x: number, z: number, w = 160, rot = 0): Panel
 
 /* ---------- vehicles: folded bodies with cut pieces glued on ---------- */
 // A piece in an object's own frame (x along it, y up, z across toward its near side), turned by the object's yaw.
-const piece = (x: number, z: number, rot: number) => {
+export const piece = (x: number, z: number, rot: number) => {
   const R = yaw(rot);
   return (id: string, o: V3, u: V3, v: V3, w: number, h: number, rest: Partial<Panel> & Pick<Panel, 'stock' | 'c'>): Panel =>
     ({ id, o: add([x, 0, z], R(o)), u: R(u), v: R(v), w, h, edge: 'cut', density: 1.8, ...rest });
 };
 // The same colour cut from a lighter (k > 0) or darker (k < 0) sheet.
 export const tone = (hex: string, k: number) => '#' + [1, 3, 5].map(i => { const c = parseInt(hex.slice(i, i + 2), 16), v = k > 0 ? c + (255 - c) * k : c * (1 + k); return Math.round(v).toString(16).padStart(2, '0'); }).join('');
-const disc = (r: number) => `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>`;
+export const disc = (r: number) => `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>`;
 // A straight strip of card from one point to another, with rounded ends: a tube or a spoke cut as one shape.
-const bar = (x1: number, y1: number, x2: number, y2: number, w: number) => {
+export const bar = (x1: number, y1: number, x2: number, y2: number, w: number) => {
   const l = Math.hypot(x2 - x1, y2 - y1) || 1, nx = -(y2 - y1) / l * w / 2, ny = (x2 - x1) / l * w / 2;
   return `<path d="M${f(x1 + nx)} ${f(y1 + ny)}L${f(x2 + nx)} ${f(y2 + ny)}L${f(x2 - nx)} ${f(y2 - ny)}L${f(x1 - nx)} ${f(y1 - ny)}Z" fill="#fff"/><circle cx="${f(x1)}" cy="${f(y1)}" r="${f(w / 2)}" fill="#fff"/><circle cx="${f(x2)}" cy="${f(y2)}" r="${f(w / 2)}" fill="#fff"/>`;
 };

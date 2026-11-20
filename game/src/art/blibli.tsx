@@ -10,9 +10,12 @@ import storeroomUrl from './baked/storeroom/atlas.webp';
 import storeroomManifest from './baked/storeroom/manifest.json';
 import trainUrl from './baked/train/atlas.webp';
 import trainManifest from './baked/train/manifest.json';
+import hometownUrl from './baked/hometown/atlas.webp';
+import hometownManifest from './baked/hometown/manifest.json';
+import hometownBackdrop from './baked/hometown/backdrop.webp';
 
 export type Art = (props: { near: string | null; toys: Toys }) => ReactNode;
 const art = (manifest: unknown, url: string): Art => ({ near, toys }) => <PaperScene manifest={manifest as Manifest} url={url} near={near} toys={toys} />;
-export const WORLD_ART: Record<string, Art> = { street: art(streetManifest, streetUrl), shop: art(shopManifest, shopUrl), storeroom: art(storeroomManifest, storeroomUrl), train: art(trainManifest, trainUrl) };
-export const WORLD_BACKDROP: Record<string, string> = { street: streetBackdrop };
+export const WORLD_ART: Record<string, Art> = { street: art(streetManifest, streetUrl), shop: art(shopManifest, shopUrl), storeroom: art(storeroomManifest, storeroomUrl), train: art(trainManifest, trainUrl), hometown: art(hometownManifest, hometownUrl) };
+export const WORLD_BACKDROP: Record<string, string> = { street: streetBackdrop, hometown: hometownBackdrop };
 export const placeOf = (s: Stop) => at(s.x, s.z);
