@@ -61,7 +61,7 @@ button { font:inherit; cursor:pointer; }
 .pc-screen { position:absolute; inset:8px; }
 .sign.hit { --hit:200px; bottom:max(0px,calc(var(--mark,0px) - var(--hit))); left:-74px; width:148px; height:var(--hit); padding:0; background:transparent; box-shadow:none; color:transparent; transform:translateZ(70px); }
 .sign.hit:focus-visible { outline-offset:-4px; }
-.sign.hit > span { position:absolute; left:50%; top:-30px; transform:translateX(-50%); white-space:nowrap; padding:2px 10px; background:#fff; color:#123a5a; border-radius:3px; font-size:15px; line-height:20px; opacity:0; }
+.sign.hit > span { position:absolute; left:50%; top:-30px; transform:translateX(-50%) translateZ(70px); white-space:nowrap; padding:2px 10px; background:#fff; color:#123a5a; border-radius:3px; font-size:15px; line-height:20px; opacity:0; }
 .sign.hit.near > span { opacity:1; }
 /* The marker over anything that can be used: a cut paper pennant, white core showing round its colour, bobbing in
    stepped frames. Each one starts at its own point in the bob (--d), so no two move together. Ways out are sun yellow. */
@@ -314,3 +314,20 @@ button { font:inherit; cursor:pointer; }
 .here { display:none; position:absolute; left:-15px; bottom:176px; width:30px; height:36px; background:radial-gradient(circle at 50% 34%,#fffaf0 0 4px,transparent 4.6px),linear-gradient(#2f3e5c,#2f3e5c) 50% 46%/22px 27px no-repeat,#fffaf0; clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%); animation:pin-bob .8s steps(4,jump-none) infinite alternate; }
 .courier[data-unseen] .here { display:block; }
 @media (prefers-reduced-motion:reduce) { .here { animation:none; } }
+/* A label and its A bubble stand well in front of the tap area (70 units toward the camera; not in the car, where nothing stands between), so no lamp, card or prop
+   between the stop and the camera covers them. */
+.sign.hit .prompt { transform:translateZ(70px); }
+.art-train .sign.hit > span { transform:translateX(-50%); } .art-train .sign.hit .prompt { transform:none; }
+.sign.hit { transform-style:preserve-3d; }
+/* ---------- a stop with no diorama yet (Moperty): the maker's bench, not grey boxes ---------- */
+/* A green cutting mat with its grid, blank cream card stock stood up where the buildings will go, and each stop a paper
+   tag on a post, high enough that the salaryman stands under it instead of behind it. */
+.art-blockout { background:radial-gradient(120% 90% at 50% 30%,#e9dfcc 0,#cdbfa5 100%); }
+.art-blockout .floor { background:repeating-linear-gradient(0deg,rgba(255,255,255,.2) 0 2px,transparent 2px 60px),repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 2px,transparent 2px 60px),repeating-linear-gradient(0deg,rgba(255,255,255,.34) 0 3px,transparent 3px 300px),repeating-linear-gradient(90deg,rgba(255,255,255,.34) 0 3px,transparent 3px 300px),#2f7d5b; }
+.art-blockout .card { background:#f6efe2 !important; border-radius:2px; box-shadow:var(--shadow-md),inset 0 0 0 2px #fffaf0,inset 0 -10px 0 rgba(120,90,50,.08); }
+.art-blockout .prop:nth-child(3n) > .card { background:#e6c9a0 !important; } .art-blockout .prop:nth-child(5n) > .card { background:#ead9bd !important; }
+.art-blockout .sign { bottom:128px; height:84px; background:#fffaf0; border-radius:3px; box-shadow:var(--shadow-md),inset 0 0 0 3px #fff; font-weight:600; }
+.art-blockout .sign::after { content:""; position:absolute; left:calc(50% - 4px); top:100%; width:8px; height:128px; background:#b5ada2; }
+.art-blockout .sign.road { background:#f0a51e; color:#23272d; }
+.art-blockout .sign.near { background:#fff; box-shadow:var(--shadow-md),inset 0 0 0 3px #e8552d; }
+.art-blockout .ground-shadow { background:rgba(8,30,20,.3); box-shadow:0 0 12px 8px rgba(8,30,20,.14); }
