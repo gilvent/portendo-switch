@@ -68,7 +68,8 @@ button { font:inherit; cursor:pointer; }
 .sign.hit::before,.sign.hit::after { content:""; position:absolute; clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%); animation:pin-bob .8s steps(4,jump-none) var(--d,0s) infinite alternate; }
 .sign.hit::before { left:calc(50% - 15px); bottom:var(--pin,calc(100% - 14px)); width:30px; height:36px; background:#fffaf0; }
 .sign.hit::after { left:calc(50% - 11px); bottom:calc(var(--pin,calc(100% - 14px)) + 5px); width:22px; height:27px; background:radial-gradient(circle at 50% 36%,#fffaf0 0 3.4px,transparent 4px),#e8552d; }
-.sign.hit.road::after { background:radial-gradient(circle at 50% 36%,#fffaf0 0 3.4px,transparent 4px),#f0a51e; }
+/* A way out carries an arrow instead of a dot: walk into it. */
+.sign.hit.road::after { content:"↑"; background:#f0a51e; color:#fffaf0; font:700 17px/19px Fredoka,system-ui,sans-serif; text-align:center; }
 /* The marker hangs at the top of the tap area; a stop on a wall lifts the whole area to it (`mark`). A way out is
    marked at door height, not over the lintel. */
 .sign.hit.road { --pin:92px; }

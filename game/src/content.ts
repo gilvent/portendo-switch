@@ -54,7 +54,7 @@ export const content: Content = validateContent({ worlds: {
       { id: 'promo', label: 'Price tag', x: 255, z: -50, focus: 1.8, look: 175, action: { kind: 'toy', toy: 'promo', states: 2 } },
       { id: 'cart', label: 'Basket', x: -310, z: 120, focus: 1.6, look: -380, action: { kind: 'toy', toy: 'cart', states: 4 } },
       { id: 'recs', label: 'Recommended shelf', x: 240, z: 130, focus: 1.6, look: 400, action: { kind: 'toy', toy: 'recs', states: 2 } },
-      { id: 'stairs-up', label: 'Upstairs', x: 400, z: -130, reach: 80, action: { kind: 'road', to: 'blibli-storeroom', stop: 'stairs-down' } } ],
+      { id: 'stairs-up', label: 'Upstairs', x: 400, z: -130, reach: 150, action: { kind: 'road', to: 'blibli-storeroom', stop: 'stairs-down' } } ],
     letters: [{ id: 'spec', title: 'Catalog', surface: 'catalog', blocks: [{ kind: 'specSheet' }] }],
     encoded: [
       { fact: 'Worked on:', at: ['showcase'] }, { fact: 'Product Detail', at: ['showcase'] },
@@ -69,7 +69,7 @@ export const content: Content = validateContent({ worlds: {
       { fact: "High volume of traffic puts continuous attention to this page's performance, pushing me to learn many web optimization techniques", at: ['recs', 'street-door'] } ] },
   // Second floor: product reviews, from writing one to browsing everyone's.
   'blibli-storeroom': { id: 'blibli-storeroom', art: 'storeroom', back: { world: 'blibli-shop', stop: 'stairs-up' }, camera: { zoom: .8, zoomWide: .96, x0: -30, x1: 30 }, bounds: { x0: -460, x1: 460, z0: -150, z1: 190 },
-    solid: [{ x0: -360, x1: 420, z0: -235, z1: -165 }, { x0: 120, x1: 420, z0: 83, z1: 153 }, { x0: -190, x1: 70, z0: 15, z1: 105 }, { x0: -277, x1: -193, z0: 143, z1: 207 }, { x0: 370, x1: 430, z0: -165, z1: -138 }, { x0: -487, x1: -287, z0: 85, z1: 260 }, { x0: 52, x1: 108, z0: 156, z1: 200 }, { x0: 420, x1: 470, z0: 0, z1: 48 }, { x0: 446, x1: 470, z0: -50, z1: -10 }],
+    solid: [{ x0: -480, x1: 420, z0: -235, z1: -165 }, { x0: 120, x1: 420, z0: 83, z1: 153 }, { x0: -190, x1: 70, z0: 15, z1: 105 }, { x0: -277, x1: -193, z0: 143, z1: 207 }, { x0: 370, x1: 430, z0: -165, z1: -138 }, { x0: -487, x1: -287, z0: 85, z1: 260 }, { x0: 52, x1: 108, z0: 156, z1: 200 }, { x0: 420, x1: 470, z0: 0, z1: 48 }, { x0: 446, x1: 470, z0: -50, z1: -10 }],
     title: 'Second floor: store-room', path: 'store', color: '#0092da', hidden: [{ x0: -200, x1: 90, z0: -70, z1: 14 }, { x0: 110, x1: 430, z0: 10, z1: 82 }],
     stops: [
       { id: 'stairs-down', label: 'Downstairs', x: -387, z: 58, reach: 80, action: { kind: 'road', to: 'blibli-shop', stop: 'stairs-up' } },

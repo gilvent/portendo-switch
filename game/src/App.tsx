@@ -299,7 +299,6 @@ export default function App() {
       if (k === 'a') { dispatch({ a: 'confirm' }); return; }
       if (k === 'Enter' || k === ' ') {
         if (document.activeElement instanceof HTMLButtonElement || document.activeElement instanceof HTMLAnchorElement) return;
-        if (place.k === 'letter') return;
         dispatch({ a: 'confirm' }); e.preventDefault(); return;
       }
       if (k in KEYS) {
