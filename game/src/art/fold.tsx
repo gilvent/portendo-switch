@@ -51,11 +51,17 @@ function looped(q: Quad, l: Loop, rest: string): CSSProperties {
 }
 const loopOf = (q: Quad, amb: Ambient) => amb.loops.find(([m]) => m.test(q.id))?.[1];
 const groupOf = (q: Quad, amb: Ambient) => amb.touch.find(t => t.match.test(q.id))?.name;
+// What a tap needs to know about a sheet (fx.ts): the touchable it belongs to, where its middle stands on the floor
+// plan, and whether it is a big sheet (a wall, the ground, a facade), which only knocks instead of hopping.
+const tag = (q: Quad, amb: Ambient) => {
+  const lu = len(q.u), lv = len(q.v), mid = (i: number) => Math.round(q.o[i] + q.u[i] / lu * q.w / 2 + q.v[i] / lv * q.h / 2);
+  return { 'data-g': groupOf(q, amb), 'data-x': mid(0), 'data-z': mid(2), 'data-big': q.w * q.h > 60000 ? '' : undefined };
+};
 
 const StaticQuads = memo(function StaticQuads({ m, url, amb }: { m: Manifest; url: string; amb: Ambient }) {
   return <>{m.quads.filter(q => !q.motion && !q.group && !q.show).map(q => {
     const l = loopOf(q, amb), base = quadStyle(q, url, m.atlas);
-    return <i key={q.id} className={l ? `pp amb${l.kind === 'peck' ? ' amb-peck' : ''}` : 'pp'} data-g={groupOf(q, amb)} style={l ? { ...base, ...looped(q, l, base.transform as string) } : base} />;
+    return <i key={q.id} className={l ? `pp amb${l.kind === 'peck' ? ' amb-peck' : ''}` : 'pp'} {...tag(q, amb)} style={l ? { ...base, ...looped(q, l, base.transform as string) } : base} />;
   })}</>;
 });
 const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
@@ -75,10 +81,10 @@ export function PaperScene({ manifest, url, near, toys, art }: { manifest: Manif
   return (
     <div className="prop" data-testid="paper-scene">
       <StaticQuads m={manifest} url={url} amb={amb} />
-      {manifest.quads.filter(q => !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" data-g={groupOf(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`show-${q.id}`} />)}
+      {manifest.quads.filter(q => !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`show-${q.id}`} />)}
       {manifest.quads.filter(q => q.motion?.swing).map((q, i) => <i key={q.id} className="pp swings" style={{ ...quadStyle(q, url, manifest.atlas), animationDelay: `${-(i * 0.37 % 1.4).toFixed(2)}s` }} />)}
       {manifest.quads.filter(q => q.motion?.spin).map(q => <i key={q.id} className="pp spins" style={quadStyle(q, url, manifest.atlas)} />)}
-      {manifest.quads.filter(q => q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} data-g={groupOf(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
+      {manifest.quads.filter(q => q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
       <Runs m={manifest} url={url} />
     </div>
   );

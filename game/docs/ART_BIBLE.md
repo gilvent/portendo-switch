@@ -170,6 +170,8 @@ No AI image or 3D tool was used. All geometry is planar and generated from data.
 
 ## Performance budget
 
+Add `?fps` to the address to see the frame rate and the worst frame of the last half second on the device in hand.
+
 Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 
 - Textured layers cost far more than flat colour ones. Up to about 120 flat faces ran at 60fps, while 59 textured quads did not.
@@ -223,6 +225,8 @@ A new loop is one line: a pattern over sheet ids and a kind (`sway`, `skew`, `ru
 ### Touch
 
 Anything listed as a touchable hops when the salaryman walks or jumps within its reach: the whole object rises together and lands again in stepped frames, with a puff of dust. People answer with a paper tag over their head instead (♪, …, !, ?, z), in keeping with their face. A touchable must be within reach of the walkable floor; the test checks that too.
+
+A tap or click reaches further than he can walk: every sheet in every space answers it. A touchable does what it does for the salaryman; any other small object hops together with the sheets it is built from; a big sheet (a wall, the ground, a facade) knocks 2.5 units. The journey test taps a grid across all four spaces and fails if any paper stays still.
 
 ### Using a stop
 

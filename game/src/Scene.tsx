@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties, type MutableRefObject, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type MutableRefObject, type RefObject } from 'react';
 import gsap from 'gsap';
 import type { Stop, World } from './schema.ts';
 import { reducedMotion, shadowFilter } from './light.ts';
@@ -54,8 +54,11 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
     return () => { if (fxRef.current === fx) fxRef.current = null; };
   }, [world.art, fxRef]);
   const backdrop = WORLD_BACKDROP[world.art];
+  // The page's two leaves exist only while they move: as the space opens, and again as it closes.
+  const [opened, setOpened] = useState(false);
+  useEffect(() => { const t = window.setTimeout(() => setOpened(true), 700); return () => clearTimeout(t); }, []);
   return (
-    <div ref={root} className={`tv art-${world.art}`} data-testid={`world-${world.id}`} data-arrival={arrival || undefined} data-fold={fold ?? undefined}>
+    <div ref={root} className={`tv art-${world.art}`} data-testid={`world-${world.id}`} data-arrival={arrival || undefined} data-fold={fold ?? undefined} onPointerDown={e => { if (!(e.target as HTMLElement).closest('button')) fxRef.current?.tap(e.clientX, e.clientY); }}>
       {/* The far backdrop is its own sheet so it can slide against the scene, and a gull crosses it now and then. */}
       {backdrop && <div className="sky" ref={skyRef} aria-hidden="true" style={{ backgroundImage: `url(${backdrop})` }}><i className="gull" /><i className="gull gull-b" /></div>}
       <svg width="0" height="0" className="defs" aria-hidden="true"><defs>
@@ -100,7 +103,7 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
         </div>
         <div className="fx" ref={bits} aria-hidden="true" />
       </div></div></div>
-      <div className="wipe" aria-hidden="true"><i /><i /></div>
+      {(!opened || fold === 'out') && <div className="wipe" aria-hidden="true"><i /><i /></div>}
     </div>
   );
 }

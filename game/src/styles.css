@@ -298,3 +298,6 @@ button { font:inherit; cursor:pointer; }
 .pp.amb-peck { animation:amb-peck var(--t) steps(1,end) var(--d) infinite; }
 @keyframes amb-peck { 0%,10%,20%,100% { transform:var(--a); } 5%,15% { transform:var(--b); } }
 @media (prefers-reduced-motion:reduce) { .pp.amb,.sign.hit::before,.sign.hit::after,.sign.hit.near > span { animation:none; } }
+.probing .pp { pointer-events:auto; }
+/* ?fps on the address shows the frame rate, for checking a device against the 60fps target. */
+.fps { position:fixed; z-index:40; left:8px; bottom:8px; padding:2px 8px; border-radius:3px; background:#14181d; color:#58e08a; font:600 13px/18px ui-monospace,monospace; pointer-events:none; }

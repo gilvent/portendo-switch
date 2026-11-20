@@ -121,6 +121,7 @@ export default function App() {
   const phase = useRef(0);
   const wasWalking = useRef(false);
   const airborne = useRef(0);
+  const fpsRef = useRef<HTMLElement>(null), meter = useRef({ n: 0, ms: 0, worst: 0 }), [showFps] = useState(() => new URLSearchParams(location.search).has('fps'));
   const framed = useRef<WorldId | null>(null);
 
   const measure = useCallback(() => { const tall = innerHeight > innerWidth; cam.current.scale = tall ? Math.min(.86, innerWidth / 480) : Math.max(.5, Math.min(innerWidth / 1100, innerHeight / 620, 1.1)); cam.current.lift = tall ? -40 : 150; cam.current.tall = tall; }, []);
@@ -168,6 +169,7 @@ export default function App() {
 
   useEffect(() => {
     const tick = (_t: number, delta: number) => {
+      if (fpsRef.current) { const f = meter.current; f.n++; f.ms += delta; f.worst = Math.max(f.worst, delta); if (f.ms >= 500) { fpsRef.current.textContent = `${Math.round(f.n * 1000 / f.ms)} fps · worst ${Math.round(f.worst)}ms`; f.n = 0; f.ms = 0; f.worst = 0; } }
       const g = gameRef.current, p = g.place, dt = Math.min(delta / 1000, .05);
       const ix0 = [...held.current].reduce((n, k) => n + (KEYS[k]?.[0] ?? 0), 0) + (stickSpent.current ? 0 : stick.current.x);
       const iz0 = [...held.current].reduce((n, k) => n + (KEYS[k]?.[1] ?? 0), 0) + (stickSpent.current ? 0 : stick.current.z);
@@ -243,12 +245,13 @@ export default function App() {
         return;
       }
       // Soft follow: the camera leads the way he faces (further while he walks), eases after him, and lets him move a
-      // little inside a dead zone before it follows at all.
+      // little inside a dead zone before it follows at all. His speed is fed forward (vx * .2 cancels the lag of an ease at
+      // 5/s), so the view does not trail behind him at a run or slide on after he has stopped.
       h.look += ((c0.tall ? 0 : facing.current * (speed > .2 ? 84 : 26)) - h.look) * (calm ? 1 : 1 - Math.exp(-2.4 * dt));
       const c = c0, k = calm ? 1 : 1 - Math.exp(-5 * dt);
       // A stop with `focus` pulls the camera in on itself while the courier stands there.
       const spotted = p.near ? stopOf(content, p.world, p.stop) : undefined, zoomIn = spotted?.focus ? spotted.focus * (w.camera?.zoom ?? 1) / zoomOf(p.world) : 1;
-      const frame = w.camera, leaning = !!spotted && zoomIn !== 1, want = leaning ? (spotted.look ?? spotted.x) * .8 + n.x * .2 : n.x + h.look + (c.tall ? 0 : w.camera?.ahead ?? 0);
+      const frame = w.camera, leaning = !!spotted && zoomIn !== 1, want = leaning ? (spotted.look ?? spotted.x) * .8 + n.x * .2 : n.x + n.vx * .2 + h.look + (c.tall ? 0 : w.camera?.ahead ?? 0);
       const err = (frame && !leaning ? Math.min(frame.x1, Math.max(frame.x0, want)) : want) - c.x, slack = leaning || calm ? 0 : DEAD;
       if (Math.abs(err) > slack) c.x += (err - Math.sign(err) * slack) * k;
       c.z += ((frame ? n.z * .4 : n.z) - c.z) * k;
@@ -306,6 +309,7 @@ export default function App() {
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
       {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} atDock={spot.k === 'walk' && spot.world === 'intro' && spot.near} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
+      {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}
       <div className="corner">
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
         <button data-testid="toggle-controller" aria-pressed={!game.controller.visible} onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'toggleController' }); }}>{game.controller.visible ? 'Hide controller' : 'Show controller'}</button>

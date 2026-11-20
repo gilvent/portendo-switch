@@ -14,6 +14,9 @@ export type Fx = {
   say(x: number, y: number, z: number, glyph: string): void;
   // Called every frame with the salaryman's place: anything he comes close to while moving hops.
   touch(x: number, z: number, moving: boolean): void;
+  // A tap or click on the scene at screen point [cx, cy]: whatever paper is under it answers. A touchable hops as it
+  // does for the salaryman; any other small object hops with the sheets it is built from; a big sheet knocks.
+  tap(cx: number, cy: number): void;
 };
 
 let seed = 7;
@@ -42,6 +45,8 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
     const L = t.lift ?? 9;
     for (const el of scene.querySelectorAll<HTMLElement>(`[data-g="${t.name}"]`)) el.animate({ translate: ['0 0', `0 ${-L}px`, '0 0', `0 ${(-L * .35).toFixed(1)}px`, '0 0'] }, { duration: 460, easing: 'steps(9,end)' });
   };
+  const jump = (els: Iterable<HTMLElement>, L: number) => { for (const el of els) el.animate({ translate: ['0 0', `0 ${-L}px`, '0 0', `0 ${(-L * .35).toFixed(1)}px`, '0 0'] }, { duration: 460, easing: 'steps(9,end)' }); };
+  let tapped = -1e9;
   const fx: Fx = {
     dust(x, z, dir, n = 2) {
       if (reducedMotion()) return;
@@ -56,6 +61,19 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
       const el = take('bit say'); el.textContent = glyph; el.style.cssText = '';
       const at = (dy: number, s: number, r: number) => `translate3d(${x}px,${-(y + dy)}px,${z + 6}px) scale(${s}) rotate(${r}deg)`;
       el.animate([{ transform: at(0, .2, -14), opacity: 1 }, { transform: at(20, 1.15, 5), opacity: 1, offset: .22 }, { transform: at(17, 1, 0), opacity: 1, offset: .34 }, { transform: at(17, 1, 0), opacity: 1, offset: .82 }, { transform: at(26, .6, 8), opacity: 0 }], { duration: 1100, easing: 'steps(12,end)', fill: 'forwards' });
+    },
+    tap(cx, cy) {
+      const now = performance.now();
+      if (reducedMotion() || now - tapped < 250) return;
+      // Sheets ignore the pointer so they never block a stop; for this one look they answer it.
+      scene.classList.add('probing'); const el = document.elementFromPoint(cx, cy); scene.classList.remove('probing');
+      if (!(el instanceof HTMLElement) || !el.classList.contains('pp')) return;
+      tapped = now;
+      const t = amb.touch.find(k => k.name === el.dataset.g), x = +(el.dataset.x ?? 0), z = +(el.dataset.z ?? 0);
+      if (t) { last.set(t.name, now); hop(t); if (t.says) fx.say(t.x, t.top ?? 120, t.z, t.says); else fx.dust(t.x, t.z + 8, 0, 2); return; }
+      if (el.dataset.big !== undefined) { jump([el], 2.5); return; }
+      jump([...scene.querySelectorAll<HTMLElement>('.pp:not([data-big])')].filter(e => Math.hypot(+(e.dataset.x ?? 0) - x, +(e.dataset.z ?? 0) - z) < 64), 7);
+      fx.dust(x, z + 10, 0, 2);
     },
     touch(x, z, moving) {
       if (!moving || reducedMotion()) return;
