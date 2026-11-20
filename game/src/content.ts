@@ -20,7 +20,7 @@ export const content: Content = validateContent({ worlds: {
     stops: [
       { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
         { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },
-      { id: 'poster', label: 'Poster', x: -260, z: -40, mark: 236, action: { kind: 'letter', letter: 'hello' } },
+      { id: 'poster', label: 'Poster', x: -260, z: -40, look: -240, mark: 300, action: { kind: 'letter', letter: 'hello' } },
       { id: 'help-point', label: 'Help point', x: -385, z: -30, look: -420, mark: 226, action: { kind: 'letter', letter: 'contact' } } ],
     letters: [
       { id: 'hello', title: 'Hey there!', surface: 'note', blocks: [{ kind: 'heading', text: 'I am Alvaro.' }, { kind: 'heading', text: 'I develop Web Frontends.' }] },

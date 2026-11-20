@@ -22,6 +22,8 @@ const SCRAPS = ['#e8552d', '#fff4e2', '#f6b73c'];
 // paper pops up (FOLD_IN).
 const FOLD_OUT = 360, FOLD_IN = 620;
 type Fold = 'out' | 'in' | null;
+// Every letter read and every toy used leaves a stamp: this is how many the line's spaces hold.
+const STAMPS = Object.values(content.worlds).filter(w => w.id !== 'intro' && !w.offLine).reduce((n, w) => n + w.stops.filter(s => s.action.kind === 'letter' || s.action.kind === 'toy').length, 0);
 
 export default function App() {
   const [game, setGame] = useState<Game>(() => start(content, location.pathname));
@@ -202,9 +204,10 @@ export default function App() {
       if (pushing && !h.moved && !calm && Math.hypot(o.vx, o.vz) < 40 && !h.air) h.windup = WINDUP;
       if (!pushing && h.moved && !calm && !h.air && Math.hypot(o.vx, o.vz) > MAX_SPEED * .6) { h.sy = .9; h.vs = -1.5; fx?.dust(o.x + facing.current * 14, o.z, facing.current, 2); }
       h.moved = pushing;
+      // The dip is only a pose: his feet answer the stick at once, so a short tap still moves him.
       const held0 = h.windup > 0;
       if (held0) { h.windup -= dt; h.sy += (.86 - h.sy) * Math.min(1, dt * 40); h.vs = 0; if (h.windup <= 0) { h.vs = 3.4; fx?.dust(o.x, o.z, -Math.sign(ix || facing.current), 2); } }
-      const n = step(o, held0 ? 0 : ix, held0 ? 0 : iz, dt, w);
+      const n = step(o, ix, iz, dt, w);
       walker.current = n;
       const near = nearest(w, n.x, n.z)?.id ?? null;
       if (near !== lastNear.current) {
@@ -213,7 +216,8 @@ export default function App() {
       }
       if (target.current && near === target.current.stop.id) {
         const t = target.current; target.current = null;
-        if (t.open) dispatch({ a: 'confirm' });
+        // Walking into a door already went through it: A there would only walk him back out.
+        if (t.open && t.stop.action.kind !== 'road') dispatch({ a: 'confirm' });
       }
       const speed = Math.hypot(n.vx, n.vz) / MAX_SPEED;
       // The card flip: he turns over like a playing card, in stepped frames, with a little skip as he does.
@@ -305,7 +309,7 @@ export default function App() {
 
   const openStop = useMemo(() => (spot.k === 'letter' ? stopOf(content, spot.world, spot.stop) : undefined), [spot]);
   const nearStop = spot.k === 'walk' && spot.near ? spot.stop : null;
-  const lit = game.place.k === 'letter' ? 'B' : nearStop && spot.k === 'walk' && stopOf(content, spot.world, nearStop)?.action.kind !== 'road' ? 'A' : game.place.k === 'walk' ? 'stick' : null;
+  const lit = game.place.k === 'letter' ? 'B' : nearStop && spot.k === 'walk' ? 'A' : game.place.k === 'walk' ? 'stick' : null;
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
@@ -316,8 +320,8 @@ export default function App() {
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
         <button data-testid="toggle-controller" aria-pressed={!game.controller.visible} onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'toggleController' }); }}>{game.controller.visible ? 'Hide controller' : 'Show controller'}</button>
       </div>
-      {game.stamps.length === 0 && game.place.k === 'walk' && <p className="keys" data-testid="keys"><b>← →</b> walk <b>A</b> or <b>Enter</b> use <b>B</b> or <b>Esc</b> back</p>}
-      {game.stamps.length > 0 && <div className="stamps" key={game.stamps.length} data-testid="stamps">{game.stamps.length} {game.stamps.length === 1 ? 'stamp' : 'stamps'}</div>}
+      {game.place.k === 'walk' && <p className="keys" data-testid="keys"><b>← ↑ ↓ →</b> walk <b>A</b> or <b>Enter</b> use, jump <b>B</b> or <b>Esc</b> close, leave</p>}
+      {game.stamps.length > 0 && <div className="stamps" key={game.stamps.length} data-testid="stamps">{game.stamps.length} of {STAMPS} stamps</div>}
       {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Wrong stop</h1><p>No line runs to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Back on the train</button></section>}

@@ -72,7 +72,7 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
       const t = amb.touch.find(k => k.name === el.dataset.g), x = +(el.dataset.x ?? 0), z = +(el.dataset.z ?? 0);
       if (t) { last.set(t.name, now); hop(t); if (t.says) fx.say(t.x, t.top ?? 120, t.z, t.says); else fx.dust(t.x, t.z + 8, 0, 2); return; }
       if (el.dataset.big !== undefined) { jump([el], 2.5); return; }
-      jump([...scene.querySelectorAll<HTMLElement>('.pp:not([data-big])')].filter(e => Math.hypot(+(e.dataset.x ?? 0) - x, +(e.dataset.z ?? 0) - z) < 64), 7);
+      jump([...scene.querySelectorAll<HTMLElement>('.pp:not([data-big])')].filter(e => e === el || Math.hypot(+(e.dataset.x ?? 0) - x, +(e.dataset.z ?? 0) - z) < 64), 7);
       fx.dust(x, z + 10, 0, 2);
     },
     touch(x, z, moving) {

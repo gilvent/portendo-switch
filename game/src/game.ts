@@ -91,6 +91,8 @@ export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
       if (!p.near) return [g, null];
       const act = stopOf(c, p.world, p.stop)?.action;
       if (!act) throw new Error(`confirm: no stop ${p.stop} in ${p.world}`);
+      // A at a door or a way out goes through it, the same as walking into it.
+      if (act.kind === 'road') return [{ ...g, place: { k: 'walk', world: act.to, stop: act.stop, near: true } }, null];
       if (act.kind === 'letter') return [{ ...g, place: { k: 'letter', world: p.world, stop: p.stop } }, null];
       if (act.kind === 'dock') return [{ ...g, controller: { ...g.controller, mode: 'docking' } }, null];
       if (act.kind === 'link') return [g, { open: act.href }];

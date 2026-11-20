@@ -86,7 +86,7 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
             {!drawn && <i className="ground-shadow" />}
             <button className={`sign${drawn ? ' hit' : ''}${s.action.kind === 'road' ? ' road' : ''}${nearStop === s.id ? ' near' : ''}`} data-testid={`stop-${world.id}-${s.id}`} style={{ '--d': `${(-hash(s.id) * 1.6).toFixed(2)}s`, ...(s.mark ? { '--mark': `${s.mark}px` } : null) } as CSSProperties} onClick={e => { if (e.detail) e.currentTarget.blur(); onStop(s); }}>
               <span>{s.action.kind === 'ride' ? <>Get off at {dest?.label} <em>B</em> change stop</> : s.label}</span>
-              {nearStop === s.id && s.action.kind !== 'road' && <b className="prompt" data-testid="prompt-a">A</b>}
+              {nearStop === s.id && <b className="prompt" data-testid="prompt-a">A</b>}
             </button>
           </div>
         ))}

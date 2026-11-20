@@ -67,6 +67,7 @@ export default function Controller({ rigRef, mode, visible, lit, atDock, introRe
         <div className="screen" data-testid="handheld-screen">
           <div className="mini-road" />
           <div className="mini-courier" ref={introRef}><Salaryman /></div>
+          {mode === 'handheld' && <span className="mini-hint">{atDock ? 'Press A to dock and play on the big screen' : 'Walk right to the dock →'}</span>}
           {atDock && <b className="prompt end" data-testid="prompt-a">A</b>}
         </div>
       </div>
