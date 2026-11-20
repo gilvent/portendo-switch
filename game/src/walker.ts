@@ -16,7 +16,9 @@ export function step(w: Walker, ix: number, iz: number, dt: number, world: World
 }
 export function nearest(world: World, x: number, z: number): Stop | null {
   let best: Stop | null = null, bd = 1;
-  for (const s of world.stops) { const r = s.reach ?? REACH, d = ((s.x - x) ** 2 + ((s.z - z) * Z_SCALE) ** 2) / (r * r); if (d < bd) { bd = d; best = s; } }
+  // A stop is in reach from where the salaryman is meant to stand, and also from in front of the thing itself (`look`):
+  // a first-time player walks up to the object, not to a spot beside it.
+  for (const s of world.stops) { const r = s.reach ?? REACH, dx = Math.min(Math.abs(s.x - x), Math.abs((s.look ?? s.x) - x)), d = (dx ** 2 + ((s.z - z) * Z_SCALE) ** 2) / (r * r); if (d < bd) { bd = d; best = s; } }
   return best;
 }
 export function seek(w: Walker, tx: number, tz: number): [number, number] {
