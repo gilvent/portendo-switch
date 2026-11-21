@@ -10,6 +10,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { content } from './content.ts';
 import { reducedMotion } from './light.ts';
+import { SalarymanArt, SEAT } from './art/Salaryman.tsx';
 
 export const GATE_X = -170, DOOR_X = 310, BENCH_X = -75;
 // How long the train takes from the gate opening to standing with its doors open.
@@ -83,15 +84,12 @@ export default function Platform({ gate, arrived, near }: Props) {
         {/* The gate's far cabinet, with its reader. */}
         <rect x={sx(GATE_X) - 26} y="268" width="34" height="74" rx="5" fill="#f1f4f7" stroke={CREAM} strokeWidth="4" /><rect x={sx(GATE_X) - 26} y="268" width="34" height="14" rx="5" fill={STEEL} />
         <circle className="pf-reader" cx={sx(GATE_X) - 9} cy="298" r="7" />
-        {/* A bench, and a commuter asleep on it. */}
+        {/* A bench. */}
         <rect x={sx(BENCH_X) - 46} y="318" width="92" height="9" rx="3" fill="#2f6f9f" stroke={CREAM} strokeWidth="3" /><path d={`M${sx(BENCH_X) - 36} 327V344M${sx(BENCH_X) + 36} 327V344`} stroke={STEEL} strokeWidth="5" strokeLinecap="round" />
-        <g transform={`translate(${sx(BENCH_X) - 6} 0)`}><g className="pf-sleeper">
-          <g fill={CREAM} stroke={CREAM} strokeWidth="7" strokeLinejoin="round"><circle cx="0" cy="268" r="24" /><path d="M-19 290H19V322H-19Z" /></g>
-          <path d="M-19 292Q-19 288 -13 288H13Q19 288 19 292V322H-19Z" fill="#2a9d8f" /><path d="M-19 296Q-19 288 -12 288V322H-19Z" fill="#1f7d72" />
-          <circle cx="0" cy="268" r="24" fill="#e2ae85" /><path d="M-25 262Q-22 240 0 240Q22 240 25 262Q10 252 -8 256Q-18 258 -25 262Z" fill="#3a2a1e" />
-          <path d="M-13 271Q-8 276 -3 271M5 271Q10 276 15 271" fill="none" stroke={INK} strokeWidth="2.4" strokeLinecap="round" /><path d="M-2 282Q1 284 4 282" fill="none" stroke="#8c4a38" strokeWidth="2" strokeLinecap="round" />
-          <g className="pf-zz"><path d="M22 222H52Q58 222 58 228V246Q58 252 52 252H34L24 262V252H22Q16 252 16 246V228Q16 222 22 222Z" fill={CREAM} /><text x="37" y="245" textAnchor="middle" fontSize="20" fontWeight="600" fill={INK}>z</text></g>
-        </g></g>
+        {/* The bored salaryman who used to be the player, dozing where he sits. */}
+        <g transform={`translate(${sx(BENCH_X) - 31} ${320 - SEAT * .78}) scale(.78)`}><g className="pf-sleeper"><SalarymanArt seated /></g>
+          <g className="pf-zz"><path d="M70 14H100Q106 14 106 20V38Q106 44 100 44H82L72 54V44H70Q64 44 64 38V20Q64 14 70 14Z" fill={CREAM} /><text x="85" y="37" textAnchor="middle" fontSize="20" fontWeight="600" fill={INK}>z</text></g>
+        </g>
         {/* The line map: two lines that meet here. Work runs across, Side projects runs down from the interchange. */}
         <g transform="translate(424 150)">
           <path d="M20 132V176M196 132V176" stroke={STEEL} strokeWidth="7" strokeLinecap="round" />

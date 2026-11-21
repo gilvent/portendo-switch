@@ -245,7 +245,8 @@ export default function App() {
       const turn = pushing && Math.abs(ix) > .3 ? Math.sign(ix) : Math.abs(n.vx) > 25 ? Math.sign(n.vx) : facing.current;
       if (turn !== facing.current) {
         facing.current = turn;
-        if (flipRef.current) gsap.to(flipRef.current, { rotationY: turn > 0 ? 0 : 180, duration: calm ? 0 : .2, ease: 'steps(5)', overwrite: true });
+        // The mirror alone would move his pocketed hand to the other side, so the arms swap with it (Hero.tsx).
+        if (flipRef.current) { gsap.to(flipRef.current, { rotationY: turn > 0 ? 0 : 180, duration: calm ? 0 : .2, ease: 'steps(5)', overwrite: true }); flipRef.current.dataset.face = String(turn); }
         if (!calm && !h.air && p.world !== 'intro') { h.air = true; h.vy = 210; h.vs = 2.2; fx?.dust(n.x, n.z, 0, 2); }
       }
       // Jump: a crouch, then up with a stretch; down with a squash and dust.
@@ -271,7 +272,7 @@ export default function App() {
         if (el && screen) {
           el.style.transform = `translate3d(${((n.x + 420) / 840 * 100).toFixed(2)}cqw,${-bob}px,0)`;
           // The toy theatre's layers slide against each other as he crosses; he turns over like a card; the sleeper stirs.
-          screen.style.setProperty('--par', (n.x / 420).toFixed(3)); el.style.setProperty('--f', String(facing.current));
+          screen.style.setProperty('--par', (n.x / 420).toFixed(3)); el.style.setProperty('--f', String(facing.current)); el.dataset.face = String(facing.current);
           screen.toggleAttribute('data-near-bench', Math.abs(n.x - BENCH_X) < 44);
         }
         return;

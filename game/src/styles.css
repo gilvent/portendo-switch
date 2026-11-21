@@ -19,11 +19,16 @@ button { font:inherit; cursor:pointer; }
 .flip { position:absolute; left:-40px; bottom:-2px; width:80px; height:137px; transform-style:preserve-3d; }
 .courier-art { position:absolute; left:0; top:0; display:block; }
 .defs { position:absolute; }
-/* Stubby suit legs with rounded shoes; only the shoes stand clear of the jacket, so only they carry the white rim. */
-/* The player is average build (Salaryman.tsx): legs start 6 lower and run 7 longer than the short build's. */
-.leg { position:absolute; top:108px; width:11px; height:22px; border-radius:2px; background:#263350; transform-origin:50% 0; }
-.leg::after { content:''; position:absolute; left:-4px; bottom:-6px; width:15px; height:7px; border:2.5px solid #fff; border-radius:8px 8px 5px 5px; background:#1d1f24; box-shadow:inset 0 2px 0 #3a3e46; }
-.leg-b { left:29px; } .leg-f { left:41px; background:#2f3e5c; }
+/* The player's legs (Hero.tsx): black suit trousers as separate strips so they can stride; the shoes carry the white rim. */
+.leg { position:absolute; top:109px; width:10.6px; height:21px; border-radius:2px; background:#131418; transform-origin:50% 0; }
+/* His shoes point the way he walks: a long toe, a short heel. */
+.leg::after { content:''; position:absolute; left:-3.5px; bottom:-6px; width:18px; height:7px; border:2.5px solid #fffaf0; border-radius:5px 10px 5px 5px; background:#17181c; box-shadow:inset 0 2px 0 #3a3e46; }
+.leg-b { left:29px; } .leg-f { left:42px; background:#22242a; }
+/* He leans into his stride: legs and body tip together about his feet. */
+.lean { position:absolute; inset:0; transform:rotate(4deg); transform-origin:40px 134px; }
+.mini-courier .lean { transform-origin:0 0; }
+/* Which arm set shows (Hero.tsx): his right hand stays the one in his pocket whichever way he faces. */
+.h-l { display:none; } [data-face="-1"] .h-r { display:none; } [data-face="-1"] .h-l { display:inline; }
 [data-walking] .leg-f { animation:stride .32s ease-in-out infinite alternate; }
 [data-walking] .leg-b { animation:stride .32s ease-in-out infinite alternate-reverse; }
 @keyframes stride { from { transform:rotate(-24deg); } to { transform:rotate(24deg); } }

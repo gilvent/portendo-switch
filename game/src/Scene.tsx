@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type MutableR
 import gsap from 'gsap';
 import type { Stop, World } from './schema.ts';
 import { reducedMotion, shadowFilter } from './light.ts';
-import Salaryman from './art/Salaryman.tsx';
+import Hero from './art/Hero.tsx';
 import { WORLD_ART, WORLD_BACKDROP } from './art/blibli.tsx';
 import { at } from './art/fold.tsx';
 import { ambientOf, hash } from './art/ambient.ts';
@@ -63,6 +63,8 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
       {backdrop && <div className="sky" ref={skyRef} aria-hidden="true" style={{ backgroundImage: `url(${backdrop})` }}><i className="gull" /><i className="gull gull-b" /></div>}
       <svg width="0" height="0" className="defs" aria-hidden="true"><defs>
         {(['sm', 'md'] as const).map(n => <filter key={n} id={`paper-${n}`} x="-20%" y="-20%" width="150%" height="150%"><feDropShadow {...shadowFilter(n)} /></filter>)}
+        {/* The player's sheet: his outline grown by the white core of the card, then the same small shadow. */}
+        <filter id="hero-rim" x="-25%" y="-20%" width="160%" height="150%"><feMorphology operator="dilate" radius="3" in="SourceAlpha" result="grown" /><feFlood floodColor="#fffaf0" /><feComposite in2="grown" operator="in" result="core" /><feMerge result="sheet"><feMergeNode in="core" /><feMergeNode in="SourceGraphic" /></feMerge><feDropShadow in="sheet" {...shadowFilter('sm')} /></filter>
       </defs></svg>
       <div className="stage" ref={stageRef}><div className="page"><div className="car">
         {/* Underground. Behind the whole train stands the tunnel's far wall, its ribs, cable runs and work lamps rushing
@@ -100,7 +102,7 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
         <div className="courier" ref={courierRef} data-testid="courier">
           <i className="ground-shadow small" />
           <i className="here" />
-          <div className="pose" ref={poseRef}><div className="flip" ref={flipRef}><Salaryman /></div></div>
+          <div className="pose" ref={poseRef}><div className="flip" ref={flipRef}><Hero /></div></div>
         </div>
         <div className="fx" ref={bits} aria-hidden="true" />
       </div></div></div>

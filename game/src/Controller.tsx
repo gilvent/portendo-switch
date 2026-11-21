@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type MutableRefObject, ty
 import gsap from 'gsap';
 import type { Action, ControllerMode } from './game.ts';
 import { reducedMotion } from './light.ts';
-import Salaryman from './art/Salaryman.tsx';
+import Hero from './art/Hero.tsx';
 import Platform, { TRAIN_MS } from './Platform.tsx';
 
 // near: which of the platform's two stops he stands at. gate: the ticket gate is open. trainIn: set once the train it
@@ -79,7 +79,7 @@ export default function Controller({ rigRef, mode, visible, lit, near, gate, tra
       <div className="console" ref={body}>
         <div className="screen" data-testid="handheld-screen" onPointerDown={e => { const r = e.currentTarget.getBoundingClientRect(); onScreenTap((e.clientX - r.left) / r.width * 840 - 420); }}>
           <Platform gate={gate} arrived={arrived} near={near} />
-          <div className="mini-courier" ref={introRef}><div className="flipper"><Salaryman /></div></div>
+          <div className="mini-courier" ref={introRef}><div className="flipper"><Hero /></div></div>
           {near === 'gate' && !gate && <b className="prompt at-gate" data-testid="prompt-gate">A</b>}
           {atDock && <b className="prompt end" data-testid="prompt-a">A</b>}
         </div>
