@@ -221,11 +221,11 @@ A loop rocks one sheet between two poses in four stepped frames. Each sheet take
 | Outlet | Bunting, pendant lamps, the plant, the clerk, the promo burst |
 | Store-room | Pendant lamps, the packer, the roller, on top of the belts |
 
-A new loop is one line: a pattern over sheet ids and a kind (`sway`, `skew`, `rustle`, `breathe`, `bob`, `peck`). `tests/model.test.ts` fails if a pattern matches nothing in the bake.
+A new loop is one line: a pattern over sheet ids and a kind (`sway`, `skew`, `rustle`, `breathe`, `bob`, `peck`).
 
 ### Touch
 
-Anything listed as a touchable hops when the salaryman walks or jumps within its reach: the whole object rises together and lands again in stepped frames, with a puff of dust. People answer with a paper tag over their head instead (♪, …, !, ?, z), in keeping with their face. A touchable must be within reach of the walkable floor; the test checks that too.
+Anything listed as a touchable hops when the salaryman walks or jumps within its reach: the whole object rises together and lands again in stepped frames, with a puff of dust. People answer with a paper tag over their head instead (♪, …, !, ?, z), in keeping with their face. A touchable must be within reach of the walkable floor.
 
 A tap or click reaches further than he can walk: every sheet in every space answers it. A touchable does what it does for the salaryman; any other small object hops together with the sheets it is built from; a big sheet (a wall, the ground, a facade) knocks 2.5 units. The journey test taps a grid across all four spaces and fails if any paper stays still.
 
