@@ -99,7 +99,8 @@ export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
       if (act.kind === 'ride') { const d = act.to[lineOf(c, g, p.world)]; return [{ ...g, place: { k: 'walk', world: d.world, stop: d.stop, near: true } }, null]; }
       if (act.kind === 'toy') {
         const key = `${p.world}/${act.toy}`, id = `${p.world}/${p.stop}`;
-        return [{ ...g, toys: { ...g.toys, [key]: ((g.toys[key] ?? 0) + 1) % act.states }, stamps: g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];
+        // The platform's gate is not one of the line's stamps: those start once he is on the train.
+        return [{ ...g, toys: { ...g.toys, [key]: ((g.toys[key] ?? 0) + 1) % act.states }, stamps: p.world === 'intro' || g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];
       }
       return [g, null];
     }

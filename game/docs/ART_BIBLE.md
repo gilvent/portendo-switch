@@ -259,9 +259,25 @@ The street's far backdrop is its own sheet and slides at a tenth of the camera's
 Three blind playtests (a fresh player given only the address) set these rules; the third reached all four spaces on foot.
 
 - A legend stays top-left on a keyboard device: the four arrows walk, A or Enter uses and jumps, B or Esc closes and leaves. The letters A, B and X on the keyboard are the buttons.
-- The handheld screen says what to do: walk right to the dock, then press A.
+- The handheld's platform tells him what to do on its departure board: tap the pass at the gate, then board.
 - A door or way out works both ways: walking into it, or A when its prompt shows. The shop door reaches the lane a player walks along from the train.
 - A puts a letter down as B does (on the catalog it turns the leaves).
 - B with nothing open asks before it leaves a space: the second press goes.
 - The stamp count shows its total.
 - A stop's tap area and marker stand on the thing used, never on the spot the salaryman stands at.
+
+## The platform: the handheld's screen
+
+The site opens on the handheld, and its screen is the MRT platform the salaryman waits on (`src/Platform.tsx`). Boarding the train is docking the console, and the big screen wakes inside that train as it pulls away, so the entry and the game are one journey.
+
+- **A toy theatre, not a diorama.** Flat cut layers in one live SVG, 840 by 472, in the walk's own x. Nothing is baked. The far wall drifts with him and what hangs from the roof drifts against him (`--par`), which is all the depth a toy theatre has; docking opens it into the 3D spaces.
+- **The name board** hangs from the roof and carries the name only. It is the page's headline.
+- **The ticket gate** stops him until A taps his commuter pass. The pass pops up, then goes to the corner and is the stamp card for the rest of the game. The gate is not a stamp.
+- **The line map** shows two lines that meet at this station, marked "You are here": the Work line (coral) and the Side projects line (mint). Its stops are read from `content.ts`; a stub past the last stop says the line goes on. The interchange is not a place to visit.
+- **The train** is called by the gate. It comes in from the left, the way it runs on the big screen, brakes in stepped frames and opens the door of its front car on the mark. He can board only once it stands.
+- **The departure board** shows the visitor's own time and the next thing to do. The hour also sets the sky in the high windows and a wash over the platform: morning, day, evening, night.
+- **Boarding:** he steps in, the doors shut, the train pulls out as the console goes to the dock, and the dock's light turns green.
+- A commuter sleeps on the bench and answers with a "z" as he passes. A tap on the screen walks him there, or presses A when he stands at the gate or the door.
+- Under reduced motion the train is already standing when the gate opens, and nothing slides.
+
+The in-car route map is baked and still draws one line; it needs a re-bake to match the platform's two.

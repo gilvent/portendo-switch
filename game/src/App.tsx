@@ -6,6 +6,7 @@ import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
 import { LIGHT, reducedMotion } from './light.ts';
 import type { Fx } from './fx.ts';
+import { BENCH_X, GATE_X } from './Platform.tsx';
 import Scene from './Scene.tsx';
 import Controller from './Controller.tsx';
 import LetterView from './LetterView.tsx';
@@ -35,6 +36,7 @@ export default function App() {
   const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
   const busy = useRef(false);
   const turning = useRef(false);
+  const trainIn = useRef(false), introGo = useRef<number | null>(null);
   const leaveAsked = useRef(-1e9), [leaving, setLeaving] = useState(0);
   useEffect(() => { if (!leaving) return; const t = window.setTimeout(() => setLeaving(0), 3000); return () => clearTimeout(t); }, [leaving]);
   const fxRef = useRef<Fx | null>(null);
@@ -47,6 +49,8 @@ export default function App() {
     if (busy.current && x.a !== 'toggleController') return;
     if (turning.current && gameRef.current.place.k === 'walk' && (x.a === 'confirm' || x.a === 'back' || x.a === 'arrive' || x.a === 'line')) return;
     const here = gameRef.current.place;
+    // On the platform: the gate opens once and stays open, and the doors take him only when the train is standing.
+    if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && here.near && (here.stop === 'gate' ? gameRef.current.toys['intro/gate'] === 1 : !trainIn.current)) return;
     if (x.a === 'confirm' && here.k === 'letter') {
       // A turns the catalog's leaves; on any other letter it puts the letter down, like B.
       const l = stopOf(content, here.world, here.stop)?.action, turns = l?.kind === 'letter' && content.worlds[here.world].letters.find(k => k.id === l.letter)?.blocks.some(k => k.kind === 'specSheet');
@@ -87,7 +91,7 @@ export default function App() {
   }, []);
 
   const spot = spotOf(game);
-  const mode = game.controller.mode;
+  const mode = game.controller.mode, gateOpen = game.toys['intro/gate'] === 1;
   const world: WorldId | null = spot.k === 'lost' ? null : spot.world === 'intro' ? 'mrt' : spot.world;
   // The space on show lags the game by one page turn: `shown` is what is drawn, `fold` is where the turn has got to.
   const [shown, setShown] = useState(world);
@@ -210,6 +214,8 @@ export default function App() {
       }
       if (busy.current || turning.current || shownRef.current !== (p.world === 'intro' ? 'mrt' : p.world)) return;
       let ix = ix0, iz = iz0;
+      // A tap on the handheld's screen walks him to that spot.
+      if (p.world === 'intro' && introGo.current !== null) { const d = introGo.current - walker.current.x; if (ix0 || Math.abs(d) < 10) introGo.current = null; else ix = Math.sign(d) * Math.min(1, Math.abs(d) / 60 + .3); }
       if (ix || iz) target.current = null;
       else if (target.current) [ix, iz] = seek(walker.current, target.current.stop.x, target.current.stop.z);
       const h = hero.current, calm = reducedMotion(), fx = p.world === 'intro' ? null : fxRef.current, o = walker.current, pushing = Math.hypot(ix, iz) > .2;
@@ -220,7 +226,9 @@ export default function App() {
       // The dip is only a pose: his feet answer the stick at once, so a short tap still moves him.
       const held0 = h.windup > 0;
       if (held0) { h.windup -= dt; h.sy += (.86 - h.sy) * Math.min(1, dt * 40); h.vs = 0; if (h.windup <= 0) { h.vs = 3.4; fx?.dust(o.x, o.z, -Math.sign(ix || facing.current), 2); } }
-      const n = step(o, ix, iz, dt, w);
+      let n = step(o, ix, iz, dt, w);
+      // The shut ticket gate stops him.
+      if (p.world === 'intro' && g.toys['intro/gate'] !== 1 && n.x > GATE_X - 30) n = { ...n, x: GATE_X - 30, vx: 0 };
       walker.current = n;
       const near = nearest(w, n.x, n.z)?.id ?? null;
       if (near !== lastNear.current) {
@@ -259,7 +267,13 @@ export default function App() {
         if (rigRef.current) rigRef.current.style.transform = `rotateX(${rig.current.x.toFixed(3)}deg) rotateY(${rig.current.y.toFixed(3)}deg)`;
       }
       if (p.world === 'intro') {
-        if (introRef.current) introRef.current.style.transform = `translate3d(${4 + (n.x + 420) / 840 * 90}cqw,${-bob}px,0)`;
+        const el = introRef.current, screen = el?.parentElement;
+        if (el && screen) {
+          el.style.transform = `translate3d(${((n.x + 420) / 840 * 100).toFixed(2)}cqw,${-bob}px,0)`;
+          // The toy theatre's layers slide against each other as he crosses; he turns over like a card; the sleeper stirs.
+          screen.style.setProperty('--par', (n.x / 420).toFixed(3)); el.style.setProperty('--f', String(facing.current));
+          screen.toggleAttribute('data-near-bench', Math.abs(n.x - BENCH_X) < 44);
+        }
         return;
       }
       // Soft follow: the camera leads the way he faces (further while he walks), eases after him, and lets him move a
@@ -328,7 +342,7 @@ export default function App() {
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
       {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
-      <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} atDock={spot.k === 'walk' && spot.world === 'intro' && spot.near} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
+      <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} near={spot.k === 'walk' && spot.world === 'intro' && spot.near ? spot.stop === 'gate' ? 'gate' : 'door' : null} gate={gateOpen} trainIn={trainIn} onScreenTap={x => { const g = gameRef.current.place; if (g.k !== 'walk' || g.world !== 'intro') return; if (g.near && Math.abs((stopOf(content, 'intro', g.stop)?.x ?? 1e9) - x) < 120) dispatch({ a: 'confirm' }); else introGo.current = x; }} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={leaving} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
       {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}
       <div className="corner">
@@ -336,7 +350,8 @@ export default function App() {
         <button data-testid="toggle-controller" aria-pressed={!game.controller.visible} onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'toggleController' }); }}>{game.controller.visible ? 'Hide controller' : 'Show controller'}</button>
       </div>
       {game.place.k === 'walk' && <p className="keys" data-testid="keys"><b>← ↑ ↓ →</b> walk <b>A</b> or <b>Enter</b> use, jump <b>B</b> or <b>Esc</b> close, leave</p>}
-      {game.stamps.length > 0 && <div className="stamps" key={game.stamps.length} data-testid="stamps">{game.stamps.length} of {STAMPS} stamps</div>}
+      {/* The commuter pass he tapped at the gate is the stamp card: every letter read and toy used stamps it. */}
+      {(mode === 'docked' || gateOpen) && game.place.k !== 'lost' && <div className={`stamps${mode === 'docked' ? '' : ' fresh'}`} key={game.stamps.length} data-testid="stamps"><b>Alvaro L.</b>{game.stamps.length} of {STAMPS} stamps</div>}
       {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Wrong stop</h1><p>No line runs to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Back on the train</button></section>}

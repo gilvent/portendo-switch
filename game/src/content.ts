@@ -13,8 +13,11 @@ const STORE = { x0: -1100, x1: 1100, z0: -150, z1: 190 };
 const foot = (x: number, z: number, w: number) => ({ x0: x - w / 2, x1: x + w / 2, z0: z - 145, z1: z - 35 });
 const out = (): Stop => ({ id: 'way-out', label: 'Back to the MRT', x: -700, z: 120, reach: 100, action: { kind: 'road', to: 'mrt', stop: 'door' } });
 export const content: Content = validateContent({ worlds: {
-  intro: { id: 'intro', art: 'blockout', bounds: { x0: -420, x1: 420, z0: 0, z1: 0 }, solid: [], title: 'Handheld', path: 'round', color: '#8d95a0',
-    stops: [{ id: 'road-end', label: 'Dock', x: 400, z: 0, reach: 300, action: { kind: 'dock' } }], letters: [] },
+  // The handheld's screen (Platform.tsx): the station platform. The gate opens on A, which calls the train; boarding
+  // at its door docks the console. `gate` and `road-end` stand where Platform.tsx draws the gate and the door.
+  intro: { id: 'intro', art: 'blockout', bounds: { x0: -380, x1: 380, z0: 0, z1: 0 }, solid: [], title: 'Platform', path: 'round', color: '#8d95a0',
+    stops: [{ id: 'gate', label: 'Ticket gate', x: -204, z: 0, reach: 56, action: { kind: 'toy', toy: 'gate', states: 2 } },
+      { id: 'road-end', label: 'Board the train', x: 310, z: 0, reach: 70, action: { kind: 'dock' } }], letters: [] },
   // Home: the inside of an MRT car on its way. The sign over the door chooses the stop; the doors get off there.
   mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -320, x1: 480, lift: 210, liftTall: 130, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [{ x0: -470, x1: -420, z0: -80, z1: -28 }, { x0: 418, x1: 470, z0: -90, z1: -46 }], title: 'MRT', path: 'round', color: '#8d95a0',
     stops: [
