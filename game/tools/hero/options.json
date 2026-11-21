@@ -1,0 +1,6 @@
+[
+ {"name":"Sure smile, fists set","note":"Eyes straight ahead under set brows, a firm closed smile, fists clenched at his sides. White tee, black shoes.","hair":"tousle","brows":"set","mouth":"sure","lid":1.8,"squint":0.6,"look":0,"fists":true,"tee":"#f6f4ee","teeD":"#d6d2c8","pose":"down","shoes":"dress"},
+ {"name":"Gritted grin, leaning in","note":"Teeth clenched in a grin, leaning into his stride like he is late for something great. Cream tee, white sneakers.","hair":"forward","brows":"set","mouth":"grit","lid":1.4,"squint":0.8,"look":0,"lean":4,"fists":true,"tee":"#fff1d6","teeD":"#e6d2aa","pose":"down","shoes":"sneaker"},
+ {"name":"Half smile, this way","note":"One brow up, half a smile, finger raised: he has the plan. Pale blue tee, white sneakers.","hair":"choppy","brows":"cocked","mouth":"half","lid":1.6,"squint":0.4,"look":0,"tee":"#dcecf5","teeD":"#b9d3e2","pose":"point","shoes":"sneaker"},
+ {"name":"Dead serious, nose puff","note":"A tiny pressed mouth and a puff of breath from his nose: far too serious for his size. Mint tee, black shoes.","hair":"sweep","brows":"set","mouth":"hmph","lid":1.8,"squint":0.6,"look":0,"fists":true,"lean":2,"tee":"#dff3e6","teeD":"#b8dcc6","pose":"down","shoes":"dress"}
+]

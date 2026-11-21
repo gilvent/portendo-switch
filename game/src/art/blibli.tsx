@@ -12,7 +12,7 @@ import trainUrl from './baked/train/atlas.webp';
 import trainManifest from './baked/train/manifest.json';
 
 export type Art = (props: { near: string | null; toys: Toys }) => ReactNode;
-const art = (manifest: unknown, url: string): Art => ({ near, toys }) => <PaperScene manifest={manifest as Manifest} url={url} near={near} toys={toys} />;
-export const WORLD_ART: Record<string, Art> = { street: art(streetManifest, streetUrl), shop: art(shopManifest, shopUrl), storeroom: art(storeroomManifest, storeroomUrl), train: art(trainManifest, trainUrl) };
+const art = (manifest: unknown, url: string, id: string): Art => ({ near, toys }) => <PaperScene manifest={manifest as Manifest} url={url} near={near} toys={toys} art={id} />;
+export const WORLD_ART: Record<string, Art> = { street: art(streetManifest, streetUrl, 'street'), shop: art(shopManifest, shopUrl, 'shop'), storeroom: art(storeroomManifest, storeroomUrl, 'storeroom'), train: art(trainManifest, trainUrl, 'train') };
 export const WORLD_BACKDROP: Record<string, string> = { street: streetBackdrop };
 export const placeOf = (s: Stop) => at(s.x, s.z);
