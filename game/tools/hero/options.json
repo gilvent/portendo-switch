@@ -1,6 +1,6 @@
 [
- {"name":"Even crop, big grin","note":"Short chunky spikes straight up, open grin, white tee, black shoes.","hair":"crop","brows":"up","mouth":"grin","tee":"#f6f4ee","teeD":"#dcd8ce","pose":"down","shoes":"dress","blush":true},
- {"name":"Textured quiff, fist pump","note":"Lifted at the front, tapering back. Cream tee, white sneakers.","hair":"quiff","brows":"keen","mouth":"cheer","tee":"#fff1d6","teeD":"#ead6ae","pose":"fist","shoes":"sneaker","blush":true},
- {"name":"Choppy fringe, smirk","note":"Short all over, fringe pushed forward. Pale blue tee, sling bag.","hair":"fringe","brows":"cocked","mouth":"smirk","tee":"#dcecf5","teeD":"#b9d3e2","pose":"down","shoes":"sneaker","bag":"sling"},
- {"name":"Brushed-up crop, wave","note":"Spikes all brushed one way. Mint tee, black shoes.","hair":"brushed","brows":"up","mouth":"smile","tee":"#dff3e6","teeD":"#b8dcc6","pose":"wave","shoes":"dress","blush":true}
+ {"name":"Tousled, dead-set stare","note":"Tufts mostly up, two tipping forward. Level glare, flat mouth. White tee, black shoes.","hair":"tousle","brows":"set","mouth":"flat","lid":3,"look":0,"tee":"#f6f4ee","teeD":"#d6d2c8","pose":"down","shoes":"dress"},
+ {"name":"Pushed forward, side-eye","note":"Front pushed forward and across. Eyes cut to the side, small smirk. Cream tee, white sneakers.","hair":"forward","brows":"sly","mouth":"smirk","lid":3.4,"look":1.9,"tee":"#fff1d6","teeD":"#e6d2aa","pose":"down","shoes":"sneaker"},
+ {"name":"Choppy, one brow up","note":"Low tufts every which way. One brow cocked, mouth pursed to the side. Pale blue tee, sling bag.","hair":"choppy","brows":"cocked","mouth":"purse","lid":2.6,"look":-1.2,"tee":"#dcecf5","teeD":"#b9d3e2","pose":"down","shoes":"sneaker","bag":"sling"},
+ {"name":"Forward sweep, on a mission","note":"A bold sweep over the brow. Hard squint, lips pressed, leaning into his stride. Mint tee, black shoes.","hair":"sweep","brows":"hard","mouth":"set","lid":3.8,"squint":2,"look":0.8,"lean":3,"tee":"#dff3e6","teeD":"#b8dcc6","pose":"down","shoes":"dress"}
 ]

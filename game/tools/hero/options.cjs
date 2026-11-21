@@ -5,33 +5,41 @@ const INK = '#1d2228', SKIN = '#f3cfab', SKIN_D = '#e2ae85', HAIR = '#17181c', H
 // A textured crop: the cap sits close to the skull, tapered paler at the sides, and the top is cut into many short
 // uneven spikes. Each spike is [x, height above the cap, lean]; the cap's own curve gives the base.
 const capY = x => 30.4 + ((x - 40) / 21) ** 2 * 9;
-const spikes = list => { let d = `M${list[0][0] - 2.6} ${capY(list[0][0] - 2.6) + 3}`; list.forEach(([x, h, lean = 0], i) => { const w = i < list.length - 1 ? (list[i + 1][0] - x) / 2 : 2.6; d += `L${x + lean} ${(capY(x) - h).toFixed(1)}L${x + w} ${(capY(x + w) + 1.2).toFixed(1)}`; }); return d + `L${list[list.length - 1][0] + 3} ${capY(list[list.length - 1][0] + 3) + 4}Z`; };
-const lights = list => list.filter((_, i) => i % 2 === 1).map(([x, h, lean = 0]) => `M${x + lean} ${(capY(x) - h + 1.6).toFixed(1)}L${x + 2.2} ${(capY(x) + 2.4).toFixed(1)}L${x - .6} ${(capY(x) + 2.6).toFixed(1)}Z`).join('');
-const mk = (list, fringe) => ({ top: spikes(list), lights: lights(list), fringe });
+// A textured crop cut into uneven tufts. Each tuft is a soft wedge: [x, width, height, lean]. Top tufts stand on the
+// cap and go up or tip forward and sideways by different amounts; fringe tufts fall forward over the hairline, each a
+// different length. No two neighbours match, so it reads as texture and not as a row of spikes.
+const tuft = (x, w, h, lean) => { const y0 = capY(x - w / 2) + 2.4, y1 = capY(x + w / 2) + 2.4, tx = x + lean, ty = capY(x) - h; return `M${(x - w / 2).toFixed(1)} ${y0.toFixed(1)}Q${(x - w * .3 + lean * .5).toFixed(1)} ${(ty + h * .45).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)}Q${(x + w * .42 + lean * .4).toFixed(1)} ${(ty + h * .5).toFixed(1)} ${(x + w / 2).toFixed(1)} ${y1.toFixed(1)}Z`; };
+const lock = (x, w, len, lean) => `M${(x - w / 2).toFixed(1)} 40.6Q${(x - w * .2 + lean * .4).toFixed(1)} ${(41 + len * .7).toFixed(1)} ${(x + lean).toFixed(1)} ${(41.6 + len).toFixed(1)}Q${(x + w * .45 + lean * .3).toFixed(1)} ${(41 + len * .5).toFixed(1)} ${(x + w / 2).toFixed(1)} 40.6Z`;
+const mk = (tufts, locks) => ({ top: tufts.map(t => tuft(...t)).join(''), fringe: locks.map(l => lock(...l)).join(''), lights: tufts.filter((_, i) => i % 3 === 1).map(([x, w, h, lean]) => tuft(x + w * .12, w * .34, h * .72, lean * .8)).join('') });
 const HAIRS = {
-  // even, short, straight up
-  crop: mk([[20, 3, 0], [25.7, 6, -0.6], [31.4, 7.6, 0.5], [37.1, 9, -0.4], [42.9, 8.2, 0.6], [48.6, 9.2, -0.5], [54.3, 6.6, 0.5], [60, 3.4, 0]], 'M22.4 42L25.6 44.6L29 41.6L33 45L37 41.6L41 44.8L45 41.6L49 44.6L53 41.6L56 44L57.6 42Z'),
-  // lifted at the front right, falling away to the back: a textured quiff
-  quiff: mk([[20, 2.6, 1], [25.7, 4.6, 1.4], [31.4, 6.4, 1.7], [37.1, 8.4, 2], [42.9, 10.6, 2.3], [48.6, 12.4, 2.6], [54.3, 10, 2.6], [60, 4.6, 1.6]], 'M22 42Q30 38.6 42 38.4Q52 38.4 58 42Q50 40.4 42 40.6Q31 40.8 22 42Z'),
-  // short all over with a choppy fringe pushed forward onto the forehead
-  fringe: mk([[20, 3, 0], [25.7, 5.4, -0.9], [31.4, 6.8, 0.6], [37.1, 5.8, -0.6], [42.9, 7.6, 0.8], [48.6, 6, -0.5], [54.3, 6.6, 0.7], [60, 3, 0]], 'M21.6 42L24 47.6L27.4 43L30.6 48.6L34.4 43.4L38 48L41.6 43.2L45 47L48.6 42.8L52 45.6L55.4 42.6L58.4 42Z'),
-  // every spike leaning the same way, as if brushed across and up
-  brushed: mk([[20, 3, 1.6], [25.7, 6, 2.2], [31.4, 8, 2.6], [37.1, 9.2, 3], [42.9, 9.6, 3.2], [48.6, 9, 3.2], [54.3, 7.2, 2.8], [60, 3.6, 1.6]], 'M22 42L27 40L33 43.4L39 40.2L45 43L51 40.4L58 42Q40 38.6 22 42Z'),
+  // mostly up, a couple tipping forward-right
+  tousle: mk([[21, 6, 2.6, -1], [26, 7, 5.4, .6], [31.5, 6, 3.6, -1.4], [36, 8, 7, 1.2], [42, 6.4, 4.6, -.6], [47, 8, 6.6, 2.6], [53, 6.4, 3.8, .4], [58.5, 6, 3, 1.8]], [[27, 6, 2.6, -.8], [34, 7, 5.6, 1.4], [41, 5.6, 2.2, -.4], [47, 7, 4.4, 1.8], [54, 5.4, 2, .6]]),
+  // the front pushed forward and to one side, the crown left to stand
+  forward: mk([[21, 6, 2.4, .8], [26.5, 7.4, 4.2, 2.2], [32.5, 7, 6.4, 3], [38.5, 7, 4.4, 1.4], [44, 7.6, 7.2, 3.4], [50, 6.6, 4.8, 2.4], [55.5, 6.4, 5.6, 3.2], [60, 5, 2.6, 1.6]], [[26, 6.4, 3.4, 1.6], [32.5, 7, 6.6, 2.6], [39.5, 6.6, 4.2, 2], [46, 7, 7, 3], [52.5, 6, 3.4, 1.8]]),
+  // short and choppy: low tufts every which way
+  choppy: mk([[21, 5.6, 2.2, -1.2], [25.5, 6, 4, 1], [30.5, 6.4, 3, -1.6], [35.5, 6.6, 5, .4], [40.5, 6, 3.2, 1.8], [45.5, 6.6, 5.2, -1], [50.5, 6, 3.4, 2.2], [55.5, 6, 4.4, -.6], [60, 5, 2.4, 1.4]], [[25.5, 5.4, 3.6, -1], [31, 6, 2, .8], [37, 6, 4.8, -.6], [43.5, 6, 2.6, 1.2], [49.5, 6, 4.2, .4], [55, 5, 2.2, -.8]]),
+  // one bold forward sweep across the brow, a few strays standing behind it
+  sweep: mk([[21.5, 6.4, 2.6, 1], [27, 7, 3.6, -1], [33, 7.6, 5.8, 1.6], [39.5, 6.4, 3.4, -1.2], [45, 7.4, 6.2, 1], [51.5, 7, 4, 2.4], [57.5, 6.4, 3.2, .6]], [[28, 8, 4.4, 3.4], [36, 9, 6.8, 4.2], [45, 8, 5, 3.4], [53, 6, 2.6, 2]]),
 };
-const eye = (cx, cy, look = 0) => `<g transform="translate(${cx} ${cy}) scale(.84) translate(${-cx} ${-cy})"><ellipse cx="${cx}" cy="${cy}" rx="6.2" ry="7.2" fill="#fff"/><ellipse cx="${cx + look}" cy="${cy + .6}" rx="4.3" ry="5.6" fill="#5a3a24"/><ellipse cx="${cx + look}" cy="${cy + 1}" rx="2.4" ry="3.3" fill="#1f1611"/><circle cx="${cx + look - 1.6}" cy="${cy - 2}" r="1.9" fill="#fff"/><circle cx="${cx + look + 1.7}" cy="${cy + 2.6}" r=".9" fill="#fff"/><path d="M${cx - 7} ${cy - 3.4}Q${cx} ${cy - 9.6} ${cx + 7} ${cy - 3.4}" fill="none" stroke="${INK}" stroke-width="2.8" stroke-linecap="round"/></g>`;
-const BROWS = { up: 'M24.5 45.4Q30.5 41.6 36.5 44.6M43.5 44.6Q49.5 41.6 55.5 45.4', keen: 'M24.5 43.2Q31 43 36.8 46M43.2 46Q49 43 55.5 43.2', cocked: 'M24.5 45.6Q30.5 42.4 36.5 45M43.5 43.6Q50 40 55.8 43.6' };
+// A narrowed eye: `inner` is the side the nose is on (1 or -1). The upper lid slants down toward the nose, heavier by
+// `lid`; the lower lid rises by `squint`. `look` slides the iris sideways for a glance.
+const eye = (cx, cy, inner, o) => { const lid = o.lid ?? 3, sq = o.squint ?? 1.2, look = o.look ?? 0, yo = cy - 4.6 + lid * .3, yi = cy - 4.6 + lid; return `<g transform="translate(${cx} ${cy}) scale(.78) translate(${-cx} ${-cy})"><ellipse cx="${cx}" cy="${cy}" rx="6.4" ry="6.6" fill="#fff"/><ellipse cx="${cx + look}" cy="${cy + .8}" rx="3.9" ry="4.9" fill="#4a3020"/><ellipse cx="${cx + look}" cy="${cy + 1}" rx="2.1" ry="2.8" fill="#1f1611"/><circle cx="${cx + look - 1.3}" cy="${cy - .4}" r="1.1" fill="#fff"/><path d="M${cx - 8} ${cy - 9}H${cx + 8}V${inner > 0 ? yi : yo}L${cx - 8} ${inner > 0 ? yo : yi}Z" fill="${SKIN}"/><path d="M${cx - 8} ${cy + 9}H${cx + 8}V${cy + 6.4 - sq}Q${cx} ${cy + 7.6 - sq} ${cx - 8} ${cy + 6.4 - sq}Z" fill="${SKIN}"/><path d="M${cx - 7} ${inner > 0 ? yo : yi}L${cx + 7} ${inner > 0 ? yi : yo}" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M${cx - 5} ${cy + 6.2 - sq}Q${cx} ${cy + 7.2 - sq} ${cx + 5} ${cy + 6.2 - sq}" fill="none" stroke="${SKIN_D}" stroke-width="1.4" stroke-linecap="round"/></g>`; };
+// Brows drawn low and heavy, driving toward the nose: a man with a plan.
+const BROWS = { set: 'M23.6 45.2L36.6 48.8M56.4 45.2L43.4 48.8', cocked: 'M23.6 46.2L36.6 49M56.6 42.6Q50 42.4 43.6 46.6', hard: 'M24.4 44.6L36.8 49.2M55.6 44.6L43.2 49.2', sly: 'M23.6 46.4L36.6 48.4M56.4 44L43.4 48.6' };
+const M = '#8c4a38';
 const MOUTHS = {
-  grin: '<path d="M32.5 66Q40 68 47.5 66Q46.4 75.4 40 75.4Q33.6 75.4 32.5 66Z" fill="#7a2b22"/><path d="M33.6 66.5Q40 68.2 46.4 66.5L45.9 69.2Q40 70.4 34.1 69.2Z" fill="#fff"/><ellipse cx="40" cy="73.4" rx="3.3" ry="1.6" fill="#e2776a"/>',
-  smile: '<path d="M33 66.6Q40 73.6 47 66.6" fill="none" stroke="#8c4a38" stroke-width="2" stroke-linecap="round"/><path d="M33.6 67.2Q40 72.4 46.4 67.2Q40 69.6 33.6 67.2Z" fill="#fff"/>',
-  smirk: '<path d="M34 68.4Q41.5 72.4 47.4 65.6" fill="none" stroke="#8c4a38" stroke-width="2.1" stroke-linecap="round"/><path d="M46.4 64.2Q48.6 65.2 48 67.4" fill="none" stroke="#8c4a38" stroke-width="1.4" stroke-linecap="round"/>',
-  cheer: '<path d="M33 65.4Q40 66.4 47 65.4Q47 76.6 40 76.6Q33 76.6 33 65.4Z" fill="#7a2b22"/><path d="M34 65.9Q40 66.8 46 65.9L45.8 68.4Q40 69.2 34.2 68.4Z" fill="#fff"/><ellipse cx="40" cy="74.2" rx="3.6" ry="1.9" fill="#e2776a"/>',
+  flat: `<path d="M35 69.6H45.4" fill="none" stroke="${M}" stroke-width="2.1" stroke-linecap="round"/>`,
+  smirk: `<path d="M35 69.8Q41 70.8 46.4 67.6" fill="none" stroke="${M}" stroke-width="2.1" stroke-linecap="round"/><path d="M45.6 66.2Q47.8 67 47.4 69" fill="none" stroke="${M}" stroke-width="1.3" stroke-linecap="round"/>`,
+  purse: `<path d="M39 69.4Q42.6 70.6 46.4 68.8" fill="none" stroke="${M}" stroke-width="2.2" stroke-linecap="round"/><path d="M36.4 70.2L38 69.2" fill="none" stroke="${M}" stroke-width="1.3" stroke-linecap="round"/>`,
+  // lips pressed together, one corner just lifting: he knows something you do not
+  set: `<path d="M35.6 69.8Q40 68.8 44.4 69.6Q45.8 69.4 46.8 68.2" fill="none" stroke="${M}" stroke-width="2.1" stroke-linecap="round"/><path d="M38 72.4H42.4" fill="none" stroke="${SKIN_D}" stroke-width="1.2" stroke-linecap="round"/>`,
 };
 function draw(o) {
   const h = HAIRS[o.hair], tee = o.tee, teeD = o.teeD;
   const armDown = (m) => `<path d="${m ? 'M59 82Q67 89 67 102Q66 106 62 105L56 92Z' : 'M21 82Q13 89 13 102Q14 106 18 105L24 92Z'}" fill="${m ? SUIT_L : SUIT_D}"/><path d="${m ? 'M57.6 101.6Q62 104.6 66.6 102.6L66.2 105Q62.4 107 58 104.6Z' : 'M13.4 102.6Q18 104.6 22.4 101.6L22 104.6Q17.6 107 13.8 105Z'}" fill="${tee}"/><circle cx="${m ? 63.6 : 16.4}" cy="107.6" r="4.7" fill="${m ? SKIN : SKIN_D}"/>`;
   const armUp = `<path d="M55.5 84L65 64.5Q69.4 62.4 71.4 66.6L63 92Z" fill="${SUIT_L}"/><path d="M64 66.2Q67.6 63.4 71.6 65.6L71.4 68Q68 66.4 65 68.4Z" fill="${tee}"/>${o.pose === 'fist' ? `<circle cx="69" cy="60.6" r="5.4" fill="${SKIN}"/><path d="M65.6 58.6H72.4M65.4 61H72.6" stroke="${SKIN_D}" stroke-width="1" stroke-linecap="round"/>` : `<circle cx="69.4" cy="60.4" r="5" fill="${SKIN}"/><path d="M66 57L64.8 51.6M68.6 55.8L68.6 50M71.4 56.2L72.6 50.8M73.6 58.6L76.4 54.6" stroke="${SKIN}" stroke-width="2.6" stroke-linecap="round"/>`}`;
   const shoe = (x) => o.shoes === 'sneaker' ? `<path d="M${x} 131Q${x} 127.6 ${x + 4} 127.6H${x + 11}Q${x + 15} 127.6 ${x + 15} 131V134H${x}Z" fill="#f6f4ee"/><rect x="${x}" y="133" width="15" height="2.6" rx="1.2" fill="#c9c5ba"/><path d="M${x + 4} 129.6H${x + 10}" stroke="#c9c5ba" stroke-width="1.2"/>` : `<path d="M${x} 131Q${x} 127.6 ${x + 4} 127.6H${x + 11}Q${x + 15} 127.6 ${x + 15} 131V135H${x}Z" fill="#17181c"/><path d="M${x + 2} 129.6H${x + 12}" stroke="#3a3e46" stroke-width="1.4" stroke-linecap="round"/>`;
-  return `<g filter="url(#rim)">
+  return `<g filter="url(#rim)" transform="rotate(${o.lean ?? 0} 40 134)">
   <rect x="29.5" y="110" width="10.5" height="20" fill="${SUIT_D}"/><rect x="40.5" y="110" width="10.5" height="20" fill="${SUIT}"/>${shoe(26)}${shoe(40)}
   ${armDown(false)}
   <rect x="35" y="72" width="10" height="9" fill="${SKIN_D}"/>
@@ -48,8 +56,8 @@ function draw(o) {
   <ellipse cx="18" cy="57" rx="4.4" ry="6" fill="${SKIN}"/><ellipse cx="62" cy="57" rx="4.4" ry="6" fill="${SKIN}"/><path d="M19 54Q16.5 57 19 60M61 54Q63.5 57 61 60" fill="none" stroke="${SKIN_D}" stroke-width="1.3" stroke-linecap="round"/>
   <path d="M19 52Q19 34 40 34Q61 34 61 52Q61 66 52 73Q46 77 40 77Q34 77 28 73Q19 66 19 52Z" fill="${SKIN}"/>
   ${o.blush ? '<ellipse cx="25.4" cy="64" rx="3.6" ry="2.2" fill="#f19a86" opacity=".7"/><ellipse cx="54.6" cy="64" rx="3.6" ry="2.2" fill="#f19a86" opacity=".7"/>' : ''}
-  ${eye(31, 56, o.look ?? .5)}${eye(49.6, 56, o.look ?? .5)}
-  <path d="${BROWS[o.brows]}" fill="none" stroke="${HAIR}" stroke-width="2.3" stroke-linecap="round"/>
+  ${eye(31, 56.4, 1, o)}${eye(49.6, 56.4, -1, o)}
+  <path d="${BROWS[o.brows]}" fill="none" stroke="${HAIR}" stroke-width="2.7" stroke-linecap="round"/>
   <path d="M42.4 61.6Q43.5 63.8 42 64.8" fill="none" stroke="${SKIN_D}" stroke-width="1.3" stroke-linecap="round"/>
   ${MOUTHS[o.mouth]}
   <path d="M16.8 55Q14.8 38 25 32.4Q40 26.6 55 32.4Q65.2 38 63.2 55L60.4 55Q60.8 47 57.6 42L22.4 42Q19.2 47 19.6 55Z" fill="${HAIR}"/><path d="M16.8 55Q16 47 18.4 42L21.4 44Q19.4 48 19.6 55Z M63.2 55Q64 47 61.6 42L58.6 44Q60.6 48 60.4 55Z" fill="#33373f"/>
