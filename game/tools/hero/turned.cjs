@@ -4,19 +4,25 @@ const { chromium } = require('playwright');
 const INK = '#1d2228', SKIN = '#f3cfab', SKIN_D = '#e2ae85', HAIR = '#17181c', HAIR_L = '#3d4350', SUIT = '#22242a', SUIT_L = '#3a3d46', SUIT_D = '#131418', M = '#8c4a38';
 const capY = x => 30.2 + ((x - 39) / 22) ** 2 * 9;
 const tuft = (x, w, h, lean) => { const y0 = capY(x - w / 2) + 2.4, y1 = capY(x + w / 2) + 2.4, tx = x + lean, ty = capY(x) - h; return `M${(x - w / 2).toFixed(1)} ${y0.toFixed(1)}Q${(x - w * .3 + lean * .5).toFixed(1)} ${(ty + h * .45).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)}Q${(x + w * .42 + lean * .4).toFixed(1)} ${(ty + h * .5).toFixed(1)} ${(x + w / 2).toFixed(1)} ${y1.toFixed(1)}Z`; };
-const lock = (x, w, len, lean) => `M${(x - w / 2).toFixed(1)} 40.4Q${(x - w * .2 + lean * .4).toFixed(1)} ${(41 + len * .7).toFixed(1)} ${(x + lean).toFixed(1)} ${(41.6 + len).toFixed(1)}Q${(x + w * .45 + lean * .3).toFixed(1)} ${(41 + len * .5).toFixed(1)} ${(x + w / 2).toFixed(1)} 40.4Z`;
-// Three cuts of the same tousled crop, seen from the side-front. Tufts are [x, width, height, lean]; locks fall over
-// the brow as [x, width, length, lean]. Toward the back they stand up; toward the brow they tip forward.
+const lock = (x, w, len, lean, up = 0) => `M${(x - w / 2).toFixed(1)} ${40.2 - up}Q${(x - w * .2 + lean * .4).toFixed(1)} ${(41 - up + len * .7).toFixed(1)} ${(x + lean).toFixed(1)} ${(41.6 - up + len).toFixed(1)}Q${(x + w * .45 + lean * .3).toFixed(1)} ${(41 - up + len * .5).toFixed(1)} ${(x + w / 2).toFixed(1)} ${40.2 - up}Z`;
+// Six cuts in one style: the same black paper, the same soft-wedge tufts, the same paler taper at the side. What
+// changes is the outline. Tufts are [x, width, height, lean] standing on the skull's cap; locks are
+// [x, width, length, lean] falling over the brow. `fade` is how high the pale taper climbs the side of the head (a
+// smaller number is higher), `brow` lifts the hairline off the forehead, and `extra` is anything only that cut has.
 const HAIRS = {
-  tousle: { tufts: [[18.5, 6, 2.2, -1.6], [23.5, 7, 4.4, -.8], [29, 6.4, 3.2, -1.4], [34.5, 7.6, 6.4, .6], [40.5, 6.6, 4.2, -.2], [46, 7.6, 6.8, 2.6], [52, 6.6, 4.8, 2.2], [57.4, 6, 3.6, 3]], locks: [[39, 6, 2.4, .8], [45, 7, 5, 2], [51.4, 6, 3, 1.6], [56.6, 5.4, 4.2, 2.2]] },
-  forward: { tufts: [[18.5, 6, 2, -1.2], [23.5, 6.6, 3.4, -.4], [29, 6.6, 4.4, .8], [34.5, 7, 5.2, 1.8], [40.5, 7, 6.2, 2.6], [46.5, 7.6, 7.2, 3.6], [52.6, 7, 6, 4], [58, 6, 4.4, 4.2]], locks: [[36.6, 6, 3, 1.6], [42.6, 7, 5.6, 2.8], [49, 7, 7, 3.4], [55.4, 6, 5, 3]] },
-  // short and choppy: low tufts leaning both ways, a ragged edge over the brow
-  choppy: { tufts: [[18.5, 5.6, 2, -1.4], [23, 6, 3.6, .8], [28, 6.2, 2.6, -1.6], [33, 6.6, 4.4, .6], [38.4, 6, 3, 1.8], [43.6, 6.6, 4.8, -.8], [49, 6.2, 3.4, 2.2], [54, 6, 4.2, 1], [58.6, 5.4, 2.6, 2.6]], locks: [[37, 5, 3.2, -.6], [42, 5.6, 1.8, 1], [47.4, 5.6, 4.2, .6], [52.6, 5.4, 2.4, 1.6], [57, 4.6, 3.6, 1.4]] },
-  // one bold sweep of fringe across the brow, the top left low behind it
-  sweep: { tufts: [[18.5, 6, 2, -1], [23.6, 6.6, 3, -.6], [29.4, 7, 3.8, .6], [35.4, 7.4, 4.6, 1.6], [41.6, 7.4, 5.4, 2.4], [47.8, 7.4, 5, 3], [53.6, 6.6, 4, 3.2], [58.4, 5.6, 2.8, 3]], locks: [[36.4, 7.6, 4.6, 3.6], [43.6, 8.4, 7.4, 4.6], [51, 7.6, 6, 4], [57, 5.6, 3.4, 2.6]] },
-  crown: { tufts: [[19, 5.6, 1.6, -1], [24, 6.4, 3.4, -1.2], [29.6, 6.6, 5.6, -.4], [35.4, 7.4, 7.6, .6], [41.6, 7, 8.2, 1.2], [47.6, 7, 6.4, 2.4], [53, 6.4, 4.4, 2.6], [58, 5.6, 2.8, 2.6]], locks: [[42, 6, 2.2, 1], [48.4, 6.4, 3.6, 2], [54.6, 5.6, 2.6, 1.8]], fade: true },
+  // medium all over, a mix of up and forward
+  tousle: { tufts: [[18.5, 6, 2.2, -1.6], [23.5, 7, 4.4, -.8], [29, 6.4, 3.2, -1.4], [34.5, 7.6, 6.4, .6], [40.5, 6.6, 4.2, -.2], [46, 7.6, 6.8, 2.6], [52, 6.6, 4.8, 2.2], [57.4, 6, 3.6, 3]], locks: [[39, 6, 2.4, .8], [45, 7, 5, 2], [51.4, 6, 3, 1.6], [56.6, 5.4, 4.2, 2.2]], fade: 50 },
+  // a quiff: low at the back, climbing to a tall front that stands off a bare forehead
+  quiff: { tufts: [[19, 7, 1.2, -.6], [25, 8, 2.2, .2], [31.6, 9, 4, 1.2], [38.6, 10, 6.6, 2.2], [46, 11, 9.4, 3], [53.4, 11, 11, 3.2], [59, 8, 8.4, 2.4]], locks: [], fade: 46, brow: 2.4 },
+  // a faux hawk: clipped pale sides and one tall ridge of tufts along the middle
+  hawk: { tufts: [[19, 5.6, .8, 0], [24, 7, 2.2, .4], [30, 9, 5.6, .8], [37, 10.6, 9.4, 1], [44.4, 10.6, 10.4, 1.6], [51, 9, 6.6, 2], [56.8, 6.6, 2.8, 1.6]], locks: [[50, 5, 1.6, 1]], fade: 40, brow: 1.6 },
+  // a clipped crop: barely off the skull, the taper high, the edge over the brow cut ragged
+  clipped: { tufts: [[19, 5, .6, 0], [23.4, 5.4, 1.2, .4], [28, 5.4, .8, -.4], [32.8, 5.6, 1.6, .5], [37.8, 5.6, 1, -.3], [42.8, 5.6, 1.8, .6], [47.8, 5.6, 1.2, .4], [52.8, 5.4, 1.6, .8], [57.6, 5, .8, .6]], locks: [[38, 4, 1.4, 0], [42.6, 4, .8, .4], [47, 4, 1.6, .4], [51.4, 4, 1, .6], [55.6, 4, 1.4, .6]], fade: 42 },
+  // a heavy fringe: flat on top, long locks down to the brows
+  fringe: { tufts: [[19, 6, 1.6, -.8], [24.4, 7, 2.6, -.4], [30.6, 7.6, 3, .4], [37, 7.6, 2.6, 1], [43.4, 7.6, 3.2, 1.6], [49.6, 7.4, 2.6, 2], [55.4, 6.6, 2, 2.2]], locks: [[34.6, 6.4, 4.6, .6], [40.4, 7.4, 6.6, 1.6], [47.2, 7.6, 5.6, 2.2], [53.6, 6.6, 6.8, 2], [58.4, 4.6, 4.4, 1.2]], fade: 52 },
+  // brushed back: the forehead bare, every tuft raked toward the back, flicking out behind his head
+  back: { tufts: [[19.4, 6.6, 6, -4.4], [25, 7.4, 6.6, -4], [31, 7.6, 6, -3.8], [37, 7.6, 5.2, -3.6], [43, 7.4, 4.6, -3.4], [49, 7, 3.8, -3], [54.6, 6.4, 2.8, -2.6], [59, 5, 1.6, -1.6]], locks: [], fade: 48, brow: 2.8, extra: 'M17.4 49L10.6 46.4L16.4 43.6Z M17.2 55.6L11 55.2L16.2 50.6Z' },
 };
-// The same sure smile, carried further toward the middle of the face, in three cuts.
 const tick = (x0, y0, x1, y1) => `<path d="M${x0 - 1} ${y0 - 1.4}L${x0 + .2} ${y0 + .4}M${x1 + 1} ${y1 - 1.4}L${x1 - .2} ${y1 + .2}" fill="none" stroke="${M}" stroke-width="1.3" stroke-linecap="round"/>`;
 const smile = d => `<path d="${d}" fill="none" stroke="${M}" stroke-width="2.2" stroke-linecap="round"/>`;
 // The original smile was 12 wide (43.6 to 55.8). These keep that width, give or take two units, moved toward the
@@ -37,7 +43,7 @@ const eye = (cx, cy, inner, sxk, lid = 1.8, sq = .6) => { const yo = cy - 4.6 + 
 // hangs with a closed fist. It is always his RIGHT hand: facing right that is the near arm, and facing left (the same
 // drawing mirrored) it is the far one, so figure() swaps the arms rather than only flipping the sheet.
 function draw34(o = {}) {
-  const tee = o.tee ?? '#f6f4ee', teeD = o.teeD ?? '#d6d2c8', far = o.far ?? .62, h = HAIRS[o.hair ?? 'tousle'], pocket = o.pocket ?? 'near';
+  const tee = o.tee ?? '#f6f4ee', teeD = o.teeD ?? '#d6d2c8', far = o.far ?? .62, h = HAIRS[o.hair ?? 'tousle'], up = h.brow ?? 0, pocket = o.pocket ?? 'near';
   const shoe = (x, c) => `<path d="M${x} 131Q${x} 127.6 ${x + 4} 127.6H${x + 10}Q${x + 17} 128 ${x + 18} 132.4V135H${x}Z" fill="${c}"/><path d="M${x + 4} 129.8H${x + 13}" stroke="#3a3e46" stroke-width="1.4" stroke-linecap="round"/>`;
   const farArm = pocket === 'far'
     ? `<path d="M53.6 84Q62.8 89.6 61 99.6L56 104.6L54.6 96Z" fill="${SUIT_D}"/>`
@@ -65,10 +71,10 @@ function draw34(o = {}) {
   ${eye(40.6, 56.4, 1, 1)}${eye(55.6, 56.4, -1, far)}
   <path d="M32.4 45.2L46.6 48.8M60.6 45.6L52.8 48.4" fill="none" stroke="${HAIR}" stroke-width="2.7" stroke-linecap="round"/>
   ${MOUTHS[o.mouth ?? 'near']}
-  <path d="M17 59.6Q13.6 39 25.8 31.4Q41 25 54.6 30.8Q63 35.4 62.2 44.6L59 42.2Q50.6 39.8 41 40.6Q34 41.4 32.6 48.2L32 52.6Q27 50.4 24 53.6Q22.6 57.6 22.8 62L18.6 62.4Z" fill="${HAIR}"/>
-  <path d="M17 59.6Q16 53 17.8 48L${h.fade ? 24 : 20.8} ${h.fade ? 48.6 : 50.4}Q${h.fade ? 22.4 : 20.4} 54 22.8 62L18.6 62.4Z" fill="#33373f"/><path d="M32 52.6Q31.4 56.4 32.2 59.6L33.8 53.4Z" fill="${HAIR}"/>
-  <path d="${h.tufts.map(t => tuft(...t)).join('')}" fill="${HAIR}"/><path d="${h.locks.map(l => lock(...l)).join('')}" fill="${HAIR}"/>
-  <path d="${h.tufts.filter((_, i) => i % 3 === 1).map(([x, w, hh, l]) => tuft(x + w * .12, w * .34, hh * .72, l * .8)).join('')}" fill="${HAIR_L}"/>
+  <path d="M17 59.6Q13.6 39 25.8 31.4Q41 25 54.6 30.8Q63 35.4 62.2 ${44.6 - up}L59 ${42.2 - up}Q50.6 ${39.8 - up} 41 ${40.6 - up}Q34 ${41.4 - up} 32.6 48.2L32 52.6Q27 50.4 24 53.6Q22.6 57.6 22.8 62L18.6 62.4Z" fill="${HAIR}"/>
+  <path d="M17 59.6Q15.4 ${h.fade + 4} ${h.fade < 46 ? 19.6 : 17.8} ${h.fade}L${h.fade < 46 ? 31 : 21.4} ${h.fade + (h.fade < 46 ? 2 : 2.4)}Q${h.fade < 46 ? 31.6 : 20.6} 50 32 52.6Q27 50.4 24 53.6Q22.6 57.6 22.8 62L18.6 62.4Z" fill="#33373f"/><path d="M32 52.6Q31.4 56.4 32.2 59.6L33.8 53.4Z" fill="${h.fade < 46 ? '#33373f' : HAIR}"/>
+  <path d="${h.tufts.map(t => tuft(...t)).join('')}${h.extra ?? ''}" fill="${HAIR}"/><path d="${h.locks.map(l => lock(...l, up)).join('')}" fill="${HAIR}"/>
+  <path d="${h.tufts.filter((t, i) => i % 3 === 1 && t[2] > 1.4).map(([x, w, hh, l]) => tuft(x + w * .12, w * .34, hh * .72, l * .8)).join('')}" fill="${HAIR_L}"/>
   </g>`;
 }
 // The figure as the game shows it: facing right as drawn, or facing left as the mirror with the arms swapped, so the
@@ -76,8 +82,8 @@ function draw34(o = {}) {
 const figure = (o, facing = 1) => facing > 0 ? draw34({ ...o, pocket: 'near' }) : `<g transform="translate(80 0) scale(-1 1)">${draw34({ ...o, pocket: 'far' })}</g>`;
 module.exports = { draw34, figure };
 if (require.main === module) {
-  const V = [{ name: 'Tousled', note: 'Back tufts up, brow tufts tipping forward. The cut he has had so far.', o: { hair: 'tousle' } }, { name: 'Brushed forward', note: 'Tufts build in height toward the brow, all leaning the way he walks.', o: { hair: 'forward' } }, { name: 'Tall crown', note: 'Faded sides, the height in the middle, a short fringe.', o: { hair: 'crown' } }, { name: 'Choppy', note: 'Shortest of the five: low tufts leaning both ways, a ragged edge over the brow.', o: { hair: 'choppy' } }, { name: 'Fringe sweep', note: 'A bold sweep of fringe over the brow, the top kept low behind it.', o: { hair: 'sweep' } }];
+  const V = [{ name: 'Tousled', note: 'Medium all over, a mix of up and forward. The cut so far.', o: { hair: 'tousle' } }, { name: 'Quiff', note: 'Low at the back, climbing to a tall front off a bare forehead.', o: { hair: 'quiff' } }, { name: 'Faux hawk', note: 'Clipped pale sides, one tall ridge down the middle.', o: { hair: 'hawk' } }, { name: 'Clipped', note: 'Barely off the skull, high taper, ragged edge over the brow.', o: { hair: 'clipped' } }, { name: 'Heavy fringe', note: 'Flat on top, long locks down to the brows.', o: { hair: 'fringe' } }, { name: 'Brushed back', note: 'Bare forehead, every tuft raked back, flicking out behind.', o: { hair: 'back' } }];
   const fig = (o, w, h, bg, facing, vb = '-10 2 100 140') => `<svg viewBox="${vb}" width="${w}" height="${h}"><rect x="-10" y="2" width="100" height="140" fill="${bg}"/><ellipse cx="${facing > 0 ? 44 : 36}" cy="136" rx="22" ry="4" fill="rgba(10,13,18,.22)"/>${figure({ mouth: 'near', ...o }, facing)}</svg>`;
-  const html = `<body style="margin:0;padding:24px;background:#14181d;color:#fff;font:500 15px/21px Fredoka,system-ui,sans-serif"><svg width="0" height="0" style="position:absolute"><filter id="rim" x="-20%" y="-20%" width="150%" height="150%"><feMorphology operator="dilate" radius="3" in="SourceAlpha" result="d"/><feFlood flood-color="#fffaf0"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></svg><h1 style="font-size:24px;margin:0 0 16px">${process.argv[3] ?? 'Haircut options'}</h1><div style="display:flex;gap:18px">${V.map((v, i) => `<figure style="margin:0;width:300px">${fig(v.o, 300, 250, '#e9dfcc', 1, '8 12 66 55')}<div style="display:flex;gap:4px;margin-top:4px">${fig(v.o, 184, 258, '#e9dfcc', 1)}<div style="display:grid;gap:4px">${fig(v.o, 90, 127, '#dba38b', 1)}${fig(v.o, 90, 127, '#e9edf1', -1)}</div></div><div style="margin-top:8px"><b style="font-size:17px">${i + 1} · ${v.name}</b><br><span style="color:#aab2bd;font-size:13.5px;line-height:18px;display:block">${v.note}</span></div></figure>`).join('')}</div></body>`;
-  (async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 5 * 318 + 48, height: 400 }, deviceScaleFactor: 2 }); await p.setContent(html); await p.waitForTimeout(300); await p.screenshot({ path: process.argv[2], fullPage: true }); await b.close(); })();
+  const html = `<body style="margin:0;padding:24px;background:#14181d;color:#fff;font:500 15px/21px Fredoka,system-ui,sans-serif"><svg width="0" height="0" style="position:absolute"><filter id="rim" x="-20%" y="-20%" width="150%" height="150%"><feMorphology operator="dilate" radius="3" in="SourceAlpha" result="d"/><feFlood flood-color="#fffaf0"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></svg><h1 style="font-size:24px;margin:0 0 16px">${process.argv[3] ?? 'Haircut options'}</h1><div style="display:flex;gap:18px">${V.map((v, i) => `<figure style="margin:0;width:300px">${fig(v.o, 300, 250, '#e9dfcc', 1, '6 8 66 55')}<div style="display:flex;gap:4px;margin-top:4px">${fig(v.o, 184, 258, '#e9dfcc', 1)}<div style="display:grid;gap:4px">${fig(v.o, 90, 127, '#dba38b', 1)}${fig(v.o, 90, 127, '#e9edf1', -1)}</div></div><div style="margin-top:8px"><b style="font-size:17px">${i + 1} · ${v.name}</b><br><span style="color:#aab2bd;font-size:13.5px;line-height:18px;display:block">${v.note}</span></div></figure>`).join('')}</div></body>`;
+  (async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 6 * 318 + 48, height: 400 }, deviceScaleFactor: 2 }); await p.setContent(html); await p.waitForTimeout(300); await p.screenshot({ path: process.argv[2], fullPage: true }); await b.close(); })();
 }
