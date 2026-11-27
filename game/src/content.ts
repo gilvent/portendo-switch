@@ -13,23 +13,28 @@ const STORE = { x0: -1100, x1: 1100, z0: -150, z1: 190 };
 const foot = (x: number, z: number, w: number) => ({ x0: x - w / 2, x1: x + w / 2, z0: z - 145, z1: z - 35 });
 const out = (): Stop => ({ id: 'way-out', label: 'Back to the MRT', x: -700, z: 120, reach: 100, action: { kind: 'road', to: 'mrt', stop: 'door' } });
 export const content: Content = validateContent({ worlds: {
-  // The handheld's screen (Platform.tsx): the station platform. The gate opens on A, which calls the train; boarding
-  // at its door docks the console. `gate` and `road-end` stand where Platform.tsx draws the gate and the door.
+  // The handheld's screen (Platform.tsx): the station platform. A taps the pass at the gate, which calls the train; the
+  // line map turns between the two lines, and the train's own sign takes the one it shows; boarding at the door docks
+  // the console. Each stop stands where Platform.tsx draws its thing.
   intro: { id: 'intro', art: 'blockout', bounds: { x0: -380, x1: 380, z0: 0, z1: 0 }, solid: [], title: 'Platform', path: 'round', color: '#8d95a0',
     stops: [{ id: 'gate', label: 'Ticket gate', x: -204, z: 0, reach: 56, action: { kind: 'toy', toy: 'gate', states: 2 } },
+      { id: 'map', label: 'Line map', x: 112, z: 0, reach: 62, action: { kind: 'toy', toy: 'map', states: 2 } },
       { id: 'road-end', label: 'Board the train', x: 310, z: 0, reach: 70, action: { kind: 'dock' } }], letters: [] },
-  // Home: the inside of an MRT car on its way. The sign over the door chooses the stop; the doors get off there.
+  // Home: the inside of an MRT car on its way (docs/MRT_DESIGN.md). The doors get off at the stop the sign shows; the
+  // line map turns the sign; the poster roll winds on; the help point is how to reach him.
   mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -320, x1: 480, lift: 210, liftTall: 130, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [{ x0: -470, x1: -420, z0: -80, z1: -28 }, { x0: 418, x1: 470, z0: -90, z1: -46 }], title: 'MRT', path: 'round', color: '#8d95a0',
     stops: [
       { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
         { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },
-      { id: 'poster', label: 'Poster', x: -260, z: -40, look: -240, mark: 300, action: { kind: 'letter', letter: 'hello' } },
+      { id: 'line-map', label: 'Line map', x: 250, z: -40, look: 275, mark: 300, action: { kind: 'toy', toy: 'line', states: 2 } },
+      { id: 'poster', label: 'Poster', x: -260, z: -40, look: -260, mark: 300, action: { kind: 'toy', toy: 'roll', states: 3 } },
       { id: 'help-point', label: 'Help point', x: -385, z: -30, look: -420, mark: 226, action: { kind: 'letter', letter: 'contact' } } ],
     letters: [
-      { id: 'hello', title: 'Hey there!', surface: 'note', blocks: [{ kind: 'heading', text: 'I am Alvaro.' }, { kind: 'heading', text: 'I develop Web Frontends.' }] },
       { id: 'contact', title: 'Get in touch', surface: 'note', blocks: [{ kind: 'links', items: [
         { label: 'Email', href: 'mailto:alvarolukmanto@gmail.com', icon: 'brand/gmail.png' }, { label: 'LinkedIn', href: 'https://linkedin.com/in/alvaro-lukmanto', icon: 'brand/linkedin.png' },
-        { label: 'Twitter', href: 'https://twitter.com/alfonsiusalvaro', icon: 'brand/twitter.png' }, { label: 'GitHub', href: 'https://github.com/gilvent', icon: 'brand/github.png' } ] }] } ] },
+        { label: 'Twitter', href: 'https://twitter.com/alfonsiusalvaro', icon: 'brand/twitter.png' }, { label: 'GitHub', href: 'https://github.com/gilvent', icon: 'brand/github.png' } ] }] } ],
+    // What the poster roll shows, one poster to a turn (Car.tsx prints them).
+    encoded: [{ fact: 'Hey there!', at: ['poster'] }, { fact: 'I am Alvaro.', at: ['poster'] }, { fact: 'I develop Web Frontends.', at: ['poster'] }] },
   blibli: { id: 'blibli', art: 'street', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -300, x1: 300 }, bounds: { x0: -700, x1: 620, z0: -30, z1: 180 },
     solid: [{ x0: -520, x1: -300, z0: -150, z1: 12 }, { x0: -310, x1: -128, z0: -150, z1: -8 }, { x0: -130, x1: -50, z0: -110, z1: -30 }],
     title: 'Blibli.com', path: 'store', url: 'https://blibli.com', role: 'Front-end Developer @', color: '#0092da', logo: 'brand/blibli-white.svg',

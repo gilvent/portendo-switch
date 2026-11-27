@@ -51,7 +51,7 @@ export function parsePath(c: Content, path: string): Place {
   if (seg[0] === 'round' && seg[1] && isPlayable(c, seg[1])) {
     const world = seg[1], s = seg[2] ? stopOf(c, world, seg[2]) : undefined;
     if (seg.length === 3 && s) return { k: 'walk', world, stop: s.id, near: true };
-    if (seg.length === 4 && s && seg[3] === 'read' && s.action.kind === 'letter') return { k: 'letter', world, stop: s.id };
+    if (seg.length === 4 && s && seg[3] === 'read') return s.action.kind === 'letter' ? { k: 'letter', world, stop: s.id } : { k: 'walk', world, stop: s.id, near: true };
   }
   return { k: 'lost', path };
 }
@@ -100,7 +100,9 @@ export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
       if (act.kind === 'toy') {
         const key = `${p.world}/${act.toy}`, id = `${p.world}/${p.stop}`;
         // The platform's gate is not one of the line's stamps: those start once he is on the train.
-        return [{ ...g, toys: { ...g.toys, [key]: ((g.toys[key] ?? 0) + 1) % act.states }, stamps: p.world === 'intro' || g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];
+        const to = ((g.toys[key] ?? 0) + 1) % act.states;
+        // The platform's line map and the train's sign are one choice: the train he boards is the one the map shows.
+        return [{ ...g, toys: { ...g.toys, [key]: to, ...(key === 'intro/map' ? { 'mrt/line': to } : null) }, stamps: p.world === 'intro' || g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];
       }
       return [g, null];
     }
