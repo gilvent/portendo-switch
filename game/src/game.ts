@@ -12,7 +12,9 @@ export type Action =
   | { a: 'arrive'; stop: string | null } | { a: 'confirm' } | { a: 'back' } | { a: 'map' }
   | { a: 'toggleController' } | { a: 'dockDone' } | { a: 'goto'; place: Spot }
   // Turn the destination sign over the train doors to the next (or previous) stop.
-  | { a: 'line'; step: 1 | -1 };
+  | { a: 'line'; step: 1 | -1 }
+  // A jump under a bump steps its toy. Standing in a zone holds its toy at 1; leaving lets it go.
+  | { a: 'bump'; id: string } | { a: 'zone'; id: string; on: boolean };
 export type Effect = { open: string } | null;
 
 const INTRO: Spot = { k: 'walk', world: 'intro', stop: 'road-end', near: false };
@@ -73,6 +75,14 @@ export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
     return [docked(g, { k: 'routeSheet', back }), null];
   }
   if (x.a === 'line') return [p.k === 'walk' ? turnLine(c, g, p.world, x.step) : g, null];
+  if (x.a === 'bump' || x.a === 'zone') {
+    if (p.k !== 'walk') return [g, null];
+    const w = c.worlds[p.world];
+    if (x.a === 'bump') { const b = w.bumps?.find(k => k.id === x.id); if (!b) throw new Error(`bump: no ${x.id} in ${p.world}`); const key = `${p.world}/${b.toy}`; return [{ ...g, toys: { ...g.toys, [key]: ((g.toys[key] ?? 0) + 1) % b.states } }, null]; }
+    const z = w.zones?.find(k => k.id === x.id); if (!z) throw new Error(`zone: no ${x.id} in ${p.world}`);
+    const key = `${p.world}/${z.toy}`, v = x.on ? 1 : 0;
+    return [(g.toys[key] ?? 0) === v ? g : { ...g, toys: { ...g.toys, [key]: v } }, null];
+  }
   switch (p.k) {
     case 'walk': {
       if (x.a === 'arrive') {
