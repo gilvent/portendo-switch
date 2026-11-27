@@ -7,6 +7,10 @@ import { WORLD_ART, WORLD_BACKDROP } from './art/blibli.tsx';
 import { at } from './art/fold.tsx';
 import { ambientOf, hash } from './art/ambient.ts';
 import { makeFx, type Fx } from './fx.ts';
+import { play as sound } from './sfx.ts';
+import { makeRig } from './toys/rig.ts';
+import { TOYBOX } from './toys/index.ts';
+import type { Ctx } from './toys/box.ts';
 import { BED, BORE, CAB, CAR, DOOR, SIGN, TUNNEL } from './art/scenes/car.ts';
 
 // The looping animations that are the train's motion (styles.css): they all follow its speed.
@@ -26,10 +30,19 @@ function scenery(w: World): Card[] {
 // at the chosen stop, 2 once its doors are open.
 // fold: the page turn between spaces. 'out' folds this space's paper flat and closes the page over it; 'in' opens the
 // page and pops the paper up. A space also pops up when it is first shown.
-type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
+// toys: every world's toys, keyed `world/toy`. stamps: the stops already used, keyed `world/stop`.
+type Props = { world: World; nearStop: string | null; toys: Record<string, number>; stamps: string[]; line: number; arrival: number; fold: 'out' | 'in' | null; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
 
-export default function Scene({ world, nearStop, toys, line, arrival, fold, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
+export default function Scene({ world, nearStop, toys: all, stamps, line, arrival, fold, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
   const drawn = world.art !== 'blockout';
+  // What this scene's paper reads: its own toys under their short names, every world's under `world/toy`, and
+  // `done:<stop>` for each of its stops that has been used.
+  const toys = useMemo(() => {
+    const t: Record<string, number> = { ...all }, own = `${world.id}/`;
+    for (const [k, v] of Object.entries(all)) if (k.startsWith(own)) t[k.slice(own.length)] = v;
+    for (const k of stamps) if (k.startsWith(own)) t[`done:${k.slice(own.length)}`] = 1;
+    return t;
+  }, [all, stamps, world.id]);
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
   const cards = useMemo(() => (drawn ? [] : scenery(world)), [world, drawn]);
@@ -53,6 +66,22 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
     fxRef.current = fx;
     return () => { if (fxRef.current === fx) fxRef.current = null; };
   }, [world.art, fxRef]);
+  // The toybox: poses the scene's actors to match the toys, and plays the change when one is used (toys/).
+  const play = useRef<{ ctx: Ctx; sync: (first: boolean) => void; near: (stop: string) => void } | null>(null);
+  useEffect(() => {
+    const make = TOYBOX[world.art], fx = fxRef.current;
+    if (!make || !root.current || !fx) return;
+    const rig = makeRig(root.current, reducedMotion()), box = make();
+    const ctx: Ctx = { rig, fx, toys, hero: { x: 0, z: 0, y: 0, speed: 0 }, say: fx.say, sfx: sound };
+    play.current = { ctx, sync: first => box.sync(ctx, first), near: stop => box.near?.(ctx, stop) };
+    box.sync(ctx, true);
+    fx.frame = (x, z, y, speed, dt) => { ctx.hero.x = x; ctx.hero.z = z; ctx.hero.y = y; ctx.hero.speed = speed; box.frame?.(ctx, dt); };
+    return () => { rig.kill(); play.current = null; fx.frame = undefined; };
+  }, [world.art, fxRef]);
+  useEffect(() => { const p = play.current; if (!p || p.ctx.toys === toys) return; p.ctx.toys = toys; p.sync(false); }, [toys]);
+  // Coming into reach of a stop stirs its toy. Not when the space opens: he is put down at a stop then.
+  const reached = useRef(nearStop);
+  useEffect(() => { if (nearStop && nearStop !== reached.current) play.current?.near(nearStop); reached.current = nearStop; }, [nearStop]);
   const backdrop = WORLD_BACKDROP[world.art];
   // The page's two leaves exist only while they move: as the space opens, and again as it closes.
   const [opened, setOpened] = useState(false);

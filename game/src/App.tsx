@@ -6,6 +6,7 @@ import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
 import { LIGHT, reducedMotion } from './light.ts';
 import type { Fx } from './fx.ts';
+import { play as sound, setSound, soundOn, wake } from './sfx.ts';
 import { BENCH_X, GATE_X } from './Platform.tsx';
 import Scene from './Scene.tsx';
 import Controller from './Controller.tsx';
@@ -42,7 +43,9 @@ export default function App() {
   const fxRef = useRef<Fx | null>(null);
   const skyRef = useRef<HTMLDivElement>(null);
   const poseRef = useRef<HTMLDivElement>(null);
-  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0 });
+  // face: set when he uses something, to turn him toward it. kick: a quick lean that eases out on its own.
+  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0, face: 0, kick: 0 });
+  const [audible, setAudible] = useState(soundOn);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const dispatch = useCallback((x: Action) => {
@@ -67,7 +70,14 @@ export default function App() {
       // A with nothing in reach is a jump. A at a stop uses it: the paper answers at once, before anything opens.
       if (!here.near) { hero.current.jump = true; return; }
       const s = stopOf(content, here.world, here.stop);
-      if (s) { fxRef.current?.scraps(s.look ?? s.x, 96, s.z - 26, [content.worlds[here.world].color, ...SCRAPS]); hero.current.sy = .84; hero.current.vs = 3; }
+      if (s) {
+        // He turns to the thing and makes the stop's move: a dip, a hop (his head knocks what hangs over him) or a lean.
+        const h = hero.current, toward = Math.sign((s.look ?? s.x) - walker.current.x) || facing.current;
+        h.face = toward;
+        if (s.gesture === 'hop') h.jump = true;
+        else if (s.gesture === 'lean') { h.kick = toward * 12; h.sy = .93; h.vs = 2; }
+        else { fxRef.current?.scraps(s.look ?? s.x, 96, s.z - 26, [content.worlds[here.world].color, ...SCRAPS], 5); h.sy = .84; h.vs = 3; }
+      }
     }
     if (x.a === 'confirm' && here.k === 'walk' && here.near && gameRef.current.controller.mode === 'docked' && !reducedMotion()) {
       const door = stopOf(content, here.world, here.stop);
@@ -157,7 +167,7 @@ export default function App() {
   useEffect(() => {
     if (!world || world === prevWorld.current || spot.k === 'lost') return;
     prevWorld.current = world;
-    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0 });
+    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0, face: 0, kick: 0 });
     held.current.clear();
     stickSpent.current = true;
     target.current = null;
@@ -242,26 +252,29 @@ export default function App() {
       }
       const speed = Math.hypot(n.vx, n.vz) / MAX_SPEED;
       // The card flip: he turns over like a playing card, in stepped frames, with a little skip as he does.
-      const turn = pushing && Math.abs(ix) > .3 ? Math.sign(ix) : Math.abs(n.vx) > 25 ? Math.sign(n.vx) : facing.current;
+      const used = h.face; h.face = 0;
+      const turn = used || (pushing && Math.abs(ix) > .3 ? Math.sign(ix) : Math.abs(n.vx) > 25 ? Math.sign(n.vx) : facing.current);
       if (turn !== facing.current) {
         facing.current = turn;
         // The mirror alone would move his pocketed hand to the other side, so the arms swap with it (Hero.tsx).
         if (flipRef.current) { gsap.to(flipRef.current, { rotationY: turn > 0 ? 0 : 180, duration: calm ? 0 : .2, ease: 'steps(5)', overwrite: true }); flipRef.current.dataset.face = String(turn); }
-        if (!calm && !h.air && p.world !== 'intro') { h.air = true; h.vy = 210; h.vs = 2.2; fx?.dust(n.x, n.z, 0, 2); }
+        if (!calm && !h.air && !used && p.world !== 'intro') { h.air = true; h.vy = 210; h.vs = 2.2; fx?.dust(n.x, n.z, 0, 2); }
       }
       // Jump: a crouch, then up with a stretch; down with a squash and dust.
       if (h.jump) { h.jump = false; if (!h.air && h.crouch <= 0 && !calm) h.crouch = CROUCH; }
       if (h.crouch > 0) { h.crouch -= dt; h.sy += (.76 - h.sy) * Math.min(1, dt * 45); h.vs = 0; if (h.crouch <= 0) { h.air = true; h.vy = JUMP; h.sy = 1.14; h.vs = 2; fx?.dust(n.x, n.z, 0, 2); } }
-      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); } }
+      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); if (hard > .6) sound('tap'); } }
       h.vs += (-(h.sy - 1) * SPRING - h.vs * DAMP) * dt; h.sy = Math.min(1.3, Math.max(.6, h.sy + h.vs * dt));
       const before = phase.current;
       phase.current += speed * dt * 16;
       // Footsteps: every other stride kicks a dot of dust out behind him.
       if (!h.air && speed > .6 && Math.floor(phase.current / Math.PI) !== Math.floor(before / Math.PI) && ++h.steps % 2 === 0) fx?.dust(n.x - facing.current * 10, n.z, -facing.current, 1);
       fx?.touch(n.x, n.z, speed > .2 || h.air);
+      fx?.frame?.(n.x, n.z, h.y, speed, dt);
+      h.kick *= Math.exp(-7 * dt);
       const bob = calm || h.air ? 0 : Math.abs(Math.sin(phase.current)) * 9 * speed;
       h.lean += ((calm ? 0 : held0 ? -Math.sign(ix || 1) * 7 : (n.vx / MAX_SPEED) * 6) - h.lean) * Math.min(1, dt * 18);
-      const lean = h.lean, sy = calm ? 1 : h.sy, sx = 1 + (1 - sy) * .55;
+      const lean = h.lean + (calm ? 0 : h.kick), sy = calm ? 1 : h.sy, sx = 1 + (1 - sy) * .55;
       const rx = calm ? 0 : -n.vz / MAX_SPEED * 1.4, ry = calm ? 0 : n.vx / MAX_SPEED * 2.2, rk = 1 - Math.exp(-6 * dt);
       if (Math.abs(rx - rig.current.x) + Math.abs(ry - rig.current.y) > .004) {
         rig.current.x += (rx - rig.current.x) * rk; rig.current.y += (ry - rig.current.y) * rk;
@@ -307,6 +320,7 @@ export default function App() {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      wake();
       const place = gameRef.current.place, k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       if (k === 'c') { dispatch({ a: 'toggleController' }); return; }
       if (k === 'm' || k === 'x') { dispatch({ a: 'map' }); return; }
@@ -322,8 +336,8 @@ export default function App() {
     };
     const up = (e: KeyboardEvent) => { held.current.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key); };
     const blur = () => held.current.clear();
-    addEventListener('keydown', down); addEventListener('keyup', up); addEventListener('blur', blur);
-    return () => { removeEventListener('keydown', down); removeEventListener('keyup', up); removeEventListener('blur', blur); };
+    addEventListener('keydown', down); addEventListener('keyup', up); addEventListener('blur', blur); addEventListener('pointerdown', wake);
+    return () => { removeEventListener('keydown', down); removeEventListener('keyup', up); removeEventListener('blur', blur); removeEventListener('pointerdown', wake); };
   }, [dispatch]);
 
   const onDockDone = useCallback(() => {
@@ -342,12 +356,13 @@ export default function App() {
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
+      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...game.toys, [`${shown}/doors`]: 1 } : game.toys} stamps={game.stamps} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} near={spot.k === 'walk' && spot.world === 'intro' && spot.near ? spot.stop === 'gate' ? 'gate' : 'door' : null} gate={gateOpen} trainIn={trainIn} onScreenTap={x => { const g = gameRef.current.place; if (g.k !== 'walk' || g.world !== 'intro') return; if (g.near && Math.abs((stopOf(content, 'intro', g.stop)?.x ?? 1e9) - x) < 120) dispatch({ a: 'confirm' }); else introGo.current = x; }} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={leaving} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
       {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}
       <div className="corner">
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
+        <button data-testid="toggle-sound" aria-pressed={audible} onClick={e => { if (e.detail) e.currentTarget.blur(); setSound(!audible); setAudible(!audible); if (!audible) wake(); }}>{audible ? 'Sound on' : 'Sound off'}</button>
         <button data-testid="toggle-controller" aria-pressed={!game.controller.visible} onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'toggleController' }); }}>{game.controller.visible ? 'Hide controller' : 'Show controller'}</button>
       </div>
       {game.place.k === 'walk' && <p className="keys" data-testid="keys"><b>← ↑ ↓ →</b> walk <b>A</b> or <b>Enter</b> use, jump <b>B</b> or <b>Esc</b> close, leave</p>}

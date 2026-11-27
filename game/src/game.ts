@@ -38,7 +38,10 @@ export function pathOf(p: Place): string {
   }
 }
 const isPlayable = (c: Content, id: string): id is WorldId => id in c.worlds && id !== 'intro';
-const firstLetter = (c: Content, w: WorldId) => c.worlds[w].stops.find(s => s.action.kind === 'letter');
+// Where an old link to a world's write-up lands: its first letter, or its first toy where the work is played, not read.
+const firstLetter = (c: Content, w: WorldId) => c.worlds[w].stops.find(s => s.action.kind === 'letter') ?? c.worlds[w].stops.find(s => s.action.kind === 'toy');
+// Spaces that are gone, and where their links go now.
+const MOVED: Record<string, [WorldId, string]> = { 'blibli-storeroom': ['blibli', 'wall'] };
 export function parsePath(c: Content, path: string): Place {
   const seg = path.split('/').filter(Boolean);
   if (!seg.length) return INTRO;
@@ -46,8 +49,9 @@ export function parsePath(c: Content, path: string): Place {
   if (seg[0] === 'work' && seg[1] && isPlayable(c, seg[1]) && seg[1] !== 'mrt') {
     const s = firstLetter(c, seg[1]);
     if (seg.length === 2 && s) return { k: 'walk', world: seg[1], stop: s.id, near: true };
-    if (seg.length === 3 && seg[2] === 'highlight' && s) return { k: 'letter', world: seg[1], stop: s.id };
+    if (seg.length === 3 && seg[2] === 'highlight' && s) return s.action.kind === 'letter' ? { k: 'letter', world: seg[1], stop: s.id } : { k: 'walk', world: seg[1], stop: s.id, near: true };
   }
+  if (seg[0] === 'round' && seg[1] && MOVED[seg[1]]) return { k: 'walk', world: MOVED[seg[1]][0], stop: MOVED[seg[1]][1], near: true };
   if (seg[0] === 'round' && seg[1] && isPlayable(c, seg[1])) {
     const world = seg[1], s = seg[2] ? stopOf(c, world, seg[2]) : undefined;
     if (seg.length === 3 && s) return { k: 'walk', world, stop: s.id, near: true };
@@ -100,7 +104,8 @@ export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
       if (act.kind === 'toy') {
         const key = `${p.world}/${act.toy}`, id = `${p.world}/${p.stop}`;
         // The platform's gate is not one of the line's stamps: those start once he is on the train.
-        return [{ ...g, toys: { ...g.toys, [key]: ((g.toys[key] ?? 0) + 1) % act.states }, stamps: p.world === 'intro' || g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];
+        const n = (g.toys[key] ?? 0) + 1;
+        return [{ ...g, toys: { ...g.toys, [key]: n < act.states ? n : act.wrapTo ?? 0 }, stamps: p.world === 'intro' || g.stamps.includes(id) ? g.stamps : [...g.stamps, id] }, null];
       }
       return [g, null];
     }

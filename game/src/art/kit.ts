@@ -10,7 +10,17 @@ export type Panel = {
   split?: number;
   // With `decal`: painted onto the parent as the game camera sees it, not straight along the parent's normal.
   view?: boolean;
+  // A live piece: this sheet belongs to the actor of that name, which a toy script moves at run time (toys/rig.ts).
+  // Actors are baked like phantoms (lit where they rest, casting no shadow) and are never culled.
+  actor?: string;
+  // The sheet takes its colour from a toy's state: `colors[state]` is multiplied over it. Only for uncut (unmasked)
+  // sheets with a pale print, so one baked sheet serves every colour.
+  tint?: Tint;
 };
+export type Tint = { toy: string; colors: readonly string[] };
+// An actor's pivot is the point its script turns and scales it about; a child actor (`parent`) rides on another.
+// `shadow` is the footprint [width, depth] of a soft live shadow kept on the ground under an actor that travels.
+export type Actor = { pivot: V3; parent?: string; shadow?: readonly [number, number] };
 // A panel with `show` exists only while its toy is in one of the listed states. Such panels are baked as phantoms:
 // lit like everything else, but they cast no shadow, so the variants that share one spot never shade each other.
 export type Show = { toy: string; at: number[] };
@@ -21,7 +31,7 @@ export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' 
 export type Lamp = { at: V3; color: readonly [number, number, number]; energy: number };
 export type Run = { group: string; from: V3; to: V3; count: number; seconds: number };
 export type Scene = {
-  id: string; panels: Panel[]; runs?: Run[]; lamps?: Lamp[];
+  id: string; panels: Panel[]; runs?: Run[]; lamps?: Lamp[]; actors?: Record<string, Actor>;
   light: { sun: number; sky: number; skyColor: readonly [number, number, number] };
   camera: { zoom: number; x0: number; x1: number };
   // Texture density for panels that set none (texels per unit). Lower it where a scene's many quads cost too much.
@@ -84,3 +94,13 @@ export function relief(parent: Panel, panels: Panel[]): Panel[] {
 // toward the camera is painted onto the wall where the camera sees it. Boxes keep their ends and tops; no quad is added.
 // Pieces are painted at the parent's resolution in the end, so they are cut no finer than it.
 export const carved = (parent: Panel, panels: Panel[]): Panel[] => panels.map(p => ({ ...p, decal: parent.id, view: true, density: Math.min(p.density ?? 3, (parent.density ?? 3) * 1.25) }));
+
+// Plain sheets by where they stand. `card` faces the camera with its bottom-left corner at [x, y, z]; `flat` lies face
+// up with its front-left corner there; `sideL` and `sideR` are upright sheets seen from the room, on its left and right.
+type Sheet = Partial<Panel> & Pick<Panel, 'id' | 'c'>;
+export const card = (x: number, y: number, z: number, w: number, h: number, rest: Sheet): Panel => ({ stock: 'cover', o: [x, y, z], u: [1, 0, 0], v: [0, 1, 0], w, h, edge: 'cut', ...rest });
+export const flat = (x: number, y: number, z: number, w: number, d: number, rest: Sheet): Panel => ({ stock: 'cover', o: [x, y, z], u: [1, 0, 0], v: [0, 0, -1], w, h: d, edge: 'fold', ...rest });
+export const sideL = (x: number, y: number, zFront: number, d: number, h: number, rest: Sheet): Panel => ({ stock: 'cover', o: [x, y, zFront], u: [0, 0, -1], v: [0, 1, 0], w: d, h, edge: 'fold', ...rest });
+export const sideR = (x: number, y: number, zBack: number, d: number, h: number, rest: Sheet): Panel => ({ stock: 'cover', o: [x, y, zBack], u: [0, 0, 1], v: [0, 1, 0], w: d, h, edge: 'fold', ...rest });
+// Every sheet of an object joins one actor.
+export const cast = (actor: string, panels: Panel[]): Panel[] => panels.map(p => ({ ...p, actor }));

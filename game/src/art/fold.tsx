@@ -1,14 +1,18 @@
 import { memo, useEffect, type CSSProperties } from 'react';
-import type { Motion, Run, Show, V3 } from './kit.ts';
+import type { Actor, Motion, Run, Show, Tint, V3 } from './kit.ts';
 import { ambientOf, hash, type Ambient, type Loop } from './ambient.ts';
 
 export const at = (x: number, z: number, y = 0, rot = 0) => ({ transform: `translate3d(${x}px,${-y}px,${z}px)${rot ? ` rotateY(${rot}deg)` : ''}` });
 
-export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null; show?: Show | null };
+// actor: the live group a toy script moves (toys/rig.ts). tint: the sheet's colour follows a toy's state. img: the
+// sheet's own picture, when the scene is drawn unbaked (grey.ts) and there is no atlas.
+export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null; show?: Show | null; actor?: string | null; tint?: Tint | null; img?: string; shade?: number };
+// A toy's state by name. A scene sees its own world's toys under their short names and every world's under
+// `world/toy`, so a sheet outside the shop can follow a choice made inside it.
 export type Toys = Record<string, number>;
 const shown = (q: Quad, toys: Toys) => !q.show || q.show.at.includes(toys[q.show.toy] ?? 0);
 const playing = (m: Motion, near: string | null, toys: Toys) => (m.when !== undefined && near === m.when) || (m.toy !== undefined && (m.at ?? [1]).includes(toys[m.toy] ?? 0));
-export type Manifest = { atlas: { w: number; h: number }; runs: Run[]; quads: Quad[] };
+export type Manifest = { atlas: { w: number; h: number }; runs: Run[]; quads: Quad[]; actors?: Record<string, Actor> };
 
 const css = ([x, y, z]: readonly number[]): V3 => [x, -y, z];
 const len = (a: readonly number[]) => Math.hypot(a[0], a[1], a[2]);
@@ -28,10 +32,16 @@ function moved(q: Quad, m: Motion) {
 }
 const spun = (q: Quad, deg: number) => `translate(${q.pw / 2}px,${q.ph / 2}px) rotate(${deg}deg) translate(${-q.pw / 2}px,${-q.ph / 2}px)`;
 const swung = (q: Quad, deg: number) => `translate(${q.pw / 2}px,0) rotate(${deg}deg) translate(${-q.pw / 2}px,0)`;
-function quadStyle(q: Quad, url: string, atlas: Manifest['atlas'], origin?: number[]): CSSProperties {
-  const k = (q.w / q.pw).toFixed(5), rest = `${matrix(q, origin)} scale(${k})`;
+// Mixes a tint toward black by a baked-less sheet's shade (grey.ts), so a tinted box still shows its faces.
+const shaded = (hex: string, k = 1) => { const n = parseInt(hex.slice(1), 16), ch = (v: number) => Math.min(255, Math.round(v * k)).toString(16).padStart(2, '0'); return `#${ch(n >> 16)}${ch((n >> 8) & 255)}${ch(n & 255)}`; };
+function quadStyle(q: Quad, url: string, atlas: Manifest['atlas'], origin?: readonly number[], toys?: Toys): CSSProperties {
+  const k = (q.w / q.pw).toFixed(5), rest = `${matrix(q, origin as number[] | undefined)} scale(${k})`;
+  const tint = q.tint ? q.tint.colors[(toys?.[q.tint.toy] ?? 0) % q.tint.colors.length] : null;
+  const paint: CSSProperties = q.img ? { backgroundImage: `url("${q.img}")`, backgroundSize: '100% 100%' }
+    : url ? { backgroundImage: `url(${url})`, backgroundPosition: `${-q.x}px ${-q.y}px`, backgroundSize: `${atlas.w}px ${atlas.h}px`, backgroundColor: tint ?? (q.solid ? q.c : undefined), backgroundBlendMode: tint ? 'multiply' : undefined }
+    : { backgroundColor: shaded(tint ?? q.c, q.shade) };
   return {
-    width: q.pw, height: q.ph, backgroundImage: `url(${url})`, backgroundPosition: `${-q.x}px ${-q.y}px`, backgroundSize: `${atlas.w}px ${atlas.h}px`, backgroundColor: q.solid ? q.c : undefined,
+    width: q.pw, height: q.ph, ...paint,
     ...(q.motion?.spin ? { transform: rest, '--a': `${rest} ${spun(q, 0)}`, '--b': `${rest} ${spun(q, -360)}`, animationDuration: `${q.motion.spin}s` } as CSSProperties : q.motion?.swing ? { transform: rest, '--a': `${rest} ${swung(q, -q.motion.swing)}`, '--b': `${rest} ${swung(q, q.motion.swing)}` } as CSSProperties : q.motion ? { '--rest': rest, '--on': `${rest} ${moved(q, q.motion)}` } as CSSProperties : { transform: rest })
   };
 }
@@ -59,9 +69,9 @@ const tag = (q: Quad, amb: Ambient) => {
 };
 
 const StaticQuads = memo(function StaticQuads({ m, url, amb }: { m: Manifest; url: string; amb: Ambient }) {
-  return <>{m.quads.filter(q => !q.motion && !q.group && !q.show).map(q => {
+  return <>{m.quads.filter(q => !q.motion && !q.group && !q.show && !q.actor && !q.tint).map(q => {
     const l = loopOf(q, amb), base = quadStyle(q, url, m.atlas);
-    return <i key={q.id} className={l ? `pp amb${l.kind === 'peck' ? ' amb-peck' : ''}` : 'pp'} {...tag(q, amb)} style={l ? { ...base, ...looped(q, l, base.transform as string) } : base} />;
+    return <i key={q.id} data-q={q.id} className={l ? `pp amb${l.kind === 'peck' ? ' amb-peck' : ''}` : 'pp'} {...tag(q, amb)} style={l ? { ...base, ...looped(q, l, base.transform as string) } : base} />;
   })}</>;
 });
 const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
@@ -75,17 +85,39 @@ const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
   })}</>;
 });
 
+// The live pieces. Each actor is two nested boxes: the outer one stands at the actor's pivot and never moves; the
+// inner one (`data-actor`) is what a toy script turns, lifts and throws. A child actor sits inside its parent's inner
+// box, so it rides along. Sheets are placed about the pivot, so the script's turns and squashes happen about it.
+function Actors({ m, url, toys, amb }: { m: Manifest; url: string; toys: Toys; amb: Ambient }) {
+  const actors = m.actors ?? {}, names = Object.keys(actors);
+  const node = (name: string) => {
+    const a = actors[name], base = a.parent ? actors[a.parent].pivot : [0, 0, 0];
+    return (
+      <div key={name} className="actor" style={{ transform: `translate3d(${a.pivot[0] - base[0]}px,${-(a.pivot[1] - base[1])}px,${a.pivot[2] - base[2]}px)` }}>
+        {a.shadow && <i className="actor-shadow" data-shadow={name} style={{ width: a.shadow[0], height: a.shadow[1], marginLeft: -a.shadow[0] / 2, marginTop: -a.shadow[1] / 2, '--drop': `${a.pivot[1]}px` } as CSSProperties} />}
+        <div className="rig" data-actor={name}>
+          {m.quads.filter(q => q.actor === name && shown(q, toys)).map(q => <i key={q.id} className={q.show ? 'pp pop' : 'pp'} data-q={q.id} data-testid={q.show ? `show-${q.id}` : undefined} {...tag(q, amb)} style={quadStyle(q, url, m.atlas, a.pivot, toys)} />)}
+          {names.filter(n => actors[n].parent === name).map(node)}
+        </div>
+      </div>
+    );
+  };
+  return <>{names.filter(n => !actors[n].parent).map(node)}</>;
+}
+
 export function PaperScene({ manifest, url, near, toys, art }: { manifest: Manifest; url: string; near: string | null; toys: Toys; art: string }) {
-  const amb = ambientOf(art);
-  useEffect(() => { const i = new Image(); i.src = url; }, [url]);
+  const amb = ambientOf(art), free = (q: Quad) => !q.actor;
+  useEffect(() => { if (!url) return; const i = new Image(); i.src = url; }, [url]);
   return (
     <div className="prop" data-testid="paper-scene">
       <StaticQuads m={manifest} url={url} amb={amb} />
-      {manifest.quads.filter(q => !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`show-${q.id}`} />)}
-      {manifest.quads.filter(q => q.motion?.swing).map((q, i) => <i key={q.id} className="pp swings" style={{ ...quadStyle(q, url, manifest.atlas), animationDelay: `${-(i * 0.37 % 1.4).toFixed(2)}s` }} />)}
-      {manifest.quads.filter(q => q.motion?.spin).map(q => <i key={q.id} className="pp spins" style={quadStyle(q, url, manifest.atlas)} />)}
-      {manifest.quads.filter(q => q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
+      {manifest.quads.filter(q => free(q) && !q.motion && !q.group && !q.show && q.tint).map(q => <i key={q.id} className="pp" data-q={q.id} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas, undefined, toys)} />)}
+      {manifest.quads.filter(q => free(q) && !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas, undefined, toys)} data-testid={`show-${q.id}`} />)}
+      {manifest.quads.filter(q => free(q) && q.motion?.swing).map((q, i) => <i key={q.id} className="pp swings" style={{ ...quadStyle(q, url, manifest.atlas), animationDelay: `${-(i * 0.37 % 1.4).toFixed(2)}s` }} />)}
+      {manifest.quads.filter(q => free(q) && q.motion?.spin).map(q => <i key={q.id} className="pp spins" style={quadStyle(q, url, manifest.atlas)} />)}
+      {manifest.quads.filter(q => free(q) && q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas, undefined, toys)} data-testid={`move-${q.id}`} />)}
       <Runs m={manifest} url={url} />
+      <Actors m={manifest} url={url} toys={toys} amb={amb} />
     </div>
   );
 }

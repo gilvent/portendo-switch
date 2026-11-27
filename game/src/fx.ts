@@ -17,6 +17,14 @@ export type Fx = {
   // A tap or click on the scene at screen point [cx, cy]: whatever paper is under it answers. A touchable hops as it
   // does for the salaryman; any other small object hops with the sheets it is built from; a big sheet knocks.
   tap(cx: number, cy: number): void;
+  // A camera flash: the whole view whites out and clears in a few stepped frames.
+  flash(): void;
+  // A knock felt through the whole scene: the view jumps `px` and settles.
+  shake(px: number): void;
+  // Every sheet whose id starts with `prefix` hops `lift` units together.
+  jolt(prefix: string, lift?: number): void;
+  // Set by the scene: called every frame with where he is, for the toys that work on presence (toys/box.ts).
+  frame?: (x: number, z: number, y: number, speed: number, dt: number) => void;
 };
 
 let seed = 7;
@@ -47,7 +55,12 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
   };
   const jump = (els: Iterable<HTMLElement>, L: number) => { for (const el of els) el.animate({ translate: ['0 0', `0 ${-L}px`, '0 0', `0 ${(-L * .35).toFixed(1)}px`, '0 0'] }, { duration: 460, easing: 'steps(9,end)' }); };
   let tapped = -1e9;
+  const white = document.createElement('i'); white.className = 'flash'; scene.appendChild(white);
+  const stage = scene.querySelector<HTMLElement>('.stage');
   const fx: Fx = {
+    flash() { if (!reducedMotion()) white.animate({ opacity: [.92, .7, .3, 0] }, { duration: 300, easing: 'steps(4,end)' }); },
+    shake(px) { if (!reducedMotion()) stage?.animate({ translate: ['0 0', `${px}px ${-px}px`, `${-px * .6}px ${px * .5}px`, `${px * .3}px 0`, '0 0'] }, { duration: 220, easing: 'steps(5,end)' }); },
+    jolt(prefix, lift = 7) { if (!reducedMotion()) jump(scene.querySelectorAll<HTMLElement>(`.pp[data-q^="${prefix}"]`), lift); },
     dust(x, z, dir, n = 2) {
       if (reducedMotion()) return;
       for (let i = 0; i < n; i++) { const d = dir || (i % 2 ? 1 : -1); fly('bit dust', x + rnd(-8, 8), rnd(3, 7), z + rnd(2, 10), d * rnd(40, 110), rnd(50, 120), rnd(-10, 20), rnd(6, 10), DUST[i % DUST.length], rnd(340, 460), 0, 420); }

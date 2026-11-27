@@ -1,4 +1,4 @@
-export type WorldId = 'intro' | 'mrt' | 'blibli' | 'blibli-shop' | 'blibli-storeroom' | 'moperty' | 'radjastone';
+export type WorldId = 'intro' | 'mrt' | 'blibli' | 'blibli-shop' | 'moperty' | 'radjastone';
 export type Span = { t: string; strong?: boolean; em?: boolean };
 export type Rich = Span[];
 export type Image = { asset: string; alt: string };
@@ -19,16 +19,20 @@ export type StopAction =
   | { kind: 'road'; to: WorldId; stop: string }
   | { kind: 'link'; href: string }
   | { kind: 'dock' }
-  | { kind: 'toy'; toy: string; states: number }
+  // A toy counts up through `states` on each use. After the last it starts again at `wrapTo` (0 unless given): a toy
+  // whose first state is "nothing made yet" never goes back to it.
+  | { kind: 'toy'; toy: string; states: number; wrapTo?: number }
   // The train doors: A gets off at whichever destination the sign over them shows. State `${world}/${toy}` holds the choice.
   | { kind: 'ride'; toy: string; to: { world: WorldId; stop: string; label: string }[] };
 // focus: the camera leans in while the courier stands at this stop (zoom multiplies the world zoom), centred on
 // `look`, the x of the thing being used, so the courier can stand beside it rather than in front of it.
 // mark: how high above the ground the thing to use reaches, when it hangs on a wall: the tap area and its marker rise to it.
-export type Stop = { id: string; label: string; x: number; z: number; reach?: number; focus?: number; look?: number; mark?: number; action: StopAction };
+// gesture: his move when he uses the stop: a dip (the default), a hop (his head knocks what hangs over him) or a lean.
+export type Gesture = 'dip' | 'hop' | 'lean';
+export type Stop = { id: string; label: string; x: number; z: number; reach?: number; focus?: number; look?: number; mark?: number; gesture?: Gesture; action: StopAction };
 export type Rect = { x0: number; x1: number; z0: number; z1: number };
 export type World = {
-  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom' | 'train'; back?: { world: WorldId; stop: string }; // ahead: on a wide screen the view leads the walker by this much along x (the train's camera looks toward its front).
+  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'train'; back?: { world: WorldId; stop: string }; // ahead: on a wide screen the view leads the walker by this much along x (the train's camera looks toward its front).
   // zoomWide: the zoom on a landscape screen, where a room has space to fill the frame; stops' `focus` close-ups stay as framed for `zoom`.
   camera?: { zoom: number; zoomWide?: number; x0: number; x1: number; lift?: number; liftTall?: number; ahead?: number }; path: 'round' | 'street' | 'store' | 'climb'; bounds: Rect; solid: Rect[];
   // Floor the camera cannot see because something tall stands in front of it. While the salaryman is there, a marker
@@ -43,7 +47,7 @@ export type World = {
 };
 export type Content = { worlds: Record<WorldId, World> };
 
-export const WORLD_IDS = ['intro', 'mrt', 'blibli', 'blibli-shop', 'blibli-storeroom', 'moperty', 'radjastone'] as const;
+export const WORLD_IDS = ['intro', 'mrt', 'blibli', 'blibli-shop', 'moperty', 'radjastone'] as const;
 export class ContentError extends Error {}
 const fail = (at: string, why: string): never => { throw new ContentError(`content ${at}: ${why}`); };
 export function validateContent(c: Content): Content {
@@ -75,7 +79,7 @@ export function validateContent(c: Content): Content {
       if (s.action.kind === 'letter') { if (!letterIds.has(s.action.letter)) fail(`${at}.action.letter`, `unknown letter ${s.action.letter}`); used.add(s.action.letter); }
       if (s.action.kind === 'link' && !/^https:\/\//.test(s.action.href)) fail(`${at}.action.href`, 'must be https');
       if (s.action.kind === 'ride') { if (!s.action.toy || s.action.to.length < 2) fail(`${at}.action`, 'a ride needs a name and at least two destinations'); s.action.to.forEach((d, k) => { if (!d.label) fail(`${at}.action.to[${k}].label`, 'missing'); if (!c.worlds[d.world]?.stops.some(x => x.id === d.stop)) fail(`${at}.action.to[${k}]`, `unknown stop ${d.world}/${d.stop}`); }); }
-      if (s.action.kind === 'toy' && (!s.action.toy || s.action.states < 2)) fail(`${at}.action`, 'a toy needs a name and at least two states');
+      if (s.action.kind === 'toy' && (!s.action.toy || s.action.states < 2 || (s.action.wrapTo ?? 0) >= s.action.states)) fail(`${at}.action`, 'a toy needs a name, at least two states, and a wrapTo inside them');
     });
     w.stops.forEach((s, i) => { if (s.action.kind === 'road') { const t = c.worlds[s.action.to]; if (!t) fail(`worlds.${id}.stops[${i}].action.to`, `unknown world ${s.action.to}`); else if (!t.stops.some(x => x.id === (s.action as { stop: string }).stop)) fail(`worlds.${id}.stops[${i}].action.stop`, 'unknown arrival stop'); } });
     if (w.back && !c.worlds[w.back.world]?.stops.some(x => x.id === w.back?.stop)) fail(`worlds.${id}.back`, 'unknown stop');
