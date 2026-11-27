@@ -19,11 +19,16 @@ button { font:inherit; cursor:pointer; }
 .flip { position:absolute; left:-40px; bottom:-2px; width:80px; height:137px; transform-style:preserve-3d; }
 .courier-art { position:absolute; left:0; top:0; display:block; }
 .defs { position:absolute; }
-/* Stubby suit legs with rounded shoes; only the shoes stand clear of the jacket, so only they carry the white rim. */
-/* The player is average build (Salaryman.tsx): legs start 6 lower and run 7 longer than the short build's. */
-.leg { position:absolute; top:108px; width:11px; height:22px; border-radius:2px; background:#263350; transform-origin:50% 0; }
-.leg::after { content:''; position:absolute; left:-4px; bottom:-6px; width:15px; height:7px; border:2.5px solid #fff; border-radius:8px 8px 5px 5px; background:#1d1f24; box-shadow:inset 0 2px 0 #3a3e46; }
-.leg-b { left:29px; } .leg-f { left:41px; background:#2f3e5c; }
+/* The player's legs (Hero.tsx): black suit trousers as separate strips so they can stride; the shoes carry the white rim. */
+.leg { position:absolute; top:109px; width:10.6px; height:21px; border-radius:2px; background:#131418; transform-origin:50% 0; }
+/* His shoes point the way he walks: a long toe, a short heel. */
+.leg::after { content:''; position:absolute; left:-3.5px; bottom:-6px; width:18px; height:7px; border:2.5px solid #fffaf0; border-radius:5px 10px 5px 5px; background:#17181c; box-shadow:inset 0 2px 0 #3a3e46; }
+.leg-b { left:29px; } .leg-f { left:42px; background:#22242a; }
+/* He leans into his stride: legs and body tip together about his feet. */
+.lean { position:absolute; inset:0; transform:rotate(4deg); transform-origin:40px 134px; }
+.mini-courier .lean { transform-origin:0 0; }
+/* Which arm set shows (Hero.tsx): his right hand stays the one in his pocket whichever way he faces. */
+.h-l { display:none; } [data-face="-1"] .h-r { display:none; } [data-face="-1"] .h-l { display:inline; }
 [data-walking] .leg-f { animation:stride .32s ease-in-out infinite alternate; }
 [data-walking] .leg-b { animation:stride .32s ease-in-out infinite alternate-reverse; }
 @keyframes stride { from { transform:rotate(-24deg); } to { transform:rotate(24deg); } }
@@ -59,15 +64,26 @@ button { font:inherit; cursor:pointer; }
 .belt { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; animation:belt 15s steps(60,end) infinite; }
 @keyframes belt { from { transform:translate3d(var(--from)); } to { transform:translate3d(var(--to)); } }
 .pc-screen { position:absolute; inset:8px; }
-.sign.hit { left:-74px; width:148px; height:200px; padding:0; background:transparent; box-shadow:none; color:transparent; transform:translateZ(70px); }
+.sign.hit { --hit:200px; bottom:max(0px,calc(var(--mark,0px) - var(--hit))); left:-74px; width:148px; height:var(--hit); padding:0; background:transparent; box-shadow:none; color:transparent; transform:translateZ(70px); }
 .sign.hit:focus-visible { outline-offset:-4px; }
-.sign.hit > span { position:absolute; left:50%; top:-8px; transform:translateX(-50%); white-space:nowrap; padding:2px 10px; background:#fff; color:#123a5a; border-radius:3px; font-size:15px; line-height:20px; opacity:0; }
+.sign.hit > span { position:absolute; left:50%; top:-30px; transform:translateX(-50%) translateZ(70px); white-space:nowrap; padding:2px 10px; background:#fff; color:#123a5a; border-radius:3px; font-size:15px; line-height:20px; opacity:0; }
 .sign.hit.near > span { opacity:1; }
-.sign.hit::after { content:""; position:absolute; left:calc(50% - 6px); top:0; width:12px; height:12px; background:#fff; transform:rotate(45deg); box-shadow:0 0 0 2px #e8552d; }
-.sign.hit.road::after { background:#f6b73c; }
-.sign.hit.near::after { display:none; }
-.sign.hit .prompt { top:-52px; }
-.art-shop,.art-storeroom { background:#0e0a08; }
+/* The marker over anything that can be used: a cut paper pennant, white core showing round its colour, bobbing in
+   stepped frames. Each one starts at its own point in the bob (--d), so no two move together. Ways out are sun yellow. */
+.sign.hit::before,.sign.hit::after { content:""; position:absolute; clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%); animation:pin-bob .8s steps(4,jump-none) var(--d,0s) infinite alternate; }
+.sign.hit::before { left:calc(50% - 15px); bottom:var(--pin,calc(100% - 14px)); width:30px; height:36px; background:#fffaf0; }
+.sign.hit::after { left:calc(50% - 11px); bottom:calc(var(--pin,calc(100% - 14px)) + 5px); width:22px; height:27px; background:radial-gradient(circle at 50% 36%,#fffaf0 0 3.4px,transparent 4px),#e8552d; }
+/* A way out carries an arrow instead of a dot: walk into it. */
+.sign.hit.road::after { content:"↑"; background:#f0a51e; color:#fffaf0; font:700 17px/19px Fredoka,system-ui,sans-serif; text-align:center; }
+/* The marker hangs at the top of the tap area; a stop on a wall lifts the whole area to it (`mark`). A way out is
+   marked at door height, not over the lintel. */
+.sign.hit.road { --pin:92px; }
+.sign.hit.near::before,.sign.hit.near::after { display:none; }
+@keyframes pin-bob { to { translate:0 -8px; } }
+.sign.hit .prompt { top:-76px; }
+.sign.hit.near > span { animation:tag-in .3s steps(4,end); }
+@keyframes tag-in { from { translate:0 10px; scale:.6; } 60% { scale:1.1; } }
+.art-shop,.art-storeroom { background:radial-gradient(110% 80% at 50% 64%,#3b2d23 0,#211813 55%,#0c0908 100%); }
 .letter.surface-note,.letter.surface-label { top:64px; bottom:auto; max-height:calc(100vh - 80px); left:auto; right:calc(98px + 2vw); margin:0; width:min(520px,calc(100vw - 16px)); padding:30px 30px 24px 58px; line-height:28px; background:repeating-linear-gradient(transparent 0 27px,#bcd2e6 27px 28px) local,linear-gradient(90deg,transparent 40px,#e58a84 40px 42px,transparent 42px),#f7e7b6; }
 .letter.surface-note h2,.letter.surface-label h2 { font:700 44px/56px Caveat,cursive; margin:0; }
 .letter.surface-note h3,.letter.surface-label h3 { color:#c2553b; font:700 26px/28px Caveat,cursive; margin:0 0 14px; }
@@ -85,9 +101,19 @@ button { font:inherit; cursor:pointer; }
 .rotated i { width:64px; height:64px; background:#bfe6f8; position:relative; transition:transform .26s cubic-bezier(.3,1.3,.5,1); } .rotated b { position:absolute; left:18px; top:8px; width:28px; height:28px; border-radius:50%; background:#e8552d; }
 .stamps { animation:thunk .3s cubic-bezier(.3,1.6,.5,1); } @keyframes thunk { from { transform:scale(1.8) rotate(-12deg); } }
 
-.wipe { position:absolute; inset:0; display:flex; pointer-events:none; }
-.wipe i { flex:1; background:var(--paper); transform:scaleX(0); transform-origin:0 50%; will-change:transform; }
-.wipe i:last-child { transform-origin:100% 50%; }
+/* The page turn between spaces. A space opens like a gatefold card: two paper leaves swing out toward you from the
+   middle, and as they clear, the standing paper pops up from flat. Leaving, the paper folds flat and the leaves shut. */
+.wipe { position:absolute; inset:0; display:flex; pointer-events:none; perspective:1500px; }
+.wipe i { flex:1; opacity:0; transform-origin:0 50%; --turn:-90deg; background:linear-gradient(90deg,#efe3cd,#f8f0e0 70%,#e2d3b8 98%,#b9a888); animation:leaf-open .46s steps(6,end) both; will-change:transform; }
+.wipe i:last-child { transform-origin:100% 50%; --turn:90deg; background:linear-gradient(270deg,#efe3cd,#f8f0e0 70%,#e2d3b8 98%,#b9a888); }
+@keyframes leaf-open { from { transform:none; opacity:1; filter:none; } 99% { opacity:1; } to { transform:rotateY(var(--turn)); opacity:0; filter:brightness(.8); } }
+@keyframes leaf-shut { from { transform:rotateY(var(--turn)); opacity:1; filter:brightness(.8); } to { transform:none; opacity:1; filter:none; } }
+[data-fold="out"] .wipe i { animation:leaf-shut .34s steps(5,end) both; }
+.page { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; transform-origin:0 0; animation:pop-up .62s steps(9,end) both; }
+@keyframes pop-up { 0%,22% { scale:1 .03 1; } 64% { scale:1 1.07 1; } 84% { scale:1 .98 1; } 100% { scale:1 1 1; } }
+@keyframes fold-flat { to { scale:1 .03 1; } }
+[data-fold="out"] .page { animation:fold-flat .3s steps(5,end) both; }
+@media (prefers-reduced-motion:reduce) { .wipe i,.page,[data-fold="out"] .wipe i,[data-fold="out"] .page { animation:none; } }
 
 .controller { position:fixed; inset:0; pointer-events:none; contain:layout; perspective:1100px; }
 .rig { position:absolute; inset:0; transform-style:preserve-3d; will-change:transform; }
@@ -169,7 +195,15 @@ button { font:inherit; cursor:pointer; }
 .pp-shadow { position:absolute; display:block; pointer-events:none; }
 .pp.moves { transform:var(--rest); transition:transform .42s steps(5,end); }
 .pp.moves.on { transform:var(--on); }
-.art-street { background:#6f5a44 no-repeat 50% calc(42vh - 562px) / 2400px auto; }
+.art-street { background:#6f5a44; }
+/* The far backdrop: its own sheet, a little wider than the screen, sliding slowly against the scene as the camera moves. */
+.sky { position:absolute; inset:0 -140px; background:no-repeat 50% calc(42vh - 562px) / 2400px auto; will-change:transform; }
+/* Two cut-paper gulls cross the sky, far apart, flapping in two frames. */
+.gull { position:absolute; left:0; top:11vh; width:26px; height:12px; background:#fffaf0; clip-path:polygon(0 30%,22% 0,50% 55%,78% 0,100% 30%,76% 34%,50% 100%,24% 34%); animation:gull-cross 52s steps(260,end) infinite,gull-flap .5s steps(1,end) infinite; }
+.gull-b { top:19vh; scale:.7; animation-duration:71s,.62s; animation-delay:-38s,0s; animation-direction:reverse,normal; }
+@keyframes gull-cross { from { transform:translate3d(-40px,0,0); } 50% { transform:translate3d(60vw,-5vh,0); } to { transform:translate3d(calc(100vw + 320px),1vh,0); } }
+@keyframes gull-flap { 50% { clip-path:polygon(0 70%,22% 50%,50% 40%,78% 50%,100% 70%,76% 62%,50% 86%,24% 62%); } }
+@media (prefers-reduced-motion:reduce) { .gull { display:none; } }
 @media (prefers-reduced-motion:reduce) { .pp.moves { transition:none; } }
 /* catalog leaflet: a printed, folded paper close-up of the sheet beside the showcased phone */
 .letter.surface-catalog { background:#fbf7ee; border:0; border-radius:2px; box-shadow:var(--shadow-lg, 0 14px 30px rgba(0,0,0,.4)); background-image:linear-gradient(90deg,transparent calc(50% - 1px),rgba(90,60,30,.18) 50%,transparent calc(50% + 1px)); }
@@ -242,9 +276,112 @@ button { font:inherit; cursor:pointer; }
 @keyframes dest-roll { from { transform:translateY(-110%); } }
 .dest :focus-visible { outline-offset:-2px; }
 /* The doors' stop: its tap area ends below the sign, and its label says what A and B do there. */
-.art-train .sign.hit { height:150px; }
-/* The label and the A bubble hang outside the tap area. Among the train's live sheets the browser clips them to it at
-   high pixel ratios unless each is its own layer. */
-.art-train .sign.hit > span,.art-train .sign.hit .prompt { will-change:transform; }
+.art-train .sign.hit { --hit:150px; }
+/* Indoors things stand close together: a lower tap area keeps one stop from covering the one behind it. */
+.art-shop .sign.hit,.art-storeroom .sign.hit { --hit:140px; }
+/* The label and the A bubble hang outside the tap area. Among live sheets (the train's, and every space's ambient
+   loops) the browser clips them to it unless each is its own layer. */
+.sign.hit > span,.sign.hit .prompt { will-change:transform; pointer-events:none; }
+/* In the car the label stays under the destination sign, clear of its arrows. */
+.art-train .sign.hit > span { top:-8px; } .art-train .sign.hit .prompt { top:-52px; }
 .sign.hit > span em { font-style:normal; display:inline-grid; place-items:center; width:18px; height:18px; margin:0 3px 0 8px; border-radius:50%; background:#2c3138; color:#fff; font-size:11px; line-height:18px; }
 @media (prefers-reduced-motion:reduce) { .art-train .car,.pp.swings,.pp.spins,.rush,.beam,.dest-go b { animation:none; } .platform-light { transition:none; } .floor-light { display:none; } }
+
+/* ---------- the salaryman's pose, and the live paper bits (fx.ts) ---------- */
+/* `.pose` stands at his feet: the jump, the lean and the squash all turn about that point, while his shadow stays on
+   the ground, slides away from the sun as he rises (--jx, --jz) and thins (--air). */
+.pose { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; transform-origin:0 0; will-change:transform; }
+.courier .ground-shadow { transform:translate3d(calc(var(--ground-dx) + var(--jx,0px)),0,calc(var(--ground-dz) + var(--jz,0px))) rotateX(90deg) scale(calc(1 - var(--air,0) * .3)); opacity:calc(1 - var(--air,0) * .45); }
+.fx { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; }
+.bit { position:absolute; left:0; top:0; display:block; opacity:0; pointer-events:none; }
+.bit.dust { border-radius:50%; }
+.bit.scrap { border-radius:1px; box-shadow:inset 0 0 0 1.5px rgba(255,250,240,.9); }
+.bit.scrap.tri { clip-path:polygon(0 100%,50% 0,100% 100%); box-shadow:none; }
+.bit.say { width:36px; height:36px; margin:-36px 0 0 -18px; display:grid; place-items:center; background:#fffaf0; color:#23272d; border-radius:50% 50% 50% 5px; font:600 21px/1 Fredoka,system-ui,sans-serif; box-shadow:var(--shadow-sm); }
+/* Ambient loops (art/ambient.ts): a sheet rocks between two poses in stepped frames, at its own period and offset. */
+.pp.amb { animation:amb var(--t) steps(4,jump-none) var(--d) infinite alternate; }
+@keyframes amb { from { transform:var(--a); } to { transform:var(--b); } }
+.pp.amb-peck { animation:amb-peck var(--t) steps(1,end) var(--d) infinite; }
+@keyframes amb-peck { 0%,10%,20%,100% { transform:var(--a); } 5%,15% { transform:var(--b); } }
+@media (prefers-reduced-motion:reduce) { .pp.amb,.sign.hit::before,.sign.hit::after,.sign.hit.near > span { animation:none; } }
+.probing .pp { pointer-events:auto; }
+/* ?fps on the address shows the frame rate, for checking a device against the 60fps target. */
+.fps { position:fixed; z-index:40; left:8px; bottom:8px; padding:2px 8px; border-radius:3px; background:#14181d; color:#58e08a; font:600 13px/18px ui-monospace,monospace; pointer-events:none; }
+/* Which keys are the buttons, for a first-time player at a keyboard: shown until the first stamp, where the stamp count then sits. */
+.keys { display:none; position:fixed; z-index:30; top:12px; left:12px; margin:0; padding:5px 12px; background:#fffaf0; color:#23272d; border-radius:3px; font-size:14px; line-height:20px; box-shadow:var(--shadow-sm); pointer-events:none; }
+.keys b { display:inline-block; min-width:22px; margin:0 3px 0 10px; padding:0 6px; border-radius:4px; background:#23272d; color:#fff; text-align:center; font-weight:600; }
+.keys b:first-child { margin-left:0; }
+@media (hover:hover) and (pointer:fine) { .keys { display:block; } }
+@media (hover:hover) and (pointer:fine) { .stamps { top:46px; } }
+.leave { position:fixed; z-index:30; left:50%; top:64px; transform:translateX(-50%); margin:0; padding:6px 16px; background:#fffaf0; color:#23272d; border-radius:3px; font-size:16px; line-height:24px; box-shadow:var(--shadow-md); pointer-events:none; animation:tag-in .3s steps(4,end); }
+.leave b { display:inline-block; min-width:22px; padding:0 6px; border-radius:50%; background:#23272d; color:#fff; text-align:center; }
+/* Where he is, when something tall hides him (World.hidden): a navy pennant over his head, its white core showing. */
+.here { display:none; position:absolute; left:-15px; bottom:176px; width:30px; height:36px; background:radial-gradient(circle at 50% 34%,#fffaf0 0 4px,transparent 4.6px),linear-gradient(#2f3e5c,#2f3e5c) 50% 46%/22px 27px no-repeat,#fffaf0; clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%); animation:pin-bob .8s steps(4,jump-none) infinite alternate; }
+.courier[data-unseen] .here { display:block; }
+@media (prefers-reduced-motion:reduce) { .here { animation:none; } }
+/* A label and its A bubble stand well in front of the tap area (70 units toward the camera; not in the car, where nothing stands between), so no lamp, card or prop
+   between the stop and the camera covers them. */
+.sign.hit .prompt { transform:translateZ(70px); }
+.art-train .sign.hit > span { transform:translateX(-50%); } .art-train .sign.hit .prompt { transform:none; }
+.sign.hit { transform-style:preserve-3d; }
+/* ---------- a stop with no diorama yet (Moperty): the maker's bench, not grey boxes ---------- */
+/* A green cutting mat with its grid, blank cream card stock stood up where the buildings will go, and each stop a paper
+   tag on a post, high enough that the salaryman stands under it instead of behind it. */
+.art-blockout { background:radial-gradient(120% 90% at 50% 30%,#e9dfcc 0,#cdbfa5 100%); }
+.art-blockout .floor { background:repeating-linear-gradient(0deg,rgba(255,255,255,.2) 0 2px,transparent 2px 60px),repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 2px,transparent 2px 60px),repeating-linear-gradient(0deg,rgba(255,255,255,.34) 0 3px,transparent 3px 300px),repeating-linear-gradient(90deg,rgba(255,255,255,.34) 0 3px,transparent 3px 300px),#2f7d5b; }
+.art-blockout .card { background:#f6efe2 !important; border-radius:2px; box-shadow:var(--shadow-md),inset 0 0 0 2px #fffaf0,inset 0 -10px 0 rgba(120,90,50,.08); }
+.art-blockout .prop:nth-child(3n) > .card { background:#e6c9a0 !important; } .art-blockout .prop:nth-child(5n) > .card { background:#ead9bd !important; }
+.art-blockout .sign { bottom:128px; height:84px; background:#fffaf0; border-radius:3px; border:3px solid #fff; box-shadow:var(--shadow-md); font-weight:600; }
+.art-blockout .sign::after { content:""; position:absolute; left:calc(50% - 4px); top:100%; width:8px; height:128px; background:#b5ada2; }
+.art-blockout .sign.road { background:#f0a51e; color:#23272d; }
+.art-blockout .sign.near { background:#fff; border-color:#e8552d; }
+.art-blockout .ground-shadow { background:rgba(8,30,20,.3); box-shadow:0 0 12px 8px rgba(8,30,20,.14); }
+/* ---------- the handheld's screen: the platform (Platform.tsx) ---------- */
+.controller[data-mode="handheld"] .screen,.controller[data-mode="docking"] .screen { background:#dfe5ea; cursor:pointer; }
+.mini-road { display:none; }
+.platform { position:absolute; inset:0; width:100%; height:100%; display:block; font-family:Fredoka,system-ui,sans-serif; }
+/* A toy theatre's depth: the far wall drifts with him, what hangs in front drifts against him. */
+.pf-back { transform:translateX(calc(var(--par,0) * 8px)); }
+.pf-front { transform:translateX(calc(var(--par,0) * -10px)); }
+.pf-train { transform:translateX(-1100px); }
+[data-train="coming"] .pf-train { animation:train-in 2s both; }
+[data-train="in"] .pf-train { transform:none; }
+/* It brakes: each stretch is shorter than the last, and each is taken in stepped frames. */
+@keyframes train-in { 0% { transform:translateX(-1100px); animation-timing-function:steps(5,end); } 30% { transform:translateX(-560px); animation-timing-function:steps(5,end); } 58% { transform:translateX(-220px); animation-timing-function:steps(5,end); } 82% { transform:translateX(-50px); animation-timing-function:steps(4,end); } 100% { transform:none; } }
+.pf-leaf { transition:transform .32s steps(4,end); }
+[data-train="in"] .pf-leaf-l { transform:translateX(-33px); } [data-train="in"] .pf-leaf-r { transform:translateX(33px); }
+.pf-reader { fill:#e8552d; } [data-gate="open"] .pf-reader { fill:#58e08a; }
+.pf-paddle { transform-box:fill-box; transform-origin:0 50%; transition:transform .3s steps(4,end); }
+[data-gate="open"] .pf-paddle { transform:scaleX(.1); }
+.pf-sleeper { transform-box:fill-box; transform-origin:50% 100%; animation:pf-breathe 2.6s steps(4,jump-none) infinite alternate; }
+@keyframes pf-breathe { to { transform:scaleY(1.03); } }
+.pf-zz { opacity:0; transform-box:fill-box; transform-origin:0 100%; }
+[data-near-bench] .pf-zz { animation:pf-zz 1.3s steps(10,end) both; }
+@keyframes pf-zz { 0% { opacity:1; transform:scale(.3); } 20% { opacity:1; transform:scale(1.12); } 30%,80% { opacity:1; transform:none; } 100% { opacity:0; transform:translateY(-8px) scale(.7); } }
+.pf-here { animation:pulse 1.1s steps(2,jump-none) infinite; }
+.pf-status { animation:pf-roll .28s steps(4,end); }
+@keyframes pf-roll { from { transform:translateY(-12px); opacity:0; } }
+/* He comes down the stairs as the page opens, and turns over like a card when he changes direction. */
+.flipper { position:absolute; left:0; top:0; width:0; height:0; transform:scaleX(var(--f,1)); transition:transform .2s steps(4,end); animation:pf-arrive .7s steps(7,end) backwards; }
+@keyframes pf-arrive { from { translate:-34px -30px; opacity:0; } 30% { opacity:1; } }
+.prompt.at-gate { left:calc(29.8% - 18px); top:36%; }
+.prompt.end { left:calc(86.9% - 18px); right:auto; top:21%; }
+/* He is drawn at the platform's own scale whatever the console's size: 100cqw is the scene's 840 units. */
+@supports (scale:tan(atan2(1px,1px))) { .mini-courier > .flipper { zoom:1; scale:calc(tan(atan2(100cqw,840px)) * .92); } }
+/* Boarding is docking: he steps in, the doors shut, and the train pulls out as the console goes to the dock. */
+.controller[data-mode="docking"] .mini-courier { animation:pf-board .34s steps(5,end) both; }
+@keyframes pf-board { to { translate:0 -6cqw; scale:.82; opacity:0; } }
+.controller[data-mode="docking"] .pf-leaf-l,.controller[data-mode="docking"] .pf-leaf-r { transform:none; transition-delay:.3s; transition-duration:.2s; }
+.controller[data-mode="docking"] .pf-train { animation:train-out .9s .55s cubic-bezier(.5,0,.9,.4) both; }
+@keyframes train-out { to { transform:translateX(760px); } }
+/* The commuter pass: it pops up as he taps it, then goes to the corner, where it is the stamp card. */
+.pass-pop { position:fixed; z-index:35; left:50%; top:42%; width:230px; margin:-70px 0 0 -115px; padding:14px 16px 22px; display:grid; gap:2px; background:#fffaf0; color:#23272d; border-radius:10px; box-shadow:var(--shadow-md),inset 0 -8px 0 #35b58a,inset 0 -16px 0 #e8552d; pointer-events:none; animation:pass-pop 1.5s steps(18,end) both; }
+.pass-pop small { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8b929c; } .pass-pop b { font-size:30px; line-height:36px; font-weight:600; } .pass-pop span { display:flex; align-items:center; gap:5px; font-size:13px; }
+.pass-pop i { width:10px; height:10px; border-radius:50%; background:#e8552d; } .pass-pop i + i { background:#35b58a; }
+@keyframes pass-pop { 0% { transform:translateY(60px) scale(.3) rotate(-10deg); opacity:0; } 14% { transform:scale(1.08) rotate(2deg); opacity:1; } 22%,66% { transform:none; opacity:1; } 100% { transform:translate(calc(-50vw + 110px),calc(-42vh + 60px)) scale(.42); opacity:0; } }
+.stamps { display:grid; padding:5px 12px 12px; border-radius:6px; background:#fffaf0; color:#23272d; font-size:13px; line-height:17px; box-shadow:var(--shadow-sm),inset 0 -3px 0 #35b58a,inset 0 -6px 0 #e8552d; }
+.stamps b { font-size:15px; line-height:19px; font-weight:600; }
+.stamps.fresh { animation:pass-land .3s 1.35s steps(4,end) backwards; }
+@keyframes pass-land { from { opacity:0; scale:1.5; } }
+@media (prefers-reduced-motion:reduce) { .pf-train,.pf-sleeper,.pf-zz,.pf-here,.pf-status,.flipper,.pass-pop,.stamps.fresh,.controller[data-mode="docking"] .mini-courier,.controller[data-mode="docking"] .pf-train { animation:none; } .pf-leaf,.pf-paddle,.flipper { transition:none; } .pass-pop { display:none; } [data-train="coming"] .pf-train { transform:none; } }
+.screen .prompt { width:clamp(18px,4.4cqw,36px); height:clamp(18px,4.4cqw,36px); margin-left:0; font-size:clamp(10px,2.2cqw,18px); }

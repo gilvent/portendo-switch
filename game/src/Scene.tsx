@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type MutableRefObject, type RefObject } from 'react';
 import gsap from 'gsap';
 import type { Stop, World } from './schema.ts';
 import { reducedMotion, shadowFilter } from './light.ts';
-import Salaryman from './art/Salaryman.tsx';
+import Hero from './art/Hero.tsx';
 import { WORLD_ART, WORLD_BACKDROP } from './art/blibli.tsx';
 import { at } from './art/fold.tsx';
+import { ambientOf, hash } from './art/ambient.ts';
+import { makeFx, type Fx } from './fx.ts';
 import { BED, BORE, CAB, CAR, DOOR, SIGN, TUNNEL } from './art/scenes/car.ts';
 
 // The looping animations that are the train's motion (styles.css): they all follow its speed.
@@ -22,9 +24,11 @@ function scenery(w: World): Card[] {
 
 // line: which destination the sign over the train doors shows. arrival: 0 while the train runs, 1 once it has stopped
 // at the chosen stop, 2 once its doors are open.
-type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; onStop: (s: Stop) => void };
+// fold: the page turn between spaces. 'out' folds this space's paper flat and closes the page over it; 'in' opens the
+// page and pops the paper up. A space also pops up when it is first shown.
+type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
 
-export default function Scene({ world, nearStop, toys, line, arrival, onLine, stageRef, courierRef, flipRef, onStop }: Props) {
+export default function Scene({ world, nearStop, toys, line, arrival, fold, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
   const drawn = world.art !== 'blockout';
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
@@ -41,18 +45,28 @@ export default function Scene({ world, nearStop, toys, line, arrival, onLine, st
     apply();
     return () => { t.kill(); };
   }, [train, arrival > 0]);
-  const b = world.bounds, wipe = useRef<HTMLDivElement>(null);
+  const b = world.bounds, bits = useRef<HTMLDivElement>(null);
+  // The live paper bits (dust, scraps, tags) and the hop of whatever the salaryman brushes past.
   useEffect(() => {
-    if (reducedMotion() || !wipe.current) return;
-    const t = gsap.fromTo(wipe.current.children, { scaleX: 1 }, { scaleX: 0, duration: .55, ease: 'power3.inOut', stagger: .04 });
-    return () => { t.kill(); };
-  }, []);
+    if (!bits.current || !root.current) return;
+    const fx = makeFx(bits.current, root.current, ambientOf(world.art));
+    fxRef.current = fx;
+    return () => { if (fxRef.current === fx) fxRef.current = null; };
+  }, [world.art, fxRef]);
+  const backdrop = WORLD_BACKDROP[world.art];
+  // The page's two leaves exist only while they move: as the space opens, and again as it closes.
+  const [opened, setOpened] = useState(false);
+  useEffect(() => { const t = window.setTimeout(() => setOpened(true), 700); return () => clearTimeout(t); }, []);
   return (
-    <div ref={root} className={`tv art-${world.art}`} data-testid={`world-${world.id}`} data-arrival={arrival || undefined} style={WORLD_BACKDROP[world.art] ? { backgroundImage: `url(${WORLD_BACKDROP[world.art]})` } : undefined}>
+    <div ref={root} className={`tv art-${world.art}`} data-testid={`world-${world.id}`} data-arrival={arrival || undefined} data-fold={fold ?? undefined} onPointerDown={e => { if (!(e.target as HTMLElement).closest('button')) fxRef.current?.tap(e.clientX, e.clientY); }}>
+      {/* The far backdrop is its own sheet so it can slide against the scene, and a gull crosses it now and then. */}
+      {backdrop && <div className="sky" ref={skyRef} aria-hidden="true" style={{ backgroundImage: `url(${backdrop})` }}><i className="gull" /><i className="gull gull-b" /></div>}
       <svg width="0" height="0" className="defs" aria-hidden="true"><defs>
         {(['sm', 'md'] as const).map(n => <filter key={n} id={`paper-${n}`} x="-20%" y="-20%" width="150%" height="150%"><feDropShadow {...shadowFilter(n)} /></filter>)}
+        {/* The player's sheet: his outline grown by the white core of the card, then the same small shadow. */}
+        <filter id="hero-rim" x="-25%" y="-20%" width="160%" height="150%"><feMorphology operator="dilate" radius="3" in="SourceAlpha" result="grown" /><feFlood floodColor="#fffaf0" /><feComposite in2="grown" operator="in" result="core" /><feMerge result="sheet"><feMergeNode in="core" /><feMergeNode in="SourceGraphic" /></feMerge><feDropShadow in="sheet" {...shadowFilter('sm')} /></filter>
       </defs></svg>
-      <div className="stage" ref={stageRef}><div className="car">
+      <div className="stage" ref={stageRef}><div className="page"><div className="car">
         {/* Underground. Behind the whole train stands the tunnel's far wall, its ribs, cable runs and work lamps rushing
             back past the windows; under it lies the track bed, its sleepers streaking by between the rails. The
             headlight throws its beam down the tunnel ahead, and the lamps' light sweeps across the car floor. When
@@ -69,11 +83,12 @@ export default function Scene({ world, nearStop, toys, line, arrival, onLine, st
         {Art && <Art near={nearStop} toys={toys} />}
         {!drawn && world.solid.map((r, i) => <div key={i} className="prop" style={at((r.x0 + r.x1) / 2, r.z0)}><div className="card" style={{ width: r.x1 - r.x0, height: 150, marginLeft: -(r.x1 - r.x0) / 2, background: '#7f8792' }} /></div>)}
         {world.stops.map(s => (
-          <div key={s.id} className="prop" style={at(s.x, s.z)}>
+          // The tap area and its marker stand at the thing being used (`look`), not where the salaryman stands to use it.
+          <div key={s.id} className="prop" style={at(drawn ? s.look ?? s.x : s.x, s.z)}>
             {!drawn && <i className="ground-shadow" />}
-            <button className={`sign${drawn ? ' hit' : ''}${s.action.kind === 'road' ? ' road' : ''}${nearStop === s.id ? ' near' : ''}`} data-testid={`stop-${world.id}-${s.id}`} onClick={() => onStop(s)}>
+            <button className={`sign${drawn ? ' hit' : ''}${s.action.kind === 'road' ? ' road' : ''}${nearStop === s.id ? ' near' : ''}`} data-testid={`stop-${world.id}-${s.id}`} style={{ '--d': `${(-hash(s.id) * 1.6).toFixed(2)}s`, ...(s.mark ? { '--mark': `${s.mark}px` } : null) } as CSSProperties} onClick={e => { if (e.detail) e.currentTarget.blur(); onStop(s); }}>
               <span>{s.action.kind === 'ride' ? <>Get off at {dest?.label} <em>B</em> change stop</> : s.label}</span>
-              {nearStop === s.id && s.action.kind !== 'road' && <b className="prompt" data-testid="prompt-a">A</b>}
+              {nearStop === s.id && <b className="prompt" data-testid="prompt-a">A</b>}
             </button>
           </div>
         ))}
@@ -86,10 +101,12 @@ export default function Scene({ world, nearStop, toys, line, arrival, onLine, st
         </div>}
         <div className="courier" ref={courierRef} data-testid="courier">
           <i className="ground-shadow small" />
-          <div className="flip" ref={flipRef}><Salaryman /></div>
+          <i className="here" />
+          <div className="pose" ref={poseRef}><div className="flip" ref={flipRef}><Hero /></div></div>
         </div>
-      </div></div>
-      <div className="wipe" ref={wipe} aria-hidden="true"><i /><i /></div>
+        <div className="fx" ref={bits} aria-hidden="true" />
+      </div></div></div>
+      {(!opened || fold === 'out') && <div className="wipe" aria-hidden="true"><i /><i /></div>}
     </div>
   );
 }

@@ -86,7 +86,8 @@ export default forwardRef(function LetterView({ world, stop, letterId, toys, onC
     const t = gsap.from(inner.current, { ...PULL[l.surface], opacity: 0, duration: .36, ease: 'back.out(1.3)', clearProps: 'transform,opacity' });
     return () => { t.kill(); };
   }, []);
-  useEffect(() => { inner.current?.focus(); return () => { document.querySelector<HTMLElement>(`[data-testid="stop-${world}-${stop}"]`)?.focus({ preventScroll: true }); }; }, [world, stop]);
+  // Putting the letter down leaves nothing focused: A (Enter) then belongs to the game again, not to whichever stop was tapped.
+  useEffect(() => { inner.current?.focus(); return () => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); }; }, [world, stop]);
   return (
     <article className={`letter surface-${l.surface}`} tabIndex={-1} data-testid={`letter-${world}-${stop}`} ref={el => { inner.current = el; if (typeof ref === 'function') ref(el); else if (ref) ref.current = el; }}>
       <h2>{l.title}</h2>

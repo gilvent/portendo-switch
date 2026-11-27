@@ -1,4 +1,5 @@
-// The player: a bored salaryman on his rounds, cut from one sheet of card like a paper toy. Anime avatar face (big eyes
+// A bored salaryman on his rounds. He was the player once; now he is one of the commuters (Platform.tsx seats him on
+// the bench). He is cut from one sheet of card like a paper toy. Anime avatar face (big eyes
 // with a coloured iris, a heavy upper lid, a highlight), drawn crisp at paper-toy proportions: a big head on a short
 // slumped suit and stubby legs. The sheet is cut a little wider than the print so the white core rims the silhouette;
 // inside it, detail is tones of the same colours. Seen nearly front on, turned a touch to the right; the legs are
@@ -30,11 +31,18 @@ const silhouette = <>
   <g transform={RIDE}><circle cx="17" cy="101" r="4.6" /><path d={caseBody} /><path d={caseHandle} fill="none" /><circle cx="63" cy="101" r="5" /></g>
   <ellipse cx="18" cy="57" rx="4.4" ry="6" /><ellipse cx="62" cy="57" rx="4.4" ry="6" /><path d={face} /><path d={hair} />
 </>;
-export default function Salaryman() {
+// The figure as SVG, for drawing inside another SVG: `seated` gives him the short legs of a man sitting down (his own
+// legs were separate strips so the player could stride). The 80-wide box starts at his hair; his suit ends at
+// SEAT, where a bench should meet him.
+export const SEAT = 107 + BODY;
+export function SalarymanArt({ seated = false }: { seated?: boolean }) {
+  const top = SEAT - 1, len = seated ? 9 : 22;
   return (
     <>
-    <i className="leg leg-b" /><i className="leg leg-f" />
-    <svg className="courier-art" viewBox={`0 0 80 ${HEIGHT}`} width="80" height={HEIGHT} overflow="visible" aria-hidden="true"><g filter="url(#paper-sm)">
+      <g fill="#fff" stroke="#fff" strokeWidth="5" strokeLinejoin="round"><rect x="29" y={top} width="11" height={len} /><rect x="41" y={top} width="11" height={len} /><rect x="25" y={top + len - 1} width="15" height="7" rx="3.5" /><rect x="41" y={top + len - 1} width="15" height="7" rx="3.5" /></g>
+      <rect x="29" y={top} width="11" height={len} fill="#263350" /><rect x="41" y={top} width="11" height={len} fill="#2f3e5c" />
+      <rect x="25" y={top + len - 1} width="15" height="7" rx="3.5" fill="#1d1f24" /><rect x="41" y={top + len - 1} width="15" height="7" rx="3.5" fill="#1d1f24" />
+      <g filter="url(#paper-sm)">
       {/* The cut sheet: every part's outline, grown so its white core rims the figure. */}
       <g fill="#fff" stroke="#fff" strokeWidth="7" strokeLinejoin="round" strokeLinecap="round">{silhouette}</g>
       {/* Slumped suit: arms hanging, the tie pulled loose and crooked. */}
@@ -62,7 +70,7 @@ export default function Salaryman() {
       <path d={hair} fill={HAIR} />
       <path d="M22 37Q37 29 56 34Q40 33.5 25 40.5Z" fill={HAIR_LIGHT} />
       <path d="M17 49Q18 52 20.5 54V47Z M63 49Q62 52 59.5 54V47Z" fill="#2c313a" />
-    </g></svg>
+    </g>
     </>
   );
 }

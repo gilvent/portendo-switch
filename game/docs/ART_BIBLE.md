@@ -97,7 +97,8 @@ Everyone, the player included, is one cut sheet at paper-toy proportions: a big 
 
 - Three builds share the design (`BUILDS` in `promenade.ts`), all with the same head: **short** is the base; **average** lengthens the body by 6 and the legs by 7; **big** is taller again (body +10, legs +9) and 14% broader, for large, energetic people. Hands, bags and shoes keep their shape as the body stretches. The player is average; on the street the father and the kiosk's hawker are big, the café diner and the backpacker average, the lady in the sun hat and the child short.
 - Anyone behind a counter stands on a step (`lift`) so their head and shoulders clear it: the ticket kiosk's hawker is never hidden.
-- The player (`Salaryman.tsx`) is a bored salaryman: a clean, short Japanese cut with a side part, heavy lids lowered over his eyes, flat brows, faint eye bags, a small flat mouth, a loosened crooked tie, slumped shoulders and a briefcase hanging from one hand. His legs are separate strips so they can stride.
+- The player (`Hero.tsx`) is a man on a mission, in a good way and a funny way. An Asian textured spiky crop: faded sides, the top cropped short and worked into piecey tufts over the whole head, each its own size and direction, with a short broken fringe a little longer toward each side of the forehead. Set brows over eyes fixed straight ahead and a sure, closed smile that is fullest under the near eye. An open black suit jacket with no tie over a light tee left untucked. Unlike everyone else he is drawn turned three-quarters toward the way he walks, leaning 4° into his stride, his right hand in his pocket. Facing left the sheet is mirrored and the arms swap, so the pocketed hand is always his right. His legs are separate strips so they can stride. The drawing is generated: edit `tools/hero/turned.cjs` and run `node tools/hero/turned.cjs --game src/art/heroArt.ts`.
+- The bored salaryman who used to be the player (`Salaryman.tsx`: a neat side part, heavy lids, a loosened crooked tie, a briefcase) is now a commuter. He dozes on the platform bench.
 - Passers-by (`shopper`) share the build and face, but each wears their own expression (`face`), the way a Paper Mario cast does, never one stock smile: **cheerful**, **determined** (fierce brows driving to the nose, narrowed eyes, an open grin), **cool** (sunglasses with a glint, one brow cocked, a smug side mouth), **sleepy** (eyes shut in downturned arcs), **grumpy** (brows pinched low, heavy lids, a frown), **surprised** (brows up, small pupils, an open O) and **shout** (eyes squeezed shut, mouth thrown wide). Blush only goes on the cheerful, surprised and shouting faces. Brows sit on the forehead over the fringe. A moustache (`tache`) is a thick cut shape over the mouth. On the street: the sun-hat lady is grumpy, the backpacker cool, the father determined, the child surprised, the café diner asleep in the sun, and the hawker shouts behind his moustache. They vary by trousers, shorts or a dress (with a bob), hats, backpacks, eye colour and what they carry; the carrying arm and bag stand proud of the figure as a second sheet.
 
 ### 3. Realism
@@ -170,6 +171,8 @@ No AI image or 3D tool was used. All geometry is planar and generated from data.
 
 ## Performance budget
 
+Add `?fps` to the address to see the frame rate and the worst frame of the last half second on the device in hand.
+
 Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 
 - Textured layers cost far more than flat colour ones. Up to about 120 flat faces ran at 60fps, while 59 textured quads did not.
@@ -202,3 +205,80 @@ Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels a
 | Recommended shelf | Placeholder cards fold down |
 | Review board | The chosen filter tab rises |
 | Any toy | A piece that appears drops into place in five stepped frames |
+
+## Life
+
+Everything below is drawn live by the game, not baked. A baked sheet keeps its baked light and its baked shadow, so live motion stays small enough that the shadow still belongs to it: a few degrees, a few units, and a touched piece always lands back where it stood. Under reduced motion none of it plays.
+
+### Ambient loops (`src/art/ambient.ts`)
+
+A loop rocks one sheet between two poses in four stepped frames. Each sheet takes its period and its starting point from its own id, so no two flags, fronds or lamps ever move in step. Sheets of one object that must move together (the river's two halves) share a key.
+
+| Space | What moves on its own |
+|---|---|
+| Street | Flags and gate bunting, festoon lights, palm fronds and tree leaves, bushes and tufts, the clothes rail, the river and its boat, shoppers breathing, the hawker bouncing as he shouts, pigeons and roof birds pecking, two cut gulls crossing the sky |
+| MRT car | Passengers breathing (the sleeper deeper and slower), on top of the train's own motion |
+| Outlet | Bunting, pendant lamps, the plant, the clerk, the promo burst |
+| Store-room | Pendant lamps, the packer, the roller, on top of the belts |
+
+A new loop is one line: a pattern over sheet ids and a kind (`sway`, `skew`, `rustle`, `breathe`, `bob`, `peck`).
+
+### Touch
+
+Anything listed as a touchable hops when the salaryman walks or jumps within its reach: the whole object rises together and lands again in stepped frames, with a puff of dust. People answer with a paper tag over their head instead (♪, …, !, ?, z), in keeping with their face. A touchable must be within reach of the walkable floor.
+
+A tap or click reaches further than he can walk: every sheet in every space answers it. A touchable does what it does for the salaryman; any other small object hops together with the sheets it is built from; a big sheet (a wall, the ground, a facade) knocks 2.5 units. The journey test taps a grid across all four spaces and fails if any paper stays still.
+
+### Using a stop
+
+Pressing A at a stop answers in the same frame, before anything opens: paper scraps in the space's colour burst from the object and the salaryman dips. The stop's own baked motion (flap, door, chip) follows as before.
+
+### The salaryman
+
+- **Sets off** with a dip of 60ms before his feet go, then stretches into the walk and kicks dust behind him.
+- **Turns** like a playing card flipped over in five stepped frames, with a small skip.
+- **Jumps** on A when nothing is in reach: a crouch, a stretch on the way up, a squash and dust on landing. His shadow stays on the ground, slides away from the sun by `SUN_TO_LIGHT` as he rises, and thins.
+- **Pulls up** from a run with a squash and dust ahead of him.
+- Every other stride leaves a dot of dust.
+
+The camera leads the way he faces (further while he walks), eases after him, and lets him move 16 units inside a dead zone before it follows.
+
+### Markers
+
+Anything that can be used carries a cut paper pennant, coral with its white core showing, bobbing in stepped frames at its own offset. Ways out are sun yellow and hang at door height. A stop sets `mark` when its object is higher or lower than the top of its tap area (the MRT poster, the help point).
+
+### Changing space
+
+A space opens like a gatefold card: two paper leaves swing out from the middle, and as they clear, the standing paper pops up from flat with a small overshoot. Leaving, the paper folds flat and the leaves shut. The game's state changes at once; what is drawn lags it by the fold (`shown` in `App.tsx`).
+
+### Depth
+
+The street's far backdrop is its own sheet and slides at a tenth of the camera's travel, behind the river view, the buildings, the plaza and the kerb planting, which keep their true parallax in the 3D scene. On a landscape screen the two rooms are framed to fill it (`zoomWide`); close-ups at stops are unchanged.
+
+### What a first-time player is told
+
+Three blind playtests (a fresh player given only the address) set these rules; the third reached all four spaces on foot.
+
+- A legend stays top-left on a keyboard device: the four arrows walk, A or Enter uses and jumps, B or Esc closes and leaves. The letters A, B and X on the keyboard are the buttons.
+- The handheld's platform tells him what to do on its departure board: tap the pass at the gate, then board.
+- A door or way out works both ways: walking into it, or A when its prompt shows. The shop door reaches the lane a player walks along from the train.
+- A puts a letter down as B does (on the catalog it turns the leaves).
+- B with nothing open asks before it leaves a space: the second press goes.
+- The stamp count shows its total.
+- A stop's tap area and marker stand on the thing used, never on the spot the salaryman stands at.
+
+## The platform: the handheld's screen
+
+The site opens on the handheld, and its screen is the MRT platform the salaryman waits on (`src/Platform.tsx`). Boarding the train is docking the console, and the big screen wakes inside that train as it pulls away, so the entry and the game are one journey.
+
+- **A toy theatre, not a diorama.** Flat cut layers in one live SVG, 840 by 472, in the walk's own x. Nothing is baked. The far wall drifts with him and what hangs from the roof drifts against him (`--par`), which is all the depth a toy theatre has; docking opens it into the 3D spaces.
+- **The name board** hangs from the roof and carries the name only. It is the page's headline.
+- **The ticket gate** stops him until A taps his commuter pass. The pass pops up, then goes to the corner and is the stamp card for the rest of the game. The gate is not a stamp.
+- **The line map** shows two lines that meet at this station, marked "You are here": the Work line (coral) and the Side projects line (mint). Its stops are read from `content.ts`; a stub past the last stop says the line goes on. The interchange is not a place to visit.
+- **The train** is called by the gate. It comes in from the left, the way it runs on the big screen, brakes in stepped frames and opens the door of its front car on the mark. He can board only once it stands.
+- **The departure board** shows the visitor's own time and the next thing to do. The hour also sets the sky in the high windows and a wash over the platform: morning, day, evening, night.
+- **Boarding:** he steps in, the doors shut, the train pulls out as the console goes to the dock, and the dock's light turns green.
+- A commuter sleeps on the bench and answers with a "z" as he passes. A tap on the screen walks him there, or presses A when he stands at the gate or the door.
+- Under reduced motion the train is already standing when the gate opens, and nothing slides.
+
+The in-car route map is baked and still draws one line; it needs a re-bake to match the platform's two.
