@@ -94,27 +94,31 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'User generated images vary in ratio. Consider all possibilities when developing the UI components displaying these images!', at: ['gallery'] } ] },
   // The hometown lane. Nothing is read here: every stop is a toy, and each toy is one thing Moperty does
   // (docs/MOPERTY_DESIGN.md). What one toy does, the visitors and the office window notice.
-  moperty: { id: 'moperty', art: 'blockout', back: { world: 'mrt', stop: 'door' }, bounds: { x0: -700, x1: 700, z0: -45, z1: 180 },
-    solid: [{ x0: -440, x1: -160, z0: -200, z1: 5 }, { x0: 90, x1: 290, z0: -200, z1: -52 }, { x0: -60, x1: 150, z0: 44, z1: 56 }, { x0: 230, x1: 340, z0: 44, z1: 56 }, { x0: -66, x1: -54, z0: -200, z1: 56 }, { x0: 334, x1: 346, z0: -200, z1: 56 }, { x0: 400, x1: 690, z0: -200, z1: 0 }],
+  moperty: { id: 'moperty', art: 'lane', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -470, x1: 500 }, bounds: { x0: -700, x1: 740, z0: -80, z1: 180 },
+    // The verge and the plot, the house, the fence either side of the gate, the yard's two sides, the office, the
+    // board's post and the mango tree.
+    solid: [{ x0: -800, x1: -60, z0: -400, z1: 56 }, { x0: 70, x1: 310, z0: -400, z1: -102 }, { x0: -60, x1: 150, z0: 44, z1: 56 }, { x0: 230, x1: 410, z0: 44, z1: 56 }, { x0: -66, x1: -54, z0: -400, z1: 56 }, { x0: 404, x1: 416, z0: -400, z1: 56 }, { x0: 410, x1: 900, z0: -400, z1: 6 }, { x0: -46, x1: 14, z0: -10, z1: 30 }, { x0: 345, x1: 387, z0: -14, z1: 26 }],
     title: 'Moperty', path: 'street', url: 'https://moperty.id', role: 'In My Free Time Developing', color: '#3f51b5', logo: 'brand/moperty-white.svg',
     description: 'A progressive web app to browse available real estate in local area around my hometown.',
+    // He stands beside each thing he uses, never in front of it: `look` is the thing.
     stops: [
       out(),
-      { id: 'road-sign', label: 'Road sign', x: -560, z: 70, action: { kind: 'toy', toy: 'post', states: 2 } },
-      { id: 'plot', label: 'Empty plot', x: -300, z: 40, action: { kind: 'toy', toy: 'build', states: 5 } },
-      { id: 'board', label: 'Board', x: 10, z: 80, action: { kind: 'toy', toy: 'board', states: 2 } },
-      { id: 'front-door', label: 'Front door', x: 190, z: -25, action: { kind: 'toy', toy: 'door', states: 2 } },
-      { id: 'bell', label: 'Agent\'s bell', x: 450, z: 30, action: { kind: 'toy', toy: 'ask', states: 4 } },
-      { id: 'office-door', label: 'Visit Moperty', x: 640, z: 30, action: { kind: 'link', href: 'https://moperty.id' } } ],
+      { id: 'road-sign', label: 'Road sign', x: -545, z: 84, look: -610, action: { kind: 'toy', toy: 'post', states: 2 } },
+      { id: 'plot', label: 'Empty plot', x: -450, z: 84, look: -300, mark: 250, focus: 1.1, action: { kind: 'toy', toy: 'build', states: 5 } },
+      { id: 'board', label: 'Board', x: 56, z: 84, look: -16, mark: 190, action: { kind: 'toy', toy: 'board', states: 2 } },
+      { id: 'front-door', label: 'Front door', x: 190, z: -40, mark: 330, action: { kind: 'toy', toy: 'door', states: 2 } },
+      { id: 'office-door', label: 'Visit Moperty', x: 476, z: 34, look: 490, action: { kind: 'link', href: 'https://moperty.id' } },
+      { id: 'bell', label: 'Agent\'s bell', x: 548, z: 36, look: 630, action: { kind: 'toy', toy: 'ask', states: 4 } } ],
     letters: [],
-    bumps: [{ id: 'mango-tree', label: 'Mango tree', x: 292, z: 120, r: 60, toy: 'mango', states: 4 }],
-    zones: [{ id: 'garden-gate', toy: 'gate', x0: 140, x1: 240, z0: 5, z1: 105 }],
-    crowd: { toy: 'post', ends: [-860, 860],
-      people: [{ id: 'a', speed: 150, z: 112, mood: '♪' }, { id: 'b', speed: 124, z: 132, mood: '!' }, { id: 'c', speed: 168, z: 152, mood: '…' }],
+    bumps: [{ id: 'mango-tree', label: 'Mango tree', x: 366, z: 116, r: 60, toy: 'mango', states: 4 }],
+    zones: [{ id: 'garden-gate', toy: 'gate', x0: 140, x1: 240, z0: -10, z1: 105 }],
+    yards: [{ x0: -54, x1: 404, z0: -80, z1: 50, gate: { x: 190, out: 82, in: 18 } }],
+    crowd: { toy: 'post', ends: [-900, 940],
+      people: [{ id: 'a', speed: 150, z: 112, h: 112, mood: '♪' }, { id: 'b', speed: 124, z: 132, h: 126, mood: '!' }, { id: 'c', speed: 168, z: 152, h: 98, mood: '…' }],
       spots: [
-        { id: 'plot', x: -200, z: 100, toy: 'build', appeal: [1, 1.5, 1.5, 1.5, 2], says: ['?', '…', '…', '…', '!'], side: 1 },
-        { id: 'house', x: 78, z: 110, toy: 'door', appeal: [1.5, 2.5], says: ['?', '♥'], side: 1 },
-        { id: 'office', x: 522, z: 100, toy: 'ask', appeal: [1, 2, 2, 2], says: ['…', '♪', '♪', '♪'], side: 1 } ] },
+        { id: 'plot', x: -150, z: 100, toy: 'build', appeal: [1, 1.5, 1.5, 1.5, 2], says: ['?', '…', '…', '…', '!'], side: 1, places: 2 },
+        { id: 'house', x: 270, z: 110, toy: 'door', appeal: [1.5, 2.5], says: ['?', '♥'], side: 1, places: 1 },
+        { id: 'office', x: 722, z: 100, toy: 'ask', appeal: [1, 2, 2, 2], says: ['…', '♪', '♪', '♪'], side: 1, places: 1 } ] },
     encoded: [
       { fact: 'In My Free Time Developing', at: ['plot'] },
       { fact: 'A progressive web app to browse available real estate in local area around my hometown.', at: ['road-sign', 'board', 'front-door', 'bell'] },

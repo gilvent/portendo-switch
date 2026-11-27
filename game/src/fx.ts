@@ -2,7 +2,7 @@
 // something is used, a tag that pops over a passer-by's head, and the hop of anything he brushes past. Like every
 // other moving sheet they move in stepped frames, and under reduced motion none of them appear.
 import { reducedMotion } from './light.ts';
-import type { Ambient, Touchable } from './art/ambient.ts';
+import type { Ambient, Reaction, Touchable } from './art/ambient.ts';
 
 const POOL = 40, GRAVITY = 1100;
 export type Fx = {
@@ -17,6 +17,10 @@ export type Fx = {
   // A tap or click on the scene at screen point [cx, cy]: whatever paper is under it answers. A touchable hops as it
   // does for the salaryman; any other small object hops with the sheets it is built from; a big sheet knocks.
   tap(cx: number, cy: number): void;
+  // He has landed a jump at [x, z]: the small things around him hop a little.
+  thump(x: number, z: number): void;
+  // A toy changed: play what the scene says should answer it.
+  react(r: Reaction): void;
 };
 
 let seed = 7;
@@ -41,8 +45,8 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
     el.animate([0, .2, .4, .6, .8, 1].map(k => ({ transform: at(k), opacity: k < .8 ? 1 : k < 1 ? .7 : 0 })), { duration: ms, easing: 'steps(7,end)', fill: 'forwards' });
   };
   const last = new Map<string, number>();
-  const hop = (t: Touchable) => {
-    const L = t.lift ?? 9;
+  const hop = (t: Touchable, k = 1) => {
+    const L = (t.lift ?? 9) * k;
     for (const el of scene.querySelectorAll<HTMLElement>(`[data-g="${t.name}"]`)) el.animate({ translate: ['0 0', `0 ${-L}px`, '0 0', `0 ${(-L * .35).toFixed(1)}px`, '0 0'] }, { duration: 460, easing: 'steps(9,end)' });
   };
   const jump = (els: Iterable<HTMLElement>, L: number) => { for (const el of els) el.animate({ translate: ['0 0', `0 ${-L}px`, '0 0', `0 ${(-L * .35).toFixed(1)}px`, '0 0'] }, { duration: 460, easing: 'steps(9,end)' }); };
@@ -75,11 +79,25 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
       jump([...scene.querySelectorAll<HTMLElement>('.pp:not([data-big])')].filter(e => e === el || Math.hypot(+(e.dataset.x ?? 0) - x, +(e.dataset.z ?? 0) - z) < 64), 7);
       fx.dust(x, z + 10, 0, 2);
     },
+    thump(x, z) {
+      if (reducedMotion()) return;
+      const now = performance.now();
+      for (const t of amb.touch) { if (!t.r || t.says || Math.hypot(t.x - x, t.z - z) > 130 || now - (last.get(t.name) ?? -1e9) < 400) continue; last.set(t.name, now); hop(t, .5); }
+    },
+    react(r) {
+      if (reducedMotion()) return;
+      const t = r.hop ? amb.touch.find(k => k.name === r.hop) : undefined;
+      if (t) { last.set(t.name, performance.now()); hop(t); }
+      if (r.say) fx.say(r.say[0], r.say[1], r.say[2], r.say[3]);
+      if (r.dust) fx.dust(r.dust[0], r.dust[1], 0, r.dust[2]);
+      if (r.scraps) fx.scraps(r.scraps[0], r.scraps[1], r.scraps[2], ['#3f51b5', '#fff4e2', '#f6b73c', '#e8552d'], r.scraps[3]);
+    },
     touch(x, z, moving) {
       if (!moving || reducedMotion()) return;
       const now = performance.now();
       for (const t of amb.touch) {
         const r = t.r ?? 62;
+        if (!r) continue;
         if (Math.abs(t.x - x) > r || Math.hypot(t.x - x, t.z - z) > r || now - (last.get(t.name) ?? -1e9) < 1500) continue;
         last.set(t.name, now); hop(t);
         if (t.says) fx.say(t.x, t.top ?? 120, t.z, t.says);

@@ -34,10 +34,10 @@ export type Zone = Rect & { id: string; toy: string };
 // The people who come to look (crowd.ts). They are in the lane only while toy `toy` is not 0. Each spot is where they
 // stand to look at one listing: `appeal` (how much it draws them) and `says` (the tag they answer with) are read at
 // the state of the spot's own toy, one entry per state. `side` is the way a second and third visitor line up.
-export type CrowdSpot = { id: string; x: number; z: number; toy: string; appeal: number[]; says: string[]; side: 1 | -1 };
-export type Crowd = { toy: string; ends: [number, number]; people: { id: string; speed: number; z: number; mood: string }[]; spots: CrowdSpot[] };
+export type CrowdSpot = { id: string; x: number; z: number; toy: string; appeal: number[]; says: string[]; side: 1 | -1; places: number };
+export type Crowd = { toy: string; ends: [number, number]; people: { id: string; speed: number; z: number; h: number; mood: string }[]; spots: CrowdSpot[] };
 export type World = {
-  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom' | 'train'; back?: { world: WorldId; stop: string }; // ahead: on a wide screen the view leads the walker by this much along x (the train's camera looks toward its front).
+  id: WorldId; title: string; art: 'blockout' | 'street' | 'shop' | 'storeroom' | 'train' | 'lane'; back?: { world: WorldId; stop: string }; // ahead: on a wide screen the view leads the walker by this much along x (the train's camera looks toward its front).
   // zoomWide: the zoom on a landscape screen, where a room has space to fill the frame; stops' `focus` close-ups stay as framed for `zoom`.
   camera?: { zoom: number; zoomWide?: number; x0: number; x1: number; lift?: number; liftTall?: number; ahead?: number }; path: 'round' | 'street' | 'store' | 'climb'; bounds: Rect; solid: Rect[];
   // Floor the camera cannot see because something tall stands in front of it. While the salaryman is there, a marker
@@ -48,6 +48,9 @@ export type World = {
   url?: string; role?: string; description?: string; logo?: string; color: string;
   stops: Stop[]; letters: Letter[];
   bumps?: Bump[]; zones?: Zone[]; crowd?: Crowd;
+  // Fenced ground with one way in. A tap that would walk him across the fence takes him round by the gate: to the
+  // point `out` in front of it, through to `in`, or the other way.
+  yards?: (Rect & { gate: { x: number; out: number; in: number } })[];
   // Facts this world shows by play instead of text: each names the stops where it is acted out. Never displayed.
   encoded?: { fact: string; at: string[] }[];
 };

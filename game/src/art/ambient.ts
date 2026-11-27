@@ -14,7 +14,11 @@ export type Loop = { kind: 'sway' | 'skew' | 'rustle' | 'breathe' | 'bob' | 'pec
 // A touchable: every sheet whose id matches belongs to one object standing at [x, z]. When the salaryman walks within
 // `r` of it, the whole object hops `lift` units, and `says` (if any) pops up over it on a paper tag.
 export type Touchable = { name: string; match: RegExp; x: number; z: number; r?: number; lift?: number; top?: number; says?: string };
-export type Ambient = { loops: [RegExp, Loop][]; touch: Touchable[] };
+// A reaction: when toy `toy` changes (to `to`, or to anything if `to` is not set), the touchable `hop` hops, a tag
+// `say` pops up over [x, y, z], dust rises at [x, z] or scraps burst from [x, y, z]. This is how one toy is noticed by
+// the rest of a scene.
+export type Reaction = { toy: string; to?: number; from?: number; hop?: string; say?: readonly [number, number, number, string]; dust?: readonly [number, number, number]; scraps?: readonly [number, number, number, number] };
+export type Ambient = { loops: [RegExp, Loop][]; touch: Touchable[]; react?: Reaction[] };
 
 const NONE: Ambient = { loops: [], touch: [] };
 export const AMBIENT: Record<string, Ambient> = {
@@ -103,6 +107,24 @@ export const AMBIENT: Record<string, Ambient> = {
       { name: 'bag', match: /^shop-bag$/, x: 211, z: -72, r: 60, lift: 8 }
     ]
   }
+};
+AMBIENT.lane = {
+  loops: [[/^hen-[ab]$/, { kind: 'peck', amp: 14, secs: 3.1 }]],
+  touch: [
+    { name: 'hens', match: /^hen-[ab]$/, x: 424, z: 78, r: 70, lift: 22 },
+    { name: 'cat', match: /^cat$/, x: 112, z: 62, r: 50, top: 78, says: '?' },
+    { name: 'barrow', match: /^barrow-/, x: -480, z: 40, r: 60, lift: 6 },
+    { name: 'sand', match: /^sand-/, x: -548, z: 0, r: 60, lift: 3 },
+    { name: 'mangoes', match: /^mango-\d$/, x: 370, z: 116, r: 44, lift: 12 },
+    { name: 'bell', match: /^bell-/, x: 604, z: 10, r: 0, lift: 10 },
+    { name: 'crown', match: /^tree-crown-/, x: 366, z: 30, r: 0, lift: 6 },
+    { name: 'stakes', match: /^stake-[01]-/, x: -300, z: 10, r: 0, lift: 5 }
+  ],
+  react: [
+    { toy: 'build', to: 4, hop: 'stakes', scraps: [-300, 190, -100, 14] }, { toy: 'build', to: 0, dust: [-300, 0, 8] },
+    { toy: 'build', to: 4, hop: 'hens' }, { toy: 'mango', to: 0, hop: 'hens', say: [424, 46, 78, '♪'] }, { toy: 'mango', hop: 'crown' },
+    { toy: 'ask', hop: 'bell', say: [604, 104, 14, '♪'] }, { toy: 'door', to: 1, say: [112, 78, 62, '!'] }, { toy: 'post', to: 1, dust: [-610, 16, 4] }, { toy: 'post', to: 0, dust: [-610, -80, 6] }
+  ]
 };
 export const ambientOf = (art: string): Ambient => AMBIENT[art] ?? NONE;
 

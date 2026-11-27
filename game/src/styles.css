@@ -194,7 +194,11 @@ button { font:inherit; cursor:pointer; }
 .pp { position:absolute; left:0; top:0; display:block; transform-origin:0 0; backface-visibility:hidden; background-repeat:no-repeat; pointer-events:none; }
 .pp-shadow { position:absolute; display:block; pointer-events:none; }
 .pp.moves { transform:var(--rest); transition:transform .42s steps(5,end); }
-.pp.moves.on { transform:var(--on); }
+.pp.moves.on { transform:var(--on); transition-delay:var(--wait,0s); }
+/* A spring: five held frames that pass the pose, come back short of it and settle. */
+.pp.moves.spring { transition-duration:.5s; transition-timing-function:linear(0 0%,0 12%,.5 12%,.5 28%,1.14 28%,1.14 46%,.94 46%,.94 64%,1.03 64%,1.03 82%,1 82%); }
+.actor { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; will-change:transform; }
+.actor-pose { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; transform-origin:0 0; }
 .art-street { background:#6f5a44; }
 /* The far backdrop: its own sheet, a little wider than the screen, sliding slowly against the scene as the camera moves. */
 .sky { position:absolute; inset:0 -140px; background:no-repeat 50% calc(42vh - 562px) / 2400px auto; will-change:transform; }
@@ -225,7 +229,7 @@ button { font:inherit; cursor:pointer; }
 .leaf-desc { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; }
 /* A piece a toy brings in drops into place in five stepped frames, like the hinges. */
 .pp.pop { animation:pop .42s steps(5,end) both; }
-@keyframes pop { from { translate:0 -18px; } }
+@keyframes pop { from { translate:0 var(--drop,-18px); } }
 @media (prefers-reduced-motion:reduce) { .pp.pop { animation:none; } }
 
 /* ---------- the MRT car: a close-up of its inside, running underground ---------- */
@@ -385,3 +389,13 @@ button { font:inherit; cursor:pointer; }
 @keyframes pass-land { from { opacity:0; scale:1.5; } }
 @media (prefers-reduced-motion:reduce) { .pf-train,.pf-sleeper,.pf-zz,.pf-here,.pf-status,.flipper,.pass-pop,.stamps.fresh,.controller[data-mode="docking"] .mini-courier,.controller[data-mode="docking"] .pf-train { animation:none; } .pf-leaf,.pf-paddle,.flipper { transition:none; } .pass-pop { display:none; } [data-train="coming"] .pf-train { transform:none; } }
 .screen .prompt { width:clamp(18px,4.4cqw,36px); height:clamp(18px,4.4cqw,36px); margin-left:0; font-size:clamp(10px,2.2cqw,18px); }
+
+/* A bump is tapped like a stop but carries no marker and no label. */
+.sign.hit.bump { --hit:230px; } .sign.hit.bump::before,.sign.hit.bump::after { display:none; }
+/* A figure the game moves is seen from both sides: it is mirrored to face the way it walks. */
+.actor .pp { backface-visibility:visible; }
+.actor[hidden] { display:none; }
+.bit.drop { border-radius:50%; }
+.pp.out { animation:fold-flat .3s steps(5,end) both; }
+.actor-flip { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; transition:transform .2s steps(4,end); }
+@media (prefers-reduced-motion:reduce) { .actor-flip { transition:none; } }

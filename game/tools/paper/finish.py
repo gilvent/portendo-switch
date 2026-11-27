@@ -188,7 +188,7 @@ L["atlas"]["h"] = keep.shape[0]
 Image.fromarray((keep * 255 + 0.5).astype(np.uint8), "RGBA").save(OUT / "atlas.webp", quality=80, method=6, alpha_quality=85)
 
 def seen(p):
-    if p["group"] or p["motion"] or p.get("show") or p.get("keep"):
+    if p["group"] or p["motion"] or p.get("show") or p.get("keep") or p.get("actor"):
         return True
     u, v = (np.array(p[k], dtype=float) for k in "uv")
     u, v = u / np.linalg.norm(u), v / np.linalg.norm(v)
@@ -196,7 +196,7 @@ def seen(p):
     return any(np.dot(np.array(p["n"]), cam - c) > 0 for cam in CAMERAS for c in corners)
 
 
-keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group", "show")
+keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group", "show", "actor")
 def tiles(q, n):
     if n <= 1:
         return [q]

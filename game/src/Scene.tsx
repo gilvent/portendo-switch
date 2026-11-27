@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MutableRefObject, type RefObject } from 'react';
 import gsap from 'gsap';
-import type { Stop, World } from './schema.ts';
+import type { Bump, Stop, World } from './schema.ts';
 import { reducedMotion, shadowFilter } from './light.ts';
 import Hero from './art/Hero.tsx';
 import { WORLD_ART, WORLD_BACKDROP } from './art/blibli.tsx';
@@ -26,9 +26,9 @@ function scenery(w: World): Card[] {
 // at the chosen stop, 2 once its doors are open.
 // fold: the page turn between spaces. 'out' folds this space's paper flat and closes the page over it; 'in' opens the
 // page and pops the paper up. A space also pops up when it is first shown.
-type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
+type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void; onBump: (b: Bump) => void };
 
-export default function Scene({ world, nearStop, toys, line, arrival, fold, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
+export default function Scene({ world, nearStop, toys, line, arrival, fold, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop, onBump }: Props) {
   const drawn = world.art !== 'blockout';
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
@@ -53,6 +53,12 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
     fxRef.current = fx;
     return () => { if (fxRef.current === fx) fxRef.current = null; };
   }, [world.art, fxRef]);
+  // One toy is noticed by the rest of the scene: when it changes, whatever the scene lists as its reaction plays.
+  const was = useRef(toys), toyKey = JSON.stringify(toys);
+  useEffect(() => {
+    const before = was.current; was.current = toys;
+    for (const r of ambientOf(world.art).react ?? []) { const a = before[r.toy] ?? 0, b = toys[r.toy] ?? 0; if (a !== b && (r.to === undefined || r.to === b) && (r.from === undefined || r.from === a)) fxRef.current?.react(r); }
+  }, [toyKey]);
   const backdrop = WORLD_BACKDROP[world.art];
   // The page's two leaves exist only while they move: as the space opens, and again as it closes.
   const [opened, setOpened] = useState(false);
@@ -92,6 +98,8 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
             </button>
           </div>
         ))}
+        {/* A bump has no marker: a tap on it walks him under it and jumps. */}
+        {world.bumps?.map(b => <div key={b.id} className="prop" style={at(b.x, b.z)}><button className="sign hit bump" aria-label={b.label} data-testid={`bump-${world.id}-${b.id}`} onClick={e => { if (e.detail) e.currentTarget.blur(); onBump(b); }} /></div>)}
         {/* The destination sign over the train doors. Its arrows turn it to the other stop; pressing the name walks the
             salaryman to the doors and gets off there. */}
         {doors && ride && dest && <div className="dest" data-testid="dest-sign" style={{ width: SIGN.w, height: SIGN.h, transform: `translate3d(${DOOR.x - SIGN.w / 2}px,${-(SIGN.y + SIGN.h)}px,${SIGN.z}px)` }}>

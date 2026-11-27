@@ -4,6 +4,11 @@ export type Panel = {
   id: string; stock: Stock; c: string; o: V3; u: V3; v: V3; w: number; h: number;
   mask?: string; print?: string; edge?: 'cut' | 'fold'; ghost?: boolean; density?: number; decal?: string;
   emit?: number; motion?: Motion; group?: string; backdrop?: boolean; show?: Show;
+  // Lit like everything else but casting no shadow: for a sheet whose pose changes so much (a wall that folds up
+  // from flat) that a shadow baked at one pose would be wrong at the other.
+  phantom?: boolean;
+  // Belongs to a figure the game moves about itself (a visitor walking the lane): drawn about the origin, on [0, 0].
+  actor?: string;
   // Never culled by the bake's guess at what the game camera sees: for faces a scene knows its own view shows.
   keep?: boolean;
   // Ship this sheet as `split` side-by-side tiles: browsers stop drawing one very wide plane seen edge-on.
@@ -13,11 +18,16 @@ export type Panel = {
 };
 // A panel with `show` exists only while its toy is in one of the listed states. Such panels are baked as phantoms:
 // lit like everything else, but they cast no shadow, so the variants that share one spot never shade each other.
-export type Show = { toy: string; at: number[] };
+// `drop`: how far above its place it starts when it appears (18 if not set): a mango falls from the tree.
+// `fold`: when its state ends it folds flat to the ground and is gone, instead of vanishing (a pop-up closing).
+export type Show = { toy: string; at: number[]; drop?: number; fold?: boolean };
 // A motion plays while the courier stands at stop `when`, or while toy `toy` is in one of the states `at`.
 // `spin` turns the sheet about its centre once every `spin` seconds, for as long as it is shown.
 // `swing` is different: the sheet hangs from its top edge and rocks `swing` degrees each way for as long as it is shown.
-export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3; swing?: number; spin?: number };
+// `edge: 'mid'` turns the sheet about its vertical middle line (a board flipping over on its post).
+// `delay` holds the move back by that many milliseconds on the way to the played pose, so the parts of one object can
+// follow one another. `spring` overshoots the played pose and settles, still in stepped frames.
+export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right' | 'mid'; deg?: number; slide?: V3; swing?: number; spin?: number; delay?: number; spring?: boolean };
 export type Lamp = { at: V3; color: readonly [number, number, number]; energy: number };
 export type Run = { group: string; from: V3; to: V3; count: number; seconds: number };
 export type Scene = {

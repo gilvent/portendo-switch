@@ -110,7 +110,8 @@ The people who browse (F1, F7). They are scenery that follows rules; nothing is 
   | office | agent up | ♪ |
 
 - **Moving on.** After three or four looks they leave by the nearer end, wait a few seconds out of sight and come back in the way they left.
-- **Places.** Two can look at one listing, side by side; the rules never send a third.
+- **Places.** Each listing has a set number of places to stand (two at the plot, one at the house and the office). A visitor never heads for a listing with no place free; with nowhere to go they leave.
+- **Staying.** The more a listing draws them, the longer they look: from 0.85 of their usual look at a bare plot to 1.3 at an open house.
 - **Brushed** by the salaryman they hop and answer, like any passer-by.
 - Under reduced motion nobody walks: while `post` is up, one visitor stands at each spot.
 
@@ -140,7 +141,7 @@ The people who browse (F1, F7). They are scenery that follows rules; nothing is 
 
 ### Review 2 (rules in simulation)
 
-`node tests/rules.ts` steps the reducer and the crowd without a page: 19 checks, one for every rule above that does not need paper to show it. It found one fault in the first draft (a visitor could take a place another still held) and one in the layout (a viewing spot in front of the road sign); both are fixed.
+`npm run rules` (`tools/design/lane-rules.ts`) steps the reducer and the crowd without a page: 20 checks, one for every rule above that does not need paper to show it. It found one fault in the first draft (a visitor could take a place another still held) and one in the layout (a viewing spot in front of the road sign); both are fixed.
 
 Pacing, measured over three minutes of simulated lane with the sign up:
 
@@ -156,3 +157,70 @@ Pacing, measured over three minutes of simulated lane with the sign up:
 The first draft walked too much and looked too little, and looking is where the reactions are. Walking speed went up by a quarter, the lane's ends came in, looks grew by half a second and each visit by one listing.
 
 **Phase 1 is ready.** Open for the dynamics phase to answer by play, not on paper: whether five presses to build feels like a build or like a chore; whether visitors in the foreground get in the way of what is being used; whether the office window's cards are noticed at all.
+
+## Phase 2: dynamics
+
+The rules were built into the game and played in a grey box: every piece that moves, at its true size and place, cut from plain card with no print (`src/art/scenes/lane.ts`, baked with `PAPER_PREVIEW=1`). The grey box runs on the real paper renderer, so what was tuned here is what the art pass inherits.
+
+### What the engine learned
+
+Each is general: any scene can use it.
+
+| New | Where | For |
+|---|---|---|
+| Hinges that turn as hinges at any angle, with a `delay` and a `spring` (five held frames that pass the pose and settle) | `Motion` in `kit.ts`, `fold.tsx` | Walls folding up, the house's leaves, furniture standing up one after another |
+| `edge: 'mid'`: a sheet turning over about its middle | `Motion` | The board |
+| `Show.drop` and `Show.fold`: a piece that falls in from a height, and one that folds flat to the ground as it goes | `kit.ts`, `fold.tsx` | The roof, the mangoes; the pop-up house closing |
+| Bumps: a jump under one steps its toy; a tap walks him under it and jumps | `schema.ts`, `App.tsx` | The mango tree |
+| Zones: a toy held at 1 while he stands inside | `schema.ts`, `App.tsx` | The garden gate |
+| Thump: landing a jump hops the small things around him | `fx.ts` | Hens, wheelbarrow |
+| Reactions: a toy's change plays a hop, a tag, dust or scraps somewhere else | `ambient.ts`, `Scene.tsx` | Every row of the chain-reaction table |
+| Actors: baked figures the game moves itself | `kit.ts`, `fold.tsx`, `App.tsx` | The visitors |
+| Yards: a tap across a fence walks him round by the gate | `schema.ts`, `walker.ts` | The front door |
+
+### What play changed
+
+Found by playing the grey box, not on paper.
+
+| Found | Change |
+|---|---|
+| Standing at a stop, he hid the thing he was using | He stands beside every toy and the camera looks at the toy (`look`). A rule check now fails if a stop puts him in front of its object |
+| The houses were smaller than he is | The listed house is two storeys, so its upstairs rooms open clear of his head; the pop-up house is a full single storey |
+| The pop-up's sheet spilled over the lane and the neighbours when laid flat | The plan is the floor and the front wall only. The back and the gabled sides rise through slots in the ground instead of unfolding outward |
+| The roof waiting on the ground cluttered the plot | It is put on from above on the fourth press, with a pennant |
+| The built house vanished on the fifth press | It folds flat to the ground in three frames, then the dust |
+| A tap on the front door walked him into the fence | Yards: he goes round by the gate, which opens for him and shuts behind |
+| The lane's back edge had a step in it that caught him | One straight edge from the plot to the gate |
+| Two visitors could be sent to a listing with one place; with every place taken a visitor picked the least bad one | Places are a hard rule; with nowhere to go they leave |
+| With one place at the house, an open door changed nothing over time | Visitors stay longer at what draws them more. Looks at the house rise by 28% when it is open, and the whole lane holds more lookers the more of it is in use (1.08 on average with nothing done, 1.27 with everything) |
+| Labels and prompts sat on top of the thing used | `mark` lifts them over the plot's roof, the house's eaves and the board |
+| At the bell he covered the agent | He stands to the left of the window; the visitors' place is to its right |
+
+### Timing
+
+All motion is held frames, never a smooth ease.
+
+| Moment | Time |
+|---|---|
+| A is pressed: he dips and scraps fly | same frame |
+| A hinge with a spring | 0.5s: five frames, 14% past the pose, back 6% short, settled |
+| Sides and back of the pop-up after the press | 0, 60 and 120ms apart |
+| Furniture after the leaves start to open | 160, 240, 320 and 400ms |
+| A piece that drops in (roof, pennant, mango) | 0.42s in five frames, from 150 to 190 units up |
+| The pop-up folding away | 0.3s |
+| First visitor after the sign goes up | 0.35s to walk in, about 5s to the first look |
+| A visitor's look | 3 to 7s, by visitor and by what they are looking at |
+
+### Review 3 (played)
+
+| Check | Result |
+|---|---|
+| Every row of the chain-reaction table is shown by paper | Six browser checks in `tests/journey.mjs` (visitors, build, board, gate and house and agent, mango, reduced motion) |
+| The rest of the game still passes | The journey suite passes with the lane added to the quad-budget and tap-area checks |
+| Five presses to build: a build or a chore? | A build. Each press is a different and larger change, and the whole takes about three seconds |
+| Do visitors get in the way? | No longer: no viewing place is in front of a toy or of where he stands to use one, and a rule check holds that. They do cross in front of him as they walk by, as passers-by do |
+| Are the office cards noticed? | From the board, on a wide screen, yes: the card turns at the edge of the view. On a phone it is something to find later. Kept: it costs four sheets |
+| Portrait and touch | Plays; taps walk him to every toy, the gate route included |
+| Reduced motion | Every toy steps with no fold; visitors stand at the listings |
+
+**Phase 2 is ready.** Handed to the art pass: the stops, sizes, poses and timings above are fixed; the lane's two ends need something tall for visitors to come out from behind; the camera needs its height set once there is a background to frame.

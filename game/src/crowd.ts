@@ -1,7 +1,7 @@
 // The people who come to look at the lane's listings. They are scenery that follows rules (docs/MOPERTY_DESIGN.md):
 // they exist only while the world's crowd toy is up, each walks to the listing that draws them most, stops to look,
-// answers with a tag that depends on what state the listing is in, answers again if it changes while they look, and
-// moves on. Nothing here touches the page: App.tsx steps the crowd each frame and draws what it returns.
+// answers with a tag that depends on what state the listing is in, stays longer the more it draws them, answers again
+// if it changes while they look, and moves on. Nothing here touches the page: App.tsx steps the crowd each frame and draws what it returns.
 import type { Crowd as Rules, CrowdSpot, World } from './schema.ts';
 
 export type Visitor = {
@@ -22,22 +22,28 @@ export const makeCrowd = (r: Rules): Crowd => ({ on: false, people: r.people.map
 const stateOf = (s: CrowdSpot, toys: Record<string, number>) => Math.min(s.appeal.length - 1, toys[s.toy] ?? 0);
 // How many others are at this spot or on their way to it.
 const taken = (c: Crowd, v: Visitor, id: string) => c.people.filter(o => o !== v && o.spot === id && (o.mode === 'walk' || o.mode === 'look')).length;
-export function choose(c: Crowd, v: Visitor, r: Rules, toys: Record<string, number>): CrowdSpot {
-  let best = r.spots[0], top = -1e9;
+// The listing a visitor goes to next: the one that draws them most, less 1 for each visitor already there and 1.5 if
+// they have just been. Never the one they are at, and never one with no place free; with nowhere to go, nothing.
+export function choose(c: Crowd, v: Visitor, r: Rules, toys: Record<string, number>): CrowdSpot | null {
+  let best: CrowdSpot | null = null, top = -1e9;
   // Ties go to a different spot for each visitor, so three people do not set off for the same listing.
   for (let k = 0; k < r.spots.length; k++) {
-    const s = r.spots[(k + v.i) % r.spots.length], score = s.appeal[stateOf(s, toys)] - taken(c, v, s.id) - (s.id === v.last ? 1.5 : 0) - (s.id === v.spot ? 9 : 0);
+    const s = r.spots[(k + v.i) % r.spots.length], n = taken(c, v, s.id);
+    if (s.id === v.spot || n >= s.places) continue;
+    const score = s.appeal[stateOf(s, toys)] - n - (s.id === v.last ? 1.5 : 0);
     if (score > top) { top = score; best = s; }
   }
   return best;
 }
+const go = (v: Visitor, r: Rules) => { v.mode = 'leave'; v.end = Math.abs(v.x - r.ends[0]) < Math.abs(v.x - r.ends[1]) ? 0 : 1; v.tx = r.ends[v.end]; v.last = v.spot; v.spot = null; };
 // They stand side by side: each takes the first place at the spot that nobody else holds or is walking to.
 const head = (c: Crowd, v: Visitor, r: Rules, toys: Record<string, number>) => {
-  const s = choose(c, v, r, toys), held = c.people.filter(o => o !== v && o.spot === s.id && (o.mode === 'walk' || o.mode === 'look')).map(o => o.place);
+  const s = choose(c, v, r, toys);
+  if (!s) { go(v, r); return; }
+  const held = c.people.filter(o => o !== v && o.spot === s.id && (o.mode === 'walk' || o.mode === 'look')).map(o => o.place);
   let place = 0; while (held.includes(place)) place++;
   v.last = v.spot; v.spot = s.id; v.place = place; v.tx = s.x + s.side * GAP * place; v.mode = 'walk';
 };
-const go = (v: Visitor, r: Rules) => { v.mode = 'leave'; v.end = Math.abs(v.x - r.ends[0]) < Math.abs(v.x - r.ends[1]) ? 0 : 1; v.tx = r.ends[v.end]; v.last = v.spot; v.spot = null; };
 
 // One frame. `calm` is reduced motion: nobody walks; while the toy is up one visitor stands at each spot.
 export function stepCrowd(c: Crowd, dt: number, w: World, toys: Record<string, number>, hero: { x: number; z: number; moving: boolean } | null, calm = false): CrowdEvent[] {
@@ -69,7 +75,7 @@ export function stepCrowd(c: Crowd, dt: number, w: World, toys: Record<string, n
       if (Math.abs(d) <= stepBy) {
         v.x = v.tx;
         if (v.mode === 'leave') { v.mode = 'away'; v.t = awayFor(v); }
-        else { const s = r.spots.find(k => k.id === v.spot)!; v.mode = 'look'; v.t = lookFor(v); v.seen = stateOf(s, toys); out.push({ k: 'say', i: v.i, glyph: s.says[v.seen] }); }
+        else { const s = r.spots.find(k => k.id === v.spot)!; v.mode = 'look'; v.seen = stateOf(s, toys); v.t = lookFor(v) * (.55 + .3 * s.appeal[v.seen]); out.push({ k: 'say', i: v.i, glyph: s.says[v.seen] }); }
       } else { v.x += Math.sign(d) * stepBy; v.moving = true; }
     }
     if (hero?.moving && v.mode !== 'away' && !v.hush && Math.abs(hero.x - v.x) < BRUSH && Math.abs(hero.z - v.z) < BRUSH) { v.hush = 1.5; out.push({ k: 'hop', i: v.i }, { k: 'say', i: v.i, glyph: r.people[v.i].mood }); }

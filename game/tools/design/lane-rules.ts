@@ -1,8 +1,8 @@
-// The Moperty lane's rules, run without a page: `node tests/rules.ts`. Every row of the chain-reaction table in
+// The Moperty lane's rules, run without a page: `npm run rules`. Every row of the chain-reaction table in
 // docs/MOPERTY_DESIGN.md that does not need paper to show it is proved here.
-import { content } from '../src/content.ts';
-import { reduce, start, type Action, type Game } from '../src/game.ts';
-import { makeCrowd, stepCrowd, type Crowd, type CrowdEvent } from '../src/crowd.ts';
+import { content } from '../../src/content.ts';
+import { reduce, start, type Action, type Game } from '../../src/game.ts';
+import { makeCrowd, stepCrowd, type Crowd, type CrowdEvent } from '../../src/crowd.ts';
 
 let failed = 0;
 const check = (name: string, f: () => void) => { try { f(); console.log('PASS', name); } catch (e) { failed++; console.log('FAIL', name, (e as Error).message); } };
@@ -87,11 +87,11 @@ check('visitors move on: over two minutes each has looked at every listing, and 
   run(c, 120, { post: 1 }, () => { for (const v of c.people) { if (v.mode === 'look') seen[v.i].add(v.spot!); if (v.mode === 'away' && was[v.i] !== 'away') left[v.i]++; was[v.i] = v.mode; } });
   seen.forEach((s, i) => eq([...s].sort(), ['house', 'office', 'plot'], `visitor ${i} saw`)); left.forEach((n, i) => { if (!n) throw new Error(`visitor ${i} never left`); });
 });
-check('two visitors never stand on the same spot, and never more than two look at one listing', () => {
+check('two visitors never stand on the same spot, and a listing never has more lookers than places', () => {
   for (const toys of [{ post: 1 }, { post: 1, door: 1 }, { post: 1, build: 4 }, { post: 1, ask: 1, door: 1, build: 4 }] as Record<string, number>[]) {
     const c = makeCrowd(W.crowd!); let worst = 1e9, most = 0;
-    run(c, 150, toys, () => { const l = c.people.filter(v => v.mode === 'look'); for (const a of l) { most = Math.max(most, l.filter(b => b.spot === a.spot).length); for (const b of l) if (a.i < b.i) worst = Math.min(worst, Math.abs(a.x - b.x)); } });
-    if (worst < 40) throw new Error(`two visitors ${worst.toFixed(0)} apart with ${JSON.stringify(toys)}`); if (most > 2) throw new Error(`${most} at one listing with ${JSON.stringify(toys)}`);
+    run(c, 150, toys, () => { const l = c.people.filter(v => v.mode === 'look'); for (const a of l) { if (l.filter(b => b.spot === a.spot).length > W.crowd!.spots.find(s => s.id === a.spot)!.places) throw new Error(`too many at ${a.spot}`); most++; for (const b of l) if (a.i < b.i) worst = Math.min(worst, Math.abs(a.x - b.x)); } });
+    if (worst < 40) throw new Error(`two visitors ${worst.toFixed(0)} apart with ${JSON.stringify(toys)}`); 
   }
 });
 check('lowering the sign sends everyone home within the time it takes to walk out', () => {
@@ -109,7 +109,10 @@ check('reduced motion: nobody walks; with the sign up one visitor stands at each
   eq(c.people.map(v => [v.mode, v.spot, v.moving]), [['look', 'plot', false], ['look', 'house', false], ['look', 'office', false]], 'standing');
   stepCrowd(c, 1 / 60, W, {}, null, true); eq(inLane(c), 0, 'sign down');
 });
-check('no viewing spot stands in front of a stop: the thing used and its marker stay in view', () => {
-  for (const s of W.crowd!.spots) for (let n = 0; n < 2; n++) { const x = s.x + s.side * 46 * n; for (const st of [...W.stops, ...W.bumps!]) if (Math.abs(('look' in st ? st.look ?? st.x : st.x) - x) < 60) throw new Error(`${s.id} place ${n} at ${x} hides ${st.id}`); }
+check('no viewing place stands in front of a thing that is used, nor where he stands to use it', () => {
+  for (const s of W.crowd!.spots) for (let n = 0; n < s.places; n++) { const x = s.x + s.side * 46 * n; for (const st of [...W.stops, ...W.bumps!]) { if (Math.abs(('look' in st ? st.look ?? st.x : st.x) - x) < 60) throw new Error(`${s.id} place ${n} at ${x} hides ${st.id}`); if (Math.abs(st.x - x) < 50 && st.z > 20) throw new Error(`${s.id} place ${n} at ${x} hides him at ${st.id}`); } }
+});
+check('he never stands in front of the thing he is using', () => {
+  for (const s of W.stops) if (s.action.kind === 'toy' && s.id !== 'front-door' && Math.abs((s.look ?? s.x) - s.x) < 60) throw new Error(`${s.id}: he stands ${Math.abs((s.look ?? s.x) - s.x)} from it`);
 });
 console.log(failed ? `\n${failed} failed` : '\nall rules hold'); process.exit(failed ? 1 : 0);

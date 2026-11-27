@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { content } from './content.ts';
 import { lineOf, pathOf, parsePath, reduce, rideIn, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
-import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
-import type { Stop, WorldId } from './schema.ts';
+import { MAX_SPEED, nearest, route, seek, step, type Walker } from './walker.ts';
+import type { Bump, Stop, WorldId } from './schema.ts';
+import { makeCrowd, stepCrowd, type Crowd } from './crowd.ts';
 import { LIGHT, reducedMotion } from './light.ts';
 import type { Fx } from './fx.ts';
 import { BENCH_X, GATE_X } from './Platform.tsx';
@@ -42,7 +43,10 @@ export default function App() {
   const fxRef = useRef<Fx | null>(null);
   const skyRef = useRef<HTMLDivElement>(null);
   const poseRef = useRef<HTMLDivElement>(null);
-  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0 });
+  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0, leap: false });
+  // The lane's own life: which zones he stands in, the bump a tap is walking him to, and the people who come to look.
+  const zoneIn = useRef<Record<string, boolean>>({}), bumpGo = useRef<Bump | null>(null);
+  const crowd = useRef<{ world: WorldId; c: Crowd; els: (HTMLElement | null)[]; step: number[]; toys: Game['toys'] | null; mine: Record<string, number> } | null>(null);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const dispatch = useCallback((x: Action) => {
@@ -126,7 +130,7 @@ export default function App() {
   const held = useRef(new Set<string>());
   const stick = useRef({ x: 0, z: 0 });
   const stickSpent = useRef(false);
-  const target = useRef<{ stop: Stop; open: boolean } | null>(null);
+  const target = useRef<{ stop: Stop; open: boolean } | null>(null), way = useRef<[number, number][]>([]);
   const walker = useRef<Walker>({ x: 0, z: 0, vx: 0, vz: 0 });
   const courierRef = useRef<HTMLDivElement>(null);
   const flipRef = useRef<HTMLDivElement>(null);
@@ -157,7 +161,8 @@ export default function App() {
   useEffect(() => {
     if (!world || world === prevWorld.current || spot.k === 'lost') return;
     prevWorld.current = world;
-    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0 });
+    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0, leap: false });
+    zoneIn.current = {}; bumpGo.current = null; crowd.current = null;
     held.current.clear();
     stickSpent.current = true;
     target.current = null;
@@ -184,7 +189,12 @@ export default function App() {
       dispatch({ a: 'confirm' });
       return;
     }
-    target.current = { stop: s, open: true };
+    bumpGo.current = null; target.current = { stop: s, open: true }; way.current = route(content.worlds[p.world], walker.current, s);
+  }, [dispatch]);
+  const onBump = useCallback((b: Bump) => {
+    if (gameRef.current.place.k !== 'walk') return;
+    if (reducedMotion()) { dispatch({ a: 'bump', id: b.id }); return; }
+    const here = gameRef.current.place; target.current = null; bumpGo.current = b; way.current = route(content.worlds[here.world], walker.current, b);
   }, [dispatch]);
 
   useEffect(() => {
@@ -216,8 +226,17 @@ export default function App() {
       let ix = ix0, iz = iz0;
       // A tap on the handheld's screen walks him to that spot.
       if (p.world === 'intro' && introGo.current !== null) { const d = introGo.current - walker.current.x; if (ix0 || Math.abs(d) < 10) introGo.current = null; else ix = Math.sign(d) * Math.min(1, Math.abs(d) / 60 + .3); }
-      if (ix || iz) target.current = null;
-      else if (target.current) [ix, iz] = seek(walker.current, target.current.stop.x, target.current.stop.z);
+      if (ix || iz) { target.current = null; bumpGo.current = null; }
+      else if (target.current || bumpGo.current) {
+        // He walks the way point by point; the last point is the thing itself.
+        const o = walker.current; while (way.current.length > 1 && Math.hypot(way.current[0][0] - o.x, way.current[0][1] - o.z) < 12) way.current.shift();
+        const [tx, tz] = way.current[0] ?? (target.current ? [target.current.stop.x, target.current.stop.z] : [bumpGo.current!.x, bumpGo.current!.z]);
+        [ix, iz] = seek(o, tx, tz);
+        // Between points he keeps his pace instead of easing to a stand at each.
+        if (way.current.length > 1 && (ix || iz)) { const m = Math.hypot(ix, iz); ix /= m; iz /= m; }
+        // A tapped bump: he walks under it, then jumps.
+        if (bumpGo.current && !target.current && !ix && !iz) { bumpGo.current = null; hero.current.jump = true; }
+      }
       const h = hero.current, calm = reducedMotion(), fx = p.world === 'intro' ? null : fxRef.current, o = walker.current, pushing = Math.hypot(ix, iz) > .2;
       // Anticipation: setting off from a stand, he dips for a moment before his feet go.
       if (pushing && !h.moved && !calm && Math.hypot(o.vx, o.vz) < 40 && !h.air) h.windup = WINDUP;
@@ -241,6 +260,29 @@ export default function App() {
         if (t.open && t.stop.action.kind !== 'road') dispatch({ a: 'confirm' });
       }
       const speed = Math.hypot(n.vx, n.vz) / MAX_SPEED;
+      // Presence: paper that answers him being there.
+      for (const z of w.zones ?? []) { const inside = n.x > z.x0 && n.x < z.x1 && n.z > z.z0 && n.z < z.z1; if (inside !== !!zoneIn.current[z.id]) { zoneIn.current[z.id] = inside; dispatch({ a: 'zone', id: z.id, on: inside }); } }
+      // The people who come to look. crowd.ts decides where each one is; here they are stood there, turned and rocked.
+      if (w.crowd) {
+        let k = crowd.current;
+        if (!k || k.world !== p.world) k = crowd.current = { world: p.world, c: makeCrowd(w.crowd), els: [], step: [], toys: null, mine: {} };
+        if (k.toys !== gameRef.current.toys) { k.toys = gameRef.current.toys; k.mine = toysOf(gameRef.current, p.world); }
+        const events = stepCrowd(k.c, dt, w, k.mine, { x: n.x, z: n.z, moving: speed > .2 || h.air }, calm);
+        k.c.people.forEach((v, i) => {
+          const el = k.els[i] ??= document.querySelector<HTMLElement>(`[data-actor="visitor-${w.crowd!.people[i].id}"]`), pose = el?.firstElementChild?.nextElementSibling as HTMLElement | null;
+          if (!el || !pose) { k.els[i] = null; return; }
+          el.hidden = v.mode === 'away'; if (el.hidden) return;
+          // A cut figure walks by rocking from foot to foot, a held frame at a time.
+          if (v.moving) k.step[i] = (k.step[i] ?? 0) + dt * w.crowd!.people[i].speed / 15;
+          const s = v.moving ? Math.sin(k.step[i]) : 0, rock = Math.round(s * 2) * 2.5, lift = Math.round(Math.abs(s) * 2) * 2;
+          el.style.transform = `translate3d(${v.x.toFixed(1)}px,0,${v.z}px)`; pose.style.transform = `translate3d(0,${-lift}px,0) rotateZ(${rock}deg)`; (pose.firstElementChild as HTMLElement).style.transform = `rotateY(${v.face > 0 ? 0 : 180}deg)`;
+        });
+        for (const e of events) {
+          const v = k.c.people[e.i], who = w.crowd.people[e.i];
+          if (e.k === 'say') fx?.say(v.x, who.h + 6, v.z, e.glyph);
+          else if (!calm) (k.els[e.i]?.firstElementChild?.nextElementSibling as HTMLElement | null)?.animate({ translate: ['0 0', '0 -14px', '0 0', '0 -5px', '0 0'] }, { duration: 460, easing: 'steps(9,end)' });
+        }
+      }
       // The card flip: he turns over like a playing card, in stepped frames, with a little skip as he does.
       const turn = pushing && Math.abs(ix) > .3 ? Math.sign(ix) : Math.abs(n.vx) > 25 ? Math.sign(n.vx) : facing.current;
       if (turn !== facing.current) {
@@ -251,8 +293,13 @@ export default function App() {
       }
       // Jump: a crouch, then up with a stretch; down with a squash and dust.
       if (h.jump) { h.jump = false; if (!h.air && h.crouch <= 0 && !calm) h.crouch = CROUCH; }
-      if (h.crouch > 0) { h.crouch -= dt; h.sy += (.76 - h.sy) * Math.min(1, dt * 45); h.vs = 0; if (h.crouch <= 0) { h.air = true; h.vy = JUMP; h.sy = 1.14; h.vs = 2; fx?.dust(n.x, n.z, 0, 2); } }
-      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); } }
+      if (h.crouch > 0) { h.crouch -= dt; h.sy += (.76 - h.sy) * Math.min(1, dt * 45); h.vs = 0; if (h.crouch <= 0) { h.air = true; h.leap = true; h.vy = JUMP; h.sy = 1.14; h.vs = 2; fx?.dust(n.x, n.z, 0, 2); } }
+      if (h.air) {
+        const rising = h.vy > 0; h.vy -= FALL * dt; h.y += h.vy * dt;
+        // The top of a real jump: whatever hangs over him is bumped.
+        if (h.leap && rising && h.vy <= 0) { const b = w.bumps?.find(k => Math.hypot(k.x - n.x, k.z - n.z) < (k.r ?? 70)); if (b) dispatch({ a: 'bump', id: b.id }); }
+        if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); if (h.leap) fx?.thump(n.x, n.z); h.leap = false; }
+      }
       h.vs += (-(h.sy - 1) * SPRING - h.vs * DAMP) * dt; h.sy = Math.min(1.3, Math.max(.6, h.sy + h.vs * dt));
       const before = phase.current;
       phase.current += speed * dt * 16;
@@ -333,7 +380,7 @@ export default function App() {
     // He comes up the aisle from the left and stops at the doors.
     walker.current = reducedMotion() ? { x: s.x, z: s.z, vx: 0, vz: 0 } : { x: s.x - 260, z: 50, vx: 0, vz: 0 };
     dispatch({ a: 'dockDone' });
-    if (!reducedMotion()) target.current = { stop: s, open: false };
+    if (!reducedMotion()) { target.current = { stop: s, open: false }; way.current = [[s.x, s.z]]; }
   }, [dispatch, teleport]);
 
   const openStop = useMemo(() => (spot.k === 'letter' ? stopOf(content, spot.world, spot.stop) : undefined), [spot]);
@@ -342,7 +389,7 @@ export default function App() {
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
+      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} onBump={onBump} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} near={spot.k === 'walk' && spot.world === 'intro' && spot.near ? spot.stop === 'gate' ? 'gate' : 'door' : null} gate={gateOpen} trainIn={trainIn} onScreenTap={x => { const g = gameRef.current.place; if (g.k !== 'walk' || g.world !== 'intro') return; if (g.near && Math.abs((stopOf(content, 'intro', g.stop)?.x ?? 1e9) - x) < 120) dispatch({ a: 'confirm' }); else introGo.current = x; }} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={leaving} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
       {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}
