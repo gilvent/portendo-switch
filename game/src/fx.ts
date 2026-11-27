@@ -17,6 +17,8 @@ export type Fx = {
   // A tap or click on the scene at screen point [cx, cy]: whatever paper is under it answers. A touchable hops as it
   // does for the salaryman; any other small object hops with the sheets it is built from; a big sheet knocks.
   tap(cx: number, cy: number): void;
+  // One touchable hops, by name, as if he had brushed it; `says` overrides what it says.
+  nudge(name: string, says?: string): void;
 };
 
 let seed = 7;
@@ -69,11 +71,19 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
       scene.classList.add('probing'); const el = document.elementFromPoint(cx, cy); scene.classList.remove('probing');
       if (!(el instanceof HTMLElement) || !el.classList.contains('pp')) return;
       tapped = now;
+      // A live thing (src/mrt) is told, so its own physics can answer too.
+      const live = el.closest<HTMLElement>('[data-live]'); if (live) scene.dispatchEvent(new CustomEvent('live-tap', { detail: live.dataset.live }));
       const t = amb.touch.find(k => k.name === el.dataset.g), x = +(el.dataset.x ?? 0), z = +(el.dataset.z ?? 0);
       if (t) { last.set(t.name, now); hop(t); if (t.says) fx.say(t.x, t.top ?? 120, t.z, t.says); else fx.dust(t.x, t.z + 8, 0, 2); return; }
       if (el.dataset.big !== undefined) { jump([el], 2.5); return; }
       jump([...scene.querySelectorAll<HTMLElement>('.pp:not([data-big])')].filter(e => e === el || Math.hypot(+(e.dataset.x ?? 0) - x, +(e.dataset.z ?? 0) - z) < 64), 7);
       fx.dust(x, z + 10, 0, 2);
+    },
+    nudge(name, says) {
+      const t = amb.touch.find(k => k.name === name);
+      if (!t || reducedMotion()) return;
+      last.set(t.name, performance.now()); hop(t);
+      const g = says ?? t.says; if (g) fx.say(t.x, t.top ?? 120, t.z, g);
     },
     touch(x, z, moving) {
       if (!moving || reducedMotion()) return;

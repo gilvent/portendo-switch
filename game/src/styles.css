@@ -365,7 +365,7 @@ button { font:inherit; cursor:pointer; }
 .flipper { position:absolute; left:0; top:0; width:0; height:0; transform:scaleX(var(--f,1)); transition:transform .2s steps(4,end); animation:pf-arrive .7s steps(7,end) backwards; }
 @keyframes pf-arrive { from { translate:-34px -30px; opacity:0; } 30% { opacity:1; } }
 .prompt.at-gate { left:calc(29.8% - 18px); top:36%; }
-.prompt.end { left:calc(86.9% - 18px); right:auto; top:21%; }
+.prompt.end { left:calc(86.9% - 18px); right:auto; top:22.5%; }
 /* He is drawn at the platform's own scale whatever the console's size: 100cqw is the scene's 840 units. */
 @supports (scale:tan(atan2(1px,1px))) { .mini-courier > .flipper { zoom:1; scale:calc(tan(atan2(100cqw,840px)) * .92); } }
 /* Boarding is docking: he steps in, the doors shut, and the train pulls out as the console goes to the dock. */
@@ -385,3 +385,30 @@ button { font:inherit; cursor:pointer; }
 @keyframes pass-land { from { opacity:0; scale:1.5; } }
 @media (prefers-reduced-motion:reduce) { .pf-train,.pf-sleeper,.pf-zz,.pf-here,.pf-status,.flipper,.pass-pop,.stamps.fresh,.controller[data-mode="docking"] .mini-courier,.controller[data-mode="docking"] .pf-train { animation:none; } .pf-leaf,.pf-paddle,.flipper { transition:none; } .pass-pop { display:none; } [data-train="coming"] .pf-train { transform:none; } }
 .screen .prompt { width:clamp(18px,4.4cqw,36px); height:clamp(18px,4.4cqw,36px); margin-left:0; font-size:clamp(10px,2.2cqw,18px); }
+/* ---------- live paper: things the game moves by its own physics (fold.tsx, src/mrt) ---------- */
+.live { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; will-change:transform; transform:translate3d(var(--lx,0px),var(--ly,0px),var(--lz,0px)) rotateZ(var(--lr,0deg)) scale(var(--lsx,1),var(--lsy,1)); }
+/* ---------- the platform's dynamics (Platform.tsx) ---------- */
+.prompt.at-map { left:calc(63.3% - 18px); top:22%; }
+.pf-line { opacity:.34; transition:opacity .2s steps(3,end); } .pf-line[data-on] { opacity:1; }
+.pf-stop { transform-box:fill-box; transform-origin:50% 30%; } .pf-line[data-on] .pf-stop { animation:pf-pop .5s .45s steps(6,end) backwards; }
+@keyframes pf-pop { from { transform:scale(.6); } 50% { transform:scale(1.25); } }
+.pf-lamp-0 { transform:translate(92px,0); animation:pf-run-0 .5s steps(6,end); } .pf-lamp-1 { transform:translate(92px,58px); animation:pf-run-1 .6s steps(8,end); }
+@keyframes pf-run-0 { from { transform:none; } } @keyframes pf-run-1 { from { transform:none; } 45% { transform:translate(0,50px); } 55% { transform:translate(10px,58px); } }
+[data-denied] .pf-paddle { animation:pf-rattle .4s steps(8,end); } [data-denied] .pf-reader { fill:#ff3b2f; }
+@keyframes pf-rattle { 25% { transform:rotate(7deg); } 50% { transform:rotate(-5deg); } 75% { transform:rotate(4deg); } }
+.pf-bang { opacity:0; } [data-startled] .pf-z { opacity:0; } [data-startled] .pf-bang { opacity:1; }
+[data-startled] .pf-zz { animation:pf-zz 1.4s steps(12,end) both; } [data-startled] .pf-sleeper { animation:pf-start .5s steps(6,end); }
+@keyframes pf-start { 30% { transform:translateY(-12px) scaleY(1.08); } 60% { transform:translateY(0) scaleY(.94); } }
+.pf-fx path { opacity:0; }
+.pass-pop em { font-style:normal; font-size:14px; line-height:18px; color:#5a626d; }
+@media (prefers-reduced-motion:reduce) { .pf-lamp,.pf-stop,.pf-line { animation:none !important; transition:none; } }
+/* ---------- the car's live layer (Car.tsx) ---------- */
+.station { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; will-change:transform; }
+.st-tile { position:absolute; left:0; top:0; background:linear-gradient(180deg,transparent 0 470px,#e8552d 470px 481px,#35b58a 481px 492px,transparent 492px 600px,#f6b73c 600px 612px,#8d96a0 612px),repeating-linear-gradient(90deg,transparent 0 296px,#aab3bc 296px 320px),linear-gradient(180deg,#8d96a0 0 250px,#dfe5ea 250px); }
+.st-at { position:absolute; left:0; top:0; width:0; height:0; }
+.st-board { position:absolute; left:-110px; top:0; width:220px; height:54px; display:none; align-items:center; justify-content:center; background:#fffaf0; border-radius:5px; box-shadow:inset 0 -9px 0 var(--c); font:600 26px/1 Fredoka,system-ui,sans-serif; color:#23272d; padding-bottom:7px; }
+.station[data-which="0"] .st-board[data-which="0"],.station[data-which="1"] .st-board[data-which="1"] { display:flex; }
+.roll { position:absolute; left:0; top:0; transform-origin:0 0; overflow:hidden; background:#fffaf0; pointer-events:none; }
+.roll-strip { transition:transform .5s steps(7,end); }
+.roll-face { margin:0; display:flex; align-items:center; justify-content:center; font:600 19px/1 Fredoka,system-ui,sans-serif; color:#23272d; white-space:nowrap; }
+@media (prefers-reduced-motion:reduce) { .roll-strip { transition:none; } }

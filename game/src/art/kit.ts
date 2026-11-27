@@ -17,7 +17,10 @@ export type Show = { toy: string; at: number[] };
 // A motion plays while the courier stands at stop `when`, or while toy `toy` is in one of the states `at`.
 // `spin` turns the sheet about its centre once every `spin` seconds, for as long as it is shown.
 // `swing` is different: the sheet hangs from its top edge and rocks `swing` degrees each way for as long as it is shown.
-export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3; swing?: number; spin?: number };
+// `live` is different again: the sheet belongs to the live thing of that name, which the game moves every frame by its
+// own physics (src/mrt). Every sheet of one thing shares the name and the `pivot`, the point in the scene it turns and
+// scales about. Live sheets are baked as phantoms: lit, but casting no shadow, since they will not stay where they were.
+export type Motion = { when?: string; toy?: string; at?: number[]; edge?: 'top' | 'bottom' | 'left' | 'right'; deg?: number; slide?: V3; swing?: number; spin?: number; live?: string; pivot?: V3 };
 export type Lamp = { at: V3; color: readonly [number, number, number]; energy: number };
 export type Run = { group: string; from: V3; to: V3; count: number; seconds: number };
 export type Scene = {

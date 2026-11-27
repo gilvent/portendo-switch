@@ -4,7 +4,9 @@ import { ambientOf, hash, type Ambient, type Loop } from './ambient.ts';
 
 export const at = (x: number, z: number, y = 0, rot = 0) => ({ transform: `translate3d(${x}px,${-y}px,${z}px)${rot ? ` rotateY(${rot}deg)` : ''}` });
 
-export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null; show?: Show | null };
+export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null; show?: Show | null;
+  // Only the greybox sets this: the sheet's cut outline as an image, since it has no baked atlas to carry it.
+  cut?: string };
 export type Toys = Record<string, number>;
 const shown = (q: Quad, toys: Toys) => !q.show || q.show.at.includes(toys[q.show.toy] ?? 0);
 const playing = (m: Motion, near: string | null, toys: Toys) => (m.when !== undefined && near === m.when) || (m.toy !== undefined && (m.at ?? [1]).includes(toys[m.toy] ?? 0));
@@ -15,7 +17,7 @@ const len = (a: readonly number[]) => Math.hypot(a[0], a[1], a[2]);
 const scale = (a: readonly number[], k: number): V3 => [a[0] * k, a[1] * k, a[2] * k];
 const cross = (a: V3, b: V3): V3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 
-function matrix({ o, u, v, h }: Quad, origin: number[] = [0, 0, 0]) {
+export function matrix({ o, u, v, h }: Pick<Quad, 'o' | 'u' | 'v' | 'h'>, origin: number[] = [0, 0, 0]) {
   const ux = css(scale(u, 1 / len(u))), vy = css(scale(v, -1 / len(v))), n = cross(ux, vy);
   const t = css([o[0] + v[0] / len(v) * h - origin[0], o[1] + v[1] / len(v) * h - origin[1], o[2] + v[2] / len(v) * h - origin[2]]);
   return `matrix3d(${[...ux, 0, ...vy, 0, ...n, 0, ...t, 1].map(q => +q.toFixed(4)).join(',')})`;
@@ -31,7 +33,7 @@ const swung = (q: Quad, deg: number) => `translate(${q.pw / 2}px,0) rotate(${deg
 function quadStyle(q: Quad, url: string, atlas: Manifest['atlas'], origin?: number[]): CSSProperties {
   const k = (q.w / q.pw).toFixed(5), rest = `${matrix(q, origin)} scale(${k})`;
   return {
-    width: q.pw, height: q.ph, backgroundImage: `url(${url})`, backgroundPosition: `${-q.x}px ${-q.y}px`, backgroundSize: `${atlas.w}px ${atlas.h}px`, backgroundColor: q.solid ? q.c : undefined,
+    width: q.pw, height: q.ph, backgroundImage: `url(${url})`, backgroundPosition: `${-q.x}px ${-q.y}px`, backgroundSize: `${atlas.w}px ${atlas.h}px`, backgroundColor: q.solid ? q.c : undefined, ...(q.cut ? { maskImage: q.cut, maskSize: '100% 100%', WebkitMaskImage: q.cut, WebkitMaskSize: '100% 100%' } : null),
     ...(q.motion?.spin ? { transform: rest, '--a': `${rest} ${spun(q, 0)}`, '--b': `${rest} ${spun(q, -360)}`, animationDuration: `${q.motion.spin}s` } as CSSProperties : q.motion?.swing ? { transform: rest, '--a': `${rest} ${swung(q, -q.motion.swing)}`, '--b': `${rest} ${swung(q, q.motion.swing)}` } as CSSProperties : q.motion ? { '--rest': rest, '--on': `${rest} ${moved(q, q.motion)}` } as CSSProperties : { transform: rest })
   };
 }
@@ -64,6 +66,15 @@ const StaticQuads = memo(function StaticQuads({ m, url, amb }: { m: Manifest; ur
     return <i key={q.id} className={l ? `pp amb${l.kind === 'peck' ? ' amb-peck' : ''}` : 'pp'} {...tag(q, amb)} style={l ? { ...base, ...looped(q, l, base.transform as string) } : base} />;
   })}</>;
 });
+// Live things (kit.ts): each is a wrapper standing at its pivot, holding its sheets. The game moves the wrapper by
+// setting --lx, --ly, --lz (units), --lr (degrees about the pivot, in the plane facing the camera) and --lsx, --lsy.
+const Lives = memo(function Lives({ m, url, amb }: { m: Manifest; url: string; amb: Ambient }) {
+  const names = [...new Set(m.quads.flatMap(q => (q.motion?.live ? [q.motion.live] : [])))];
+  return <>{names.map(name => {
+    const parts = m.quads.filter(q => q.motion?.live === name), [px, py, pz] = parts[0].motion?.pivot ?? [0, 0, 0];
+    return <div key={name} className="live" data-live={name} style={{ transformOrigin: `${px}px ${-py}px ${pz}px` }}>{parts.map(q => <i key={q.id} className="pp" {...tag(q, amb)} style={quadStyle({ ...q, motion: null }, url, m.atlas)} />)}</div>;
+  })}</>;
+});
 const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
   return <>{m.runs.flatMap(r => {
     const parts = m.quads.filter(q => q.group === r.group);
@@ -84,7 +95,8 @@ export function PaperScene({ manifest, url, near, toys, art }: { manifest: Manif
       {manifest.quads.filter(q => !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`show-${q.id}`} />)}
       {manifest.quads.filter(q => q.motion?.swing).map((q, i) => <i key={q.id} className="pp swings" style={{ ...quadStyle(q, url, manifest.atlas), animationDelay: `${-(i * 0.37 % 1.4).toFixed(2)}s` }} />)}
       {manifest.quads.filter(q => q.motion?.spin).map(q => <i key={q.id} className="pp spins" style={quadStyle(q, url, manifest.atlas)} />)}
-      {manifest.quads.filter(q => q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
+      <Lives m={manifest} url={url} amb={amb} />
+      {manifest.quads.filter(q => q.motion && !q.motion.swing && !q.motion.spin && !q.motion.live && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas)} data-testid={`move-${q.id}`} />)}
       <Runs m={manifest} url={url} />
     </div>
   );

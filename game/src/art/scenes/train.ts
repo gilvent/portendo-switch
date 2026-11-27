@@ -1,7 +1,7 @@
 import { box, carved, on, type Panel, type Scene, type V3 } from '../kit.ts';
 import { BLUE, CORAL, CREAM, DEEP, INK, KRAFT, SUN, reseed, specks } from '../recipes.ts';
 import { MINT, PLUM, shopper, type Look } from './promenade.ts';
-import { CAB, CAR, DOOR, SIGN, UNDER } from './car.ts';
+import { CAB, CAN, CAR, DOOR, HANDSET, RAIL, SIGN, STRAP, UNDER } from './car.ts';
 
 // The home space: the inside of one MRT car, running underground. The near side is cut away and the camera stands
 // close, so the car fills the view: nothing of its outside is modelled. Past the windows there is only the dark of the
@@ -30,7 +30,7 @@ const backWall = (): Panel => {
 };
 
 // The cove: the upper wall, leaning in over the benches, where the posters and the light strip sit.
-const COVE_IN = 34, COVE_LEN = Math.hypot(CAR.CEIL - H, COVE_IN), coveV: V3 = [0, (CAR.CEIL - H) / COVE_LEN, COVE_IN / COVE_LEN];
+const COVE_IN = CAR.COVE_IN, COVE_LEN = Math.hypot(CAR.CEIL - H, COVE_IN), coveV: V3 = [0, (CAR.CEIL - H) / COVE_LEN, COVE_IN / COVE_LEN];
 const cove = (): Panel => ({ id: 'cove', stock: 'cover', c: SHELL, w: W, h: COVE_LEN, o: [-W / 2, H, BACK], u: [1, 0, 0], v: coveV, edge: 'fold', density: 1.6, split: 4, print: `<rect width="${W}" height="${COVE_LEN}" fill="${SHELL}"/>` });
 
 /* ---------- the car ---------- */
@@ -193,8 +193,8 @@ export function train(): Scene {
   const benches = [...bench('bench-l', -410, -300, SEAT_PRIORITY), ...bench('bench-lm', -300, -112, SEAT), ...bench('bench-r', 112, 410, SEAT)];
 
   // Grab poles at the door, floor to ceiling, and the overhead rail on its hangers. Each a strip of card.
-  const RAIL_Y = 232, RAIL_Z = -64;
-  const pole = (id: string, x: number): Panel => ({ id, stock: 'greyboard', c: POLE, w: 8, h: CAR.CEIL, o: [x - 4, 0, RAIL_Z], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 2, print: `<rect width="8" height="${CAR.CEIL}" fill="${POLE}"/><rect x="1.5" width="2" height="${CAR.CEIL}" fill="#fff" fill-opacity=".6"/>` });
+  const RAIL_Y = RAIL.y, RAIL_Z = RAIL.z;
+  const pole = (id: string, x: number): Panel => ({ id, stock: 'greyboard', c: POLE, w: 8, h: CAR.CEIL, o: [x - 4, 0, -64], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', density: 2, print: `<rect width="8" height="${CAR.CEIL}" fill="${POLE}"/><rect x="1.5" width="2" height="${CAR.CEIL}" fill="#fff" fill-opacity=".6"/>` });
   const poles = [pole('pole-a', -108), pole('pole-b', 108)];
   const rail = (id: string, x0: number, x1: number): Panel => {
     const rw = x1 - x0, rh = CAR.CEIL - RAIL_Y, hangers = [4, rw - 4];
@@ -203,15 +203,28 @@ export function train(): Scene {
       print: `<rect width="${rw}" height="${rh}" fill="${POLE}"/><rect y="${rh - 6}" width="${rw}" height="2" fill="#fff" fill-opacity=".6"/>` };
   };
   // Hand straps hang from the rail and swing with the car: each is its own small sheet.
-  const SL = 62;
+  const SL = STRAP.len;
   const strap = (x: number, i: number): Panel => {
     const pri = x < -300, band = pri ? '#c9861f' : '#5d6670';
     return { id: `strap-${i}`, stock: 'cover', c: pri ? SUN : '#f4f6f8', w: 20, h: SL, o: [x - 10, RAIL_Y + 4 - SL, RAIL_Z + 1.5], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 3,
       mask: `<path fill-rule="evenodd" d="M7 0H13V${SL - 34}H7Z M5 ${SL - 36}H15V${SL - 26}H5Z M10 ${SL - 28}L20 ${SL - 12}Q20 ${SL} 10 ${SL}Q0 ${SL} 0 ${SL - 12}Z M10 ${SL - 21}L5 ${SL - 12}Q5 ${SL - 5} 10 ${SL - 5}Q15 ${SL - 5} 15 ${SL - 12}Z" fill="#fff"/>`,
       print: `<rect width="20" height="${SL}" fill="${pri ? SUN : '#f4f6f8'}"/><rect x="7" width="6" height="${SL - 34}" fill="${band}"/><rect x="5" y="${SL - 36}" width="10" height="10" fill="${band}"/>`,
-      motion: { swing: 5 } };
+      motion: { live: `strap-${i}`, pivot: [x, RAIL_Y + 4, RAIL_Z + 1.5] } };
   };
-  const straps = [-385, -330, -270, -215, -165, 165, 215, 270, 330, 385].map(strap);
+  const straps = STRAP.xs.map(strap);
+  // The drinks can somebody left: a strip rolled into a six-sided tube, lying across the car so it rolls along it.
+  // Its body only slides (`can`); the end facing the cut also turns (`can-end`), so the roll shows.
+  const can = (): Panel[] => {
+    const { x, z, r, len } = CAN, f = z + len / 2, h = r * .866, body = { stock: 'cover' as const, c: CORAL, w: r, h: len, v: [0, 0, -1] as V3, edge: 'fold' as const, density: 3, motion: { live: 'can', pivot: [x, 0, z] as V3 } };
+    return [
+      { ...body, id: 'can-top', o: [x - r / 2, r + h, f], u: [1, 0, 0] },
+      { ...body, id: 'can-right', o: [x + r / 2, r + h, f], u: [.5, -.866, 0] },
+      { ...body, id: 'can-left', o: [x - r, r, f], u: [.5, .866, 0] },
+      { id: 'can-end', stock: 'cover', c: '#d9dee3', w: r * 2, h: r * 2, o: [x - r, 0, f + .5], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 4, mask: `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>`, motion: { live: 'can-end', pivot: [x, r, f + .5] } }
+    ];
+  };
+  // The help point's handset, off its cradle on a short cord: it swings with the train.
+  const handset: Panel = { id: 'handset', stock: 'cover', c: INK, w: 14, h: HANDSET.len, o: [HANDSET.x - 7, HANDSET.y - HANDSET.len, HANDSET.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 4, motion: { live: 'handset', pivot: [HANDSET.x, HANDSET.y, HANDSET.z] } };
 
   // End walls: on the left the gangway door into the next car, its window dark; on the right the door to the driving cab.
   const WALL_H = CAR.CEIL;
@@ -244,7 +257,7 @@ export function train(): Scene {
 
   const panels: Panel[] = [fl, section, undercar, ...wheels, ...cab(), ...rearCar(), ...ownRoof, back, cv, ceiling, endWall(-1, 'wall-left'), endWall(1, 'wall-right'), strip,
     ...winFrames, doorFrame, ...leaves, ...wallTrim, helpSign, priority, ...hello, ...lineMap, ...lamps, ...coveTrim,
-    ...benches, ...poles, rail('rail-l', -420, -130), rail('rail-r', 130, 420), ...straps, ...people, ...suitcase, bag];
+    ...benches, ...poles, rail('rail-l', -420, -130), rail('rail-r', 130, 420), ...straps, ...can(), handset, ...people, ...suitcase, bag];
   return {
     id: 'train', camera: { zoom: 1.12, x0: -320, x1: 480 }, panels,
     // No sun underground: the car is lit by its own ceiling strips, with a little fill through the cut.

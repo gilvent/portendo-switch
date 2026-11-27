@@ -10,6 +10,9 @@ import { BENCH_X, GATE_X } from './Platform.tsx';
 import Scene from './Scene.tsx';
 import Controller from './Controller.tsx';
 import LetterView from './LetterView.tsx';
+import { hero as live, ride, wind } from './mrt/live.ts';
+import { TUNE } from './mrt/sim.ts';
+import { isMuted, play, setMuted } from './sfx.ts';
 import RouteSheet from './RouteSheet.tsx';
 
 // The arrow keys walk. The letters on the controller's buttons are those buttons: a first-time player presses what he sees.
@@ -34,7 +37,7 @@ export default function App() {
   // `stage` is 1 once the train has stopped and 2 once the doors are open. Input waits while it plays.
   const [arrival, setArrival] = useState(0);
   const exit = useRef<{ x: number; z: number; then: () => void } | null>(null);
-  const busy = useRef(false);
+  const busy = useRef(false), stood = useRef<(() => void) | null>(null);
   const turning = useRef(false);
   const trainIn = useRef(false), introGo = useRef<number | null>(null);
   const leaveAsked = useRef(-1e9), [leaving, setLeaving] = useState(0);
@@ -42,7 +45,8 @@ export default function App() {
   const fxRef = useRef<Fx | null>(null);
   const skyRef = useRef<HTMLDivElement>(null);
   const poseRef = useRef<HTMLDivElement>(null);
-  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0 });
+  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0, drift: 0 });
+  const [muted, setMute] = useState(isMuted);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const dispatch = useCallback((x: Action) => {
@@ -50,7 +54,9 @@ export default function App() {
     if (turning.current && gameRef.current.place.k === 'walk' && (x.a === 'confirm' || x.a === 'back' || x.a === 'arrive' || x.a === 'line')) return;
     const here = gameRef.current.place;
     // On the platform: the gate opens once and stays open, and the doors take him only when the train is standing.
-    if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && here.near && (here.stop === 'gate' ? gameRef.current.toys['intro/gate'] === 1 : !trainIn.current)) return;
+    // A always answers: with nothing to use (or a gate already open, or a door with no train behind it) it is a jump.
+    if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && gameRef.current.controller.mode === 'handheld' && (!here.near || (here.stop === 'gate' ? gameRef.current.toys['intro/gate'] === 1 : here.stop === 'road-end' && !trainIn.current))) { hero.current.jump = true; return; }
+    if (x.a === 'confirm' && here.k === 'walk' && here.near) play(here.world === 'intro' && here.stop === 'gate' ? 'beep' : 'use');
     if (x.a === 'confirm' && here.k === 'letter') {
       // A turns the catalog's leaves; on any other letter it puts the letter down, like B.
       const l = stopOf(content, here.world, here.stop)?.action, turns = l?.kind === 'letter' && content.worlds[here.world].letters.find(k => k.id === l.letter)?.blocks.some(k => k.kind === 'specSheet');
@@ -74,13 +80,17 @@ export default function App() {
       if (door?.action.kind === 'ride') {
         const later = (ms: number, f: () => void) => { timers.current.push(window.setTimeout(f, ms)); };
         busy.current = true; held.current.clear(); target.current = null;
+        // The train brakes (Car.tsx) and says when it stands: only then do the doors open and he walks out.
         setArrival(1);
-        later(450, () => setArrival(2));
-        later(950, () => { exit.current = { x: door.x, z: -205, then: () => {
-          busy.current = false; exit.current = null; timers.current = []; setArrival(0);
-          const [next] = reduce(content, gameRef.current, { a: 'confirm' });
-          gameRef.current = next; setGame(next);
-        } }; });
+        stood.current = () => {
+          stood.current = null; setArrival(2);
+          later(480, () => { exit.current = { x: door.x, z: -205, then: () => {
+            busy.current = false; exit.current = null; timers.current = []; setArrival(0);
+            const [next] = reduce(content, gameRef.current, { a: 'confirm' });
+            gameRef.current = next; setGame(next);
+          } }; });
+        };
+        later(5000, () => stood.current?.());
         return;
       }
     }
@@ -157,7 +167,7 @@ export default function App() {
   useEffect(() => {
     if (!world || world === prevWorld.current || spot.k === 'lost') return;
     prevWorld.current = world;
-    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0 });
+    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0, drift: 0 });
     held.current.clear();
     stickSpent.current = true;
     target.current = null;
@@ -212,6 +222,15 @@ export default function App() {
         if (poseRef.current) poseRef.current.style.transform = `translate3d(0,${-Math.abs(Math.sin(phase.current)) * 6}px,0)`;
         return;
       }
+      // While the train brakes for his stop he cannot walk, but the brake still has him: he slides and tips with it.
+      if (busy.current && p.world === 'mrt' && !reducedMotion()) {
+        const o = walker.current, h = hero.current;
+        walker.current = { ...o, x: Math.min(w.bounds.x1, Math.max(w.bounds.x0, o.x - ride.a * TUNE.hero.slide * 1.6 * dt)), vx: 0, vz: 0 };
+        h.lean += (-ride.a * TUNE.hero.lean * 1.4 - h.lean) * Math.min(1, dt * 12);
+        if (courierRef.current) courierRef.current.style.transform = `translate3d(${walker.current.x}px,0,${o.z}px)`;
+        if (poseRef.current) poseRef.current.style.transform = `translate3d(0,0,0) rotateZ(${h.lean.toFixed(2)}deg)`;
+        if (wasWalking.current) { wasWalking.current = false; courierRef.current?.toggleAttribute('data-walking', false); }
+      }
       if (busy.current || turning.current || shownRef.current !== (p.world === 'intro' ? 'mrt' : p.world)) return;
       let ix = ix0, iz = iz0;
       // A tap on the handheld's screen walks him to that spot.
@@ -227,8 +246,15 @@ export default function App() {
       const held0 = h.windup > 0;
       if (held0) { h.windup -= dt; h.sy += (.86 - h.sy) * Math.min(1, dt * 40); h.vs = 0; if (h.windup <= 0) { h.vs = 3.4; fx?.dust(o.x, o.z, -Math.sign(ix || facing.current), 2); } }
       let n = step(o, ix, iz, dt, w);
+      // In the car the train's own acceleration moves him: a little on his feet, a lot in the air.
+      if (p.world === 'mrt' && !calm) {
+        h.drift = h.air ? h.drift - ride.a * TUNE.hero.air * dt : 0;
+        const dx = (h.air ? h.drift : -ride.a * TUNE.hero.slide) * dt;
+        if (dx) n = { ...n, x: Math.min(w.bounds.x1, Math.max(w.bounds.x0, n.x + dx)) };
+      }
       // The shut ticket gate stops him.
-      if (p.world === 'intro' && g.toys['intro/gate'] !== 1 && n.x > GATE_X - 30) n = { ...n, x: GATE_X - 30, vx: 0 };
+      live.pushing = false;
+      if (p.world === 'intro' && g.toys['intro/gate'] !== 1 && n.x > GATE_X - 30) { n = { ...n, x: GATE_X - 30, vx: 0 }; live.pushing = ix > .3; }
       walker.current = n;
       const near = nearest(w, n.x, n.z)?.id ?? null;
       if (near !== lastNear.current) {
@@ -251,8 +277,12 @@ export default function App() {
       }
       // Jump: a crouch, then up with a stretch; down with a squash and dust.
       if (h.jump) { h.jump = false; if (!h.air && h.crouch <= 0 && !calm) h.crouch = CROUCH; }
-      if (h.crouch > 0) { h.crouch -= dt; h.sy += (.76 - h.sy) * Math.min(1, dt * 45); h.vs = 0; if (h.crouch <= 0) { h.air = true; h.vy = JUMP; h.sy = 1.14; h.vs = 2; fx?.dust(n.x, n.z, 0, 2); } }
-      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); } }
+      if (h.crouch > 0) { h.crouch -= dt; h.sy += (.76 - h.sy) * Math.min(1, dt * 45); h.vs = 0; if (h.crouch <= 0) { h.air = true; h.vy = JUMP; h.sy = 1.14; h.vs = 2; fx?.dust(n.x, n.z, 0, 2); live.jumps++; play('jump'); } }
+      // A bonk: his head met something hard, so his rise ends there.
+      if (live.bonk === 1 && h.air) { h.vy = Math.min(h.vy, -60); h.sy = .86; h.vs = 0; }
+      live.bonk = 0;
+      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); if (hard > .5) { live.landings++; play('land'); } } }
+      Object.assign(live, { x: n.x, z: n.z, vx: n.vx, vz: n.vz, y: h.y, vy: h.vy, air: h.air, facing: facing.current });
       h.vs += (-(h.sy - 1) * SPRING - h.vs * DAMP) * dt; h.sy = Math.min(1.3, Math.max(.6, h.sy + h.vs * dt));
       const before = phase.current;
       phase.current += speed * dt * 16;
@@ -260,7 +290,8 @@ export default function App() {
       if (!h.air && speed > .6 && Math.floor(phase.current / Math.PI) !== Math.floor(before / Math.PI) && ++h.steps % 2 === 0) fx?.dust(n.x - facing.current * 10, n.z, -facing.current, 1);
       fx?.touch(n.x, n.z, speed > .2 || h.air);
       const bob = calm || h.air ? 0 : Math.abs(Math.sin(phase.current)) * 9 * speed;
-      h.lean += ((calm ? 0 : held0 ? -Math.sign(ix || 1) * 7 : (n.vx / MAX_SPEED) * 6) - h.lean) * Math.min(1, dt * 18);
+      const blown = p.world === 'mrt' ? -ride.a * TUNE.hero.lean : p.world === 'intro' ? wind.x * 9 : 0;
+      h.lean += ((calm ? 0 : (held0 ? -Math.sign(ix || 1) * 7 : (n.vx / MAX_SPEED) * 6) + blown) - h.lean) * Math.min(1, dt * 18);
       const lean = h.lean, sy = calm ? 1 : h.sy, sx = 1 + (1 - sy) * .55;
       const rx = calm ? 0 : -n.vz / MAX_SPEED * 1.4, ry = calm ? 0 : n.vx / MAX_SPEED * 2.2, rk = 1 - Math.exp(-6 * dt);
       if (Math.abs(rx - rig.current.x) + Math.abs(ry - rig.current.y) > .004) {
@@ -270,7 +301,7 @@ export default function App() {
       if (p.world === 'intro') {
         const el = introRef.current, screen = el?.parentElement;
         if (el && screen) {
-          el.style.transform = `translate3d(${((n.x + 420) / 840 * 100).toFixed(2)}cqw,${-bob}px,0)`;
+          el.style.transform = `translate3d(${((n.x + 420) / 840 * 100).toFixed(2)}cqw,calc(${(-bob).toFixed(1)}px - ${(h.y / 840 * 92).toFixed(2)}cqw),0) rotate(${lean.toFixed(2)}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
           // The toy theatre's layers slide against each other as he crosses; he turns over like a card; the sleeper stirs.
           screen.style.setProperty('--par', (n.x / 420).toFixed(3)); el.style.setProperty('--f', String(facing.current)); el.dataset.face = String(facing.current);
           screen.toggleAttribute('data-near-bench', Math.abs(n.x - BENCH_X) < 44);
@@ -330,23 +361,26 @@ export default function App() {
     const s = rideIn(content, 'mrt')?.stop;
     if (!s) throw new Error('the MRT has no doors');
     teleport('mrt', s);
-    // He comes up the aisle from the left and stops at the doors.
-    walker.current = reducedMotion() ? { x: s.x, z: s.z, vx: 0, vz: 0 } : { x: s.x - 260, z: 50, vx: 0, vz: 0 };
+    // He has just come in by these doors. The train pulls away under him at once (Car.tsx).
+    walker.current = { x: s.x, z: s.z + 12, vx: 0, vz: 0 };
     dispatch({ a: 'dockDone' });
-    if (!reducedMotion()) target.current = { stop: s, open: false };
   }, [dispatch, teleport]);
 
+  // Every stamp lands with a thump.
+  const stamped = useRef(0);
+  useEffect(() => { if (game.stamps.length > stamped.current) play('stamp'); stamped.current = game.stamps.length; }, [game.stamps.length]);
   const openStop = useMemo(() => (spot.k === 'letter' ? stopOf(content, spot.world, spot.stop) : undefined), [spot]);
   const nearStop = spot.k === 'walk' && spot.near ? spot.stop : null;
   const lit = game.place.k === 'letter' ? 'B' : nearStop && spot.k === 'walk' ? 'A' : game.place.k === 'walk' ? 'stick' : null;
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
-      <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} near={spot.k === 'walk' && spot.world === 'intro' && spot.near ? spot.stop === 'gate' ? 'gate' : 'door' : null} gate={gateOpen} trainIn={trainIn} onScreenTap={x => { const g = gameRef.current.place; if (g.k !== 'walk' || g.world !== 'intro') return; if (g.near && Math.abs((stopOf(content, 'intro', g.stop)?.x ?? 1e9) - x) < 120) dispatch({ a: 'confirm' }); else introGo.current = x; }} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
+      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} open={game.place.k === 'letter' && shown === 'mrt'} onStood={() => stood.current?.()} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
+      <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} near={spot.k === 'walk' && spot.world === 'intro' && spot.near ? spot.stop === 'gate' ? 'gate' : spot.stop === 'map' ? 'map' : 'door' : null} gate={gateOpen} line={game.toys['intro/map'] ?? 0} trainIn={trainIn} onScreenTap={x => { const g = gameRef.current.place; if (g.k !== 'walk' || g.world !== 'intro') return; if (g.near && Math.abs((stopOf(content, 'intro', g.stop)?.x ?? 1e9) - x) < 120) dispatch({ a: 'confirm' }); else introGo.current = x; }} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={leaving} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
       {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}
       <div className="corner">
+        <button data-testid="toggle-sound" aria-pressed={!muted} onClick={e => { if (e.detail) e.currentTarget.blur(); setMuted(!muted); setMute(!muted); }}>{muted ? 'Sound off' : 'Sound on'}</button>
         <button data-testid="open-route" onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'map' }); }}>Route sheet</button>
         <button data-testid="toggle-controller" aria-pressed={!game.controller.visible} onClick={e => { if (e.detail) e.currentTarget.blur(); dispatch({ a: 'toggleController' }); }}>{game.controller.visible ? 'Hide controller' : 'Show controller'}</button>
       </div>

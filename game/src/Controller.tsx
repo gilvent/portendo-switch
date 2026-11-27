@@ -3,14 +3,14 @@ import gsap from 'gsap';
 import type { Action, ControllerMode } from './game.ts';
 import { reducedMotion } from './light.ts';
 import Hero from './art/Hero.tsx';
-import Platform, { TRAIN_MS } from './Platform.tsx';
+import Platform, { platformTap, TRAIN_MS } from './Platform.tsx';
 
 // near: which of the platform's two stops he stands at. gate: the ticket gate is open. trainIn: set once the train it
 // called stands at the platform, which is when boarding (docking) is allowed. onScreenTap: a tap on the handheld's
 // screen, as the walk's x.
-type Props = { rigRef: RefObject<HTMLDivElement>; mode: ControllerMode; visible: boolean; lit: string | null; near: 'gate' | 'door' | null; gate: boolean; trainIn: MutableRefObject<boolean>; onScreenTap: (x: number) => void; introRef: RefObject<HTMLDivElement>; stick: MutableRefObject<{ x: number; z: number }>; stickSpent: MutableRefObject<boolean>; dispatch: (a: Action) => void; onDockDone: () => void };
+type Props = { rigRef: RefObject<HTMLDivElement>; mode: ControllerMode; visible: boolean; lit: string | null; near: 'gate' | 'map' | 'door' | null; gate: boolean; line: number; trainIn: MutableRefObject<boolean>; onScreenTap: (x: number) => void; introRef: RefObject<HTMLDivElement>; stick: MutableRefObject<{ x: number; z: number }>; stickSpent: MutableRefObject<boolean>; dispatch: (a: Action) => void; onDockDone: () => void };
 
-export default function Controller({ rigRef, mode, visible, lit, near, gate, trainIn, onScreenTap, introRef, stick, stickSpent, dispatch, onDockDone }: Props) {
+export default function Controller({ rigRef, mode, visible, lit, near, gate, line, trainIn, onScreenTap, introRef, stick, stickSpent, dispatch, onDockDone }: Props) {
   const body = useRef<HTMLDivElement>(null), left = useRef<HTMLDivElement>(null), right = useRef<HTMLDivElement>(null), off = useRef<HTMLDivElement>(null);
   const nub = useRef<HTMLDivElement>(null), slotC = useRef<HTMLDivElement>(null), slotL = useRef<HTMLDivElement>(null), slotR = useRef<HTMLDivElement>(null), holdL = useRef<HTMLDivElement>(null), holdR = useRef<HTMLDivElement>(null);
   const slotUp = useRef<HTMLDivElement>(null), dockBack = useRef<HTMLDivElement>(null), dockFront = useRef<HTMLDivElement>(null), led = useRef<HTMLDivElement>(null);
@@ -72,15 +72,16 @@ export default function Controller({ rigRef, mode, visible, lit, near, gate, tra
     <div className="controller" data-testid={`controller-${mode}`} data-mode={mode} data-visible={visible}>
       <div className="tv-off" ref={off} aria-hidden="true" />
       {/* His commuter pass, shown as he taps it on the gate; it then becomes the stamp card in the corner (App.tsx). */}
-      {gate && mode === 'handheld' && <div className="pass-pop" aria-hidden="true"><small>Commuter pass</small><b>Alvaro L.</b><span><i /><i />Valid on all lines</span></div>}
+      {gate && mode === 'handheld' && <div className="pass-pop" aria-hidden="true"><small>Commuter pass</small><b>Alvaro L.</b><em>Web Frontend Developer</em><span><i /><i />Valid on all lines</span></div>}
       <div className="rig" ref={rigRef} data-testid="controller-camera">
       <i className="slot slot-c" ref={slotC} /><i className="slot slot-up" ref={slotUp} /><i className="slot slot-l" ref={slotL} /><i className="slot slot-r" ref={slotR} /><i className="slot hold-l" ref={holdL} /><i className="slot hold-r" ref={holdR} />
       <div className="dock-back" ref={dockBack} aria-hidden="true" />
       <div className="console" ref={body}>
-        <div className="screen" data-testid="handheld-screen" onPointerDown={e => { const r = e.currentTarget.getBoundingClientRect(); onScreenTap((e.clientX - r.left) / r.width * 840 - 420); }}>
-          <Platform gate={gate} arrived={arrived} near={near} />
+        <div className="screen" data-testid="handheld-screen" onPointerDown={e => { const r = e.currentTarget.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 840, y = (e.clientY - r.top) / r.height * 472; if (mode === 'handheld' && !platformTap(x, y)) onScreenTap(x - 420); }}>
+          <Platform gate={gate} arrived={arrived} near={near} line={line} leaving={mode === 'docking'} />
           <div className="mini-courier" ref={introRef}><div className="flipper"><Hero /></div></div>
           {near === 'gate' && !gate && <b className="prompt at-gate" data-testid="prompt-gate">A</b>}
+          {near === 'map' && <b className="prompt at-map" data-testid="prompt-map">A</b>}
           {atDock && <b className="prompt end" data-testid="prompt-a">A</b>}
         </div>
       </div>
