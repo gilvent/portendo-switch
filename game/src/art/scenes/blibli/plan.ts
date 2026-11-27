@@ -17,7 +17,7 @@ export const FLOOR = {
   basket: { x: -246, z: 124, slots: [[-272, 8, 124], [-220, 8, 124], [-246, 54, 122]] },
   // The recommended shelf on the back wall, over his head: one card per place.
   recs: { y: 186, z: -218, xs: [276, 328, 380, 432, 484], card: { w: 44, h: 60 } },
-  lamps: [{ x: -150, z: 40 }, { x: 10, z: 92 }], lampY: 226,
+  lamps: [{ x: -150, z: 40 }, { x: 10, z: 92 }], lampY: 206,
   door: { x: 0, z: 190 }
 } as const;
 

@@ -95,7 +95,7 @@ function Actors({ m, url, toys, amb }: { m: Manifest; url: string; toys: Toys; a
     return (
       <div key={name} className="actor" style={{ transform: `translate3d(${a.pivot[0] - base[0]}px,${-(a.pivot[1] - base[1])}px,${a.pivot[2] - base[2]}px)` }}>
         {a.shadow && <i className="actor-shadow" data-shadow={name} style={{ width: a.shadow[0], height: a.shadow[1], marginLeft: -a.shadow[0] / 2, marginTop: -a.shadow[1] / 2, '--drop': `${a.pivot[1]}px` } as CSSProperties} />}
-        <div className="rig" data-actor={name}>
+        <div className="actor-rig" data-actor={name}>
           {m.quads.filter(q => q.actor === name && shown(q, toys)).map(q => <i key={q.id} className={q.show ? 'pp pop' : 'pp'} data-q={q.id} data-testid={q.show ? `show-${q.id}` : undefined} {...tag(q, amb)} style={quadStyle(q, url, m.atlas, a.pivot, toys)} />)}
           {names.filter(n => actors[n].parent === name).map(node)}
         </div>

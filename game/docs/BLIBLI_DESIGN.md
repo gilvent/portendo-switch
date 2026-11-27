@@ -153,7 +153,69 @@ An independent read of the first draft found twelve problems and a second read o
 
 ## Phase 2: dynamics
 
-*Filled in as the greybox is built and tuned.*
+Built and tuned in a greybox: both spaces drawn straight from their scene data as plain boxes and cards (`art/grey.ts`), with every moving piece already the actor it will be when it has art. Nothing in this phase depends on how a thing looks.
+
+### How a toy is made
+
+- **The state is the game's.** A toy's number lives in `game.toys`; a press changes it in the reducer and nowhere else. So the route sheet, a deep link and a mashed button all end in the same place.
+- **A toybox shows the state** (`toys/shop.ts`, `toys/front.ts`). Each toy is a view with two parts: `rest` stands its pieces where a state leaves them, and `play` builds the motion from one state to the next.
+- **A press never waits.** If a toy is still moving when it is pressed again, its pieces are stood where that motion would have ended and the new motion starts from there.
+- **Paper moves at 14 frames a second.** Motion is written as a smooth timeline and shown in whole frames, so an arc, a flip and a squash land on the same beats.
+- **What works on presence** (the door, the shelf, the pigeons, his card joining the wall, lamps knocked by a jump) is watched every frame from where he stands, and is never saved.
+
+### Feel, in numbers
+
+| | |
+|---|---|
+| First answer to a press | within two frames: his move starts and the toy's state has changed (checked for all nine) |
+| His moves | dip: squashes to 84%. Hop: 70ms crouch, 82 units up, so his head reaches 219. Lean: 12° toward the thing. He turns to face what he uses. |
+| A knock | the reel is struck 200ms after the press, when his head gets there; nothing on the tag moves before that |
+| Length of a toy's motion | 300 to 700ms; a wave across several pieces is staggered 70 to 100ms apart |
+| Things hung to be knocked | lowest edge at 206, a head's reach below the top of his jump |
+| Coming into reach | the toy stirs once (a bob, a swing, the cover lifting), so he sees what the A is for |
+| Feedback beyond motion | paper scraps in the toy's colour, dust on landings, a flash for the camera, a 3-unit shake for the stamp, tags over the shoppers |
+| Sound | eleven sounds made from filtered noise and sine blips (`sfx.ts`): tap, flip, thump, pop, flutter, rip, shutter, ding, slide, peel, whoosh. On from his first press; a button turns it off and the choice is kept. |
+| Reduced motion | a toy steps straight to its new state: no flash, scraps, shake or tags |
+
+### What playing it changed
+
+| Found | Change |
+|---|---|
+| He stood in front of the basket; the box flew behind his head | He stands beside it, facing the stack, and the camera centres between them |
+| Prompts and labels sat on top of the phone, the tag and the catalog | Each stop's marker hangs above its object |
+| The colour changed a frame before the phone began to turn | The turn starts edge-on: the first half of the card flip takes no time |
+| The reel and the right-hand lamp covered the shelf | The shelf moved right; the lamp moved over the way in from the door |
+| His head did not visibly reach the reel or the lamps | Both hang lower (see the table) |
+| A shopper stood in the doorway | Moved to the wall's side of it |
+| His photo vanished from his card while a second print was out | The card shows it for both states |
+| A new class name collided with the handheld's and threw the controller off a phone screen | Renamed; the phone check caught it |
+
+### Sheets per toy (greybox, before any culling)
+
+| Shop floor | | Shopfront | |
+|---|---|---|---|
+| Showcase | 11 | Review wall | 12 |
+| Price tag | 10 | Photo string | 14 |
+| Catalog | 14 | Camera and table | 22 |
+| Stock and basket | 18 | Writing stand | 20 |
+| Shelf | 15 | Door and bell | 5 |
+| Lamps | 4 | Scooter, people, pigeons | 9 |
+
+The shopfront's toys come to about 80 sheets in greybox. Baking removes hidden box faces and flattens prints into their parents, but phase 3 still has to bring the visible total to 210 by cutting toy sheets and naming the dressing that goes.
+
+### Gate 2
+
+- [x] All nine toys play in both spaces from a fresh link, in any order.
+- [x] Every toy answers within two frames of the press.
+- [x] A mashed toy ends exactly where slow presses leave it (compared pose for pose).
+- [x] His print and card are never taken away, however often the camera and stamp are pressed.
+- [x] What is chosen inside shows outside: colour, basket count, and his own review under each filter.
+- [x] Presence works without a press: door, shelf, pigeons, a lamp knocked by a jump.
+- [x] Reduced motion steps without motion, flash or paper bits.
+- [x] The whole journey still runs: platform, train, wall, shop and back; phone and landscape; old links land on the wall.
+- [ ] Every sheet answers a tap: holds in the train and the shop; the greybox shopfront is too bare under the tap grid to judge, so this carries into Gate 3.
+
+These are the checks in `tests/journey.mjs` (24; 23 pass in greybox).
 
 ## Phase 3: aesthetics
 
