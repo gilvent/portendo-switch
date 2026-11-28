@@ -277,3 +277,26 @@ Scripted play (`tests/play.mjs`) gave the first numbers:
 
 Also fixed: the page-turn leaves showed at the screen edges when they should have been hidden; the station wall outside
 the windows showed past the car's end walls (now clipped to the car).
+
+### Pass 2: M1 to M4, the grammar, the three scenes, the day, the ending
+
+Built: the mechanism grammar (`src/game/mech.ts`: a coral tab that wiggles every 2.5 s within 3.6 m, a 12 fps stepped
+snap, an overshoot settle, a caption, a punch); the three project scenes on a shared one-way station builder
+(`src/scenes/station.ts`); the car changing with the day; the terminus and the undocked business card; the one-page
+version (`one-page.html`, built from the same content, the only place the tech stack appears).
+
+Calls made by the lead in this pass, and why:
+
+- **The day shows on a clock, not in the car's light.** The art checklist says underground places have no time of day.
+  The car instead shows the day through a wall clock that moves on with each ride, the three poster frames filling,
+  and souvenirs (a shopping bag, a key tag, a stone tile) that ride on the free end of a seat and slide with the
+  train's inertia. The evening belongs to an outdoor place: Moperty's street lamp.
+- **Low blocks are steps.** Radjastone's rough block stood in the only lane, so a player who just holds → got stuck,
+  and getting stuck is Challenge the design does not want. Blocks up to 0.5 m are now walked up onto; jumping on one
+  is the secret, not the way past.
+- **The secret's glint** comes on once a stop's marked holes are all punched, as the design asked.
+- **Every fact is punched once.** Two routes can tell the same fact (Blibli's panel tab and its ALL AT ONCE lever both
+  tell "incremental beats big bang"), and the hole is punched by whichever comes first.
+
+Scripted checks (`tests/scene.mjs <station>`): Blibli 8 of 8 marked holes, Moperty 3 of 3, Radjastone 3 of 3,
+walking right and pressing A at each prompt. The terminus runs through tap-out, undock and the card.
