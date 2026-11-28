@@ -69,7 +69,8 @@ export class Hero {
   hop(v = 4) { if (this.body.ground) { this.body.vy = v; this.body.ground = false; this.squash.x = 1.12; } }
   kick(vx: number, vy = 0) { this.body.vx += vx; if (vy) { this.body.vy = vy; this.body.ground = false; } }
   // Hit a wall hard: he crumples flat against it and pops back.
-  crumple() { this.squash.x = .32; this.squash.v = 0; }
+  crumple() { this.squash.x = .32; this.squash.v = 0; this.crushed = .28; }
+  private crushed = 0;
   update(dt: number, move: { x: number; z: number }, holdA: boolean, bounds: Rect, solids: Solid[]) {
     const b = this.body, H = HERO;
     if (this.hang) {
@@ -112,6 +113,7 @@ export class Hero {
     const b = this.body;
     this.flipT = Math.min(1, this.flipT + dt / HERO.flip);
     const sx = this.flipT < 1 ? Math.cos(this.flipT * Math.PI) * -this.flipFrom : this.facing;
+    if (this.crushed > 0) { this.crushed -= dt; this.squash.x = .32; this.squash.v = 0; }
     const sq = this.squash.step(1, dt), air = !b.ground ? clamp(b.vy * .03, -.12, .14) : 0;
     const sy = clamp(sq + air, .65, 1.35), sxs = 1 / Math.sqrt(sy);
     const bob = b.ground ? Math.abs(Math.sin(this.stride * Math.PI)) * .06 : 0;

@@ -12,7 +12,7 @@ import type { Solid } from '../game/body.ts';
 // The opening, on the handheld's screen: one platform, one job. The station sign says who; the departure board is the
 // only tutorial voice; the shut gate teaches A; the train arrives as wind; the doors are the first, soft, challenge.
 export const PLATFORM = {
-  gateX: -2, doorX: 4.6, arrive: 2.5, doorsOpen: 8, nextTrain: 5, wind: .55
+  gateX: -2, doorX: 4.6, arrive: 2.5, doorsOpen: 8, nextTrain: 2.5, wind: .3
 };
 type TrainState = 'away' | 'arriving' | 'open' | 'closing' | 'leaving';
 
@@ -83,11 +83,11 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
   const mark = box(1.3, .015, .5, '#f2c230', P.doorX, 0, -1.7); group.add(mark);
   let doorOpen = 0, lastTick = -1, gust = 0, called = false;
   const door: Mech = { id: 'door', x: P.doorX, reach: 1.1, at: new THREE.Vector3(P.doorX, 2.3, -1), label: 'Board', up: true, on: () => train.state === 'open', use: g => void board_(g) };
-  const tap: Mech = { id: 'gate', x: P.gateX - .55, reach: 1, at: new THREE.Vector3(P.gateX, 1.6, 0), label: 'Tap in', on: () => !gateOpen, use: g => openGate(g) };
+  const tap: Mech = { id: 'gate', x: P.gateX - .55, reach: 1, at: new THREE.Vector3(P.gateX, 1.6, 0), label: 'Tap in', on: () => !called, use: g => openGate(g) };
   let boarding = false;
   const self = {
     id: 'platform', group, lane: { x0: -7.4, x1: 7.4, z: 0 }, solids: [gateSolid] as Solid[], mechs: [tap, door], train,
-    enter(g: Game) { g.hero.place(-6.6, 0, 1); g.stage.scene.background = new THREE.Color('#2a2e35'); say('Walk to the gate', input.source === 'touch' ? 'tap the floor' : '→'); },
+    enter(g: Game) { g.hero.place(-6.6, 0, 1); g.stage.scene.background = new THREE.Color('#2a2e35'); say('Walk to the gate', input.source === 'touch' ? 'tap floor' : '→'); },
     camera(g: Game) { g.stage.want = { x: .2, y: 2.2, z: 0, dist: 16.5, pitch: .1, yaw: 0 }; },
     update(dt: number, g: Game) {
       // The gate's paddles.
@@ -102,7 +102,7 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
       } else if (train.state === 'open') {
         doorOpen = Math.min(1, doorOpen + dt * 3);
         const left = Math.max(0, P.doorsOpen - train.t), sec = Math.ceil(left);
-        if (!boarding) say(`Doors closing 0:0${sec}`, input.source === 'touch' ? 'tap the doors' : 'A at the doors');
+        if (!boarding) say(`Doors close 0:0${sec}`, input.source === 'touch' ? 'tap door' : 'A: board');
         // The countdown ticks, quicker in the last three seconds, and the lamp flashes.
         const rate = left < 3 ? 4 : 1, tick = Math.floor(train.t * rate);
         if (tick !== lastTick) { lastTick = tick; if (!boarding) tone({ f: left < 3 ? 1480 : 1180, d: .06, type: 'square', v: left < 3 ? .14 : .08 }); }
@@ -113,7 +113,7 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
         if (train.t > .9) { train.state = 'leaving'; train.t = 0; }
       } else if (train.state === 'leaving') {
         const x = P.doorX - 2.2 * train.t * train.t * 4; train.v = (x - train.x) / dt; train.x = x;
-        say(`Next train 0:0${Math.max(0, Math.ceil(P.nextTrain - train.t))}`, 'it comes every few seconds');
+        say(`Next train 0:0${Math.max(0, Math.ceil(P.nextTrain - train.t))}`, '');
         if (train.t > P.nextTrain) { train.state = 'arriving'; train.t = 0; train.x = 60; lastTick = -1; say('Train arriving', ''); }
       }
       tg.position.x = train.x - 0;
@@ -121,7 +121,8 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
       // Wind: a moving train pushes the air along the platform; he leans and slides, the sign swings.
       const wind = Math.abs(train.v) > 1.5 ? Math.sign(train.v) * Math.min(1, Math.abs(train.v) / 25) : 0;
       gust += (wind - gust) * Math.min(1, dt * 4);
-      g.hero.push = gust * P.wind * 14; g.hero.grip = .35;
+      g.hero.push = gust * P.wind * 14 * (train.state === 'leaving' ? .5 : 1); g.hero.grip = .35;
+      if (gateOpen && !behind && g.hero.body.x > P.gateX + .5) { behind = true; self.solids = [gateSolid]; gateOpen = false; }
       if (Math.abs(gust) > .2 && Math.random() < dt * 30) g.fx.puff(g.hero.body.x - 1.5 * Math.sign(gust), .3, -.5, 1, .8);
       signSwing.kick(-gust * dt * 2.2); sign.rotation.x = 0; sign.rotation.z = signSwing.step(0, dt) * .3;
       board.rotation.z = sign.rotation.z * .6;
@@ -133,18 +134,18 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
       if (!gateOpen && !called && g.near !== tap && Math.abs(g.hero.body.x - (P.gateX - .48)) < .05 && input.move.x > .2) {
         if (!bumped) { bumped = true; sfx.deny(); g.stage.nudge(.08, 0); (reader.material as THREE.MeshStandardMaterial).color.set('#e8552d'); setTimeout(() => (reader.material as THREE.MeshStandardMaterial).color.set('#35b58a'), 350); }
       } else bumped = false;
-      if (!called) say(g.hero.body.x > P.gateX - 2.2 ? 'Tap in at the gate' : 'Walk to the gate', g.hero.body.x > P.gateX - 2.2 ? (input.source === 'touch' ? 'tap the gate' : input.source === 'pad' ? 'press A' : 'A (Space)') : (input.source === 'touch' ? 'tap the floor' : '→'));
+      if (!called) say(g.hero.body.x > P.gateX - 2.2 ? 'Tap in at the gate' : 'Walk to the gate', g.hero.body.x > P.gateX - 2.2 ? (input.source === 'touch' ? 'tap gate' : 'A') : (input.source === 'touch' ? 'tap floor' : '→'));
     }
   };
-  let bumped = false;
+  let bumped = false, behind = false;
   function openGate(g: Game) {
     gateOpen = true; called = true; self.solids = [];
     sfx.beep(); gateSpring.kick(6);
     g.save.ticket = true; g.emit('ticket-print');
     g.punch('line', 'ticket');
-    g.caption('That’s me: I build web frontends.', new THREE.Vector3(P.gateX, 2.2, 0));
+    setTimeout(() => g.caption('Tap in. Coffee can wait.', new THREE.Vector3(P.gateX, 2.2, 0)), 1300);
     say('Train arriving', '');
-    setTimeout(() => { train.state = 'arriving'; train.t = 0; }, 400);
+    setTimeout(() => { train.state = 'arriving'; train.t = 0; }, 1400);
   }
   async function board_(g: Game) {
     if (boarding) return; boarding = true; g.busy = true;

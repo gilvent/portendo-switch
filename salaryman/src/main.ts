@@ -21,7 +21,9 @@ game.listeners.add((e, d) => {
   if (e === 'board') void shell.dock(async () => { await game.go(car, 'platform', false); sfx.whoosh(); game.stage.shake(.3); });
   if (e === 'getoff') void game.go(sceneFor(d as number), 'car');
   if (e === 'reboard') void game.go(car, 'stop');
-  if (e === 'end') setTimeout(() => void shell.undock(() => { ticket.el.hidden = true; }).then(() => card.show()), 700);
+  // The gate takes the ticket: it shows its front, turns over to his contact side, and the console comes out with his card.
+  if (e === 'tap-out') { ticket.open('front'); setTimeout(() => ticket.open('back'), 800); }
+  if (e === 'end') setTimeout(() => void shell.undock(() => { ticket.el.hidden = true; }).then(() => card.show()), 1200);
 });
 void ticket;
 const params = new URLSearchParams(location.search);

@@ -19,8 +19,8 @@
 .ticket-layer[data-state="print"] .ticket-big { background: #0000; pointer-events: none; }
 .tk-card { width: min(380px, 78%); aspect-ratio: 1.62; position: relative; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.3,1.4,.5,1); transform: translateY(30px) rotate(-4deg); cursor: pointer; }
 .ticket-layer[data-state="front"] .tk-card, .ticket-layer[data-state="print"] .tk-card { transform: none; }
-.ticket-layer[data-state="print"] .tk-card { animation: print 2.6s cubic-bezier(.3,1.2,.5,1) forwards; }
-@keyframes print { 0% { transform: translateY(70%) scaleY(.2); opacity: 0; } 18% { transform: none; opacity: 1; } 80% { transform: none; opacity: 1; } 100% { transform: translate(-60%, -70%) scale(.3); opacity: 0; } }
+.ticket-layer[data-state="print"] .tk-card { animation: print 1.4s cubic-bezier(.3,1.2,.5,1) forwards; }
+@keyframes print { 0% { transform: translate(-45%, -20%) scale(.62, .12); opacity: 0; } 20% { transform: translate(-45%, -35%) scale(.62); opacity: 1; } 78% { transform: translate(-45%, -35%) scale(.62); opacity: 1; } 100% { transform: translate(-95%, -95%) scale(.2); opacity: 0; } }
 .ticket-layer[data-state="back"] .tk-card { transform: rotateY(180deg); }
 .tk-face { position: absolute; inset: 0; backface-visibility: hidden; background: #fff6e3; border-radius: 10px; padding: 4.5% 6%; box-shadow: 0 10px 30px #0006; display: flex; flex-direction: column; font-family: Fredoka, sans-serif; color: #23262b;
   background-image: radial-gradient(circle at 0 50%, #0000 9px, #fff6e3 10px), radial-gradient(circle at 100% 50%, #0000 9px, #fff6e3 10px); }

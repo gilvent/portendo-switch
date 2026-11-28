@@ -5,13 +5,13 @@ import './ui.css';
 // answer, and the scene's title as it opens. Text stays crisp because it is text.
 const v = new THREE.Vector3();
 export class Pins {
-  private items = new Map<string, { el: HTMLElement; at: THREE.Vector3; until: number }>();
+  private items = new Map<string, { el: HTMLElement; at: THREE.Vector3; until: number; follow?: () => THREE.Vector3 }>();
   constructor(private layer: HTMLElement, private camera: THREE.Camera) {}
-  show(key: string, html: string, at: THREE.Vector3, cls = 'pin', ms = 0) {
+  show(key: string, html: string, at: THREE.Vector3, cls = 'pin', ms = 0, follow?: () => THREE.Vector3) {
     let it = this.items.get(key);
     if (!it) { const el = document.createElement('div'); el.className = cls; this.layer.appendChild(el); it = { el, at: at.clone(), until: 0 }; this.items.set(key, it); requestAnimationFrame(() => el.classList.add('in')); }
     if (it.el.innerHTML !== html) it.el.innerHTML = html;
-    it.el.className = `${cls} in`; it.at.copy(at); it.until = ms ? performance.now() + ms : 0;
+    it.el.className = `${cls} in`; it.at.copy(at); it.until = ms ? performance.now() + ms : 0; it.follow = follow;
     return it.el;
   }
   hide(key: string) {
@@ -23,6 +23,7 @@ export class Pins {
     const w = this.layer.clientWidth, h = this.layer.clientHeight, now = performance.now();
     for (const [k, it] of this.items) {
       if (it.until && now > it.until) { this.hide(k); continue; }
+      if (it.follow) it.at.copy(it.follow());
       v.copy(it.at).project(this.camera);
       it.el.style.transform = `translate(${((v.x + 1) / 2 * w).toFixed(1)}px, ${((1 - v.y) / 2 * h).toFixed(1)}px)`;
       it.el.style.visibility = v.z > 1 ? 'hidden' : 'visible';

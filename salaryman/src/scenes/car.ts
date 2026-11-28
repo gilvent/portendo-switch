@@ -17,7 +17,7 @@ export const RIDE = {
   throw: 4.6,        // how hard the train's push acts on him
   grip: .12,         // how well his shoes hold on the vinyl
   reach: 1.45,        // A this close to a strap grabs it
-  strapL: .55, railY: 2.95, joint: 9
+  strapL: .55, railY: 2.7, joint: 9
 };
 type Phase = 'closing' | 'chime' | 'accel' | 'cruise' | 'warn' | 'brake' | 'stand' | 'leave';
 const W = 15.6, H = 3.3, D = 3.2;
@@ -31,7 +31,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   group.add(box(W, 1.05, .14, '#e9edf1', 0, 0, backZ), box(W, .95, .14, '#e9edf1', 0, 2.35, backZ));
   for (const x of [-7.3, -4.4, -1.45, 1.45, 4.4, 7.3]) group.add(box(x === -1.45 || x === 1.45 ? .5 : .4, 1.3, .14, '#e9edf1', x, 1.05, backZ));
   group.add(box(.3, H, D, '#dfe4ea', -W / 2 - .15, 0, -.2), box(.3, H, D, '#dfe4ea', W / 2 + .15, 0, -.2));
-  group.add(box(W, .12, .9, '#f4f6f8', 0, H, backZ + .4));
+  group.add(box(W, .12, .35, '#f4f6f8', 0, H, backZ + .18));
   // Seats under the windows.
   for (const x of [-5.85, -2.95, 2.95, 5.85]) group.add(box(2.5, .48, .6, '#2f6f9f', x, 0, backZ + .38), box(2.5, .5, .12, '#2f6f9f', x, .48, backZ + .12));
   // The doors.
@@ -45,25 +45,27 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
     rrect(g, 0, 0, Wd, Ht, 10, '#1d2026'); label(g, signText.top, Wd / 2, Ht * .27, Ht * .22, '#9aa3ad', 'center', 600);
     label(g, signText.name, Wd / 2, Ht * .68, Ht * .4, signText.color === '#e8552d' ? '#ff8a5c' : '#ffd27a', 'center', 700);
   }, { rim: .02 });
-  sign.position.set(0, 2.45, backZ + .12); group.add(sign);
+  sign.position.set(0, 2.76, backZ + .12); group.add(sign);
   const setSign = (top: string, i: number) => { const s = LINE[i]; if (signText.top !== top || signText.name !== s.name) { signText = { top, name: s.name, color: s.color }; sign.redraw(); } };
   // The ad panel over the left seats: on the first ride it says hello, a line at a time.
   let ad = 0;
-  const adCard = card(2.6, .62, (g, Wd, Ht) => { rrect(g, 0, 0, Wd, Ht, 10, '#f6b73c'); label(g, HELLO[ad], Wd / 2, Ht / 2, Ht * .42, '#23262b', 'center', 700); }, { rim: .03 });
-  adCard.position.set(-4.4, 2.42, backZ + .12); group.add(adCard);
+  // After the first ride it advertises the stop just left.
+  let adLine = '';
+  const adCard = card(2.6, .5, (g, Wd, Ht) => { rrect(g, 0, 0, Wd, Ht, 10, '#f6b73c'); label(g, adLine || HELLO[ad], Wd / 2, Ht / 2, Ht * .42, '#23262b', 'center', 700, Wd * .9); }, { rim: .03 });
+  adCard.position.set(-4.4, 2.76, backZ + .12); group.add(adCard);
   // Three poster frames, empty at first: each project he visits puts its poster up.
   let visited: string[] = [];
-  const POSTER: Record<string, { mark: string; line: string }> = { blibli: { mark: '🛍', line: 'The big online store' }, moperty: { mark: '⌂', line: 'Homes near you' }, radjastone: { mark: '◆', line: 'Natural stone' } };
+  const POSTER: Record<string, { mark: string; line: string }> = { blibli: { mark: '🛍', line: 'All in one bag' }, moperty: { mark: '⌂', line: 'Homes near you' }, radjastone: { mark: '◆', line: 'Natural stone' } };
   const posters = [2.6, 4.6, 6.6].map((x, j) => { const c = card(1.7, .55, (g, Wd, Ht) => {
     const id = visited[j], st = LINE.find(l => l.id === id);
     if (!st) { rrect(g, 0, 0, Wd, Ht, 8, '#d4d9df'); g.setLineDash([6, 5]); g.strokeStyle = '#b3bac2'; g.lineWidth = 3; g.strokeRect(8, 8, Wd - 16, Ht - 16); return; }
     rrect(g, 0, 0, Wd, Ht, 8, st.color); label(g, POSTER[id].mark, Ht * .45, Ht / 2, Ht * .5, '#fffaf0'); label(g, st.name, Ht * .9, Ht * .38, Ht * .3, '#fffaf0', 'left', 700); label(g, POSTER[id].line, Ht * .9, Ht * .7, Ht * .2, '#fffaf0cc', 'left', 500);
-  }, { rim: .02 }); c.position.set(x, 2.45, backZ + .12); group.add(c); return c; });
+  }, { rim: .02 }); c.position.set(x, 2.78, backZ + .12); group.add(c); return c; });
   // The clock over the far seats: the day goes on, ride by ride. (Underground has no daylight; the clock is the day.)
   const TIMES = ['8:52', '12:10', '15:24', '18:47', '21:05', '22:30'];
   let clockText = TIMES[0];
   const clock = card(.62, .62, (g, Wd, Ht) => { g.fillStyle = '#fffaf0'; g.beginPath(); g.arc(Wd / 2, Ht / 2, Wd / 2, 0, 7); g.fill(); g.strokeStyle = '#3d444e'; g.lineWidth = 6; g.stroke(); label(g, clockText, Wd / 2, Ht / 2, Ht * .26, '#23262b', 'center', 700); }, { rim: .02 });
-  clock.position.set(-6.75, 2.32, backZ + .12); group.add(clock);
+  clock.position.set(-6.75, 2.74, backZ + .12); clock.scale.multiplyScalar(.85); group.add(clock);
   // Souvenirs from each stop ride on the free end of a seat, and slide with the train like everything loose.
   const souvenirs = [
     { id: 'blibli', x0: 1.75, x1: 3.05, m: (() => { const b = box(.32, .38, .18, '#0092da'); b.add(box(.06, .22, .01, '#fffaf0', .07, -.02, .095)); return b; })() },
@@ -120,7 +122,9 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
     enter(g: Game, from: string | null) {
       g.hero.place(0, .1, 1); g.hero.grip = R.grip;
       g.stage.scene.background = new THREE.Color('#0b0d10');
-      rideNo = ++g.save.rides; ad = 0; adCard.redraw();
+      rideNo = ++g.save.rides; ad = 0;
+      const last = [...g.save.visited].reverse().find(v => v !== 'home'), ls = LINE.find(l => l.id === last);
+      adLine = rideNo > 1 && ls && POSTER[ls.id] ? `${ls.name} · ${POSTER[ls.id].line}` : ''; adCard.redraw();
       visited = g.save.visited.filter(v => v !== 'home'); posters.forEach(p => p.redraw());
       clockText = TIMES[Math.min(TIMES.length - 1, rideNo - 1)]; clock.redraw();
       souvenirs.forEach(sv => (sv.m.visible = visited.includes(sv.id as never)));
@@ -215,9 +219,9 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       }
       // Thrown into the end wall: he crumples flat and pops back.
       if (!hold && Math.abs(g.hero.body.vx) > 2.4 && (g.hero.body.x < self.lane.x0 + .35 || g.hero.body.x > self.lane.x1 - .35)) { g.hero.crumple(); g.hero.body.vx = 0; sfx.bonk(.9); g.stage.shake(.3); g.fx.burst(g.hero.body.x, 1, .1, ['#fffaf0', '#d9dde2'], 6, .5); folk.forEach(f => f.jolt.kick(Math.sign(g.hero.body.x - f.x) * 3)); g.emit('crumple');
-        if (!crumpled && g.save.holds === 0) { crumpled = true; g.caption('Note to self: grab a strap.', new THREE.Vector3(g.hero.body.x * .8, 2.3, .1)); } }
+        if (!crumpled && g.save.holds === 0) { crumpled = true; g.say('Note to self: grab a strap.'); } }
       // The first ride's ad panel says hello by itself.
-      if (rideNo === 1) { const n = Math.min(HELLO.length - 1, Math.floor((sim.phase === 'closing' || sim.phase === 'chime' ? 0 : (sim.phase === 'accel' ? .5 : sim.phase === 'cruise' ? 1 + sim.t / 2 : 3)))); if (n !== ad) { ad = n; adCard.redraw(); sfx.paper(); } }
+      if (rideNo === 1 && !adLine) { const n = Math.min(HELLO.length - 1, Math.floor((sim.phase === 'closing' || sim.phase === 'chime' ? 0 : (sim.phase === 'accel' ? .5 : sim.phase === 'cruise' ? 1 + sim.t / 2 : 3)))); if (n !== ad) { ad = n; adCard.redraw(); sfx.paper(); } }
       if (sim.phase !== 'stand') leaving = false;
     }
   };
@@ -226,7 +230,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
     if (hold && held) {
       g.save.holds++;
       g.hero.hang = null; g.hero.kick(0, 4.5); hold = null; sfx.jump();
-      if (g.punch('line', 'hold', true)) { g.caption('Held on. Like a local.', new THREE.Vector3(g.hero.body.x, 2.6, .1)); }
+      if (g.punch('line', 'hold', true)) { g.say('Held on. Like a local.'); }
       if (!clapped) { clapped = true; standees.forEach(s => (s.cheer = .4)); sfx.pop(); }
     }
     held = false;

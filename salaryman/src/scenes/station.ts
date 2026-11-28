@@ -28,7 +28,8 @@ export function station(i: number, width: number, look: StationLook, build: (k: 
   const mechs: Mech[] = [], parts: Part[] = [];
   const kit: Kit = {
     group, mechs, parts, color: st.color, id: st.id, tab,
-    tell(g, id, text, at, star = false) { g.caption(text, at); g.punch(st.id, id, star); }
+    // The hole is punched with the snap; his line comes after the settle, over his head.
+    tell(g, id, text, _at, star = false) { g.punch(st.id, id, star); const place = g.place; setTimeout(() => { if (g.place === place) g.say(text); }, 400); }
   };
   build(kit);
   if (st.url) {

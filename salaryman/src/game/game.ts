@@ -73,7 +73,13 @@ export class Game {
     return true;
   }
   // A first-person caption stub by the thing that told it.
-  caption(text: string, at: THREE.Vector3, ms = 3200) { this.pins.show('caption', `<span>${text}</span>`, at, 'say', ms); }
+  // It stays up long enough to read: 1.2 s plus a little per word.
+  caption(text: string, at: THREE.Vector3, ms = 1200 + 350 * text.split(' ').length) { this.pins.show('caption', `<span>${text}</span>`, at, 'say', ms); }
+  // His own line: it rides above his head, so walking on does not leave it behind.
+  say(text: string, ms = 1200 + 350 * text.split(' ').length) {
+    const head = () => new THREE.Vector3(this.hero.body.x, this.hero.body.y + 1.95, this.hero.body.z);
+    this.pins.show('caption', `<span>${text}</span>`, head(), 'say', ms, head);
+  }
   private press(b: Button) {
     if (this.busy || !this.place) return;
     if (b === 'X' || b === 'B') { this.emit(b === 'X' ? 'ticket' : 'back'); return; }

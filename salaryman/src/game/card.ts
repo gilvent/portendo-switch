@@ -14,14 +14,14 @@ export class EndCard {
   show() {
     const holes = this.g.save.holes, total = ROWS.reduce((n, r) => n + r.round + r.star, 0);
     const all = holes.length >= total;
-    const strip = ROWS.map(r => { const got = holes.filter(h => h.startsWith(`${r.id}/`)); const st = got.filter(h => h.endsWith('*')).length; return `<span title="${r.label}">${Array.from({ length: r.round }, (_, i) => `<i class="${i < got.length - st ? 'on' : ''}"></i>`).join('')}${Array.from({ length: r.star }, (_, i) => `<i class="star ${i < st ? 'on' : ''}"></i>`).join('')}</span>`; }).join('');
+    const strip = ROWS.map(r => { const got = holes.filter(h => h.startsWith(`${r.id}/`)); const st = got.filter(h => h.endsWith('*')).length; return `<span title="${r.label}"><em>${r.label}</em>${Array.from({ length: r.round }, (_, i) => `<i class="${i < got.length - st ? 'on' : ''}"></i>`).join('')}${Array.from({ length: r.star }, (_, i) => `<i class="star ${i < st ? 'on' : ''}"></i>`).join('')}</span>`; }).join('');
     this.el.innerHTML = `<div class="ec-card${all ? ' gold' : ''}">
       <h2>${PERSON.name}</h2><p class="ec-trade">${PERSON.trade}</p>
       <ul>${PERSON.links.map(l => `<li><a href="${l.href}" target="_blank" rel="noopener"><b>${l.label}</b>${l.text}</a></li>`).join('')}</ul>
       <div class="ec-strip">${strip}</div>
-      <p class="ec-note">${all ? 'You found every hole in the ticket. Thanks for riding the whole line.' : `${holes.length} of ${total} holes punched today.`}</p>
+      <p class="ec-note">${all ? 'You found every hole in my ticket. Thanks for riding the whole line.' : `You punched ${holes.length} ${holes.length === 1 ? 'hole' : 'holes'} in my ticket. Thanks for riding.`}</p>
       <button class="ec-again" data-testid="ride-again">Ride again</button></div>`;
     this.el.querySelector('.ec-again')!.addEventListener('click', () => { location.href = location.pathname; });
-    requestAnimationFrame(() => this.el.classList.add('in'));
+    requestAnimationFrame(() => { this.el.classList.add('in'); this.el.querySelector<HTMLElement>('a')?.focus({ preventScroll: true }); });
   }
 }

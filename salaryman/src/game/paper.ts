@@ -37,8 +37,10 @@ export function card(w: number, h: number, paint: (g: CanvasRenderingContext2D, 
   m.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: .5 });
   return Object.assign(m, { redraw });
 }
-export function label(g: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, color = '#23262b', align: CanvasTextAlign = 'center', weight = 600) {
-  g.font = `${weight} ${size}px Fredoka, system-ui, sans-serif`; g.fillStyle = color; g.textAlign = align; g.textBaseline = 'middle'; g.fillText(text, x, y);
+export function label(g: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, color = '#23262b', align: CanvasTextAlign = 'center', weight = 600, maxW = 0) {
+  g.font = `${weight} ${size}px Fredoka, system-ui, sans-serif`;
+  // Too wide for its card: the type shrinks to fit rather than run off the paper.
+  if (maxW) { const w = g.measureText(text).width; if (w > maxW) g.font = `${weight} ${Math.floor(size * maxW / w)}px Fredoka, system-ui, sans-serif`; } g.fillStyle = color; g.textAlign = align; g.textBaseline = 'middle'; g.fillText(text, x, y);
 }
 export function rrect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number, fill?: string) {
   g.beginPath(); g.roundRect(x, y, w, h, r); if (fill) { g.fillStyle = fill; g.fill(); }

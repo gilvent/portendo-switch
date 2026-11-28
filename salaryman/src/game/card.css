@@ -11,7 +11,8 @@
 .ec-card a:hover { background: #f6b73c; }
 .ec-card a b { color: #e8552d; margin-right: 6px; }
 .ec-strip { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 2px; }
-.ec-strip span { display: flex; gap: 3px; }
+.ec-strip span { display: flex; gap: 3px; align-items: center; }
+.ec-strip em { font: 500 10px Fredoka, sans-serif; font-style: normal; color: #9a8f78; margin-right: 2px; }
 .ec-strip i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px dashed #b9a98a; }
 .ec-strip i.on { border: 0; background: #23262b; }
 .ec-strip i.star { border-radius: 1px; border: 0; background: #d9ccb0; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }

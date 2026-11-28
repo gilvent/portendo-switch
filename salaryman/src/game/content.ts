@@ -26,4 +26,4 @@ export const ROWS: { id: 'line' | StationId; label: string; round: number; star:
   { id: 'radjastone', label: 'Radjastone', round: 3, star: 1 }
 ];
 // The ad panel's three intro lines, which cycle by themselves on the first ride.
-export const HELLO = ['Hey there!', 'I am Alvaro.', 'I develop web frontends.'];
+export const HELLO = ['Hi, I’m Alvaro.', 'I build websites.', 'Mind the pull. Grab a strap.'];

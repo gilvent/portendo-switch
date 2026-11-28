@@ -61,7 +61,7 @@ export class Ticket {
   print() {
     sfx.paper(); this.drawFront(); this.hint();
     this.state = 'front'; this.el.dataset.state = 'print';
-    setTimeout(() => { if (this.el.dataset.state === 'print') { this.el.dataset.state = 'corner'; this.state = 'corner'; this.drawCorner(); } }, 2600);
+    setTimeout(() => { if (this.el.dataset.state === 'print') { this.el.dataset.state = 'corner'; this.state = 'corner'; this.drawCorner(); } }, 1400);
   }
   open(s: 'front' | 'back') {
     if (!this.g.save.ticket) return;

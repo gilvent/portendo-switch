@@ -25,6 +25,8 @@ export class Input {
     addEventListener('keydown', e => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if ((e.target as HTMLElement)?.closest?.('input,textarea')) return;
+      // On a focused link or button (the card at the end), Enter and Space do what they do on the web.
+      if ((e.code === 'Enter' || e.code === 'Space') && (e.target as HTMLElement)?.closest?.('a,button')) return;
       const b = BTN[e.code];
       if (MOVE[e.code] || b) e.preventDefault();
       this.source = 'keys';
