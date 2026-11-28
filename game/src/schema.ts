@@ -7,12 +7,9 @@ export type Block =
   | { kind: 'heading'; text: string }
   | { kind: 'paragraph'; text: Rich }
   | { kind: 'list'; title?: string; items: Rich[] }
-  | { kind: 'pages'; pages: { tab: string; blocks: Block[] }[] }
-  | { kind: 'reviewDesk' }
-  | { kind: 'specSheet' }
   | { kind: 'tech'; items: Tech[] }
   | { kind: 'links'; items: { label: string; href: string; icon: string }[] };
-export type Surface = 'note' | 'catalog' | 'monitor' | 'label';
+export type Surface = 'note' | 'label';
 export type Letter = { id: string; title: string; surface: Surface; blocks: Block[] };
 export type StopAction =
   | { kind: 'letter'; letter: string }

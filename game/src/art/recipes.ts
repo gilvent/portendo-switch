@@ -1,4 +1,4 @@
-import { add, backOf, box, normal, on, rad, spin, tilted, unit, yaw, type Panel, type Stock, type V3 } from './kit.ts';
+import { add, backOf, box, normal, on, rad, tilted, unit, yaw, type Panel, type V3 } from './kit.ts';
 
 export const KRAFT = '#b98450', KRAFT_DARK = '#94633a', TAPE = '#d9b781', INK = '#2b2622';
 export const CORAL = '#e8552d', CREAM = '#fff4e2', SUN = '#f6b73c', DEEP = '#0a6aa8', BLUE = '#0092da', GRASS = '#7fbf6a', FOLIAGE = '#3f9a5b';
@@ -58,86 +58,6 @@ export function openFlaps({ id, x, z, y, w, d, rot }: { id: string; x: number; z
   tissue(0, -w * .3, w * .6, 30, -6, '#ffffff');
   tissue(1, -w * .22, w * .5, 24, 8, '#fff1dc');
   return out;
-}
-
-export const MB = { x: -260, z: -48, post: 84, w: 96, h: 72, d: 64 };
-
-export function mailbox(): Panel[] {
-  const { x, z, post, w, h, d } = MB, out: Panel[] = [];
-  const wood = `<path d="M3 0C5 20 2 50 4 84M8 0C7 26 11 54 9 84M13 0C12 30 14 50 12.5 84" fill="none" stroke="#2b2622" stroke-opacity=".16" stroke-width=".7"/>`;
-  out.push(...box({ id: 'post', x, z, w: 16, h: post, d: 16, stock: 'greyboard', c: '#8f8579', front: wood, left: wood, right: wood }));
-  const foot = (id: string, cx: number, cz: number, fw: number, fd: number, rot: number) => {
-    const r = yaw(rot);
-    out.push({ id, stock: 'greyboard', c: '#8f8579', w: fw, h: fd, o: add([cx, .7, cz], r([-fw / 2, 0, fd / 2])), u: r([1, 0, 0]), v: r([0, 0, -1]), edge: 'cut', mask: `<path d="M0 ${fd}L${fw * .14} 0H${fw * .86}L${fw} ${fd}Z" fill="#fff"/>` });
-  };
-  foot('foot-front', x, z + 13, 22, 10, 0); foot('foot-left', x - 13, z, 22, 10, 90); foot('foot-right', x + 13, z, 22, 10, -90);
-
-  const bodyPrint = `<path d="M0 ${h - 9}H${w}" stroke="${CREAM}" stroke-opacity=".0"/>`;
-  const glueSeam = (fw: number) => `<path d="M0 3H${fw}" stroke="#7d2a12" stroke-opacity=".22" stroke-width="5"/>`;
-  const slotX = 24, slotW = 48, slotY = 13, slotH = 7;
-  const faceMask = `<path fill-rule="evenodd" d="M0 0H${w}V${h}H0Z M${slotX} ${slotY}V${slotY + slotH}H${slotX + slotW}V${slotY}Z" fill="#fff"/>`;
-  const body = box({ id: 'body', x, z, y: post, w, h, d, stock: 'cover', c: CORAL, front: bodyPrint, left: glueSeam(d), right: glueSeam(d), noTop: true });
-  const front = { ...body[0], mask: faceMask };
-  out.push(front, ...body.slice(1));
-  out.push({ id: 'body-inside', stock: 'greyboard', c: '#2c1610', w: w - 4, h: h - 4, o: [x - w / 2 + 2, post + 2, z + d / 2 - 22], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold' });
-
-  const trimMask = `<path fill-rule="evenodd" d="M0 0H${w - 8}V${h - 8}H0Z M5 5V${h - 13}H${w - 13}V5Z" fill="#fff"/>`;
-  out.push(on(front, 1, 4, 4, w - 8, h - 8, { id: 'trim', stock: 'cover', c: CREAM, mask: trimMask }));
-  const plate = on(front, 1.4, 28, 8, 40, 19, {
-    id: 'plate', stock: 'bond', c: CREAM,
-    mask: `<rect width="40" height="19" rx="3" fill="#fff"/>`,
-    print: `<g fill="none" stroke="${DEEP}" stroke-width="1.4" stroke-linejoin="round"><rect x="12" y="4.5" width="16" height="10.5" rx="1"/><path d="M12 5.5L20 11L28 5.5"/></g><g fill="${SUN}"><circle cx="5" cy="9.5" r="1.5"/><circle cx="35" cy="9.5" r="1.5"/></g>`
-  });
-  out.push(plate);
-
-  const flapDeg = 34, slotTop = post + h - slotY;
-  const flapV: V3 = [0, -Math.cos(rad(flapDeg)), Math.sin(rad(flapDeg))];
-  const flapP: Panel = { id: 'slot-flap', stock: 'cover', c: '#f26a3f', w: slotW + 2, h: slotH + 3, o: add([x - w / 2 + slotX - 1, slotTop + 1, z + d / 2 + 1.6], flapV, slotH + 3), u: [1, 0, 0], v: [0, -flapV[1], -flapV[2]], edge: 'cut', print: `<rect x="${(slotW + 2) / 2 - 6}" y="3.2" width="12" height="2.6" rx="1.3" fill="${CREAM}"/>` };
-  out.push(flapP, backOf(flapP, '#a53a1b'));
-
-  const letV = unit([.05, -.36, 1]);
-  const letter: Panel = {
-    id: 'letter', stock: 'bond', c: '#fdf9f0', w: 34, h: 24, o: add([x - 18, slotTop - slotH + 3, z + d / 2 - 8], letV, 0), u: [1, 0, -.04], v: [-letV[0], -letV[1], -letV[2]], edge: 'cut',
-    print: `<path d="M0 .8H34" stroke="${CORAL}" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M0 2.6L17 11L34 2.6" fill="none" stroke="#c9bfae" stroke-width=".7"/>`
-  };
-  const letterFacing: Panel = { ...letter, o: add(letter.o, letV, 24), v: [-letV[0], -letV[1], -letV[2]] };
-  out.push(letterFacing);
-
-  const peak = 40, gy = post + h, gableMask = `<path d="M0 ${peak}L${w / 2} 0L${w} ${peak}Z" fill="#fff"/>`;
-  const gable: Panel = { id: 'gable', stock: 'cover', c: CORAL, w, h: peak, o: [x - w / 2, gy, z + d / 2], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', mask: gableMask, print: `<g fill="none" stroke="${CREAM}" stroke-width="1.5"><circle cx="${w / 2}" cy="${peak * .66}" r="5.5"/></g><circle cx="${w / 2}" cy="${peak * .66}" r="1.6" fill="${CREAM}"/>` };
-  out.push(gable, { ...gable, id: 'gable-rear', o: [x + w / 2, gy, z - d / 2], u: [-1, 0, 0], ghost: true, density: .1 });
-
-  const over = 9, rl = Math.hypot(w / 2 + over, peak * (w / 2 + over) / (w / 2)), rd = d + 12, a = Math.atan2(peak, w / 2);
-  const ridge: V3 = [x, gy + peak + 1, z + d / 2 + 6];
-  const slope = (id: string, s: 1 | -1) => {
-    const down: V3 = [s * Math.cos(a), -Math.sin(a), 0];
-    const roof: Panel = s < 0
-      ? { id, stock: 'cover', c: DEEP, w: rl, h: rd, o: add(ridge, down, rl), u: [-down[0], -down[1], -down[2]], v: [0, 0, -1], edge: 'cut' }
-      : { id, stock: 'cover', c: DEEP, w: rl, h: rd, o: ridge, u: down, v: [0, 0, -1], edge: 'cut' };
-    out.push({ ...roof, print: Array.from({ length: 5 }, (_, i) => `<path d="M${(i + 1) * rl / 6} 0V${rd}" stroke="#063f66" stroke-opacity=".55" stroke-width="1"/>`).join('') }, { ...backOf(roof, '#07456f') });
-    const lip: Panel = s < 0
-      ? { id: `${id}-edge`, stock: 'cover', c: '#f7ecd8', w: rl, h: 1.8, o: add(ridge, down, rl), u: [-down[0], -down[1], -down[2]], v: [down[1] * -1 * 0, -1, 0], edge: 'fold', ghost: false }
-      : { id: `${id}-edge`, stock: 'cover', c: '#f7ecd8', w: rl, h: 1.8, o: ridge, u: down, v: [0, -1, 0], edge: 'fold' };
-    out.push({ ...lip, u: s < 0 ? lip.u : lip.u, v: [0, 1, 0], o: add(lip.o, [0, -1.8, 0]) });
-    const n = 7, step = (rl - 3) / n, r = step / 2;
-    const scallop = `<path d="M0 0H${rl - 3}V${6 - r}${Array.from({ length: n }, () => `a${r} ${r} 0 0 1 ${-step} 0`).join('')}Z" fill="#fff"/>`;
-    const barge: Panel = { id: `${id}-barge`, stock: 'cover', c: CREAM, w: rl - 3, h: 7, mask: scallop, edge: 'cut', v: [0, 1, 0],
-      ...(s < 0 ? { o: add(add(ridge, down, rl - 3), [0, -8.5, -5]), u: [-down[0], -down[1], -down[2]] as V3 } : { o: add(ridge, [0, -8.5, -5]), u: down }) };
-    out.push(barge);
-  };
-  slope('roof-l', -1); slope('roof-r', 1);
-
-  const fa = 38, fu: V3 = [Math.cos(rad(fa)), Math.sin(rad(fa)), 0], fv: V3 = [-Math.sin(rad(fa)), Math.cos(rad(fa)), 0];
-  const pivot: V3 = [x + w / 2 + 2.2, post + h * .34, z + 6];
-  const flagMask = `<path d="M0 13.5H42V0H64V18H0Z" fill="#fff"/>`;
-  const flag: Panel = { id: 'flag', stock: 'cover', c: SUN, w: 64, h: 18, o: add(add(pivot, fu, -8), fv, -2.25), u: fu, v: fv, edge: 'cut', mask: flagMask, print: `<circle cx="8" cy="15.75" r="1.5" fill="${INK}" fill-opacity=".75"/>` };
-  out.push(flag, backOf(flag, '#d9972b'));
-  return out;
-}
-
-export function tuft(id: string, x: number, z: number, w: number, h: number, c: string, rot = 0): Panel[] {
-  const r = yaw(rot), p: Panel = { id, stock: 'sugar', c, w, h, o: add([x, 0, z], r([-w / 2, 0, 0])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', mask: `<path d="M0 ${h}L${w * .1} ${h * .34}L${w * .22} ${h * .7}L${w * .36} 0L${w * .48} ${h * .62}L${w * .64} ${h * .18}L${w * .74} ${h * .68}L${w * .92} ${h * .3}L${w} ${h}Z" fill="#fff"/>` };
-  return [p, backOf(p)];
 }
 
 let seed = 7;

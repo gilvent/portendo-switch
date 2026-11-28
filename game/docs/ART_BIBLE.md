@@ -8,7 +8,7 @@ Target: a photographed miniature paper diorama. Every surface must be something 
 
 | Stock | Weight, feel | Core (cut edge) | Light through | Used for |
 |---|---|---|---|---|
-| Cover | 220gsm coated, smooth | White core shows at cuts | 8% | Printed objects: mailbox, signs, awnings, shop fronts, roofs |
+| Cover | 220gsm coated, smooth | White core shows at cuts | 8% | Printed objects: signs, awnings, shop fronts, roofs, the camera |
 | Kraft | 300gsm unbleached, faint flutes | Pale tan, zigzag rib on open edges | 4% | Parcels, cartons, anything shipped |
 | Greyboard | 1.5mm chipboard, matte | Solid grey | 0% | Structure: posts, feet, stair stringers, belt frames, shelves |
 | Bond | 120gsm uncoated | White | 30% | Labels, letters, receipts, tissue, catalog pages |
@@ -25,10 +25,9 @@ Each space uses its base colours plus at most two accents. All values come from 
 |---|---|---|---|
 | Riverside promenade (street) | Sky `#8fd3f4`, brick paving `#dba38b`, river `#4fa9d6`, palm `#3f9a5b` | Blibli blue `#0092da`, coral `#e8552d` | Cream `#fff4e2`, kraft `#b98450` |
 | MRT car | Shell `#e9edf1`, floor vinyl `#9aa3ad`, seats `#2f6f9f` | Sun `#f6b73c`, coral `#e8552d` | Steel `#3d444e`, tunnel black `#07090c` |
-| First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
-| Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
+| Shop floor | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 
-Tech colours from `content.ts` appear only as small label bars.
+A sheet that follows the chosen phone colour is white dyed-through paper tinted at run time (`tint` in `kit.ts`), so one baked sheet serves blue, coral and mint.
 
 ## Edges and creases
 
@@ -62,7 +61,7 @@ Sun colour is warm (1, .96, .9) with a 8° soft edge. Sky fill is cool, at stren
 
 ### 0. Setting
 
-The Blibli street is a walkable riverside shopping promenade: a brick plaza closed by shops on the left, right and back, the Blibli shop as its anchor, and the river seen through a pergola gate at the back left, with boats on it and the far bank beyond. Every object must belong to that place: stalls, kiosks, palms, planters, café tables, flags, festoon lights, shoppers. Nothing is added only to fill space (no balloons, no mountains).
+The Blibli street is a walkable riverside shopping promenade: a brick plaza closed by shops on the left, right and back, the Blibli shop as its anchor, and the river seen through a pergola gate at the back left, with boats on it and the far bank beyond. The shop's front is where its customers' reviews are: a cork review wall in the right bay, customers' photos pegged on strings in the left window, and by the river gate a photo spot (an instant camera turned to the phone on its unboxing table) and a writing stand. Every object must belong to that place: stalls, kiosks, palms, planters, café tables, flags, festoon lights, shoppers. Nothing is added only to fill space (no balloons, no mountains).
 
 Every space follows one scene standard. It is not limited to shoeboxes: a space can be a room box, a street on a curved ring, or any other diorama shape the game needs.
 
@@ -72,9 +71,9 @@ Split each space into the **main space**, where the courier walks and plays, and
 
 | Part | Build | In the Blibli spaces |
 |---|---|---|
-| Main space | Freestanding folds with real volume: boxes, tubes, ridge folds, slotted pairs, stacked contours. Slim or intricate outlines (people, bikes, scooters) are stand-up cut cards. The ground is flat sheets at slightly different heights. | Mailbox, parcels, bench, sandwich board, bins, lamps; showcase pedestal, tri-fold leaflet, price stand, basket, riser; reviewer's desk, camera, belts |
+| Main space | Freestanding folds with real volume: boxes, tubes, ridge folds, slotted pairs, stacked contours. Slim or intricate outlines (people, bikes, scooters) are stand-up cut cards. The ground is flat sheets at slightly different heights. | Unboxing table and its opened parcel, camera on its tripod, writing stand, scooter, bins; showcase pedestal, catalog stand, price post, boxed phones, basket |
 | Open surroundings | A shadow box: many thin cut layers stood well apart, one behind another, alternating pale and deep and paler with distance, each throwing its shadow and sky occlusion on the next. Things that sit in the view (boats, a bridge, trees) stand *between* layers, never printed on one. Layers whose position must match the scene's parallax are real layers flattened onto a card in the 3D scene (`riverView` in `promenade.ts`); layers far enough to stay put go in the CSS backdrop. Far detail is tiny flat print. Only what belongs to the place. | Through the gate, card one just behind the railing: five cut water bands with a two-layer tour boat riding between them. Card two further back, the far bank: lapping water, the quay wall with lamps, a footbridge, waterfront shops and cafés with awnings, a tree row with palms, a middle row of flats; the city rows in the backdrop rise behind it. In the CSS backdrop: the city's haze, far and middle rows and two layers of cut clouds stood off the sky, with gulls printed small. The street is also seen through every window |
-| Enclosed surroundings | Bounding facades on every side the eye is stopped, built flat and dressed in relief fixed to their surface, sticking out toward the main space: half pieces on walls, hanging pieces on ceilings, low edges on floors. Anything with depth is **carved** relief (`carved` in `kit.ts`): real volume, painted onto the wall as the game camera sees it, so shelf lips, box ends and tops all show | The promenade's white waterfront building (souvenir stall, scarves, boat-tour office, balcony, window boxes), red café (striped awnings, shutters, menu board, planters) and boutique; window boxes, lanterns and a blade sign on the Blibli shop; pegboard, shelves, clock and frame on the shop walls; steel racking stocked with cartons, totes, crates, binders and rolls on the store-room side walls; high shelves under the roof slopes |
+| Enclosed surroundings | Bounding facades on every side the eye is stopped, built flat and dressed in relief fixed to their surface, sticking out toward the main space: half pieces on walls, hanging pieces on ceilings, low edges on floors. Anything with depth is **carved** relief (`carved` in `kit.ts`): real volume, painted onto the wall as the game camera sees it, so shelf lips, box ends and tops all show | The promenade's white waterfront building (souvenir stall, scarves, boat-tour office, balcony, window boxes), red café (striped awnings, shutters, menu board, planters) and boutique; the door's canopy, window boxes, lanterns and a blade sign on the Blibli shop; the review wall's cork board and the pegged prints of the photo string, printed flat on its front; pegboard, shelves, clock and frame on the shop walls |
 
 - Shadow-box layers stand deep, like card on thick foam spacers: 30–60 units between neighbours. The sun is in front, so a layer's shadow mostly hides behind it and only the sideways part shows, 0.62 of the gap; shallower gaps leave it a hairline and the view reads flat.
 - Layered shadow-box work (flat cards stacked a little apart, flattened along the surface's normal by `relief`) is only for flat objects (posters, boards, frames, cards) and for open distant views. Never use it for objects with depth on a wall indoors, above all on side walls, where the camera sees them edge-on and they collapse into flat strips.
@@ -110,22 +109,22 @@ Everyone, the player included, is one cut sheet at paper-toy proportions: a big 
 
 ### The projects are played, not read
 
-Neither floor carries a written account of the work. Each part of the work is an object you use. `encoded` in `content.ts` lists which stop acts out each fact.
+No space carries a written account of the work. Each part of the work is an object you use; `encoded` in `content.ts` lists which stop acts out each fact. How the Blibli toys were designed, mechanics first, is in [BLIBLI_DESIGN.md](BLIBLI_DESIGN.md); the frame for the whole game is [GAME_DESIGN.md](GAME_DESIGN.md).
 
-| Stop | What you do | What it stands for |
-|---|---|---|
-| Showcase phone | A turns the phone through its three colours; the matching swatch chip pops up | Product detail: variant selection |
-| Catalog paper | Opens the tri-fold leaflet: Specs, Promo, Shipping, Discussion and Description leaves, showing the colour you chose | Secondary pages for the mobile page |
-| Price tag | A sticks the deal on: the price is struck through, a burst appears, the coupon is torn off | Promotions |
-| Basket | Each A drops one boxed phone in; the fourth empties it | The simpler one-step add to cart |
-| Recommended shelf | Grey placeholders fold away as you arrive; A turns to the next set | Recommendations, lazy loading |
-| Instant camera | A prints the photo sideways; A again sets it upright on the review card | Photo upload, and the EXIF rotation bug |
-| Review card | Each A adds a star | Writing a review as a reviewer |
-| Photo gallery | A switches between a grid of square crops and a list of photos at their own shapes | Gallery with grid and list views; photos vary in ratio |
-| Review board | Paper tabs filter it: all, with photo, five stars | Filter by photo or rating |
-| Old-theme card and paint cans | Dressing | The redesign rolled out piece by piece |
+| Space | Stop | What you do | What it stands for |
+|---|---|---|---|
+| Shop floor | Showcase phone | The phone turns over to the next colour; its swatch chip rises; every boxed phone follows | Variant selection |
+| | Price tag | He hops and knocks the coupon reel; a coupon flutters down and sticks; the price is struck | Promotions |
+| | Catalog | The catalog fans open on its stand, leaf by leaf | Secondary pages |
+| | Stock and basket | One press throws one boxed phone into the basket | The one-step add to cart |
+| | Recommended shelf | Cards turn face up outward from where he stands; A deals the next set | Recommendations |
+| Shopfront | Review wall | The tab strip turns; cards that do not match fold away | Filter by photo or rating |
+| | Photo string | A tug on the cord runs a blind with six square windows down over the prints | Gallery, grid and list |
+| | Instant camera | Flash; the print comes out sideways; the next press sets it upright on his peg | Photo upload, and the rotated-photo bug |
+| | Review card | The rubber stamp comes down: one star a press | Writing a review |
+| Both | Station trims | Each station's strip turns from kraft to the new blue the first time it is used | The redesign rolled out piece by piece |
 
-Stops carry `focus` and `look`: the camera leans in on the object being used while the courier stands beside it, not in front of it.
+Stops carry `focus` and `look`: the camera leans in on the object being used while he stands beside it, not in front of it. A stop's `mark` hangs its marker above the object, never on it.
 
 ### The MRT car: the home space
 
@@ -151,23 +150,27 @@ The game opens inside the front car of an MRT train running underground (`scenes
 
 A room diorama is the building seen from the street, cut open. Every room's outline must match the exterior that holds it.
 
-- The Blibli shop is a two-storey building with a gabled roof.
-- The first-floor outlet is a rectangular room with a flat ceiling, because the second floor sits on it.
-- The second-floor store-room is gabled, because it sits directly under that roof.
-- Stairs go the way the floor goes. In the outlet they climb; in the store-room, the top floor, they go **down**: a notch in the front left of the floor, a balustrade on its open side, the wall handrail falling with the flight, and the cut floor slab showing the treads dropping toward the shop.
-- The exterior is about 500 units tall so the whole roof stays in frame on the street camera. Rooms are drawn larger than the exterior scale, like any cutaway model.
+- The Blibli shop is a clapboard building under a gabled roof: a tall ground storey of two bays either side of the door, and a low attic of small windows under the roof.
+- Inside it is one floor, a rectangular room with a flat ceiling. There are no stairs: the attic is not a place to go.
+- The exterior is about 500 units tall so the whole roof stays in frame on the street camera. The room is drawn larger than the exterior scale, like any cutaway model.
 
 ## Pipeline
 
-`npm run paper` rebuilds all four spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds all three baked spaces (`street`, `shop`, `train`). `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
-1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
+1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the spaces as data; the Blibli stop's two are in `scenes/blibli/`, with `plan.ts` the one floor plan the art, the stops and the toy scripts all read.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
 3. Blender Cycles bakes light only, at half the atlas size (`LIGHT_SCALE`): each surface sees itself as white while bounce rays still take on the colours around it. Light is smooth by nature, so a low sample count is enough once `finish.py` smooths it within each panel.
 4. `finish.py` multiplies the crisp print back over the light, lights the far backdrop evenly (nothing near can shade it) apart from the shadows its own cut layers throw on each other, worked out from `SUN_TO_LIGHT`, the sun's soft edge and each layer's gap, flattens decals and flat relief into their parents along the parent's normal, paints carved relief onto its wall along the game camera's rays (nearest piece wins), culls faces no game camera can see, and writes the atlas, backdrop and manifest. Far layers are packed last and cropped off the shipped atlas, so the backdrop can be cut at high resolution for free.
 5. `PaperScene` in `src/art/fold.tsx` renders the manifest as `matrix3d` quads.
 
 No AI image or 3D tool was used. All geometry is planar and generated from data.
+
+Blender can also be the `bpy` Python module: `pip install bpy numpy scipy pillow`, then `BLENDER=tools/paper/blender-bpy CYCLES_DEVICE=NONE npm run paper -- street 96`. The Blibli spaces were baked that way on a machine with no Blender application, at 96 to 128 samples on the CPU.
+
+### Live pieces
+
+A sheet with `actor` belongs to a piece a toy script moves at run time (`src/toys/`): the phone that turns over, a box thrown into the basket, a card folding off the wall. An actor's sheets are baked like phantoms (lit where they rest, casting no shadow) and are never culled; `Scene.actors` gives each one the pivot it turns about, an optional parent to ride on, and an optional soft shadow that stays on the ground under it. A sheet with `tint` takes its colour from a toy's state. A scene can be looked at with no bake at all through `art/grey.ts`, which draws it straight from its data in flat colour: the greybox a space is played in before it has any art.
 
 ## Performance budget
 
@@ -183,12 +186,11 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 - Texture area costs as much as quad count: every quad is rasterised at its own texel size times the device pixel ratio. A scene sets `density` for panels that set none (the street uses 2.1), ghost faces pack at .35, and carved pieces are cut no finer than their wall.
 - Measured with `tests/perf.mjs` (software GPU, 4x CPU throttle, DPR 2.625) in a cloud container slower than the original machine: the old 112-quad street walked at 27.8fps there; the 200-quad promenade walks at about 17–21fps depending on texture density. With the river view rebuilt as a layered shadow box (198 quads; 192 once the sailboat, yachts and front bench were removed; 209 with the folded scooter, bicycle, pigeons and café chairs, which walked at 18.3fps), the same run measured 17.5fps against 16.6fps for the 200-quad version just before it. Re-measure on the reference machine before trusting the 60fps target.
 
-| Space | Quad limit, enforced by the journey test |
+| Space | Sheet limit, enforced by the journey test |
 |---|---|
-| Street (riverside promenade) | 210 (uses 209) |
+| Street (riverside promenade) | 210 (shows 197) |
 | MRT car | 140 (uses 124) |
-| First-floor outlet | 75 |
-| Second-floor store-room | 115 |
+| Shop floor | 90 (shows 80) |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
@@ -196,15 +198,7 @@ Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phant
 
 Paper moves in five stepped frames over .42s, never smoothly. Conveyor parcels advance in 60 steps per run. Under reduced motion, hinges jump straight to their end pose and belts stop.
 
-| Stop | What moves |
-|---|---|
-| Mailbox | Slot flap lifts, letter slides out, flag tips |
-| Delivery boxes | Top parcel flap opens |
-| Enter the store | Both door leaves swing inward |
-| Showcase phone | The chosen swatch chip rises |
-| Recommended shelf | Placeholder cards fold down |
-| Review board | The chosen filter tab rises |
-| Any toy | A piece that appears drops into place in five stepped frames |
+A toy's own motion is written in `src/toys/` as a smooth timeline and then shown at 14 frames a second, so an arc, a flip and a squash land on the same beats. A press never waits for motion: whatever was moving is stood where it would have ended and the new motion starts from there.
 
 ## Life
 
@@ -218,8 +212,7 @@ A loop rocks one sheet between two poses in four stepped frames. Each sheet take
 |---|---|
 | Street | Flags and gate bunting, festoon lights, palm fronds and tree leaves, bushes and tufts, the clothes rail, the river and its boat, shoppers breathing, the hawker bouncing as he shouts, pigeons and roof birds pecking, two cut gulls crossing the sky |
 | MRT car | Passengers breathing (the sleeper deeper and slower), on top of the train's own motion |
-| Outlet | Bunting, pendant lamps, the plant, the clerk, the promo burst |
-| Store-room | Pendant lamps, the packer, the roller, on top of the belts |
+| Shop floor | Bunting, the plant, the clerk on her stool |
 
 A new loop is one line: a pattern over sheet ids and a kind (`sway`, `skew`, `rustle`, `breathe`, `bob`, `peck`).
 
@@ -231,7 +224,7 @@ A tap or click reaches further than he can walk: every sheet in every space answ
 
 ### Using a stop
 
-Pressing A at a stop answers in the same frame, before anything opens: paper scraps in the space's colour burst from the object and the salaryman dips. The stop's own baked motion (flap, door, chip) follows as before.
+Pressing A at a stop answers in the same frame: he turns to the thing and makes the stop's move (a dip, a hop or a lean; `gesture` in `content.ts`), the toy's state changes, and its motion starts. Each use is heard (`src/sfx.ts`: paper foley made from filtered noise, no files) and, on a phone, felt as a short buzz.
 
 ### The salaryman
 
@@ -278,7 +271,8 @@ The site opens on the handheld, and its screen is the MRT platform the salaryman
 - **The train** is called by the gate. It comes in from the left, the way it runs on the big screen, brakes in stepped frames and opens the door of its front car on the mark. He can board only once it stands.
 - **The departure board** shows the visitor's own time and the next thing to do. The hour also sets the sky in the high windows and a wash over the platform: morning, day, evening, night.
 - **Boarding:** he steps in, the doors shut, the train pulls out as the console goes to the dock, and the dock's light turns green.
-- A commuter sleeps on the bench and answers with a "z" as he passes. A tap on the screen walks him there, or presses A when he stands at the gate or the door.
+- A away from the gate and the doors is a hop, as everywhere else. The train is heard before it is seen; its wind swings the hung boards and blows paper scraps along the platform.
+- A commuter sleeps on the bench and answers with a "z" as he passes, and starts awake when the train comes in or someone lands a hop beside him. A tap on the screen walks him there, or presses A when he stands at the gate or the door.
 - Under reduced motion the train is already standing when the gate opens, and nothing slides.
 
 The in-car route map is baked and still draws one line; it needs a re-bake to match the platform's two.

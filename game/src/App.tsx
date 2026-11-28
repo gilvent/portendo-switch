@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { content } from './content.ts';
-import { lineOf, pathOf, parsePath, reduce, rideIn, start, stopOf, toysOf, type Action, type Game, type Spot } from './game.ts';
+import { lineOf, pathOf, parsePath, reduce, rideIn, start, stopOf, type Action, type Game, type Spot } from './game.ts';
 import { MAX_SPEED, nearest, seek, step, type Walker } from './walker.ts';
 import type { Stop, WorldId } from './schema.ts';
 import { LIGHT, reducedMotion } from './light.ts';
@@ -53,14 +53,11 @@ export default function App() {
     if (turning.current && gameRef.current.place.k === 'walk' && (x.a === 'confirm' || x.a === 'back' || x.a === 'arrive' || x.a === 'line')) return;
     const here = gameRef.current.place;
     // On the platform: the gate opens once and stays open, and the doors take him only when the train is standing.
-    if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && here.near && (here.stop === 'gate' ? gameRef.current.toys['intro/gate'] === 1 : !trainIn.current)) return;
+    // A is never a dead button: where it has nothing to use (the gate already open, the train not yet in), he hops.
+    if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && here.near && (here.stop === 'gate' ? gameRef.current.toys['intro/gate'] === 1 : !trainIn.current)) { hero.current.jump = true; return; }
     if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && !here.near && gameRef.current.controller.mode === 'handheld') { hero.current.jump = true; return; }
-    if (x.a === 'confirm' && here.k === 'letter') {
-      // A turns the catalog's leaves; on any other letter it puts the letter down, like B.
-      const l = stopOf(content, here.world, here.stop)?.action, turns = l?.kind === 'letter' && content.worlds[here.world].letters.find(k => k.id === l.letter)?.blocks.some(k => k.kind === 'specSheet');
-      if (turns) { dispatchEvent(new Event('letter-confirm')); return; }
-      x = { a: 'back' };
-    }
+    // A puts a letter down, as B does.
+    if (x.a === 'confirm' && here.k === 'letter') x = { a: 'back' };
     // B with nothing open leaves the whole space, so it asks first: the second press within three seconds goes.
     if (x.a === 'back' && here.k === 'walk' && content.worlds[here.world].back && !(here.near && stopOf(content, here.world, here.stop)?.action.kind === 'ride')) {
       const now = performance.now();
@@ -372,7 +369,7 @@ export default function App() {
       {game.place.k === 'walk' && <p className="keys" data-testid="keys"><b>← ↑ ↓ →</b> walk <b>A</b> or <b>Enter</b> use, jump <b>B</b> or <b>Esc</b> close, leave</p>}
       {/* The commuter pass he tapped at the gate is the stamp card: every letter read and toy used stamps it. */}
       {(mode === 'docked' || gateOpen) && game.place.k !== 'lost' && <div className={`stamps${mode === 'docked' ? '' : ' fresh'}`} key={game.stamps.length} data-testid="stamps"><b>Alvaro L.</b>{game.stamps.length} of {STAMPS} stamps</div>}
-      {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
+      {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Wrong stop</h1><p>No line runs to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Back on the train</button></section>}
     </div>

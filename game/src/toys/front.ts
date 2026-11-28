@@ -18,7 +18,8 @@ export function front(): Toybox {
   let doorOpen = false, seen = '';
   const flown = [0, 0];
   const mine = (t: Record<string, number>) => `${t.rating ?? 0}|${(t.photo ?? 0) >= 2}`;
-  const answer = (c: Ctx, glyphs: string[]) => F.shoppers.forEach((p, i) => c.say(p.x, 126, p.z, glyphs[i % glyphs.length]));
+  // The two who read the wall (the father and his child) answer what happens on it.
+  const answer = (c: Ctx, glyphs: string[]) => F.shoppers.slice(0, 2).forEach((p, i) => c.say(p.x, [140, 88][i], p.z, glyphs[i % glyphs.length]));
   const run = runner([
     view<Wall>({
       key: 'wall', read: t => ({ f: t.filter ?? 0, photo: (t.photo ?? 0) >= 2, stars: t.rating ?? 0 }),
@@ -93,7 +94,7 @@ export function front(): Toybox {
       }
       // His card joins the wall when he is there to see it: it drops onto its pin and the shoppers answer.
       const sig = mine(c.toys);
-      if (sig !== seen && Math.abs(h.x - (B.x + B.w / 2)) < 330) {
+      if (sig !== seen && Math.abs(h.x - (B.x + B.w / 2)) < 240) {
         seen = sig;
         const [x, y] = cardXY(0), on = keeps({ f: c.toys.filter ?? 0, photo: (c.toys.photo ?? 0) >= 2, stars: c.toys.rating ?? 0 }, 0);
         if (on) c.rig.play('mine', tl => { tl.set('card-0', { ...REST, show: true, y: 60, rz: -14 }, 0).to('card-0', { y: 0 }, .26, .12, 'power2.in').to('card-0', { rz: 5 }, .1, .38).to('card-0', { rz: 0 }, .16, undefined, 'back.out(3)').call(() => { c.sfx('thump'); c.fx.scraps(x, y, F.wall.z + 12, [SUN, '#0092da', '#fff4e2'], 8); answer(c, ['!', '♪']); }, .38); }, () => c.rig.set('card-0', { ...REST, show: true }));

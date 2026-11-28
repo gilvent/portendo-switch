@@ -219,4 +219,54 @@ These are the checks in `tests/journey.mjs` (24; 23 pass in greybox).
 
 ## Phase 3: aesthetics
 
-*Filled in when Gate 2 holds.*
+Only now does anything get a look. The toys keep the geometry, the actors and the scripts they were tuned with in greybox; this phase gives them paper, and plans the two places by the Paper Diorama Checklist (its section 9, step by step).
+
+### What changed from the greybox plan, and why
+
+- **The front was mirrored.** The promenade already had its open view (the river gate) at the back left and its café on the right. The photo spot belongs beside the river, so the loop now runs right to left: the train leaves him at the plaza's right end, by the review wall.
+- **The shop's front was re-proportioned.** The old front had low windows under a long awning: a wall and a string hung there would sit behind a walker's head and under the awning's lip. The ground storey is now two tall bays, read over his head, with a short canopy over the door only and the sign above it.
+- **The stamp rests on an ink pad.** In greybox it hovered over the card. It now sits on the stand, hops onto the card and back.
+
+### Shopfront: the plan
+
+| Step | |
+|---|---|
+| Container | The riverside promenade as built: an open box, wide, with the plaza as its floor. |
+| Layout | Anchor: the Blibli shop, back centre. Groups: the review wall with the two who read it (right bay); the door under its canopy and bell; the photo string (left bay); the photo spot and the writing stand at the river gate (left). Clear ground between them is the walk. Enclosed left, right and back right by relief buildings; open at the back left through the gate. |
+| Ground | Flat brick plaza; the wave band along the quay and the gate carry it into the river view. |
+| Freestanding objects | Folding table with the opened parcel (folded kraft, flaps up) and the phone: what he bought, unboxed. Instant camera, a folded box on a cut tripod, turned to the table. Writing stand, a folded box with a sloping top, ink pad and stamp. Courier's scooter at the kerb with the basket's parcels. All are things a shop sets out front for customers; each stands where its use puts it. |
+| Open view | Unchanged: the layered river view through the gate and the city rows behind. |
+| Relief | On the shop: the door's canopy, the sign, four attic window boxes, two lanterns, a blade sign; the cork board and the pegged prints are flat things, printed flat. The neighbours keep theirs. |
+| Characters | A father (big, determined) and his child (short, surprised) read the wall; a backpacker (cool) and a woman in a sun hat (grumpy) stroll the plaza. None stands in front of a toy or its stand point. |
+| Telling the project | The shopfront as a whole is "what customers say": the place stands for product reviews, and each toy for one feature (see Phase 1). No written note; the only words are the shop's name, "Blibli.com" on the link board, "TRAIN" on the way back and "PHONE" on the parcel's label. |
+
+What left to pay for it: the mailbox, the four tech parcels, the tufts, the bench, the pot plant, the parcel by the door and the sandwich board.
+
+### Shop floor: the plan
+
+| Step | |
+|---|---|
+| Container | The shop's one room, cut open: brick walls, plank floor, flat ceiling under bunting. |
+| Layout | Anchor: the showcase pedestal, back centre, under its poster. Around it: catalog stand (left), price post with the coupon reel over the floor beside it (right), stock and basket (front left), the recommended shelf on the back wall over the clerk's corner (right). The way in from the door runs up the middle. |
+| Ground | Flat planks, a rug and the door mat. |
+| Freestanding objects | Pedestal (folded box) with the phone and swatch chips; catalog (three hinged bond leaves) on a wooden stand; price tag on a post; three boxed phones and a slotted basket; two pendant lamps over the floor. |
+| Relief | As built: shelves of boxed phones, pegboard, cabinets, clock and frame carved on the walls; the recommended shelf and its brackets are carved on the back wall, only its cards are loose. |
+| Characters | The clerk (average build, cheerful) on a step stool at the end of the shelf, laying the cards out. |
+| Telling the project | The room is the product page: the product, its price, its catalog, the way to buy it, what else to look at. |
+
+What left: the stairs (the shop is one floor inside), the stepped riser, and the old toys.
+
+### How the toys are made as paper
+
+| Piece | Made as |
+|---|---|
+| Phone, boxed phones, the phone in the catalog, on the table and on his print | White dyed-through paper, tinted to the chosen colour at run time; a dark screen printed on. One baked sheet serves all three colours. |
+| Review cards, catalog leaves, price tag, coupon, his print | Bond, printed in flat ink: stars, bars, a pictogram. No words. |
+| Camera, pedestal, basket, table, stamp, reel | Folded boxes of coated cover stock, only the faces the camera can see. |
+| Stands, shelf, tripod, posts | Greyboard, plank-printed where it is wood. |
+| Parcels | Kraft with tape and a label. |
+| Trims | A strip of kraft, swapped for a strip of blue with cream dots. |
+
+### Gate 3
+
+*Filled in when both spaces are baked and played.*

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Stands in for the Blender application where only the `bpy` Python module is installed (pip install bpy numpy).
+# Point BLENDER at this file: build.ts calls it as `blender --background ... --python bake.py -- <work dir>`, and it
+# runs that script with the Python given in BPY_PYTHON (default: python3).
+while [ "$1" != "--python" ] && [ $# -gt 0 ]; do shift; done
+script="$2"; shift 2
+exec "${BPY_PYTHON:-python3}" "$script" "$@"

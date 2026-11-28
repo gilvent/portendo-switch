@@ -83,6 +83,28 @@ The opening is the station platform on the handheld's screen; the hub is the tra
 | Passengers | Each answers when brushed. They also answer the car: when the sign turns, when the chime sounds, when he knocks a strap over their heads. | People who notice what he does. |
 | Poster, help point | His name and trade; how to reach him. | The two things a visitor must be able to read. Kept as paper he picks up. |
 
-### Dynamics and aesthetics
+### Dynamics: what was built
 
-*Filled in as these are built and played.*
+Nothing in the opening or the hub was re-drawn for this. Every change is in what the existing paper does.
+
+| Rule | What it does when played |
+|---|---|
+| A is a hop on the platform | The first press a visitor makes is answered whatever he is standing at. Landing beside the sleeper startles him awake with a "!". |
+| The gate calls the train | The pass beeps; the train is heard before it is seen (a roar that swells for two seconds, then brakes); its wind swings the two hung boards, blows six scraps of paper down the platform and shakes the screen; the sleeper starts; the doors chime as they open. |
+| Boarding | The doors slide, the console lands in the dock with a thump, the big screen wakes with a pop. |
+| The train's speed drives the car | A low rumble follows the speed, with a double knock at each rail joint in time with the car's jolt. Pulling away, straps and passengers hang back and he leans back; braking, all ten straps and everyone seated are thrown forward and settle, he is tipped toward the front, the brakes squeal, the doors slide and chime. |
+| Straps can be knocked | A hop under a strap throws it wide; whoever sits beneath it looks up with a "!". |
+| The sign turns | It clicks over, and every other passenger looks up with a "?". |
+| A buzz with every knock | On a phone, thumps, taps, the shutter and the brakes are felt as a short buzz. Reduced motion turns it off. |
+
+### Aesthetics: the check
+
+| | Opening | Hub |
+|---|---|---|
+| Discovery: what answers without a label | the hop, the sleeper (passing and startled), the wind on the boards | ten straps, eight passengers and bags brushed, the passengers answering the sign, the brakes and a knocked strap |
+| Discovery: what is labelled | the gate, the doors | the doors and sign, the poster, the help point |
+| Sensation: channels on a press | motion, sound, buzz | motion, sound, paper bits, buzz |
+| Sensation: is anything ever still | the sleeper breathes, the map's "you are here" pulses | the tunnel, wheels, straps, sway and jolt run with the train; passengers breathe |
+| Challenge | one lock (the gate), opened by the only button, with the next thing to do on the departure board | none: the sign names the stop, the label names both buttons |
+
+Checked in `tests/journey.mjs`: A hops on the platform, the startle, the train's wind; a hop knocks one to three straps; pulling away and braking throw all ten; passengers feel the brakes and notice the sign.
