@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { card } from './paper.ts';
+import { box, card } from './paper.ts';
 import { clamp, damp, Spring } from '../core/math.ts';
 import { moveBody, type Body, type Rect, type Solid } from './body.ts';
 import { reducedMotion } from '../core/stage.ts';
@@ -28,7 +28,7 @@ export class Hero {
   swingers: THREE.Object3D[] = [];
   private swing = new Spring(0, 70, 3.2); private lastVx = 0;
   private flipT = 1; private flipFrom = 1;
-  private squash = new Spring(1, 320, 14);
+  squash = new Spring(1, 320, 14);
   private lean = 0; private stride = 0; private coyote = 0; private buffered = 0; private holding = false;
   private shadow: THREE.Mesh;
   onStep?: () => void; onLand?: (speed: number) => void; onJump?: () => void;
@@ -55,6 +55,11 @@ export class Hero {
       g.strokeStyle = '#7a3b2a'; g.lineWidth = 2.4 * s; g.lineCap = 'round'; g.beginPath(); g.arc(68 * s, H - 92 * s, 6 * s, .2, Math.PI - .6); g.stroke();
     });
     this.sheet.position.x = 0;
+    // His own sheet geometry: six vertical columns, unshared and flat-shaded, so he can fold like a concertina.
+    const geo = new THREE.PlaneGeometry(1, 1, 6, 1).translate(0, .5, 0).toNonIndexed();
+    this.sheet.geometry = geo; this.base = Float32Array.from(geo.attributes.position.array as Float32Array);
+    // Turned exactly edge-on, a card is its white core: a hairline.
+    this.edge.visible = false; this.group.add(this.edge);
     const sh = new THREE.Mesh(new THREE.CircleGeometry(.36, 20), new THREE.MeshBasicMaterial({ color: '#000', transparent: true, opacity: .18, depthWrite: false }));
     sh.rotation.x = -Math.PI / 2; sh.position.y = .01; this.shadow = sh;
     this.group.add(this.sheet, this.wear);
@@ -69,8 +74,19 @@ export class Hero {
   hop(v = 4) { if (this.body.ground) { this.body.vy = v; this.body.ground = false; this.squash.x = 1.12; } }
   kick(vx: number, vy = 0) { this.body.vx += vx; if (vy) { this.body.vy = vy; this.body.ground = false; } }
   // Hit a wall hard: he crumples flat against it and pops back.
-  crumple() { this.squash.x = .32; this.squash.v = 0; this.crushed = .28; }
-  private crushed = 0;
+  // Thrown into a wall: he folds across his width into pleats against it, holds, springs open, and the creases
+  // stay a moment. Poses, not tweens (a stop-motion film): [from s, width, pleat depth, zigzag].
+  crumple(side = -1) { this.crumpleT = 0; this.crumpleSide = side; }
+  private crumpleT = -1; private crumpleSide = -1; private base!: Float32Array; private edge = box(.05, 1.46, .05, '#fffaf0');
+  private static POSES: [number, number, number, number][] = [[0, .46, .12, .03], [.36, .8, .09, .02], [.443, 1.1, .02, .01], [.527, .96, .05, 0], [.61, 1, .04, 0], [2.6, 1, .02, 0], [2.683, 1, 0, 0]];
+  private fold(w: number, d: number, zig: number, side: number) {
+    const pos = this.sheet.geometry.attributes.position as THREE.BufferAttribute, a = pos.array as Float32Array, B = this.base;
+    for (let i = 0; i < a.length; i += 3) {
+      const x = B[i], y = B[i + 1], col = Math.round((x + .5) * 6), par = col % 2 ? 1 : -1, edgeX = side * .5;
+      a[i] = edgeX + (x - edgeX) * w; a[i + 2] = par * d; a[i + 1] = y + (y < .01 || y > .99 ? par * zig : 0);
+    }
+    pos.needsUpdate = true; this.sheet.geometry.computeVertexNormals();
+  }
   update(dt: number, move: { x: number; z: number }, holdA: boolean, bounds: Rect, solids: Solid[]) {
     const b = this.body, H = HERO;
     if (this.hang) {
@@ -116,13 +132,24 @@ export class Hero {
     const b = this.body;
     this.flipT = Math.min(1, this.flipT + dt / HERO.flip);
     const sx = this.flipT < 1 ? Math.cos(this.flipT * Math.PI) * -this.flipFrom : this.facing;
-    if (this.crushed > 0) { this.crushed -= dt; this.squash.x = .32; this.squash.v = 0; }
+    // The crumple's poses; the wall side in the sheet's own x (which flips with his facing).
+    if (this.crumpleT >= 0) {
+      this.crumpleT += dt;
+      const P = reducedMotion ? [Hero.POSES[0], Hero.POSES[4], Hero.POSES[6]] : Hero.POSES;
+      let pose = P[0]; for (const q of P) if (this.crumpleT >= q[0]) pose = q;
+      const sheetSide = this.crumpleSide * Math.sign(this.facing || 1);
+      this.fold(pose[1], pose[2], pose[3], sheetSide);
+      if (this.crumpleT > 2.7) { this.crumpleT = -1; this.fold(1, 0, 0, 1); }
+    }
     const sq = this.squash.step(1, dt), air = !b.ground ? clamp(b.vy * .03, -.12, .14) : 0;
     const sy = clamp(sq + air, .65, 1.35), sxs = 1 / Math.sqrt(sy);
     const bob = b.ground ? Math.abs(Math.sin(this.stride * Math.PI)) * .06 : 0;
     this.group.position.set(b.x, b.y + bob, b.z);
-    this.sheet.scale.set((1.05 + .07) * sx * sxs * (1 - this.thin), (HERO.height + .07) * sy, 1);
-    this.wear.scale.set(sx * sxs * (1 - this.thin), sy, 1);
+    this.sheet.scale.set((1.05 + .07) * sx * sxs, (HERO.height + .07) * sy, 1);
+    this.wear.scale.set(sx * sxs, sy, 1);
+    // Edge-on is a real turn about his vertical axis; at the end it is the card's white core.
+    this.group.rotation.y = this.thin * Math.PI / 2 * this.facing;
+    this.edge.visible = this.thin > .97;
     this.swing.kick((this.lastVx - b.vx) * 1.4); this.lastVx = b.vx;
     const sw = reducedMotion ? 0 : clamp(this.swing.step(0, dt), -1.2, 1.2) * this.facing;
     for (const o of this.swingers) o.rotation.z = sw;
@@ -130,6 +157,6 @@ export class Hero {
     // A card turning shows its edge: a little yaw sells it as paper.
     this.sheet.rotation.y = this.flipT < 1 ? Math.sin(this.flipT * Math.PI) * .5 : 0;
     this.shadow.position.set(b.x + .08, b.floor + .012, b.z + .02);
-    const lift = clamp(1 - (b.y - b.floor) * .35, .35, 1); this.shadow.scale.setScalar(lift);
+    const lift = clamp(1 - (b.y - b.floor) * .35, .35, 1); this.shadow.scale.set(lift * (1 - this.thin * .8), lift, lift);
   }
 }

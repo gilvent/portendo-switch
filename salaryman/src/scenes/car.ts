@@ -5,6 +5,7 @@ import { bed, buzz, noise } from '../core/audio.ts';
 import { sfx } from '../game/sfx.ts';
 import { HELLO, LINE } from '../game/content.ts';
 import { reducedMotion } from '../core/stage.ts';
+import { slipThrough } from '../game/squeeze.ts';
 import type { Mech, Place } from '../game/place.ts';
 import type { Game } from '../game/game.ts';
 
@@ -26,7 +27,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   const R = RIDE, group = new THREE.Group();
   // Shell: floor, back wall with windows and the doors in the middle, end walls, a strip of ceiling.
   group.add(box(W + .6, .3, D, '#9aa3ad', 0, -.3, -.2));
-  group.add(box(W + .6, .04, .2, '#e8552d', 0, -.04, D / 2 - .2));
+  group.add(box(W + .6, .04, .2, '#3d444e', 0, -.04, D / 2 - .2));
   const backZ = -1.75;
   group.add(box(W, 1.05, .14, '#e9edf1', 0, 0, backZ), box(W, .95, .14, '#e9edf1', 0, 2.35, backZ));
   for (const x of [-7.3, -4.4, -1.45, 1.45, 4.4, 7.3]) group.add(box(x === -1.45 || x === 1.45 ? .5 : .4, 1.3, .14, '#e9edf1', x, 1.05, backZ));
@@ -197,7 +198,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       // The bar: amber pulses with the brace notes, coral at four a second while the doors close.
       const ptn = (ph === 'chime' || ph === 'warn') && sim.t < .6 && sim.t % .2 < .13 ? '#f6b73c' : hurry && Math.floor(sim.t * 8) % 2 ? '#e8552d' : null;
       barSet(reducedMotion && hurry ? '#e8552d' : ptn);
-      doorL.position.x = -.45 - doorOpen * .82; doorR.position.x = .45 + doorOpen * .82;
+      const dOpen = pinch ?? doorOpen; doorL.position.x = -.45 - dOpen * .82; doorR.position.x = .45 + dOpen * .82;
       // The push: -a acts on everything loose. He slides unless he is holding on.
       g.hero.push = -sim.a * R.throw; g.hero.grip = R.grip;
       for (const s of straps) {
@@ -236,7 +237,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
         s.c.position.x = s.x + Math.sin(st.th) * R.strapL * s.hold; s.c.position.y = s.hold * .35 + s.cheer; s.cheer = Math.max(0, s.cheer - dt * 1.2); s.arm.visible = s.hold > .5;
       }
       // Thrown into the end wall: he crumples flat and pops back.
-      if (!hold && Math.abs(g.hero.body.vx) > 2.4 && (g.hero.body.x < self.lane.x0 + .35 || g.hero.body.x > self.lane.x1 - .35)) { g.hero.crumple(); g.hero.body.vx = 0; sfx.crumple(); g.freeze = .083; g.stage.shake(.55); g.fx.burst(g.hero.body.x, 1, .1, ['#fffaf0', '#d9dde2'], 12, .5); setTimeout(() => sfx.pop(), 360);
+      if (!hold && Math.abs(g.hero.body.vx) > 2.4 && (g.hero.body.x < self.lane.x0 + .35 || g.hero.body.x > self.lane.x1 - .35)) { const side = Math.sign(g.hero.body.x); g.hero.crumple(side); g.hero.body.x = side * (W / 2 - .56); g.hero.body.vx = 0; sfx.crumple(); g.freeze = .083; g.stage.shake(.55); g.fx.burst(g.hero.body.x, 1, .1, ['#fffaf0', '#d9dde2'], 12, .5); setTimeout(() => sfx.pop(), 360);
         const near = folk.reduce((a, b) => (Math.abs(b.x - g.hero.body.x) < Math.abs(a.x - g.hero.body.x) ? b : a)); g.pins.show('oops', '<span>!</span>', new THREE.Vector3(near.x, 1.75, backZ + .55), 'tag', 600); folk.forEach(f => f.jolt.kick(Math.sign(g.hero.body.x - f.x) * 3)); g.emit('crumple');
         if (!crumpled && g.save.holds === 0) { crumpled = true; g.say('Note to self: grab a strap.'); } }
       // The first ride's ad panel says hello by itself.
@@ -244,7 +245,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       if (sim.phase !== 'stand') leaving = false;
     }
   };
-  let leaving = false, wasWin = false, crumpled = false, hurry = false, tickN = -1, missedOnce = false, quietStraps = 0, creakSign = 0;
+  let leaving = false, wasWin = false, crumpled = false, hurry = false, tickN = -1, missedOnce = false, quietStraps = 0, creakSign = 0, pinch: number | null = null;
   function endHold(g: Game) {
     if (hold && held) {
       g.save.holds++;
@@ -256,8 +257,8 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   }
   async function getOff(g: Game) {
     leaving = true; g.busy = true;
-    const h = g.hero, x0 = h.body.x, t0 = performance.now();
-    await new Promise<void>(res => { const f = () => { const k = Math.min(1, (performance.now() - t0) / 360); h.body.x = x0 * (1 - k); h.body.z = .1 - 1.8 * k; h.thin = k * .85; if (k < 1) requestAnimationFrame(f); else res(); }; f(); });
+    await slipThrough(g, { x: 0, z1: -1.7, last: hurry, pinch: v => (pinch = v), seam: { x: 0, y: 1, z: -1.6 } });
+    pinch = null;
     g.save.firstStop = true;
     g.emit('getoff', sim.at);
   }

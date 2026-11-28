@@ -84,7 +84,7 @@ export function blibli(i: number) {
     fascia(k);
     greeter(k, bag);
     lamp(k, bag);
-    const shelves = [shelf(k, B.shelfA, [MINT, SUN, '#7b4b8f', BLUE]), shelf(k, B.shelfB, [SUN, '#c0392b', MINT, '#8fd3f4']), shelf(k, B.shelfC, ['#7b4b8f', BLUE, SUN, MINT])];
+    const shelves = [shelf(k, B.shelfA, [MINT, SUN, '#7b4b8f', BLUE]), shelf(k, B.shelfB, [SUN, '#b3263a', MINT, '#8fd3f4']), shelf(k, B.shelfC, ['#7b4b8f', BLUE, SUN, MINT])];
     cans(k, bag);
     fitting(k);
     surprise(k, bag);
@@ -124,8 +124,8 @@ function priceTag(price: () => number) {
   const c = card(.62, .4, (g, W, H) => {
     rrect(g, 0, 0, W, H, 6, CREAM); const p = price();
     if (!shop.sale) { label(g, `Rp ${p}k`, W / 2, H / 2, H * .36, INK, 'center', 700); return; }
-    label(g, `Rp ${p}k`, W / 2, H * .3, H * .24, '#9aa0a8', 'center', 700); g.strokeStyle = '#c0392b'; g.lineWidth = 5; g.beginPath(); g.moveTo(W * .2, H * .33); g.lineTo(W * .8, H * .27); g.stroke();
-    label(g, `Rp ${Math.round(p * .8)}k`, W / 2, H * .7, H * .32, '#c0392b', 'center', 700);
+    label(g, `Rp ${p}k`, W / 2, H * .3, H * .24, '#9aa0a8', 'center', 700); g.strokeStyle = '#b3263a'; g.lineWidth = 5; g.beginPath(); g.moveTo(W * .2, H * .33); g.lineTo(W * .8, H * .27); g.stroke();
+    label(g, `Rp ${Math.round(p * .8)}k`, W / 2, H * .7, H * .32, '#b3263a', 'center', 700);
   });
   shop.redraws.push(() => c.redraw());
   return c;
@@ -137,11 +137,11 @@ function lamp(k: Kit, bag: Bag) {
   const wheel = new THREE.Group(); wheel.position.set(x, .48, z + .42); k.group.add(wheel);
   const disc = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .05, 24), mat('#d7dbe0')); disc.rotation.x = Math.PI / 2; wheel.add(disc);
   VARIANTS.forEach((v, n) => { const d = new THREE.Mesh(new THREE.CircleGeometry(.07, 12), mat(v.c)); d.position.set(Math.sin(n * 2.094) * .19, Math.cos(n * 2.094) * .19, .03); wheel.add(d); });
-  const t = k.tab('turn'); t.position.set(.3, .1, .04); wheel.add(t);
+  const t = k.tab('turn', .3); t.position.set(.3, .1, .04); wheel.add(t);
   let n = 0, told = false, glow = 0;
   const tag = priceTag(() => VARIANTS[n].price); tag.position.set(x + .62, .95, z + .3); tag.rotation.z = -.08; k.group.add(tag);
   const settle = new Settle();
-  k.mechs.push({ id: 'lamp', x, at: V(x, 2.2), label: 'Turn the wheel', use: async (g: Game) => {
+  k.mechs.push({ id: 'lamp', x: x - .85, at: V(x, 2.2), label: 'Turn the wheel', use: async (g: Game) => {
     n = (n + 1) % 3; t.kick();
     const from = wheel.rotation.z;
     [0, .07, .14].forEach(at => tone({ f: 2400, d: .025, type: 'square', v: .06, at }));
@@ -186,7 +186,7 @@ function cans(k: Kit, bag: Bag) {
   const tag = priceTag(() => 12); tag.position.set(x + 1.05, 1.2, z + .14); k.group.add(tag);
   const home: { x: number; y: number }[] = [];
   [4, 3, 2, 1].forEach((n, r) => { for (let j = 0; j < n; j++) home.push({ x: x + (j - (n - 1) / 2) * .26, y: top + r * HC + HC / 2 }); });
-  const colors = ['#c0392b', SUN, MINT, BLUE];
+  const colors = ['#b3263a', SUN, MINT, BLUE];
   const tins = home.map((p, j) => {
     const g = new THREE.Group(), inner = new THREE.Group();
     const cyl = new THREE.Mesh(new THREE.CylinderGeometry(R, R, HC, 16), mat(colors[j % 4])); cyl.castShadow = true;
@@ -195,12 +195,12 @@ function cans(k: Kit, bag: Bag) {
     return { g, inner, x: p.x, y: p.y, vx: 0, vy: 0, loose: false };
   });
   const pull = 1, topCan = tins.length - 1;
-  const t = k.tab('down', .26); t.position.set(home[pull].x, top + .02, z + R + .06); k.group.add(t);
+  const t = k.tab('down'); t.position.set(home[pull].x, top - .02, z + R + .1); k.group.add(t);
   const clerk = person({ ...CROWD[2], face: 'o' }); clerk.position.set(x - .3, -1.3, z - .75); k.group.add(clerk);
   let busy = false, pulls = 0, clerkUp = 0, told = false;
   const can = (j: number) => { const it = mini(colors[j % 4], 'can', .16, .2); return it; };
   const reset = (s: typeof tins[number], j: number) => { s.loose = false; s.x = home[j].x; s.y = home[j].y; s.vx = s.vy = 0; s.g.position.set(s.x, s.y, z); s.g.rotation.z = 0; s.inner.rotation.x = 0; s.g.visible = true; };
-  k.mechs.push({ id: 'cans', x, at: V(x, 2.3), label: 'Pull the bottom can', on: () => !busy, use: async (g: Game) => {
+  k.mechs.push({ id: 'cans', x: x - 1, at: V(x, 2.3), label: 'Pull the bottom can', on: () => !busy, use: async (g: Game) => {
     busy = true; t.kick(); pulls++;
     const p = tins[pull];
     sfx.paper();
@@ -256,7 +256,7 @@ function wearable(kind: 'glasses' | 'cap' | 'bow') {
   const g = new THREE.Group();
   if (kind === 'glasses') { g.add(box(.14, .09, .03, INK, .09, .97, .03), box(.13, .09, .03, INK, .245, .97, .03), box(.06, .02, .03, INK, .17, 1.02, .03)); }
   if (kind === 'cap') { g.add(box(.6, .15, .34, BLUE, 0, 1.27, 0), box(.32, .04, .34, BLUE, .36, 1.26, 0), box(.08, .04, .08, CREAM, 0, 1.42, 0)); }
-  if (kind === 'bow') { const a = box(.12, .1, .03, '#c0392b', -.06, .7, .04), b = box(.12, .1, .03, '#c0392b', .06, .7, .04); a.rotation.z = .4; b.rotation.z = -.4; g.add(a, b, box(.04, .06, .035, '#8e2a1f', 0, .72, .05)); }
+  if (kind === 'bow') { const a = box(.12, .1, .03, '#b3263a', -.06, .7, .04), b = box(.12, .1, .03, '#b3263a', .06, .7, .04); a.rotation.z = .4; b.rotation.z = -.4; g.add(a, b, box(.04, .06, .035, '#8e2a1f', 0, .72, .05)); }
   return g;
 }
 function priceTagOn(at: THREE.Vector3) {
@@ -277,7 +277,7 @@ function fitting(k: Kit) {
   curtain.position.y = -CH - .02; piv.add(curtain);
   const roll = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, CW + .1, 12), mat('#6a3d7d')); roll.rotation.z = Math.PI / 2; roll.position.set(x, rail - .06, cz); k.group.add(roll);
   piv.scale.y = .03;
-  const t = k.tab('down', .28); t.position.set(x + .62, rail - .25, cz + .08); k.group.add(t);
+  const t = k.tab('down'); t.position.set(x + .62, rail - .3, cz + .08); k.group.add(t);
   let n = -1, busy = false, told = false;
   const worn = { now: null as THREE.Group | null };
   k.mechs.push({ id: 'fitting', x, at: V(x, 2.85, .3), label: 'Pull the curtain', on: () => !busy, use: async (g: Game) => {
@@ -320,7 +320,7 @@ function toyModel(n: number) {
   const g = new THREE.Group();
   if (n === 0) { const b = new THREE.Mesh(new THREE.SphereGeometry(.17, 14, 10), mat(SUN)); b.position.y = .17; const h = new THREE.Mesh(new THREE.SphereGeometry(.11, 12, 8), mat(SUN)); h.position.set(.1, .38, 0); g.add(b, h, box(.1, .04, .08, '#e67e22', .22, .35, 0)); }
   if (n === 1) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.09, .1, .4, 12), mat(MINT)); c.position.y = .2; g.add(c, box(.16, .06, .07, MINT, -.13, .22, 0), box(.06, .12, .07, MINT, -.2, .28, 0), box(.14, .06, .07, MINT, .12, .28, 0), box(.06, .1, .07, MINT, .17, .33, 0)); }
-  if (n === 2) { g.add(box(.3, .26, .24, '#9aa0a8', 0, 0, 0), box(.22, .18, .2, '#b7bec7', 0, .26, 0), box(.03, .12, .03, '#8a919b', 0, .44, 0), box(.06, .06, .02, '#e74c3c', -.05, .32, .1), box(.06, .06, .02, '#e74c3c', .05, .32, .1)); }
+  if (n === 2) { g.add(box(.3, .26, .24, '#9aa0a8', 0, 0, 0), box(.22, .18, .2, '#b7bec7', 0, .26, 0), box(.03, .12, .03, '#8a919b', 0, .44, 0), box(.06, .06, .02, '#b3263a', -.05, .32, .1), box(.06, .06, .02, '#b3263a', .05, .32, .1)); }
   if (n === 3) { const ear = (s: number) => { const e = new THREE.Mesh(new THREE.ConeGeometry(.06, .12, 4), mat('#e67e22')); e.position.set(s * .08, .46, 0); return e; }; g.add(box(.28, .22, .2, '#e67e22', 0, 0, 0), box(.24, .2, .2, '#e67e22', 0, .22, 0), ear(-1), ear(1)); }
   g.traverse(o => { if ((o as THREE.Mesh).isMesh) o.castShadow = true; });
   return g;
@@ -338,7 +338,7 @@ function surprise(k: Kit, bag: Bag) {
   const lenS = new Spring(0, 140, 7), sway = new Spring(0, 60, 2.5);
   const setLen = (l: number) => { len = Math.max(0, l); spring.scale.y = Math.max(.01, len); spring.position.y = len / 2; zig.forEach((r, j) => (r.position.y = len * (j + .5) / 5)); toy.position.set(0, len, 0); coil.visible = len > .02; };
   setLen(0); lenS.x = 0;
-  const t = k.tab('down', .28); t.position.set(x + .55, .95, z + .48); k.group.add(t);
+  const t = k.tab('down'); t.position.set(x + .62, 1.05, z + .5); k.group.add(t);
   const spring_ = async (g: Game) => {
     state = 'busy';
     noise({ d: .06, f: 900, q: 1, v: .3 });
@@ -356,7 +356,7 @@ function surprise(k: Kit, bag: Bag) {
     n = (n + 1) % 4; toy = toyModel(n); toy.visible = false; coil.add(toy);
     state = 'up';
   };
-  k.mechs.push({ id: 'box', x, at: V(x, 2.2), label: 'Push it back in', on: () => state === 'up', use: async (g: Game) => {
+  k.mechs.push({ id: 'box', x: x - .3, at: V(x, 2.2), label: 'Push it back in', on: () => state === 'up', use: async (g: Game) => {
     state = 'busy'; t.kick(); sfx.fold();
     toy.visible = true;
     await g.anims.play(150, kk => { manual = 1.4 * (1 - stepped(kk, 12, 150)); });

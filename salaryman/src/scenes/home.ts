@@ -18,7 +18,7 @@ export function home(): Place {
   const group = new THREE.Group();
   group.add(box(16.5, .4, 3.8, '#8f949b', 0, -.4, -.35), box(16.5, .02, .25, '#f2c230', 0, 0, -2.1), box(16.5, .2, 3, '#25282d', 0, -1.5, -3.8));
   // A parapet, not a wall: over it, the town.
-  group.add(box(30, 1.1, .3, '#2c313a', 0, 0, -6.2), box(30, .5, .32, '#e8552d', 0, 1.0, -6.2));
+  group.add(box(30, 1.1, .3, '#2c313a', 0, 0, -6.2), box(30, .5, .32, '#35b58a', 0, 1.0, -6.2));
   const town = new THREE.Group(); group.add(town);
   [[-12, 2.8, 5.2, -9], [-8.6, 2.4, 3.6, -10], [-5.4, 3.2, 6.4, -9], [-1.6, 2.6, 4.2, -10], [1.8, 3, 5.6, -9], [5.4, 2.4, 3.4, -10], [9, 3.2, 6, -9.5]].forEach(([x, w, h, z], b) => {
     town.add(box(w, h, .4, '#141a2c', x, -.4, z));

@@ -22,5 +22,5 @@ export function person(l: Look) {
 }
 export const CROWD: Look[] = [
   { shirt: '#7b4b8f' }, { shirt: '#3f7a5b', skin: '#c68e63' }, { shirt: '#a0522d', hair: '#5a3a22', face: 'o' }, { shirt: '#35577f', skin: '#8d5b3c' },
-  { shirt: '#8f6b3f', h: 1.05, face: 'o' }, { shirt: '#c0392b', skin: '#e9bf98', hair: '#3b2a1a' }, { shirt: '#2e86ab', face: 'flat' }, { shirt: '#6d8b3a', skin: '#c68e63', h: 1.4 }
+  { shirt: '#8f6b3f', h: 1.05, face: 'o' }, { shirt: '#b3263a', skin: '#e9bf98', hair: '#3b2a1a' }, { shirt: '#2e86ab', face: 'flat' }, { shirt: '#6d8b3a', skin: '#c68e63', h: 1.4 }
 ];

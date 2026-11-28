@@ -52,7 +52,7 @@ export class Game {
     if (turn && this.place) { sfx.fold(); await this.wipe.close(); }
     if (this.place) { this.place.exit?.(this); this.stage.scene.remove(this.place.group); }
     this.anims.clear(); this.pins.clear(); this.near = null; this.pendingUse = null; input.target = null;
-    this.hero.hang = null; this.hero.frozen = false; this.hero.thin = 0; this.hero.push = 0; this.hero.grip = 1;
+    this.hero.hang = null; this.hero.frozen = false; this.hero.thin = 0; this.hero.group.visible = true; this.hero.push = 0; this.hero.grip = 1;
     this.place = next;
     this.stage.resetLight();
     this.stage.scene.add(next.group);

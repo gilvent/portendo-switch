@@ -5,6 +5,8 @@ import { input } from '../core/input.ts';
 import { sfx } from '../game/sfx.ts';
 import { bed, buzz, noise } from '../core/audio.ts';
 import { reducedMotion } from '../core/stage.ts';
+import { tab } from '../game/mech.ts';
+import { slipThrough } from '../game/squeeze.ts';
 import { LINE, PERSON } from '../game/content.ts';
 import type { Mech, Place } from '../game/place.ts';
 import type { Game } from '../game/game.ts';
@@ -25,7 +27,7 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
   group.add(box(16.5, .02, .25, '#f2c230', 0, 0, -2.1));
   group.add(box(16.5, .2, 3, '#4a4d52', 0, -1.5, -3.8));
   const wall = box(30, 6, .3, '#dfe2e6', 0, -1.4, -6.2); wall.castShadow = false; group.add(wall);
-  group.add(box(30, .5, .32, '#e8552d', 0, 1.0, -6.2));
+  group.add(box(30, .5, .32, '#35b58a', 0, 1.0, -6.2));
   // Stairs he came down, at the left.
   for (let i = 0; i < 6; i++) group.add(box(1.4, .3 + i * .3, .6, '#b9bdc3', -8.2 + i * .0, 0, -1.6 + i * .0).translateX(-.0));
   // The station sign: who and what, before any input.
@@ -52,6 +54,8 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
   const gate = new THREE.Group(); gate.position.set(P.gateX, 0, 0);
   gate.add(box(.35, 1.05, .5, '#eef0f2', 0, 0, -.75), box(.35, 1.05, .5, '#eef0f2', 0, 0, .75));
   const reader = box(.25, .06, .25, '#35b58a', 0, 1.05, -.75); gate.add(reader);
+  // The first tab of the game, standing in the reader: where the affordance is learnt.
+  const gateTab = tab('up', .3); gateTab.position.set(0, 1.31, -.75); gate.add(gateTab);
   const paddles = [-1, 1].map(s => { const pv = new THREE.Group(); pv.position.set(0, .55, s * .5); const pd = box(.06, .5, .48, '#e8552d', 0, -.25, -s * .24); pv.add(pd); gate.add(pv); return { pv, s }; });
   group.add(gate);
   let gateOpen = false; const gateSpring = new Spring(0, 160, 10);
@@ -72,7 +76,7 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
   const train = { state: 'away' as TrainState, x: 60, t: 0, v: 0 };
   const tg = new THREE.Group(); tg.position.set(60, 0, -3.8);
   const car = box(36, 3.1, 2.6, '#e9edf1', 0, -.9, 0); tg.add(car);
-  tg.add(box(36.02, .18, 2.62, '#e8552d', 0, .15, 0), box(36.02, .08, 2.62, '#35b58a', 0, .38, 0));
+  tg.add(box(36.02, .18, 2.62, '#35b58a', 0, .15, 0), box(36.02, .08, 2.62, '#2f6f9f', 0, .38, 0));
   for (let i = -4; i <= 4; i++) if (i !== 0) tg.add(box(1.5, 1, .05, '#2b3038', i * 3.6, .75, 1.31));
   const doorL = box(.62, 2.1, .06, '#cfd5dc', -.32, -.1, 1.32), doorR = box(.62, 2.1, .06, '#cfd5dc', .32, -.1, 1.32);
   const doorGap = box(1.26, 2.1, .04, '#2b3038', 0, -.1, 1.3);
@@ -95,6 +99,7 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
     exit() { windBed.set(0); railBed.set(0); },
     camera(g: Game) { g.stage.want = { x: .2, y: 2.2, z: 0, dist: 16.5, pitch: .1, yaw: 0 }; },
     update(dt: number, g: Game) {
+      gateTab.tick(dt, Math.abs(g.hero.body.x - P.gateX), !called);
       // The gate's paddles.
       const gp = gateSpring.step(gateOpen ? 1 : 0, dt);
       for (const { pv, s } of paddles) pv.rotation.y = s * gp * 1.45;
@@ -126,7 +131,7 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
         if (train.t > P.nextTrain) { train.state = 'arriving'; train.t = 0; train.x = 60; lastTick = -1; say('Train arriving', ''); }
       }
       tg.position.x = train.x - 0;
-      doorL.position.x = -.32 - doorOpen * .6; doorR.position.x = .32 + doorOpen * .6;
+      const dOpen = pinch ?? doorOpen; doorL.position.x = -.32 - dOpen * .6; doorR.position.x = .32 + dOpen * .6;
       // Wind: a moving train pushes the air along the platform; he leans and slides, the sign swings.
       const wind = Math.abs(train.v) > 1.5 ? Math.sign(train.v) * Math.min(1, Math.abs(train.v) / 25) : 0;
       gust += (wind - gust) * Math.min(1, dt * 4);
@@ -147,9 +152,9 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
       if (!called) say(g.hero.body.x > P.gateX - 2.2 ? 'Tap in at the gate' : 'Walk to the gate', g.hero.body.x > P.gateX - 2.2 ? (input.source === 'touch' ? 'tap gate' : 'A') : (input.source === 'touch' ? 'tap floor' : '→'));
     }
   };
-  let bumped = false, behind = false;
+  let bumped = false, behind = false, pinch: number | null = null;
   function openGate(g: Game) {
-    gateOpen = true; called = true; self.solids = [];
+    gateOpen = true; called = true; self.solids = []; gateTab.kick();
     // The reader beeps, the printer chatters, the ticket comes out, and the first ka-chunk lands on it.
     sfx.beep(); gateSpring.kick(6);
     [60, 130, 200, 270].forEach(ms => setTimeout(() => noise({ d: .05, f: 3000, q: 1.5, v: .12 }), ms));
@@ -163,10 +168,8 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
     if (boarding) return; boarding = true; g.busy = true;
     const last = train.state === 'open' && P.doorsOpen - train.t < 1;
     say('Doors closing', last ? 'just made it!' : '');
-    // He turns edge-on and slips in (paper-thin when it is close).
-    const h = g.hero; const x0 = h.body.x, t0 = performance.now(); sfx.fwip();
-    await new Promise<void>(res => { const f = () => { const k = Math.min(1, (performance.now() - t0) / 380); h.body.x = x0 + (P.doorX - x0) * k; h.body.z = -2.4 * k; h.thin = k * (last ? .95 : .8); if (k < 1) requestAnimationFrame(f); else res(); }; f(); });
-    sfx.doors();
+    // He turns and slips in; edge-on, a white line between the doors, when it is close.
+    await slipThrough(g, { x: P.doorX, z1: -2.4, last, pinch: v => (pinch = v), seam: { x: P.doorX, y: 1, z: -2.4 } });
     g.emit('board');
   }
   return self;

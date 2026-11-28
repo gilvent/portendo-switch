@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { box } from './paper.ts';
+import { box, card } from './paper.ts';
 import { reducedMotion } from '../core/stage.ts';
 import { Spring } from '../core/math.ts';
 
@@ -8,27 +8,50 @@ import { Spring } from '../core/math.ts';
 // snap like stop-motion, an overshoot that settles, then a first-person caption and a punch in the ticket.
 export const GRAMMAR = { wiggleNear: 3.6, wiggleEvery: 2.5, wiggleFor: .3, snapFps: 12, settle: .4 };
 
-// A tab: the one affordance. A small coral card with a pale arrow, standing proud of whatever it works.
-export function tab(dir: 'left' | 'right' | 'down' | 'up' | 'turn' = 'right', size = .34) {
-  const g = new THREE.Group();
-  const t = box(size, size * .8, .05, '#e8552d'); t.position.y = -size * .4; g.add(t);
-  const arrow = box(size * .45, size * .12, .052, '#fff4e2'); arrow.position.y = 0; g.add(arrow);
-  const head = box(size * .14, size * .3, .053, '#fff4e2'); head.position.set(size * .2, 0, 0); g.add(head);
-  const rot = { right: 0, left: Math.PI, up: Math.PI / 2, down: -Math.PI / 2, turn: Math.PI / 4 }[dir];
-  [arrow, head].forEach(m => { m.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), rot); m.rotation.z = rot; });
-  const wob = new Spring(0, 260, 9);
+// A tab: the one affordance. The pull-tab of a movable book: a coral tongue of card with a round end and two cream
+// chevrons, coming out of a dark slot with a cream lip, tilted 12° off its host so the sun lights it and it casts its
+// own shadow. Coral means "A works this" and nothing else. It previews its verb (out, in, out, in) every 2.5 s while
+// he is near, and on use it jumps out one frame and settles back.
+const CHEV = '#fff4e2';
+export function tab(dir: 'left' | 'right' | 'down' | 'up' | 'turn' = 'right', size = .36) {
+  const W = size, H = size * 1.33, turn = dir === 'turn';
+  const g = new THREE.Group(), root = new THREE.Group(), slide = new THREE.Group();
+  const tongue = card(W, H, (c, w, h) => {
+    const r = w / 2, neck = w * .09;
+    c.fillStyle = '#e8552d'; c.beginPath();
+    c.moveTo(neck, h); c.lineTo(0, h * .78); c.lineTo(0, r); c.arc(r, r, r, Math.PI, 0); c.lineTo(w, h * .78); c.lineTo(w - neck, h); c.closePath(); c.fill();
+    c.fillStyle = '#c9431f'; c.fillRect(neck, h * .9, w - neck * 2, h * .1);
+    c.strokeStyle = CHEV; c.lineWidth = w * .15; c.lineCap = 'round'; c.lineJoin = 'round';
+    for (const f of [.26, .5]) {
+      c.beginPath();
+      if (turn) { const y = h * (f + .1), x = w * .5; c.moveTo(x - w * .14, y - w * .22); c.lineTo(x + w * .12, y); c.lineTo(x - w * .14, y + w * .22); }
+      else { const y = h * f; c.moveTo(w * .25, y + w * .16); c.lineTo(w * .5, y - w * .06); c.lineTo(w * .75, y + w * .16); }
+      c.stroke();
+    }
+  }, { rim: .03, res: 320 });
+  slide.add(tongue); slide.rotation.x = .21;
+  root.add(box(W + .12, .05, .03, '#2a2118', 0, -.05, 0), box(W + .16, .03, .028, CHEV, 0, -.08, 0), slide);
+  const rot = { up: 0, left: Math.PI / 2, down: Math.PI, right: -Math.PI / 2, turn: -Math.PI / 4 }[dir];
+  root.rotation.z = rot; root.position.set(Math.sin(rot) * H / 2, -Math.cos(rot) * H / 2, 0);
+  g.add(root);
+  const mat = tongue.material as THREE.MeshStandardMaterial;
+  if (reducedMotion) { mat.emissiveMap = mat.map; }
+  const back = new Spring(0, 300, 11);
   let clock = Math.random() * 2, done = false;
   return Object.assign(g, {
-    // Wiggle every few seconds while he is near and the thing still has something to show.
     tick(dt: number, near: number, alive = true) {
       clock += dt;
-      if (alive && !done && near < GRAMMAR.wiggleNear && clock % GRAMMAR.wiggleEvery < dt) wob.kick(9);
-      g.rotation.z = (reducedMotion ? 0 : wob.step(0, dt) * .25);
-      // Still, the tab brightens instead of wiggling.
-      if (reducedMotion) (t.material as THREE.MeshStandardMaterial).emissive.set(alive && !done && near < GRAMMAR.wiggleNear && clock % GRAMMAR.wiggleEvery < .3 ? '#5a1a08' : '#000');
       g.visible = alive;
+      // The preview: four frames of 83 ms, out, in, out, in.
+      const ph = clock % GRAMMAR.wiggleEvery, frame = Math.floor(ph / .083);
+      const out = alive && !done && near < GRAMMAR.wiggleNear && frame < 4 && frame % 2 === 0;
+      const k = back.step(0, dt);
+      if (reducedMotion) { mat.emissive.set(out ? '#5a1a08' : '#000'); slide.position.y = 0; slide.scale.setScalar(1); root.rotation.z = rot; return; }
+      if (turn) { root.rotation.z = rot + (out ? .18 : 0) + k * 2.2; slide.position.y = 0; }
+      else { slide.position.y = (out ? .08 : 0) + k; slide.scale.setScalar(out ? 1.1 : 1); }
     },
-    kick() { wob.kick(-14); },
+    // Used: one frame out, then it settles back over 400 ms.
+    kick() { back.x = .16; back.v = 0; },
     spent(v = true) { done = v; }
   });
 }
