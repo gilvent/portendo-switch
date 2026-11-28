@@ -25,9 +25,9 @@ function scenery(w: World): Card[] {
 // at the chosen stop, 2 once its doors are open.
 // fold: the page turn between spaces. 'out' folds this space's paper flat and closes the page over it; 'in' opens the
 // page and pops the paper up. A space also pops up when it is first shown.
-type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; open: boolean; onStood: () => void; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
+type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; open: boolean; from: { name: string; color: string }; onStood: () => void; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
 
-export default function Scene({ world, nearStop, toys, line, arrival, fold, open, onStood, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
+export default function Scene({ world, nearStop, toys, line, arrival, fold, open, from, onStood, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
   const drawn = world.art !== 'blockout';
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
@@ -69,7 +69,7 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, open
         {!drawn && <div className="floor" style={{ width: b.x1 - b.x0 + 2400, height: 3000, left: b.x0 - 1200, top: -1500, transform: `translateZ(${b.z0 + 1300}px) rotateX(90deg)` }} />}
         {cards.map((c, i) => <div key={i} className="prop" style={at(c.x, c.z)}><div className="card" style={{ width: c.w, height: c.h, marginLeft: -c.w / 2, background: `rgb(${c.g},${c.g + 3},${c.g + 8})` }} /></div>)}
         {Art && <Art near={nearStop} toys={toys} />}
-        {train && dest && <Car root={root} fx={fxRef} arrival={arrival} onStood={onStood} open={open} roll={toys.roll ?? 0} posters={world.encoded?.filter(e => e.at.includes('poster')).map(e => e.fact) ?? []} station={{ name: dest.label, color: content.worlds[dest.world].color }} home={{ name: 'Alvaro L.', color: '#e8552d' }} />}
+        {train && dest && <Car root={root} fx={fxRef} arrival={arrival} onStood={onStood} open={open} roll={toys.roll ?? 0} posters={world.encoded?.filter(e => e.at.includes('poster')).map(e => e.fact) ?? []} station={{ name: dest.label, color: content.worlds[dest.world].color }} home={from} />}
         {!drawn && world.solid.map((r, i) => <div key={i} className="prop" style={at((r.x0 + r.x1) / 2, r.z0)}><div className="card" style={{ width: r.x1 - r.x0, height: 150, marginLeft: -(r.x1 - r.x0) / 2, background: '#7f8792' }} /></div>)}
         {world.stops.map(s => (
           // The tap area and its marker stand at the thing being used (`look`), not where the salaryman stands to use it.

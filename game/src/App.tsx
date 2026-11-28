@@ -106,6 +106,10 @@ export default function App() {
   // The space on show lags the game by one page turn: `shown` is what is drawn, `fold` is where the turn has got to.
   const [shown, setShown] = useState(world);
   const [fold, setFold] = useState<Fold>(null);
+  // The station the train stands at when the car opens: the one he boarded at. Coming back from a project, that is
+  // the project's own stop; from the platform (or a link straight into the car), it is the home station.
+  const boardedAt = useRef({ name: 'Alvaro L.', color: '#e8552d' });
+  if (shown && shown !== 'mrt' && world === 'mrt') boardedAt.current = { name: content.worlds[shown].title, color: content.worlds[shown].color };
   const shownRef = useRef(shown);
   shownRef.current = shown;
   useEffect(() => {
@@ -375,7 +379,7 @@ export default function App() {
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} open={game.place.k === 'letter' && shown === 'mrt'} onStood={() => stood.current?.()} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
+      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} open={game.place.k === 'letter' && shown === 'mrt'} from={boardedAt.current} onStood={() => stood.current?.()} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} near={spot.k === 'walk' && spot.world === 'intro' && spot.near ? spot.stop === 'gate' ? 'gate' : spot.stop === 'map' ? 'map' : 'door' : null} gate={gateOpen} line={game.toys['intro/map'] ?? 0} trainIn={trainIn} onScreenTap={x => { const g = gameRef.current.place; if (g.k !== 'walk' || g.world !== 'intro') return; if (g.near && Math.abs((stopOf(content, 'intro', g.stop)?.x ?? 1e9) - x) < 120) dispatch({ a: 'confirm' }); else introGo.current = x; }} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
       {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={leaving} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
       {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}

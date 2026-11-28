@@ -80,6 +80,8 @@ export default function Controller({ rigRef, mode, visible, lit, near, gate, lin
         <div className="screen" data-testid="handheld-screen" onPointerDown={e => { const r = e.currentTarget.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 840, y = (e.clientY - r.top) / r.height * 472; if (mode === 'handheld' && !platformTap(x, y)) onScreenTap(x - 420); }}>
           <Platform gate={gate} arrived={arrived} near={near} line={line} leaving={mode === 'docking'} />
           <div className="mini-courier" ref={introRef}><div className="flipper"><Hero /></div></div>
+          {/* The paper's own grain, and the shade of the theatre's frame, over every layer at once. */}
+          <i className="pf-grain" aria-hidden="true" />
           {near === 'gate' && !gate && <b className="prompt at-gate" data-testid="prompt-gate">A</b>}
           {near === 'map' && <b className="prompt at-map" data-testid="prompt-map">A</b>}
           {atDock && <b className="prompt end" data-testid="prompt-a">A</b>}

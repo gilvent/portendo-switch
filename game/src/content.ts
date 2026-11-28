@@ -26,8 +26,8 @@ export const content: Content = validateContent({ worlds: {
     stops: [
       { id: 'door', label: 'Doors', x: 0, z: -40, reach: 110, action: { kind: 'ride', toy: 'line', to: [
         { world: 'blibli', stop: 'mailbox', label: 'Blibli.com' }, { world: 'moperty', stop: 'first-house', label: 'Moperty' } ] } },
-      { id: 'line-map', label: 'Line map', x: 250, z: -40, look: 275, mark: 300, action: { kind: 'toy', toy: 'line', states: 2 } },
-      { id: 'poster', label: 'Poster', x: -260, z: -40, look: -260, mark: 300, action: { kind: 'toy', toy: 'roll', states: 3 } },
+      { id: 'line-map', label: 'Line map', x: 250, z: -40, look: 275, mark: 262, action: { kind: 'toy', toy: 'line', states: 2 } },
+      { id: 'poster', label: 'Poster', x: -260, z: -40, look: -260, mark: 262, action: { kind: 'toy', toy: 'roll', states: 3 } },
       { id: 'help-point', label: 'Help point', x: -385, z: -30, look: -420, mark: 226, action: { kind: 'letter', letter: 'contact' } } ],
     letters: [
       { id: 'contact', title: 'Get in touch', surface: 'note', blocks: [{ kind: 'links', items: [

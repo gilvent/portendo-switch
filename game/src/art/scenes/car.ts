@@ -16,9 +16,10 @@ export const TUNNEL = { x: -CAR.W / 2, y: 0, z: BACK - 24, w: CAR.W, h: CAR.H };
 // the track bed up, and the track bed, a sheet lying under it from that wall to past the near rail.
 export const BORE = { x: -1900, w: 4400, top: 600, z: BACK - 26, near: CAR.D / 2 + 150 };
 // The live things (src/mrt/Car.tsx moves them; train.ts cuts them). The hand straps hang from the rail at RAIL, over the aisle
-// (clear of the back wall's stops, so a jump under one is a jump and not a use), each
+// (clear of the back wall's stops, so a jump under one is a jump and not a use; and high enough that from the game
+// camera they hang above the band of the windows where the station's name boards stand), each
 // STRAP.len long. The drinks can lies on the floor with its axis across the car. The help point's handset hangs on its cord.
-export const RAIL = { y: 232, z: 12 }, STRAP = { len: 62, xs: [-385, -330, -270, -215, -165, 165, 215, 270, 330, 385] };
+export const RAIL = { y: 250, z: 12 }, STRAP = { len: 58, xs: [-385, -330, -270, -215, -165, 165, 215, 270, 330, 385] };
 export const CAN = { x: -150, z: 34, r: 9, len: 30 };
 export const HANDSET = { x: -416, y: 176, z: BACK + 14, len: 46 };
 // The poster roll's window on the cove, and the line map's, as [x of the left edge, width].

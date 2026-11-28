@@ -403,12 +403,30 @@ button { font:inherit; cursor:pointer; }
 .pass-pop em { font-style:normal; font-size:14px; line-height:18px; color:#5a626d; }
 @media (prefers-reduced-motion:reduce) { .pf-lamp,.pf-stop,.pf-line { animation:none !important; transition:none; } }
 /* ---------- the car's live layer (Car.tsx) ---------- */
-.station { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; pointer-events:none; will-change:transform; }
-.st-tile { position:absolute; left:0; top:0; background:linear-gradient(180deg,transparent 0 470px,#e8552d 470px 481px,#35b58a 481px 492px,transparent 492px 600px,#f6b73c 600px 612px,#8d96a0 612px),repeating-linear-gradient(90deg,transparent 0 296px,#aab3bc 296px 320px),linear-gradient(180deg,#8d96a0 0 250px,#dfe5ea 250px); }
-.st-at { position:absolute; left:0; top:0; width:0; height:0; }
-.st-board { position:absolute; left:-110px; top:0; width:220px; height:54px; display:none; align-items:center; justify-content:center; background:#fffaf0; border-radius:5px; box-shadow:inset 0 -9px 0 var(--c); font:600 26px/1 Fredoka,system-ui,sans-serif; color:#23272d; padding-bottom:7px; }
+/* Live sheets are not baked, so they carry their own grain: the same fibre the atlas prints, laid over their colour. */
+:root { --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .06 0 0 0 0 .02 1.5 0 0 0 -.62'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)' opacity='.2'/%3E%3C/svg%3E"); }
+/* The station past the far windows: the platform he would step out onto, seen from the track. Its wall is tiled, the
+   two line colours run along it as they do on the handheld's platform, pillars stand every 320, and the roof is dark. */
+.station { position:absolute; left:0; top:0; z-index:2; pointer-events:none; will-change:transform; background:
+  var(--grain),
+  linear-gradient(180deg,#2c3138 0 150px,#3d444e 150px 166px,#fff4d6 166px 174px,transparent 174px 388px,#e8552d 388px 397px,transparent 397px 400px,#35b58a 400px 409px,transparent 409px 600px,#f6b73c 600px 611px,#6f7882 611px 616px,#4a5059 616px),
+  repeating-linear-gradient(90deg,transparent 0 290px,#fffaf0 290px 293px,#c3ccd4 293px 311px,#aab3bc 311px 320px),
+  repeating-linear-gradient(90deg,transparent 0 78px,#c9d2da 78px 80px),
+  repeating-linear-gradient(180deg,transparent 0 54px,#c9d2da 54px 56px),
+  #dfe5ea; }
+.st-at { position:absolute; width:0; height:0; }
+.st-board { position:absolute; left:0; top:0; width:122px; height:44px; display:none; align-items:center; justify-content:center; background:var(--grain),#fffaf0; border:3px solid #fff; border-radius:6px; box-shadow:3px 5px 0 rgba(10,13,18,.22),inset 0 -8px 0 var(--c); font:600 20px/1 Fredoka,system-ui,sans-serif; color:#23272d; padding-bottom:7px; box-sizing:border-box; white-space:nowrap; }
+.st-board::before,.st-board::after { content:""; position:absolute; top:-200px; width:4px; height:197px; background:#3d444e; } .st-board::before { left:16px; } .st-board::after { right:16px; }
 .station[data-which="0"] .st-board[data-which="0"],.station[data-which="1"] .st-board[data-which="1"] { display:flex; }
+/* The poster roll. */
 .roll { position:absolute; left:0; top:0; transform-origin:0 0; overflow:hidden; background:#fffaf0; pointer-events:none; }
 .roll-strip { transition:transform .5s steps(7,end); }
-.roll-face { margin:0; display:flex; align-items:center; justify-content:center; font:600 19px/1 Fredoka,system-ui,sans-serif; color:#23272d; white-space:nowrap; }
+.roll-face { position:relative; margin:0; display:flex; align-items:center; justify-content:center; gap:10px; font:600 19px/1 Fredoka,system-ui,sans-serif; color:#23272d; white-space:nowrap; box-shadow:inset 0 -1.5px 0 rgba(10,13,18,.25); }
+.roll-0 { background:var(--grain),#f6b73c; } .roll-1 { background:var(--grain),linear-gradient(90deg,#e8552d 0 16px,#fffaf0 16px calc(100% - 16px),#35b58a calc(100% - 16px)); font-size:24px; } .roll-2 { background:var(--grain),#bfe6dc; font-size:16px; }
+.roll-me { height:40px; flex:none; } .roll-web { height:30px; flex:none; filter:drop-shadow(1.5px 2.5px 0 rgba(10,13,18,.2)); }
 @media (prefers-reduced-motion:reduce) { .roll-strip { transition:none; } }
+/* ---------- the platform as paper (Platform.tsx) ---------- */
+.pf-grain { position:absolute; inset:0; pointer-events:none; background:var(--grain); background-size:200px 200px; opacity:.9; box-shadow:inset 0 0 0 1px rgba(10,13,18,.2),inset 0 14px 22px -12px rgba(10,13,18,.5),inset 0 -10px 18px -12px rgba(10,13,18,.35); }
+.controller[data-mode="docked"] .pf-grain { display:none; }
+[data-gate="open"] .pf-paddle-far { transform:scaleX(.1); }
+@media (max-width:560px) { .stamps { top:58px; } }

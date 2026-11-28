@@ -23,12 +23,19 @@ const two = (n: number) => String(n).padStart(2, '0');
 // The floor line he stands on, and how tall he is drawn, in the box's units (styles.css: .mini-courier).
 const FEET = 349, TALL = 126;
 // What hangs from the roof: [left, top, width, height] of the board, hung from the roof beam at y 16.
-const NAME = { x: 126, y: 88, w: 300, h: 74 }, BOARD = { x: 590, y: 36, w: 238, h: 60 }, ROOF = 16;
+const NAME = { x: 112, y: 88, w: 296, h: 74 }, BOARD = { x: 590, y: 36, w: 238, h: 60 }, ROOF = 16;
 
 // The two lines the map draws, in the order the train's sign turns through them (content.ts: the MRT doors' `to`).
 const LINES = [{ world: 'blibli', name: 'WORK LINE', c: CORAL, ink: CORAL }, { world: 'moperty', name: 'SIDE PROJECTS LINE', c: MINT, ink: '#1f8a66' }] as const;
 
 type Props = { gate: boolean; arrived: boolean; near: 'gate' | 'map' | 'door' | null; line: number; leaving: boolean };
+// A gate cabinet: a folded box seen from the front and a little above, so its lid and one return show.
+const cabinet = (x: number, y: number, h: number, w = 34) => <>
+  <path d={`M${x + w} ${y}l8 -9v${h}l-8 9Z`} fill="#c3ccd4" stroke={CREAM} strokeWidth="3" strokeLinejoin="round" />
+  <path d={`M${x} ${y}l8 -9h${w}l-8 9Z`} fill="#fff" stroke={CREAM} strokeWidth="3" strokeLinejoin="round" />
+  <rect x={x} y={y} width={w} height={h} rx="3" fill="#eef1f4" stroke={CREAM} strokeWidth="3" /><rect x={x} y={y} width={w} height="12" rx="3" fill={STEEL} />
+</>;
+
 // A tap on the screen at [x, y] in the box's units: true if something on the platform took it for itself.
 let onTap: ((x: number, y: number) => boolean) | null = null;
 export const platformTap = (x: number, y: number) => onTap?.(x, y) ?? false;
@@ -61,8 +68,8 @@ export default function Platform({ gate, arrived, near, line, leaving }: Props) 
   useEffect(() => {
     if (calm) return;
     const P: { p: Pend; el: () => SVGGElement | null; cx: number }[] = [
-      { p: pend(NAME.y + NAME.h - ROOF, 1.5, .16), el: () => nameRef.current, cx: NAME.x + NAME.w / 2 },
-      { p: pend(BOARD.y + BOARD.h - ROOF, 1.9, .14), el: () => boardRef.current, cx: BOARD.x + BOARD.w / 2 }
+      { p: pend(NAME.y + NAME.h - ROOF, 1.5, .12), el: () => nameRef.current, cx: NAME.x + NAME.w / 2 },
+      { p: pend(BOARD.y + BOARD.h - ROOF, 1.9, .09), el: () => boardRef.current, cx: BOARD.x + BOARD.w / 2 }
     ];
     let bonked = -1e9, pushed = false, jumps = hero.jumps, startled = 0;
     const tick = (_t: number, delta: number) => {
@@ -80,7 +87,7 @@ export default function Platform({ gate, arrived, near, line, leaving }: Props) 
       }
       for (const { p, el: get, cx } of P) {
         if (!w && resting(p)) continue;
-        stepPend(p, -w * 950, dt);
+        stepPend(p, -w * 620, dt);
         get()?.setAttribute('transform', `rotate(${(-p.th * 57.3).toFixed(2)} ${cx} ${ROOF})`);
       }
       if (!el) return;
@@ -109,16 +116,23 @@ export default function Platform({ gate, arrived, near, line, leaving }: Props) 
       </defs>
       {/* Back layer: the far wall across the track, tiled, with the two line colours along it. Underground: no sky. */}
       <g className="pf-back">
-        <rect x="-30" y="0" width="900" height="320" fill="#dfe5ea" />
-        <g stroke="#c9d2da" strokeWidth="2">{tile(-30, 20, 900, 300, 46)}<path d="M-30 84H870M-30 140H870M-30 196H870M-30 252H870" /></g>
+        <rect x="-30" y="0" width="900" height="320" fill="#e3e8ec" />
+        <g stroke="#cdd5dc" strokeWidth="2">{tile(-30, 20, 900, 300, 46)}<path d="M-30 84H870M-30 140H870M-30 196H870M-30 252H870" /></g>
+        {/* Pilasters, each a folded strip: a lit face and a shaded return. */}
+        {[40, 340, 640].map(x => <g key={x}><rect x={x} y="16" width="26" height="284" fill="#eef1f4" /><rect x={x + 26} y="16" width="7" height="284" fill="#bcc5cd" /><path d={`M${x} 16V300`} stroke={CREAM} strokeWidth="2" /></g>)}
         <rect x="-30" y="212" width="900" height="9" fill={CORAL} /><rect x="-30" y="225" width="900" height="9" fill={MINT} />
+        <rect x="-30" y="16" width="900" height="26" fill="#0a0d12" opacity=".12" />
+        {/* The track pit, and the far rail in it. */}
+        <rect x="-30" y="282" width="900" height="20" fill="#2c3138" /><rect x="-30" y="291" width="900" height="3" fill="#8a939d" />
       </g>
       {/* The train: it comes in from the left behind the platform edge, the way it will run on the big screen, and stands
           with the door of its front car on the mark. Its cab is at the right, mostly past the edge of the screen. */}
       <g className="pf-train">
         <path d="M-900 138H820Q862 138 882 176L904 236V300H-900Z" fill={SHELL} stroke={CREAM} strokeWidth="5" strokeLinejoin="round" />
         <path d="M-900 138H820Q862 138 882 176L888 192H-900Z" fill={SHELL_DARK} />
-        <path d="M806 166H838Q866 200 870 226H806Z" fill={GLASS} />
+        <path d="M-900 144H818Q854 144 872 176" fill="none" stroke="#fff" strokeWidth="3" opacity=".8" />
+        <path d="M806 166H838Q866 200 870 226H806Z" fill={GLASS} /><path d="M816 172H834Q846 186 852 200Z" fill="#7d93a6" opacity=".5" />
+        <rect x="-900" y="282" width="1804" height="18" fill="#3a4049" />
         <rect x="-900" y="256" width="1804" height="12" fill={CORAL} /><rect x="-900" y="270" width="1804" height="5" fill={MINT} />
         {[560, 410, 260, 110, -40, -190, -340, -490, -640].map((x, i) => <g key={x}>
           <rect x={x} y="166" width="112" height="62" rx="4" fill={GLASS} />
@@ -132,21 +146,26 @@ export default function Platform({ gate, arrived, near, line, leaving }: Props) 
         <rect x="692" y="150" width="76" height="9" fill={STEEL} />
       </g>
       {/* The platform: its floor, the yellow line at the edge, and the mark where the door stops. */}
-      <rect x="-30" y="300" width="900" height="180" fill="#b4bcc5" />
-      <g stroke="#a3acb6" strokeWidth="2">{tile(-30, 314, 900, 160, 70)}<path d="M-30 392H870" /></g>
+      <rect x="-30" y="300" width="900" height="180" fill="#bcc4cc" />
+      <g stroke="#a9b2bb" strokeWidth="2">{tile(-30, 314, 900, 160, 70)}<path d="M-30 392H870" /></g>
+      <rect x="-30" y="314" width="900" height="10" fill="#0a0d12" opacity=".07" />
+      {/* The front lip of the stage: the platform slab's cut edge. */}
+      <rect x="-30" y="456" width="900" height="16" fill="#8f98a2" /><path d="M-30 456H870" stroke={CREAM} strokeWidth="2.5" />
       <rect x="-30" y="300" width="900" height="14" fill={SUN} /><g fill="#d9992a">{Array.from({ length: 44 }, (_, i) => <circle key={i} cx={-20 + i * 20} cy="307" r="2.6" />)}</g>
       <path d={`M${sx(DOOR_X) - 22} 334H${sx(DOOR_X) + 22}L${sx(DOOR_X)} 318Z`} fill={CREAM} opacity=".9" />
       {/* Middle layer: what stands on the platform behind him. */}
       <g className="pf-mid" filter="url(#pf-shadow)">
-        {/* The stairs he came down. */}
-        <path d="M-30 150H40L118 338H-30Z" fill="#cbd3db" stroke={CREAM} strokeWidth="4" strokeLinejoin="round" />
-        <g stroke="#aab4be" strokeWidth="3">{Array.from({ length: 7 }, (_, i) => <path key={i} d={`M-30 ${176 + i * 24}H${52 + i * 10}`} />)}</g>
-        <path d="M36 128L122 322" stroke={STEEL} strokeWidth="7" strokeLinecap="round" /><path d="M122 322V340" stroke={STEEL} strokeWidth="6" strokeLinecap="round" />
+        {/* The stairs he came down: a folded flight, each tread lit and each riser in shade, a stringer down its side. */}
+        <path d="M-30 136H46L126 338H-30Z" fill="#aeb8c2" stroke={CREAM} strokeWidth="4" strokeLinejoin="round" />
+        {Array.from({ length: 8 }, (_, i) => { const y = 146 + i * 24, x = 42 + (y - 136) * .4; return <g key={i}><rect x="-30" y={y} width={x + 30} height="10" fill="#f1f4f7" /><rect x="-30" y={y + 10} width={x + 34} height="14" fill="#cbd3db" /><path d={`M-30 ${y}H${x}`} stroke="#fff" strokeWidth="1.6" /></g>; })}
+        <path d="M38 104L128 322" stroke={STEEL} strokeWidth="7" strokeLinecap="round" /><path d="M128 322V342M83 213V236M38 104V128" stroke={STEEL} strokeWidth="5" strokeLinecap="round" />
         {/* The gate's far cabinet, with its reader. */}
-        <rect x={sx(GATE_X) - 26} y="268" width="34" height="74" rx="5" fill="#f1f4f7" stroke={CREAM} strokeWidth="4" /><rect x={sx(GATE_X) - 26} y="268" width="34" height="14" rx="5" fill={STEEL} />
-        <circle className="pf-reader" cx={sx(GATE_X) - 9} cy="298" r="7" />
+        {cabinet(sx(GATE_X) - 26, 268, 74)}
+        <circle cx={sx(GATE_X) - 9} cy="298" r="10" fill={STEEL} /><circle className="pf-reader" cx={sx(GATE_X) - 9} cy="298" r="6.5" />
+        <g className="pf-paddle pf-paddle-far"><path d={`M${sx(GATE_X) + 2} 300H${sx(GATE_X) + 30}L${sx(GATE_X) + 24} 312H${sx(GATE_X) + 2}Z`} fill="#c8431f" stroke={CREAM} strokeWidth="2.5" strokeLinejoin="round" /></g>
         {/* A bench. */}
-        <rect x={sx(BENCH_X) - 46} y="318" width="92" height="9" rx="3" fill="#2f6f9f" stroke={CREAM} strokeWidth="3" /><path d={`M${sx(BENCH_X) - 36} 327V344M${sx(BENCH_X) + 36} 327V344`} stroke={STEEL} strokeWidth="5" strokeLinecap="round" />
+        <path d={`M${sx(BENCH_X) - 36} 327V344M${sx(BENCH_X) + 36} 327V344`} stroke={STEEL} strokeWidth="5" strokeLinecap="round" />
+        <path d={`M${sx(BENCH_X) - 46} 318L${sx(BENCH_X) - 38} 308H${sx(BENCH_X) + 54}L${sx(BENCH_X) + 46} 318Z`} fill="#4a8dbd" stroke={CREAM} strokeWidth="3" strokeLinejoin="round" /><rect x={sx(BENCH_X) - 46} y="318" width="92" height="9" rx="2" fill="#2f6f9f" stroke={CREAM} strokeWidth="3" />
         {/* The bored salaryman who used to be the player, dozing where he sits. */}
         <g transform={`translate(${sx(BENCH_X) - 31} ${320 - SEAT * .78}) scale(.78)`}><g className="pf-sleeper"><SalarymanArt seated /></g>
           <g className="pf-zz"><path d="M70 14H100Q106 14 106 20V38Q106 44 100 44H82L72 54V44H70Q64 44 64 38V20Q64 14 70 14Z" fill={CREAM} /><text className="pf-z" x="85" y="37" textAnchor="middle" fontSize="20" fontWeight="600" fill={INK}>z</text><text className="pf-bang" x="85" y="38" textAnchor="middle" fontSize="24" fontWeight="600" fill={CORAL}>!</text></g>
@@ -176,9 +195,10 @@ export default function Platform({ gate, arrived, near, line, leaving }: Props) 
       <g className="pf-front">
         <g filter="url(#pf-shadow)">
           <g className="pf-paddle"><path d={`M${sx(GATE_X) - 6} 352H${sx(GATE_X) + 30}L${sx(GATE_X) + 22} 368H${sx(GATE_X) - 6}Z`} fill={CORAL} stroke={CREAM} strokeWidth="3" strokeLinejoin="round" /></g>
-          <rect x={sx(GATE_X) - 30} y="372" width="38" height="62" rx="5" fill="#f1f4f7" stroke={CREAM} strokeWidth="4" /><rect x={sx(GATE_X) - 30} y="372" width="38" height="14" rx="5" fill={STEEL} />
+          {cabinet(sx(GATE_X) - 30, 372, 62, 38)}<path d={`M${sx(GATE_X) - 18} 414h14l-7 -10z`} fill={MINT} />
         </g>
         <rect x="-30" y="0" width="900" height="16" fill={STEEL} /><rect x="-30" y="16" width="900" height="5" fill="#2c3138" />
+        {[20, 470].map(x => <g key={x}><rect x={x} y="21" width="96" height="6" rx="2" fill="#fff4d6" /><path d={`M${x - 6} 27H${x + 102}L${x + 124} 60H${x - 28}Z`} fill="#fff4d6" opacity=".16" /></g>)}
         {/* The station's name board: whose station this is. It hangs low enough for a jump to reach. */}
         <g ref={nameRef} filter="url(#pf-shadow)" data-testid="name-board">
           <path d={`M${NAME.x + 32} ${ROOF}V${NAME.y + 2}M${NAME.x + NAME.w - 32} ${ROOF}V${NAME.y + 2}`} stroke={STEEL} strokeWidth="5" />
