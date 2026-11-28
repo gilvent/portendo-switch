@@ -1,0 +1,40 @@
+.ticket-layer { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.ticket-corner { pointer-events: auto; position: absolute; left: 12px; top: 12px; display: flex; flex-direction: column; gap: 4px; padding: 7px 10px 8px; border: 0; border-radius: 6px; cursor: pointer;
+  background: #fff6e3; box-shadow: 0 3px 0 #0003, inset 0 0 0 1px #0001; font: 600 11px Fredoka, sans-serif; color: #62676f; text-align: left; transition: transform .3s, opacity .3s; transform-origin: 0 0; }
+.ticket-corner[hidden] { display: none; }
+.ticket-layer:not([data-state="corner"]) .ticket-corner { opacity: 0; transform: scale(.8); pointer-events: none; }
+.ticket-corner.kachunk { animation: kachunk .45s cubic-bezier(.3,1.8,.5,1); }
+@keyframes kachunk { 0% { transform: scale(1); } 25% { transform: scale(1.18) rotate(-3deg); } 100% { transform: none; } }
+.holes { display: flex; gap: 4px; align-items: center; }
+.hole { width: 12px; height: 12px; border-radius: 50%; border: 1.5px dashed #b9a98a; position: relative; }
+.hole.star { border-radius: 2px; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); border: 0; background: #d9ccb0; }
+.hole.on { border: 0; background: #23262b; box-shadow: inset 0 2px 2px #000; }
+.hole.star.on { background: #23262b; }
+.hole.new { animation: punch .5s cubic-bezier(.3,1.8,.5,1); }
+.hole.new::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #fff6e3; animation: chad .9s ease-in forwards; }
+@keyframes punch { 0% { transform: scale(1.8); } 100% { transform: none; } }
+@keyframes chad { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 100% { transform: translate(6px, 40px) rotate(220deg); opacity: 0; } }
+.ticket-big { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 10px; perspective: 1200px; background: #0006; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.ticket-layer[data-state="front"] .ticket-big, .ticket-layer[data-state="back"] .ticket-big, .ticket-layer[data-state="print"] .ticket-big { opacity: 1; pointer-events: auto; }
+.ticket-layer[data-state="print"] .ticket-big { background: #0000; pointer-events: none; }
+.tk-card { width: min(380px, 78%); aspect-ratio: 1.62; position: relative; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.3,1.4,.5,1); transform: translateY(30px) rotate(-4deg); cursor: pointer; }
+.ticket-layer[data-state="front"] .tk-card, .ticket-layer[data-state="print"] .tk-card { transform: none; }
+.ticket-layer[data-state="print"] .tk-card { animation: print 2.6s cubic-bezier(.3,1.2,.5,1) forwards; }
+@keyframes print { 0% { transform: translateY(70%) scaleY(.2); opacity: 0; } 18% { transform: none; opacity: 1; } 80% { transform: none; opacity: 1; } 100% { transform: translate(-60%, -70%) scale(.3); opacity: 0; } }
+.ticket-layer[data-state="back"] .tk-card { transform: rotateY(180deg); }
+.tk-face { position: absolute; inset: 0; backface-visibility: hidden; background: #fff6e3; border-radius: 10px; padding: 4.5% 6%; box-shadow: 0 10px 30px #0006; display: flex; flex-direction: column; font-family: Fredoka, sans-serif; color: #23262b;
+  background-image: radial-gradient(circle at 0 50%, #0000 9px, #fff6e3 10px), radial-gradient(circle at 100% 50%, #0000 9px, #fff6e3 10px); }
+.tk-back { transform: rotateY(180deg); }
+.tk-face header { display: flex; justify-content: space-between; font: 600 11px Fredoka, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #e8552d; border-bottom: 2px dashed #e4d6b8; padding-bottom: 4px; }
+.tk-face h2 { margin: 6px 0 0; font: 700 clamp(18px, 3.2vw, 28px) Fredoka, sans-serif; }
+.tk-trade { margin: 0 0 4px; color: #62676f; font-size: 13px; }
+.tk-rows { list-style: none; margin: auto 0 0; padding: 0; display: grid; gap: 4px; font-size: 12px; }
+.tk-rows li { display: flex; justify-content: space-between; align-items: center; }
+.tk-face footer { margin-top: 6px; font-size: 11px; color: #9a8f78; text-align: right; }
+.tk-links { list-style: none; margin: auto 0 0; padding: 0; display: grid; gap: 6px; }
+.tk-links a { color: #23262b; text-decoration: none; font-size: 14px; display: block; padding: 4px 8px; border-radius: 6px; background: #f3e7cc; }
+.tk-links a:hover { background: #f6b73c; }
+.tk-links b { display: inline-block; width: 70px; color: #e8552d; }
+.tk-hint { margin: 0; color: #fffd; font: 500 13px Fredoka, sans-serif; text-shadow: 0 1px 2px #000; }
+.ticket-layer[data-state="print"] .tk-hint { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .tk-card, .ticket-corner { transition: none; animation: none !important; } }

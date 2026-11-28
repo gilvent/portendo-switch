@@ -1,4 +1,5 @@
-import { input, type Button } from '../core/input.ts';
+import { input } from '../core/input.ts';
+import { isMuted, setMuted } from '../core/audio.ts';
 import { reducedMotion } from '../core/stage.ts';
 import './console.css';
 
@@ -12,7 +13,7 @@ export class Shell {
   screen: HTMLElement;      // the game's canvas host
   overlay: HTMLElement;     // DOM drawn over the game (prompts, labels, cards)
   mode: Mode = 'handheld';
-  private btn: Record<Button, HTMLElement>;
+  private btn: Record<'A' | 'B' | 'X', HTMLElement>;
   private stickKnob: HTMLElement;
 
   constructor(host: HTMLElement) {
@@ -21,26 +22,31 @@ export class Shell {
         <div class="dock" aria-hidden="true"><i class="dock-led"></i><span>DOCK</span></div>
         <div class="console" data-testid="console">
           <div class="joy joy-l"><i class="joy-minus">−</i><div class="stick" data-testid="stick"><i class="knob"></i></div></div>
-          <div class="bezel"><div class="slot"></div></div>
+          <div class="bezel"><div class="slot"></div><button class="vol" data-testid="mute" aria-label="Sound"></button></div>
           <div class="joy joy-r"><i class="joy-plus">+</i>
+            <button class="pad-btn pad-x" data-btn="X" data-testid="btn-x" aria-label="X: ticket">X</button>
             <button class="pad-btn pad-a" data-btn="A" data-testid="btn-a" aria-label="A: use / jump">A</button>
             <button class="pad-btn pad-b" data-btn="B" data-testid="btn-b" aria-label="B: back">B</button>
           </div>
         </div>
         <div class="screen" data-testid="screen"><div class="overlay"></div></div>
+        <a class="hurry" href="./one-page.html" data-testid="one-page">In a hurry? One-page version</a>
       </div>`;
     this.root = host.querySelector('.shell')!;
     this.screen = host.querySelector('.screen')!;
     this.overlay = host.querySelector('.overlay')!;
     this.stickKnob = host.querySelector('.knob')!;
-    this.btn = { A: host.querySelector('[data-btn=A]')!, B: host.querySelector('[data-btn=B]')! };
-    for (const b of ['A', 'B'] as Button[]) {
+    this.btn = { A: host.querySelector('[data-btn=A]')!, B: host.querySelector('[data-btn=B]')!, X: host.querySelector('[data-btn=X]')! };
+    for (const b of ['A', 'B', 'X'] as const) {
       const el = this.btn[b];
       el.addEventListener('pointerdown', e => { e.preventDefault(); input.source = 'touch'; input.press(b); });
       const up = () => input.release(b);
       el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
     }
     this.bindStick(host.querySelector('.stick')!);
+    const vol = host.querySelector<HTMLElement>('.vol')!;
+    const showVol = () => { vol.dataset.muted = String(isMuted()); vol.title = isMuted() ? 'Sound off' : 'Sound on'; };
+    vol.addEventListener('click', () => { setMuted(!isMuted()); showVol(); }); showVol();
     this.place();
     addEventListener('resize', () => this.place());
   }
@@ -62,6 +68,7 @@ export class Shell {
   sync() {
     this.btn.A.classList.toggle('down', input.held.A);
     this.btn.B.classList.toggle('down', input.held.B);
+    this.btn.X.classList.toggle('down', input.held.X);
     this.stickKnob.style.transform = `translate(${input.move.x * 12}px, ${input.move.z * 12}px)`;
   }
   // The screen's box: inside the bezel in handheld mode, the whole window once docked.
@@ -74,12 +81,13 @@ export class Shell {
     }
   }
   // Boarding: the console drops into the dock, the screen leaves it and opens out to fill the window.
-  async dock() {
+  async dock(mid?: () => Promise<void> | void) {
     if (this.mode !== 'handheld') return;
     this.mode = 'docking';
     this.root.dataset.mode = 'docking';
     const wait = (ms: number) => new Promise(r => setTimeout(r, reducedMotion ? 0 : ms));
     await wait(650);
+    await mid?.();
     this.mode = 'docked';
     this.root.dataset.mode = 'docked';
     this.place();

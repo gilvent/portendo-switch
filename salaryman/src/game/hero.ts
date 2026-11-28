@@ -19,6 +19,10 @@ export class Hero {
   // Forces from the world (the train's acceleration), in units/s², and how well his feet grip against them (0..1).
   push = 0; grip = 1;
   frozen = false;
+  // Turned edge-on (0 face-on, 1 a hairline): how he slips through a closing door.
+  thin = 0;
+  // Hanging from a strap: the strap says where his hands are; he follows it and nothing else moves him.
+  hang: (() => { x: number; y: number }) | null = null;
   private flipT = 1; private flipFrom = 1;
   private squash = new Spring(1, 320, 14);
   private lean = 0; private stride = 0; private coyote = 0; private buffered = 0; private holding = false;
@@ -58,8 +62,15 @@ export class Hero {
   release() { this.holding = false; }
   hop(v = 4) { if (this.body.ground) { this.body.vy = v; this.body.ground = false; this.squash.x = 1.12; } }
   kick(vx: number, vy = 0) { this.body.vx += vx; if (vy) { this.body.vy = vy; this.body.ground = false; } }
+  // Hit a wall hard: he crumples flat against it and pops back.
+  crumple() { this.squash.x = .32; this.squash.v = 0; }
   update(dt: number, move: { x: number; z: number }, holdA: boolean, bounds: Rect, solids: Solid[]) {
     const b = this.body, H = HERO;
+    if (this.hang) {
+      const p = this.hang(); b.vx = (p.x - b.x) / dt; b.x = p.x; b.y = p.y; b.vy = 0; b.ground = false; this.pushCarry = 0; this.stride = 0;
+      this.lean = damp(this.lean, clamp(-b.vx * .06, -.5, .5), 8, dt);
+      return [];
+    }
     const mx = this.frozen ? 0 : move.x, mz = this.frozen ? 0 : move.z;
     const ctl = b.ground ? 1 : H.airControl;
     const ax = (want: number, v: number, max: number) => {
@@ -99,11 +110,11 @@ export class Hero {
     const sy = clamp(sq + air, .65, 1.35), sxs = 1 / Math.sqrt(sy);
     const bob = b.ground ? Math.abs(Math.sin(this.stride * Math.PI)) * .06 : 0;
     this.group.position.set(b.x, b.y + bob, b.z);
-    this.sheet.scale.set((1.05 + .07) * sx * sxs, (HERO.height + .07) * sy, 1);
+    this.sheet.scale.set((1.05 + .07) * sx * sxs * (1 - this.thin), (HERO.height + .07) * sy, 1);
     this.group.rotation.z = reducedMotion ? 0 : this.lean;
     // A card turning shows its edge: a little yaw sells it as paper.
     this.sheet.rotation.y = this.flipT < 1 ? Math.sin(this.flipT * Math.PI) * .5 : 0;
     this.shadow.position.set(b.x + .08, b.floor + .012, b.z + .02);
-    const lift = clamp(1 - (b.y - b.floor) * .35, .45, 1); this.shadow.scale.setScalar(lift);
+    const lift = clamp(1 - (b.y - b.floor) * .35, .35, 1); this.shadow.scale.setScalar(lift);
   }
 }
