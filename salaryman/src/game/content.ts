@@ -21,7 +21,7 @@ export const LINE: Station[] = [
 // The ticket's rows: how many round holes (facts) and star holes (secrets) each station holds.
 export const ROWS: { id: 'line' | StationId; label: string; round: number; star: number }[] = [
   { id: 'line', label: 'Line', round: 1, star: 1 },
-  { id: 'blibli', label: 'Blibli.com', round: 7, star: 1 },
+  { id: 'blibli', label: 'Blibli.com', round: 8, star: 1 },
   { id: 'moperty', label: 'Moperty', round: 3, star: 1 },
   { id: 'radjastone', label: 'Radjastone', round: 3, star: 1 }
 ];

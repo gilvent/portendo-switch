@@ -40,6 +40,8 @@ export class Stage {
     new ResizeObserver(() => this.resize()).observe(host);
     this.resize();
   }
+  // Every place starts in the same daylight; a scene may dim it (an evening, a night platform).
+  resetLight() { this.sun.intensity = 2.3; this.hemi.intensity = 1.15; this.sun.color.set('#fff4e6'); this.hemi.color.set('#dfe9f5'); }
   resize() {
     const w = this.host.clientWidth || 1, h = this.host.clientHeight || 1;
     this.renderer.setSize(w, h, false);

@@ -9,6 +9,7 @@ import { Wipe } from './wipe.ts';
 import { sfx } from './sfx.ts';
 import type { Mech, Place } from './place.ts';
 import type { StationId } from './content.ts';
+import { Anims } from './mech.ts';
 
 // The run of one visit: where he is, what he has punched, how far the train has got.
 export type Save = {
@@ -27,6 +28,7 @@ export class Game {
   near: Mech | null = null;
   busy = false;               // a transition is playing: input waits
   time = 0;
+  anims = new Anims();
   private pendingUse: Mech | null = null;
   private ray = new THREE.Raycaster();
   listeners = new Set<(e: string, d?: unknown) => void>();
@@ -49,9 +51,10 @@ export class Game {
     this.busy = true;
     if (turn && this.place) { sfx.fold(); await this.wipe.close(); }
     if (this.place) { this.place.exit?.(this); this.stage.scene.remove(this.place.group); }
-    this.pins.clear(); this.near = null; this.pendingUse = null; input.target = null;
+    this.anims.clear(); this.pins.clear(); this.near = null; this.pendingUse = null; input.target = null;
     this.hero.hang = null; this.hero.frozen = false; this.hero.thin = 0; this.hero.push = 0; this.hero.grip = 1;
     this.place = next;
+    this.stage.resetLight();
     this.stage.scene.add(next.group);
     next.enter(this, from);
     next.camera(this); this.stage.snap();
@@ -126,6 +129,7 @@ export class Game {
     const hits = this.hero.update(dt, move, input.held.A, { x0: p.lane.x0, x1: p.lane.x1, z0: p.lane.z, z1: p.lane.z }, p.solids);
     for (const h of hits) this.emit('hit', h);
     if (this.pendingUse && this.near === this.pendingUse && !input.target) { this.useMech(this.pendingUse); this.pendingUse = null; }
+    this.anims.update(dt);
     p.update(dt, this);
     // What is in reach: the nearest enabled mechanism.
     let near: Mech | null = null, nd = Infinity;

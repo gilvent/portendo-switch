@@ -5,6 +5,8 @@ export type Solid = Rect & { h: number; id?: string };
 
 export const inside = (r: Rect, x: number, z: number, pad = 0) => x > r.x0 - pad && x < r.x1 + pad && z > r.z0 - pad && z < r.z1 + pad;
 
+// The highest block he steps onto without jumping.
+export const STEP = .5;
 export type Body = { x: number; y: number; z: number; vx: number; vy: number; vz: number; r: number; ground: boolean; floor: number };
 
 // Move a body by its velocity, keep it in bounds, push it out of solids it is below the top of, and land it on the
@@ -14,6 +16,8 @@ export function moveBody(b: Body, dt: number, bounds: Rect, solids: Solid[], gra
   const blocking = (s: Solid) => b.y < s.h - .02;
   b.x += b.vx * dt;
   for (const s of solids) if (blocking(s) && inside(s, b.x, b.z, b.r)) {
+    // A low block is a step: he walks up onto it.
+    if (s.h - b.y <= STEP && b.ground) { b.y = s.h; continue; }
     const speed = b.vx; b.x = b.vx > 0 ? s.x0 - b.r : s.x1 + b.r; b.vx = 0; hits.push({ solid: s, axis: 'x', speed });
   }
   b.z += b.vz * dt;
@@ -26,7 +30,7 @@ export function moveBody(b: Body, dt: number, bounds: Rect, solids: Solid[], gra
   if (b.z > bounds.z1) { b.z = bounds.z1; b.vz = Math.min(0, b.vz); }
   // The surface under him: the floor, or the top of a block he is over.
   let floor = 0;
-  for (const s of solids) if (inside(s, b.x, b.z, b.r * .4) && b.y >= s.h - .3) floor = Math.max(floor, s.h);
+  for (const s of solids) if (inside(s, b.x, b.z, b.r) && b.y >= s.h - .3) floor = Math.max(floor, s.h);
   b.floor = floor;
   b.vy -= gravity * dt; b.y += b.vy * dt;
   if (b.y <= floor) {
