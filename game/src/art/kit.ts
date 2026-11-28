@@ -4,6 +4,10 @@ export type Panel = {
   id: string; stock: Stock; c: string; o: V3; u: V3; v: V3; w: number; h: number;
   mask?: string; print?: string; edge?: 'cut' | 'fold'; ghost?: boolean; density?: number; decal?: string;
   emit?: number; motion?: Motion; group?: string; backdrop?: boolean; show?: Show;
+  // A card of an open view that stands in the scene to keep its parallax. Like the far backdrop it is lit evenly and
+  // nothing near can shade it (a house's shadow across it would turn far land into a wall); its own layers still shade
+  // one another.
+  open?: boolean;
   // Lit like everything else but casting no shadow: for a sheet whose pose changes so much (a wall that folds up
   // from flat) that a shadow baked at one pose would be wrong at the other.
   phantom?: boolean;

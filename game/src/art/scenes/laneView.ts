@@ -30,8 +30,9 @@ export function land(): Panel[] {
     `<rect y="${Y(l0)}" width="${W}" height="${l1 - l0}" fill="#d9caae"/>${pave}<rect y="${Y(l0) - 7}" width="${W}" height="9" fill="#bfae90"/><rect y="${Y(l1) - 2}" width="${W}" height="9" fill="#bfae90"/>`;
   const ground: Panel = { id: 'ground', stock: 'sugar', c: GRASS, w: W, h: D, o: [LAND.x0, 0, LAND.z1], u: [1, 0, 0], v: [0, 0, -1], density: .42, edge: 'fold', split: 8, print };
   const skirt: Panel = { id: 'ground-skirt', stock: 'greyboard', c: '#8a6a4c', w: W, h: 50, o: [LAND.x0, -50, LAND.z1 + 1], u: [1, 0, 0], v: [0, 1, 0], density: .6, edge: 'cut', split: 2, print: `<rect width="${W}" height="9" fill="#6fae5c"/>` };
-  // The railing along the ridge's edge, open where the path goes down.
-  const rail = (id: string, x0: number, x1: number): Panel => { const w = x1 - x0; return { id, stock: 'cover', c: PICKET, w, h: 46, o: [x0, 0, LAND.z0 + 6], u: [1, 0, 0], v: [0, 1, 0], density: .9, edge: 'cut', split: 2,
+  // The railing along the ridge's edge, open where the path goes down. It casts no shadow: the card behind it stands
+  // in for land that falls away, and a shadow across it would make it a wall.
+  const rail = (id: string, x0: number, x1: number): Panel => { const w = x1 - x0; return { id, phantom: true, stock: 'cover', c: PICKET, w, h: 46, o: [x0, 0, LAND.z0 + 6], u: [1, 0, 0], v: [0, 1, 0], density: .9, edge: 'cut', split: 2,
     mask: `<rect y="6" width="${w}" height="6" fill="#fff"/><rect y="24" width="${w}" height="5" fill="#fff"/>${Array.from({ length: Math.floor(w / 46) + 1 }, (_, i) => `<rect x="${Math.min(i * 46, w - 7)}" width="7" height="46" fill="#fff"/>`).join('')}` }; };
   return [ground, skirt, rail('rail-l', LAND.x0, LAND.path[0] - 6), rail('rail-r', LAND.path[1] + 6, LAND.x1)];
 }
@@ -80,7 +81,7 @@ export function view(): Panel[] {
   // Near card, standing below the ridge: only what rises above its edge shows.
   { const W = NEAR.w, H = 300;
     const hill = roll(W, H, 150, 16, 210, .4);
-    out.push({ id: NEAR.id, stock: 'sugar', c: '#9ed084', w: W, h: H, o: [NEAR.x0, NEAR.y0, NEAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: NEAR.density, split: 2, mask: `<path d="${hill}" fill="#fff"/>`,
+    out.push({ id: NEAR.id, open: true, stock: 'sugar', c: '#9ed084', w: W, h: H, o: [NEAR.x0, NEAR.y0, NEAR.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: NEAR.density, split: 2, mask: `<path d="${hill}" fill="#fff"/>`,
       print: Array.from({ length: 36 }, (_, i) => `<path d="M${i * 100 + 20} ${H - 150}q30 -10 60 0" stroke="#b6de9c" stroke-width="5" fill="none"/>`).join('') });
     const roofs = homes(W, H, 132, 1.25, [70, 240], '#9ed084', { 3: '#f6b73c', 9: INDIGO, 14: '#f6b73c' });
     out.push(layer(NEAR, 'view-roofs', 34, H, '#fff4e2', roofs.m, roofs.p));
@@ -101,7 +102,7 @@ export function view(): Panel[] {
   { const W = TOWN.w, H = 420;
     let paddies = '';
     for (let x = 0; x < W; x += r(150, 280)) { const pw = r(110, 220), py = H - r(190, 250), c = pick(['#b9d98a', '#cfe39a', '#a5cc7a', '#d9e8a6']); paddies += `<path d="M${f(x)} ${f(py)}l${f(pw)} -8l22 44l${f(-pw - 10)} 10Z" fill="${c}"/>${Array.from({ length: 5 }, (_, i) => `<path d="M${f(x + 4)} ${f(py + 6 + i * 8)}l${f(pw + 8)} -8" stroke="${tone(c, -.12)}" stroke-width="2"/>`).join('')}`; }
-    out.push({ id: TOWN.id, stock: 'sugar', c: '#a9d58c', w: W, h: H, o: [TOWN.x0, TOWN.y0, TOWN.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: TOWN.density, split: 2, mask: `<path d="${roll(W, H, 262, 12, 330, 1.2)}" fill="#fff"/>`, print: paddies });
+    out.push({ id: TOWN.id, open: true, stock: 'sugar', c: '#a9d58c', w: W, h: H, o: [TOWN.x0, TOWN.y0, TOWN.z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: TOWN.density, split: 2, mask: `<path d="${roll(W, H, 262, 12, 330, 1.2)}" fill="#fff"/>`, print: paddies });
     const far = homes(W, H, 236, .7, [4, 60], '#a9d58c'); out.push(layer(TOWN, 'town-far', 26, H, '#fff4e2', far.m, far.p));
     const line = crowns(W, H, 214, 16, 28, [34, 70], [['#5aab70', '#4f9e66'], ['#74bb80', '#5aab70']], 1700, W); out.push(layer(TOWN, 'town-trees', 52, H, '#5aab70', line.m, line.p));
     const mid = homes(W, H, 196, .95, [10, 130], '#b6de9c', { 6: '#f6b73c', 17: INDIGO }); out.push(layer(TOWN, 'town-mid', 78, H, '#fff4e2', mid.m, mid.p));

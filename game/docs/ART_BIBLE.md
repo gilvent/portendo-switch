@@ -274,6 +274,7 @@ Three blind playtests (a fresh player given only the address) set these rules; t
 
 `scenes/lane.ts` and `scenes/laneView.ts`. Its design, from the rules to the paper, is recorded in [MOPERTY_DESIGN.md](MOPERTY_DESIGN.md); this is what the art has to keep.
 
+- **Its view cards are `open`.** The two cards of the town stand in the scene to keep their parallax, but are lit evenly like the far backdrop, so no house throws its shadow across the valley.
 - **A ridge-top lane.** The lane runs along the top of a rise, so the whole back of the scene is open view and the homes stand free against it. It is closed on no side. No other space may be laid out this way.
 - **Nothing is read here.** Every stop is a toy with its own verb, and what one toy does the rest of the lane notices: the visitors, the hens, the cat, the cards on the office's board.
 - **The pop-up house** is the scene's signature. Its inside is plain bond with the plan in pencil; its outside is printed. It lies flat as the plan, the front folds up, the back and sides come up through slots, the roof is put on. Sheets that change pose like this are `phantom`: lit, but casting no baked shadow.

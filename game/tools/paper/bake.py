@@ -158,7 +158,7 @@ def build(name, panels, phantom):
 # The far backdrop and its layers are the same: they stand in for things far away, so they never shade the scene
 # (finish.py lights them evenly and works out the shadows they throw on each other itself).
 BY_ID = {p["id"]: p for p in L["panels"]}
-far = lambda p: bool(p.get("backdrop") or (p.get("decal") and BY_ID[p["decal"]].get("backdrop")))
+far = lambda p: bool(p.get("backdrop") or p.get("open") or (p.get("decal") and (BY_ID[p["decal"]].get("backdrop") or BY_ID[p["decal"]].get("open"))))
 is_phantom = lambda p: bool(p.get("show") or p.get("group") or p.get("phantom") or p.get("actor") or far(p))
 solid_panels = [p for p in L["panels"] if not is_phantom(p)]
 phantom_panels = [p for p in L["panels"] if is_phantom(p)]

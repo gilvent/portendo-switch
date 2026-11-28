@@ -40,7 +40,7 @@ for p in L["panels"]:
     if not m.any():
         continue
     part = light[y:y + h, x:x + w]
-    far = p["backdrop"] or (p["decal"] and BY_ID[p["decal"]]["backdrop"])
+    far = p["backdrop"] or p.get("open") or (p["decal"] and (BY_ID[p["decal"]]["backdrop"] or BY_ID[p["decal"]].get("open")))
     if far:
         # The open view is far off: nothing in the near scene can shade it, so it takes the sky's unshaded light.
         lit = part[m > 0.5]
@@ -80,7 +80,7 @@ def flatten(d):
     colour = np.dstack([ndimage.map_coordinates(lin[..., c], coords, order=1) for c in range(3)])
     y, x = base["y"], base["x"]
     region = lin[y:y + base["ph"], x:x + base["pw"]]
-    if base["backdrop"]:
+    if base["backdrop"] or base.get("open"):
         region *= far_shade(d, base, world, n, dn, do, du, dv, over)[..., None]
     region[:] = region * (1 - over[..., None]) + colour * over[..., None]
     held = a[y:y + base["ph"], x:x + base["pw"]]

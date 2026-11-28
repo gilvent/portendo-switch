@@ -314,18 +314,18 @@ Checked on screenshots of the baked scene at 1280 by 720, 1720 by 720 and 412 by
 |---|---|
 | 1. One coherent place | One theme: a hometown lane on a rise. Every object is listed in step 4 with its reason. Day scene. The homes are whole: four walls, floors, a roof. Its plan is shared with no other scene |
 | 2. Technique by zone | Main space: folded buildings, the pop-up, tree, hens, barrow, bricks. Open view: flat layers on two cards and a far backdrop. Relief only on the two buildings, the lane being enclosed on no side. The ground is level; a raised yard was left out to keep the walk simple |
-| 3. The open view | Fourteen layers of different kinds, each with its own detail; houses differ in roof, wall, chimney and windows; the far signs repeat the tag and the key. The path's stones lead to the gap in the railing and the road goes on below it, though from most of the lane the tree or a roof hides the road: the weakest point of the view |
+| 3. The open view | Fourteen layers of different kinds, each with its own detail; houses differ in roof, wall, chimney and windows; the far signs repeat the tag and the key. The path's stones lead to the gap in the railing and the road goes on below it, seen from the lane's left half; from the right the tree and the house hide it |
 | 4. Freestanding objects | Folded bodies with glued pieces; the hens and barrow turned to the camera; the tree is a forked trunk with clusters at three depths and fruit glued on. Flat only where allowed: signs, fence, railing, people, the cat on the fence, the furniture, which is stand-up card on purpose |
 | 5. Placement | Three groups (plot, yard, office) with clear lane between them. He stands beside every toy; no visitor's place is in front of one. One of each sign |
 | 6. Characters | Three visitors in three builds and three faces; the agent stands on a step so his head and shoulders clear the sill |
 | 7. Telling the project | No paragraph, screenshot or tech. Six verbs for six stops. The mark appears once |
 | 8. Paper look | Baked light and shadow from the one sun; cut edges and grain from the stocks. The rooms and the leaves' insides carry their own light, since a doll's house is looked into |
 
-Found on the way and fixed: the tree hid the office door (moved to the yard's left, the board to its right); back-to-back sheets on one plane baked black (set apart); the rooms were dark behind their own roof (they carry light); the visitors were baked under the tree and came out dim (they are baked on the open verge); a tap on a far stop could walk him into the open gate (taps keep to the lane); focus on a stop off screen could scroll the whole view sideways (the view no longer scrolls).
+Found on the way and fixed: the tree hid the office door (moved to the yard's left, the board to its right); back-to-back sheets on one plane baked black (set apart); the rooms were dark behind their own roof (they carry light); the visitors were baked under the tree and came out dim (they are baked on the open verge); a tap on a far stop could walk him into the open gate (taps keep to the lane); focus on a stop off screen could scroll the whole view sideways (the view no longer scrolls); the house and the railing threw their shadows on the cards of the view, which made far land read as a wall (a card of an open view is now lit evenly, as the far backdrop is, and only its own layers shade one another: `open` in `kit.ts`).
 
 Measured in a cloud container with software rendering, walking with all three visitors out: the lane runs at 27 to 42 frames a second where the promenade runs at 22 to 33. It uses 177 quads of its budget of 190.
 
-**Phase 3 is ready**, with two things left open on purpose: the road below the ridge could be made easier to see, and the frame rate has not been measured on a phone.
+**Phase 3 is ready.** Left open on purpose: the frame rate has not been measured on a phone.
 
 ![The plot built, the sign up, visitors in the lane](spaces/lane-plot.png)
 
