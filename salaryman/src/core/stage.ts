@@ -45,13 +45,20 @@ export class Stage {
   resize() {
     const w = this.host.clientWidth || 1, h = this.host.clientHeight || 1;
     this.renderer.setSize(w, h, false);
-    this.camera.aspect = w / h;
+    // Narrower than 16:9 (a phone held upright, a tall window), the view keeps its width, down to a square.
+    const a = w / h, half = Math.tan(13 * Math.PI / 180) * 16 / 9;
+    this.camera.fov = a >= 16 / 9 ? 26 : 2 * Math.atan(half / Math.max(1, a)) * 180 / Math.PI;
+    this.camera.aspect = a;
     this.camera.updateProjectionMatrix();
+    // Draw at once: a resized canvas is blank until the next frame, and the dock resizes it every frame.
+    this.render();
   }
   // Shake on a hit: trauma 0..1, felt as its square so small knocks stay small.
   shake(amount: number) { if (!reducedMotion) this.trauma = clamp(this.trauma + amount, 0, 1); }
   // A one-off shove of the whole view (a landing, a brake), springing back.
   nudge(x: number, y: number) { if (!reducedMotion) { this.kick.x += x; this.kick.y += y; } }
+  // Half the width of floor the camera sees at a distance.
+  halfWidth(dist: number) { return dist * Math.tan(this.camera.fov / 2 * Math.PI / 180) * this.camera.aspect; }
   snap() { Object.assign(this.rig, this.want); }
   update(dt: number) {
     this.t += dt;

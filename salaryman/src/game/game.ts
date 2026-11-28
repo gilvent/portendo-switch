@@ -112,7 +112,7 @@ export class Game {
     const hit = new THREE.Vector3();
     if (this.ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -this.place.lane.z), hit)) {
       // A tap above his head is a jump; anywhere else on the scene, a walk.
-      if (Math.abs(hit.x - this.hero.body.x) < .6 && hit.y > 1.6) { this.hero.jump(); return; }
+      if (Math.abs(hit.x - this.hero.body.x) < .6 && hit.y > 1.6) { this.hero.jump(true); return; }
       input.target = { x: hit.x, z: 0 }; this.pendingUse = null;
     }
   }

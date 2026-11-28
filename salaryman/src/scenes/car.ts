@@ -86,12 +86,12 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   clipAll();
   const setStation = (i: number) => { stName = LINE[i]; (stBand.material as THREE.MeshStandardMaterial).color.set(stName.color); stSigns.forEach(c => c.redraw()); };
   // Straps over the aisle, clear of the doors.
-  const straps: { x: number; th: number; w: number; mesh: THREE.Group }[] = [];
+  const straps: { x: number; th: number; w: number; mesh: THREE.Group; ring: THREE.Mesh }[] = [];
   for (let x = -6.6; x <= 6.61; x += 1.1) {
     if (Math.abs(x) < .9) continue;
     const m = new THREE.Group(); m.position.set(x, R.railY, .1);
     const band = box(.05, R.strapL - .12, .03, '#e9edf1', 0, -(R.strapL - .12), 0); const ring = new THREE.Mesh(new THREE.TorusGeometry(.09, .022, 6, 14), new THREE.MeshStandardMaterial({ color: '#f6b73c' }));
-    ring.position.y = -R.strapL + .04; ring.castShadow = true; m.add(band, ring); group.add(m); straps.push({ x, th: 0, w: 0, mesh: m });
+    ring.position.y = -R.strapL + .04; ring.castShadow = true; m.add(band, ring); group.add(m); straps.push({ x, th: 0, w: 0, mesh: m, ring });
   }
   group.add(box(13.8, .05, .05, '#b7bec7', 0, R.railY, .1));
   // Passengers: seated ones jolt; two standees grab their straps just before the pull, so a watcher learns from them.
@@ -101,15 +101,17 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   });
   const standees = [-3.85, 4.95].map((x, i) => {
     const c = card(.95, 1.45, (g, Wd, Ht) => { const s = Wd / 95; g.fillStyle = i ? '#4a5a6a' : '#6a4a5a'; g.beginPath(); g.roundRect(22 * s, Ht - 80 * s, 50 * s, 64 * s, 10 * s); g.fill(); g.fillRect(64 * s, Ht - 126 * s, 9 * s, 50 * s); g.fillStyle = '#f0c8a0'; g.beginPath(); g.ellipse(47 * s, Ht - 104 * s, 24 * s, 24 * s, 0, 0, 7); g.fill(); g.fillStyle = '#222'; g.beginPath(); g.ellipse(47 * s, Ht - 114 * s, 25 * s, 13 * s, 0, Math.PI, 0); g.fill(); g.fillRect(40 * s, Ht - 106 * s, 4 * s, 5 * s); g.fillRect(54 * s, Ht - 106 * s, 4 * s, 5 * s); });
-    c.position.set(x, 0, -.3); group.add(c); return { c, x, hold: 0 };
+    c.position.set(x, 0, -.3); group.add(c);
+    const arm = box(.09, .62, .06, i ? '#4a5a6a' : '#6a4a5a', .2, .78, .01); arm.visible = false; c.add(arm);
+    return { c, x, hold: 0, cheer: 0, arm };
   });
   // The sim.
   const sim = { phase: 'stand' as Phase, t: 0, v: 0, a: 0, at: 0, dist: 0, stopAt: 0, express: false };
   const rumble = bed(180);
   let hold: typeof straps[number] | null = null, held = false, lastJoint = 0, doorOpen = 1, clapped = false, rideNo = 0;
-  const holdWindow = () => sim.phase === 'chime' || sim.phase === 'accel' || sim.phase === 'warn' || sim.phase === 'brake';
+  const holdWindow = () => sim.phase === 'closing' || sim.phase === 'chime' || sim.phase === 'accel' || sim.phase === 'warn' || sim.phase === 'brake' || (sim.phase === 'cruise' && sim.t > R.cruise - .6);
   const door: Mech = {
-    id: 'doors', x: 0, reach: 1.25, at: new THREE.Vector3(0, 2.0, -1), up: true,
+    id: 'doors', x: 0, reach: 2.6, at: new THREE.Vector3(0, 2.0, -1), up: true,
     label: () => `Get off: ${LINE[sim.at].name}`, on: () => sim.phase === 'stand' && doorOpen > .9, use: g => void getOff(g)
   };
   const go = (p: Phase) => { sim.phase = p; sim.t = 0; };
@@ -124,13 +126,13 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       souvenirs.forEach(sv => (sv.m.visible = visited.includes(sv.id as never)));
       // Boarding (from the platform or a station): the doors shut behind him and the train pulls away at once.
       sim.at = from === 'platform' ? 0 : g.save.next; setStation(sim.at); setSign('Next stop', sim.at);
-      sim.v = 0; sim.a = 0; doorOpen = 1; go('closing'); held = false; clapped = false;
+      sim.v = 0; sim.a = 0; doorOpen = 1; go('closing'); if (from === 'platform') sim.t = -.9; held = false; clapped = false; crumpled = false;
       station.position.x = 0; lamps.forEach(l => (l.visible = false));
     },
-    camera(g: Game) { g.stage.want = { x: clamp(g.hero.body.x * .12, -1, 1), y: 1.75, z: 0, dist: 22.5, pitch: .13, yaw: 0 }; },
+    camera(g: Game) { const room = Math.max(1.5, W / 2 + .5 - g.stage.halfWidth(22.5)); g.stage.want = { x: clamp(g.hero.body.x * (room > 1.5 ? 1 : .3), -room, room), y: 1.75, z: 0, dist: 22.5, pitch: .13, yaw: 0 }; },
     onA(g: Game) {
       // In the hold window, A reaches for the nearest strap; while hanging, A lets go.
-      if (hold) { letGo(g, false); return true; }
+      if (hold) return true;
       if (!holdWindow() || g.near) return false;
       let best = null, bd = R.reach;
       for (const s of straps) { const d = Math.abs(s.x - g.hero.body.x); if (d < bd) { bd = d; best = s; } }
@@ -145,7 +147,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       sim.t += dt;
       const ph = sim.phase;
       // Phases.
-      if (ph === 'closing') { doorOpen = Math.max(0, doorOpen - dt / R.closing); if (sim.t > R.closing) { go('chime'); sfx.chime(); g.emit('ride', rideNo); } }
+      if (ph === 'closing') { if (sim.t > 0) doorOpen = Math.max(0, doorOpen - dt / R.closing); if (sim.t > R.closing) { go('chime'); sfx.chime(); g.emit('ride', rideNo); } }
       else if (ph === 'chime') { if (sim.t > R.chime) { go('accel'); g.stage.nudge(-.15, 0); } }
       else if (ph === 'accel') { sim.a = R.a; if (sim.t > R.accel) { go('cruise'); sim.a = 0; endHold(g); } }
       else if (ph === 'cruise') { sim.a = Math.sin(sim.t * 2.3) * .25; if (sim.t > R.cruise) { go('warn'); setSign('Arriving', sim.at); const j = LINE[sim.at].jingle; j.forEach((f, i) => tone({ f, d: .5, type: 'sine', v: .2, at: i * .22 })); g.emit('arriving', sim.at); } }
@@ -196,30 +198,39 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       if (!hold && g.hero.body.vy > 2 && g.hero.body.y > .5) for (const s of straps) if (Math.abs(s.x - g.hero.body.x) < .4 && Math.abs(s.w) < 2) { s.w += 4 * (Math.random() < .5 ? 1 : -1); sfx.bonk(.2); }
       // Passengers jolt with the train; standees grab straps half a second before the pull.
       for (const f of folk) { f.jolt.kick(-sim.a * dt * 2.5); f.c.rotation.z = reducedMotion ? 0 : f.jolt.step(0, dt) * .12; }
+      const win = holdWindow();
+      if (win && !wasWin) { for (const s of straps) s.w += (Math.random() - .5) * 1.2; }
+      wasWin = win;
+      for (const s of straps) (s.ring.material as THREE.MeshStandardMaterial).color.set(win ? '#e8552d' : '#f6b73c');
+      // Until he has held on once, from the second ride, the nearest strap says so.
+      if (win && !hold && rideNo >= 2 && g.save.holds === 0 && !g.near) {
+        const st = straps.reduce((a, b) => (Math.abs(b.x - g.hero.body.x) < Math.abs(a.x - g.hero.body.x) ? b : a));
+        g.pins.show('holdhint', `<div class="prompt"><b>A</b>Hold on</div>`, new THREE.Vector3(st.x, R.railY + .45, .1), 'pin');
+      } else g.pins.hide('holdhint');
       for (const s of standees) {
-        const want = holdWindow() || (sim.phase === 'closing' && sim.t > R.closing - .5) ? 1 : 0;
+        const want = holdWindow() ? 1 : 0;
         s.hold += (want - s.hold) * Math.min(1, dt * 10);
         const st = straps.reduce((a, b) => (Math.abs(b.x - s.x) < Math.abs(a.x - s.x) ? b : a));
-        s.c.position.x = s.x + Math.sin(st.th) * R.strapL * s.hold; s.c.position.y = s.hold * .12;
+        s.c.position.x = s.x + Math.sin(st.th) * R.strapL * s.hold; s.c.position.y = s.hold * .35 + s.cheer; s.cheer = Math.max(0, s.cheer - dt * 1.2); s.arm.visible = s.hold > .5;
       }
       // Thrown into the end wall: he crumples flat and pops back.
-      if (!hold && Math.abs(g.hero.body.vx) > 2.4 && (g.hero.body.x < self.lane.x0 + .35 || g.hero.body.x > self.lane.x1 - .35)) { g.hero.crumple(); g.hero.body.vx = 0; sfx.bonk(.9); g.stage.shake(.3); g.fx.burst(g.hero.body.x, 1, .1, ['#fffaf0', '#d9dde2'], 6, .5); g.emit('crumple'); }
+      if (!hold && Math.abs(g.hero.body.vx) > 2.4 && (g.hero.body.x < self.lane.x0 + .35 || g.hero.body.x > self.lane.x1 - .35)) { g.hero.crumple(); g.hero.body.vx = 0; sfx.bonk(.9); g.stage.shake(.3); g.fx.burst(g.hero.body.x, 1, .1, ['#fffaf0', '#d9dde2'], 6, .5); folk.forEach(f => f.jolt.kick(Math.sign(g.hero.body.x - f.x) * 3)); g.emit('crumple');
+        if (!crumpled && g.save.holds === 0) { crumpled = true; g.caption('Note to self: grab a strap.', new THREE.Vector3(g.hero.body.x * .8, 2.3, .1)); } }
       // The first ride's ad panel says hello by itself.
       if (rideNo === 1) { const n = Math.min(HELLO.length - 1, Math.floor((sim.phase === 'closing' || sim.phase === 'chime' ? 0 : (sim.phase === 'accel' ? .5 : sim.phase === 'cruise' ? 1 + sim.t / 2 : 3)))); if (n !== ad) { ad = n; adCard.redraw(); sfx.paper(); } }
       if (sim.phase !== 'stand') leaving = false;
     }
   };
-  let warned = false, leaving = false;
+  let warned = false, leaving = false, wasWin = false, crumpled = false;
   function endHold(g: Game) {
     if (hold && held) {
       g.save.holds++;
       g.hero.hang = null; g.hero.kick(0, 4.5); hold = null; sfx.jump();
-      if (g.punch('line', 'hold', true)) { g.caption('Held on! You ride like a local.', new THREE.Vector3(g.hero.body.x, 2.6, .1)); }
-      if (!clapped) { clapped = true; standees[0].c.position.y += .3; }
+      if (g.punch('line', 'hold', true)) { g.caption('Held on. Like a local.', new THREE.Vector3(g.hero.body.x, 2.6, .1)); }
+      if (!clapped) { clapped = true; standees.forEach(s => (s.cheer = .4)); sfx.pop(); }
     }
     held = false;
   }
-  function letGo(g: Game, kept: boolean) { if (!hold) return; hold = null; held = kept; g.hero.hang = null; g.hero.body.vy = 1; }
   async function getOff(g: Game) {
     leaving = true; g.busy = true;
     const h = g.hero, x0 = h.body.x, t0 = performance.now();

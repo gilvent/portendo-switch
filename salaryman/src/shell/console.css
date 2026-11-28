@@ -28,7 +28,7 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; f
 .overlay { position: absolute; inset: 0; pointer-events: none; }
 /* Docking: the console falls into the dock; the screen leaves it and opens out to the window. */
 .shell[data-mode="docking"] .console { transform: translateY(70vh) scale(.6); }
-.shell[data-mode="docking"] .screen, .shell[data-mode="docked"] .screen { transition: left .9s cubic-bezier(.2,.9,.2,1), top .9s cubic-bezier(.2,.9,.2,1), width .9s cubic-bezier(.2,.9,.2,1), height .9s cubic-bezier(.2,.9,.2,1), border-radius .9s; }
+.shell[data-mode="docking"] .screen, .shell[data-mode="docked"] .screen { transition: left .9s cubic-bezier(.5,0,.2,1), top .9s cubic-bezier(.5,0,.2,1), width .9s cubic-bezier(.5,0,.2,1), height .9s cubic-bezier(.5,0,.2,1), border-radius .9s; }
 .shell[data-mode="docking"] .screen { left: 50% !important; top: 100% !important; width: 0 !important; height: 0 !important; transition-duration: .55s; }
 .shell[data-mode="docked"] .screen { border-radius: 0; }
 .shell[data-mode="docked"] .console { transform: translateY(80vh) scale(.5); opacity: 0; pointer-events: none; }
@@ -44,3 +44,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; f
 .shell[data-mode="docking"] .hurry, .shell[data-mode="docked"] .hurry { opacity: 0; pointer-events: none; }
 .shell.undocking .screen { transition: left .7s .25s cubic-bezier(.2,.9,.2,1), top .7s .25s cubic-bezier(.2,.9,.2,1), width .7s .25s cubic-bezier(.2,.9,.2,1), height .7s .25s cubic-bezier(.2,.9,.2,1); }
 .shell.undocking[data-mode="handheld"] .console { transition: transform .7s cubic-bezier(.2,1.3,.4,1), opacity .3s; }
+
+/* A phone held upright: the car is wider than the screen. A small note, never in the way. */
+.shell[data-mode="docked"]::after { content: 'Turn your phone sideways for the whole car ↻'; position: absolute; left: 50%; bottom: 14px; translate: -50% 0; padding: 4px 12px; border-radius: 999px;
+  background: #0009; color: #fffd; font: 500 13px Fredoka, sans-serif; white-space: nowrap; pointer-events: none; z-index: 7; display: none; }
+@media (orientation: portrait) and (max-aspect-ratio: 3/4) { .shell[data-mode="docked"]::after { display: block; } }

@@ -37,7 +37,7 @@ export function home(): Place {
       g.stage.sun.intensity = .25; g.stage.hemi.intensity = .35; g.stage.hemi.color.set('#8aa0d0');
       setTimeout(() => g.pins.show('title', '<span><b>Alvaro L.</b> · end of the line. Thanks for riding.</span>', new THREE.Vector3(-1, 3.6, 0), 'tag', 4000), 500);
     },
-    camera(g: Game) { g.stage.want = { x: Math.max(-2, Math.min(2, g.hero.body.x * .5)), y: 2.1, z: 0, dist: 16, pitch: .1, yaw: 0 }; },
+    camera(g: Game) { const room = Math.max(2, 7.6 - g.stage.halfWidth(16)); g.stage.want = { x: Math.max(-room, Math.min(room, g.hero.body.x * (room > 2 ? 1 : .5))), y: 2.1, z: 0, dist: 16, pitch: .1, yaw: 0 }; },
     update(dt: number) { const k = open.step(opened ? 1 : 0, dt); paddles.forEach(({ pv, s }) => (pv.rotation.y = s * k * 1.45)); }
   };
   async function finish(g: Game) {

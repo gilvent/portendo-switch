@@ -38,3 +38,10 @@
 .tk-hint { margin: 0; color: #fffd; font: 500 13px Fredoka, sans-serif; text-shadow: 0 1px 2px #000; }
 .ticket-layer[data-state="print"] .tk-hint { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .tk-card, .ticket-corner { transition: none; animation: none !important; } }
+
+@media (max-width: 700px), (max-height: 500px) {
+  .ticket-big { position: fixed; z-index: 20; }
+  .tk-card { width: 92vw; max-width: 420px; }
+  .ticket-layer[data-state="back"] .tk-card { aspect-ratio: auto; min-height: 300px; }
+  .tk-links a { font-size: 16px; min-height: 44px; display: flex; align-items: center; }
+}

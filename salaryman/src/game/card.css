@@ -18,3 +18,15 @@
 .ec-strip i.star.on { background: #23262b; }
 .ec-note { margin: 2px 0 6px; font-size: clamp(10px, 1.3vw, 13px); color: #62676f; }
 .ec-again { border: 0; border-radius: 999px; padding: 5px 16px; background: #e8552d; color: #fff; font: 600 clamp(11px, 1.4vw, 15px) Fredoka, sans-serif; cursor: pointer; box-shadow: 0 3px 0 #0003; }
+
+/* A phone: the card leaves the little screen and takes the whole viewport, links big enough for a thumb. */
+@media (max-width: 700px), (max-height: 500px) {
+  .endcard { position: fixed; z-index: 20; }
+  .ec-card { width: 92vw; padding: 20px 18px; }
+  .ec-card h2 { font-size: 26px; } .ec-trade { font-size: 15px; }
+  .ec-card ul { gap: 8px; }
+  .ec-card a { font-size: 16px; min-height: 44px; display: flex; align-items: center; }
+  .ec-note { font-size: 14px; } .ec-again { font-size: 16px; min-height: 44px; padding: 8px 22px; }
+}
+@media (max-width: 700px) { .ec-card ul { grid-template-columns: 1fr; } }
+@media (max-height: 500px) { .ec-card { padding: 12px 18px; } .ec-card h2 { font-size: 22px; } }

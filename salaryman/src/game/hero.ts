@@ -62,7 +62,9 @@ export class Hero {
   get shadowMesh() { return this.shadow; }
   place(x: number, z: number, facing = 1) { Object.assign(this.body, { x, z, y: 0, vx: 0, vz: 0, vy: 0, ground: true }); this.facing = facing; this.flipT = 1; this.flipFrom = facing; }
   // A pressed with nothing to use: a jump (buffered a moment so a slightly early press still counts).
-  jump() { this.buffered = HERO.buffer; }
+  // A finger has no button to hold, so a tap jumps full height.
+  jump(full = false) { this.buffered = HERO.buffer; this.full = full; }
+  private full = false;
   release() { this.holding = false; }
   hop(v = 4) { if (this.body.ground) { this.body.vy = v; this.body.ground = false; this.squash.x = 1.12; } }
   kick(vx: number, vy = 0) { this.body.vx += vx; if (vy) { this.body.vy = vy; this.body.ground = false; } }
@@ -91,7 +93,7 @@ export class Hero {
     this.coyote = b.ground ? H.coyote : Math.max(0, this.coyote - dt);
     if (this.buffered > 0) {
       this.buffered -= dt;
-      if (this.coyote > 0 && !this.frozen) { b.vy = H.jump; b.ground = false; this.coyote = 0; this.buffered = 0; this.holding = true; this.squash.x = .78; this.squash.kick(6); this.onJump?.(); }
+      if (this.coyote > 0 && !this.frozen) { b.vy = H.jump; b.ground = false; this.coyote = 0; this.buffered = 0; this.holding = !this.full; this.squash.x = .78; this.squash.kick(6); this.onJump?.(); }
     }
     if (this.holding && !holdA && b.vy > 0) { b.vy *= H.cut; this.holding = false; }
     const wasGround = b.ground, vy = b.vy;

@@ -50,7 +50,7 @@ export function station(i: number, width: number, look: StationLook, build: (k: 
       setTimeout(() => g.pins.show('title', `<span><b>${st.name}</b> · ${st.pin ?? st.role}</span>`, new THREE.Vector3(2, 3.3, 0), 'tag', 3800), 500);
     },
     exit(g: Game) { parts.forEach(p => p.exit?.(g)); },
-    camera(g: Game) { const lead = g.hero.facing * 2.2; g.stage.want = { x: Math.max(3.5, Math.min(x1 - 3.5, g.hero.body.x + lead)), y: 1.95, z: 0, dist: 16.5, pitch: .11, yaw: 0 }; },
+    camera(g: Game) { const hw = g.stage.halfWidth(16.5), lead = g.hero.facing * Math.min(2.2, hw * .4), lo = Math.min(3.5, hw - 2); g.stage.want = { x: Math.max(lo, Math.min(x1 - lo, g.hero.body.x + lead)), y: 1.95, z: 0, dist: 16.5, pitch: .11, yaw: 0 }; },
     update(dt: number, g: Game) {
       for (const p of parts) {
         p.update?.(dt, g);
