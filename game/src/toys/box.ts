@@ -8,7 +8,7 @@ import type { Rig, Tl } from './rig.ts';
 
 // Where he is this frame: his feet on the floor plan, how high he has jumped, how fast he is going (0..1).
 export type Hero = { x: number; z: number; y: number; speed: number };
-export type Ctx = { rig: Rig; fx: Fx; toys: Toys; hero: Hero; say(x: number, y: number, z: number, glyph: string): void; sfx(name: Sound, delay?: number): void };
+export type Ctx = { rig: Rig; fx: Fx; toys: Toys; hero: Hero; root: HTMLElement; say(x: number, y: number, z: number, glyph: string): void; sfx(name: Sound, delay?: number): void };
 export type Toybox = {
   // The toys changed (or, with `first`, the space has just opened: snap everything, play nothing).
   sync(c: Ctx, first: boolean): void;
@@ -16,6 +16,8 @@ export type Toybox = {
   frame?(c: Ctx, dt: number): void;
   // He has just come into reach of a stop: its toy stirs, so he sees what the A is for.
   near?(c: Ctx, stop: string): void;
+  // The space is going away: stop anything that would outlast it.
+  end?(): void;
 };
 // One toy's view. `read` picks its state out of the toys; `rest` stands the pieces where that state leaves them;
 // `play` builds the motion from one state to the next. A view with no `play` just snaps.

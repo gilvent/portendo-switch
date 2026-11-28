@@ -89,6 +89,8 @@ export default function Platform({ gate, arrived, near }: Props) {
         {/* The bored salaryman who used to be the player, dozing where he sits. */}
         <g transform={`translate(${sx(BENCH_X) - 31} ${320 - SEAT * .78}) scale(.78)`}><g className="pf-sleeper"><SalarymanArt seated /></g>
           <g className="pf-zz"><path d="M70 14H100Q106 14 106 20V38Q106 44 100 44H82L72 54V44H70Q64 44 64 38V20Q64 14 70 14Z" fill={CREAM} /><text x="85" y="37" textAnchor="middle" fontSize="20" fontWeight="600" fill={INK}>z</text></g>
+          {/* He starts awake when the train comes in, or when someone lands a jump beside him. */}
+          <g className="pf-oh"><path d="M70 14H100Q106 14 106 20V38Q106 44 100 44H82L72 54V44H70Q64 44 64 38V20Q64 14 70 14Z" fill={CREAM} /><text x="85" y="37" textAnchor="middle" fontSize="20" fontWeight="600" fill={CORAL}>!</text></g>
         </g>
         {/* The line map: two lines that meet here. Work runs across, Side projects runs down from the interchange. */}
         <g transform="translate(424 150)">
@@ -115,15 +117,15 @@ export default function Platform({ gate, arrived, near }: Props) {
           <rect x={sx(GATE_X) - 30} y="372" width="38" height="62" rx="5" fill="#f1f4f7" stroke={CREAM} strokeWidth="4" /><rect x={sx(GATE_X) - 30} y="372" width="38" height="14" rx="5" fill={STEEL} />
         </g>
         <rect x="-30" y="0" width="900" height="16" fill={STEEL} /><rect x="-30" y="16" width="900" height="5" fill="#2c3138" />
-        {/* The station's name board: whose station this is. */}
-        <g filter="url(#pf-shadow)">
+        {/* The station's name board: whose station this is. Both boards hang from the roof and swing in the train's wind. */}
+        <g filter="url(#pf-shadow)" className="pf-hang">
           <path d="M182 16V34M418 16V34" stroke={STEEL} strokeWidth="5" />
           <rect x="150" y="32" width="300" height="72" rx="7" fill={CREAM} stroke="#fff" strokeWidth="5" />
           <rect x="150" y="88" width="300" height="8" fill={CORAL} /><rect x="150" y="96" width="300" height="8" fill={MINT} /><path d="M150 96H450V98Q450 104 443 104H157Q150 104 150 98Z" fill={MINT} />
           <text x="300" y="76" textAnchor="middle" fontSize="40" fontWeight="600" fill={INK} data-testid="station-name">Alvaro L.</text>
         </g>
         {/* The departure board: the time where the visitor is, and what to do next. */}
-        <g filter="url(#pf-shadow)">
+        <g filter="url(#pf-shadow)" className="pf-hang pf-hang-b">
           <path d="M618 16V30M800 16V30" stroke={STEEL} strokeWidth="5" />
           <rect x="590" y="28" width="238" height="60" rx="5" fill="#1b1408" stroke={STEEL} strokeWidth="5" />
           <text x="604" y="52" fontSize="18" fontWeight="600" fill="#ffb648">{two(now.getHours())}:{two(now.getMinutes())}</text>
@@ -131,6 +133,8 @@ export default function Platform({ gate, arrived, near }: Props) {
           <text key={status} className="pf-status" x="604" y="76" fontSize="15" fontWeight="600" fill="#ffd89a" data-testid="platform-status">{status}</text>
         </g>
       </g>
+      {/* Scraps of paper blown along the platform by the train coming in. */}
+      <g className="pf-wind">{[[336, CREAM, 0], [352, CORAL, .16], [328, '#dfe5ea', .3], [360, SUN, .44], [344, CREAM, .58], [332, MINT, .7]].map(([y, c, d], i) => <rect key={i} className="pf-scrap" x="-30" y={y} width={i % 2 ? 9 : 12} height={i % 2 ? 9 : 7} fill={c as string} style={{ animationDelay: `${.5 + (d as number)}s` }} />)}</g>
       <rect className="pf-wash" x="-30" y="0" width="900" height="480" fill={light.wash} />
     </svg>
   );

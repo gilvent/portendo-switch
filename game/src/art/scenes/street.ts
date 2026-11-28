@@ -1,10 +1,8 @@
 import { add, backOf, box, hinged, normal, on, slot, yaw, type Panel, type Scene, type V3 } from '../kit.ts';
 import { BLUE, CORAL, CREAM, DEEP, FOLIAGE, INK, SUN, cloud, parcel, reseed, scallopTop, specks } from '../recipes.ts';
-import { heroPanels } from './_hero.ts';
 import { bench, bin, bush, carved, clothesStall, fat, fawning, fbalcony, fblade, fbox, festoon, fflat, fflowers, flagPole, flamp, frame, FROND, palm, riverView, scooter, bicycle, pigeon, tone, parasolTable, planter, plaza, riverGate, scallopBlob, shadeTree, shopper, ticketKiosk } from './promenade.ts';
 
-const MINT = '#35b58a', PLUM = '#7c6be0', WARM = '#ffe7a8', LEAF = '#57b36f';
-const SHOP = { x: 150, z: -80, w: 720, d: 300, ground: 230, upper: 150, peak: 120 };
+export const MINT = '#35b58a', PLUM = '#7c6be0', WARM = '#ffe7a8', LEAF = '#57b36f';
 
 // Seeded noise for the far layers, so each rebuild cuts the same city.
 let far = 1;
@@ -34,7 +32,7 @@ function blocks(w: number, h: number, seed: number, lo: number, hi: number, minW
 // Gulls over the river.
 const birds = (pts: [number, number, number][]) => pts.map(([x, y, k]) => `<path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6Q18 3 12 9Q6 3 0 6Z" fill="#fdfcf8"/><path transform="translate(${x} ${y}) scale(${k})" d="M0 6Q6 0 12 6Q18 0 24 6" stroke="#5d6670" stroke-width="1.2" fill="none"/>`).join('');
 // Open surroundings: sky, clouds and gulls, then the city's offices and malls beyond the far bank, pale to deep.
-function backdrop(): Panel[] {
+export function backdrop(): Panel[] {
   reseed(11);
   const FAR = .72;
   const card = (id: string, z: number, y: number, w: number, h: number, c: string, mask: string, print = ''): Panel => ({ id, stock: 'sugar', c, w, h, o: [-w / 2 + 120, y, z], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: FAR, mask, print });
@@ -52,52 +50,14 @@ function backdrop(): Panel[] {
     ...[card('city-haze', -780 + 40, 0, 4400, 700, '#c4e1ee', hazeCity.mask, hazeCity.print), card('city-far', -780 + 100, 0, 4200, 640, '#9cc6d9', farCity.mask, farCity.print), card('city-mid', -780 + 170, 0, 3900, 520, '#7fb2c4', midCity.mask, midCity.print)].map(p => ({ ...p, decal: 'sky' }))
   ];
 }
-function windowBox(id: string, parent: Panel, x: number, y: number, w: number, h: number, goods: string, cols: number, rows: number, gap = 18): Panel[] {
+export function windowBox(id: string, parent: Panel, x: number, y: number, w: number, h: number, goods: string, cols: number, rows: number, gap = 18): Panel[] {
   const inner: Panel = { id: `${id}-room`, stock: 'cover', c: '#f4cf8c', w: w + 10, h: h + 10, o: add(add(add(parent.o, parent.u, x - 5), parent.v, y - 5), [0, 0, -gap]), u: parent.u, v: parent.v, edge: 'fold', emit: .34, print: goods, density: 1.5, decal: parent.id };
   const bar = 5, pw = (w - bar * (cols - 1)) / cols, ph = (h - bar * (rows - 1)) / rows, panes: [number, number, number, number][] = [];
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) panes.push([7 + c * (pw + bar), 7 + r * (ph + bar), pw, ph]);
   return [inner, on(parent, 1.2, x - 7, y - 7, w + 14, h + 14, { id: `${id}-frame`, stock: 'cover', c: CREAM, density: 1.5, mask: slot(w + 14, h + 14, ...panes) })];
 }
-// Upstairs is the store-room: through its windows, plank walls, stacked parcels and the review board.
-const upstairs = (i: number) => `<rect width="106" height="72" fill="#a0805f"/><path d="M26 0V72M54 0V72M82 0V72" stroke="#7a5e44" stroke-width="2"/>` + [
-  `<rect x="8" y="40" width="34" height="32" fill="${'#b98450'}"/><rect x="22" y="40" width="6" height="32" fill="#d9b781"/><rect x="40" y="50" width="28" height="22" fill="${CORAL}"/><rect x="14" y="20" width="26" height="20" fill="#b98450"/>`,
-  `<rect x="14" y="10" width="78" height="44" fill="#c89a62"/><g fill="#fbf7ee"><rect x="20" y="15" width="20" height="16"/><rect x="44" y="15" width="20" height="16"/><rect x="68" y="15" width="20" height="16"/><rect x="20" y="35" width="20" height="16"/><rect x="44" y="35" width="20" height="16"/></g>`,
-  `<rect x="60" y="34" width="38" height="38" fill="#b98450"/><rect x="76" y="34" width="6" height="38" fill="#d9b781"/><rect x="12" y="12" width="40" height="30" fill="#e9dcc4"/><g fill="#7fbf6a"><rect x="16" y="16" width="14" height="10"/><rect x="34" y="16" width="14" height="10"/></g>`][i];
-function shop(): Panel[] {
-  const { x, z, w, d, ground: g, upper, peak } = SHOP, h = g + upper, H = h + peak, density = 1.25;
-  const door = { x: w / 2 - 68, w: 136, h: 190 };
-  const win = [[60, 44, 210, 140], [450, 44, 210, 140]] as const;
-  const up = [[116, 298, 96, 62], [312, 298, 96, 62], [508, 298, 96, 62]] as const;
-  const shape = `<path fill-rule="evenodd" d="M0 ${H}V${peak}L${w / 2} 0L${w} ${peak}V${H}Z ${[...win, ...up].map(([a, b, c, e]) => `M${a} ${H - b}V${H - b - e}H${a + c}V${H - b}Z`).join(' ')} M${door.x} ${H}V${H - door.h}H${door.x + door.w}V${H}Z" fill="#fff"/>`;
-  const clap = Array.from({ length: 18 }, (_, i) => `<path d="M0 ${peak + (i + 1) * 21}H${w}" stroke="#0577b4" stroke-width="2"/>`).join('');
-  const front: Panel = { id: 'shop-front', stock: 'cover', c: BLUE, w, h: H, o: [x - w / 2, 0, z], u: [1, 0, 0], v: [0, 1, 0], density, edge: 'cut', mask: shape, print: clap + `<rect y="${H - g - 4}" width="${w}" height="10" fill="${CREAM}"/><rect y="${H - 16}" width="${w}" height="16" fill="${DEEP}"/>` };
-  const goodsL = `<rect x="44" y="96" width="44" height="68" fill="${CORAL}"/><rect x="102" y="112" width="58" height="52" fill="${MINT}"/><rect x="176" y="88" width="24" height="76" fill="#1d2228"/><rect x="179" y="92" width="18" height="60" fill="#bfe6f8"/>`;
-  const goodsR = `<rect x="34" y="104" width="46" height="60" fill="${PLUM}"/><rect x="96" y="84" width="60" height="80" fill="${SUN}"/><rect x="170" y="88" width="24" height="76" fill="#1d2228"/><rect x="173" y="92" width="18" height="60" fill="#ffd3a8"/>`;
-  const windows = [...windowBox('win-l', front, win[0][0], win[0][1], win[0][2], win[0][3], goodsL, 2, 2), ...windowBox('win-r', front, win[1][0], win[1][1], win[1][2], win[1][3], goodsR, 2, 2),
-    ...up.flatMap(([a, b, c, e], i) => windowBox(`win-up${i}`, front, a, b, c, e, upstairs(i), 2, 1, 10))];
-  const doorRoom: Panel = { id: 'door-room', stock: 'cover', c: '#ffdf9e', w: door.w + 16, h: door.h + 8, o: [x - door.w / 2 - 8, 0, z - 22], u: [1, 0, 0], v: [0, 1, 0], edge: 'fold', emit: 1, density };
-  const leaf = (id: string, ox: number, edge: 'left' | 'right', deg: number): Panel => hinged({ id, stock: 'cover', c: DEEP, w: door.w / 2, h: door.h, o: [ox, 0, z + .8], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density, motion: { when: 'shop-door', edge, deg: edge === 'left' ? 74 : -74 }, mask: slot(door.w / 2, door.h, [12, 14, door.w / 2 - 24, 150]), print: '' }, edge, deg);
-  const walls = box({ id: 'shop-body', x, z: z - d / 2, w, h, d, stock: 'cover', c: BLUE, noTop: true, right: clap, left: clap }).filter(p => !p.id.endsWith('front')).map(p => ({ ...p, density: 1 }));
-  const rise = Math.hypot(w / 2 + 26, peak * (w / 2 + 26) / (w / 2)), a = Math.atan2(peak, w / 2), ridge: V3 = [x, H + 2, z + 18], rd = d + 40;
-  const roof = (id: string, s: 1 | -1): Panel[] => {
-    const dn: V3 = [s * Math.cos(a), -Math.sin(a), 0], base: Panel = s < 0 ? { id, stock: 'cover', c: DEEP, w: rise, h: rd, o: add(ridge, dn, rise), u: [-dn[0], -dn[1], -dn[2]], v: [0, 0, -1], edge: 'cut', density: 1 } : { id, stock: 'cover', c: DEEP, w: rise, h: rd, o: ridge, u: dn, v: [0, 0, -1], edge: 'cut', density: 1 };
-    const lip: Panel = { id: `${id}-lip`, stock: 'cover', c: CREAM, w: rise, h: 8, o: add(s < 0 ? add(ridge, dn, rise) : ridge, [0, -8, 0]), u: base.u, v: [0, 1, 0], edge: 'fold', density: 1.4 };
-    return [{ ...base, print: Array.from({ length: 13 }, (_, i) => `<path d="M${(i + 1) * rise / 14} 0V${rd}" stroke="${tone(DEEP, -.3)}" stroke-width="3"/>`).join('') }, lip];
-  };
-  const stripe = Array.from({ length: 8 }, (_, i) => `<rect x="${i * 88}" width="44" height="66" fill="${CREAM}"/>`).join('');
-  const awningTop: Panel = { id: 'awning', stock: 'cover', c: CORAL, w: 690, h: 66, o: [x - 345, g - 42, z + 60], u: [1, 0, 0], v: [0, .75, -.66], edge: 'fold', density: 1.6, print: stripe };
-  const awningLip: Panel = { id: 'awning-lip', stock: 'cover', c: CORAL, w: 690, h: 22, o: [x - 345, g - 64, z + 60], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 1.6, mask: `<path d="M0 22H690V10${Array.from({ length: 20 }, () => 'a17.5 12 0 0 0 -35 0').join('')}Z" transform="matrix(1 0 0 -1 0 22)" fill="#fff"/>`, print: Array.from({ length: 8 }, (_, i) => `<rect x="${i * 88}" width="44" height="22" fill="${CREAM}"/>`).join('') };
-  const signBoard: Panel = { id: 'shop-sign', stock: 'cover', c: CREAM, w: 220, h: 58, o: [x - 110, g + 4, z + 10], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 3, mask: `<rect width="220" height="58" rx="8" fill="#fff"/>`, print: `<image href="/PUBLIC/img/brand/blibli-logo.png" x="30" y="4" width="160" height="50" preserveAspectRatio="xMidYMid meet"/>` };
-  const signSide: Panel = { id: 'shop-sign-top', stock: 'cover', c: '#e9dcc4', w: 220, h: 10, o: [x - 110, g + 62, z + 10], u: [1, 0, 0], v: [0, 0, -1], edge: 'fold', density: 2 };
-  const roundel: Panel = on(front, 1, w / 2 - 26, H - 72 - 26, 52, 52, { id: 'gable-roundel', stock: 'cover', c: CREAM, mask: '<circle cx="26" cy="26" r="26" fill="#fff"/>', print: `<circle cx="26" cy="26" r="17" fill="${WARM}"/><path d="M26 9V43M9 26H43" stroke="${CREAM}" stroke-width="4"/>` });
-  // Relief on the front: window boxes under the upstairs windows, lanterns by the door, a blade sign on the corner.
-  const F = frame(x - w / 2, z, 0);
-  const dress = carved(front, [...up.flatMap(([a], i) => fflowers(F, `shop-flowers${i}`, a - 4, g + 56, 104)), ...flamp(F, 'shop-lamp-l', door.x - 30, 120), ...flamp(F, 'shop-lamp-r', door.x + door.w + 14, 120),
-    ...fblade(F, 'shop-blade', w - 24, g + 60, 64, 64, CREAM, `<circle cx="32" cy="32" r="28" fill="${BLUE}"/><path d="M20 24h24l-3 20h-18Z" fill="${CREAM}"/><path d="M26 24q6 -10 12 0" stroke="${CREAM}" stroke-width="3" fill="none"/>`, '<circle cx="32" cy="32" r="32" fill="#fff"/>')]);
-  return [front, ...dress, ...walls, ...windows, doorRoom, leaf('door-l', x - door.w / 2, 'left', 0), leaf('door-r', x, 'right', 0), ...roof('shop-roof-l', -1), ...roof('shop-roof-r', 1), awningTop, awningLip, signBoard, roundel];
-}
 // Main space: freestanding street furniture and passers-by, each a real fold or a stand-up cut card.
-const card = (id: string, x: number, z: number, w: number, h: number, c: string, rest: Partial<Panel> = {}, rot = 0, y = 0): Panel => { const r = yaw(rot); return { id, stock: 'cover', c, w, h, o: add([x, y, z], r([-w / 2, 0, 0])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.4, ...rest }; };
+export const card = (id: string, x: number, z: number, w: number, h: number, c: string, rest: Partial<Panel> = {}, rot = 0, y = 0): Panel => { const r = yaw(rot); return { id, stock: 'cover', c, w, h, o: add([x, y, z], r([-w / 2, 0, 0])), u: r([1, 0, 0]), v: [0, 1, 0], edge: 'cut', density: 1.4, ...rest }; };
 function streetLamp(id: string, x: number, z: number, h: number, head: string, rot = 0): Panel[] {
   return [...box({ id: `${id}-post`, x, z, w: 10, h, d: 10, stock: 'greyboard', c: '#3d444e', noTop: true }),
     card(`${id}-arm`, x + 18, z, 46, 8, '#3d444e', { stock: 'greyboard' }, rot, h - 10),
@@ -108,7 +68,7 @@ function passerBy(id: string, x: number, z: number, coat: string, bag: string, f
   const body = `M22 176V120H14V64Q14 44 30 42Q20 36 22 22Q24 4 36 4Q50 4 50 22Q51 36 42 42Q58 44 58 64V100H70V140H50V176H40V128H32V176Z`;
   return card(id, x, z, w, h, coat, { density: 2, mask: `<g transform="scale(${k}) ${flip ? 'translate(74 0) scale(-1 1)' : ''}"><path d="${body}" fill="#fff"/></g>`, print: `<g transform="scale(${k}) ${flip ? 'translate(74 0) scale(-1 1)' : ''}"><rect width="74" height="44" fill="#f3c9a0"/><path d="M20 4Q36 -6 52 8V18Q36 10 20 18Z" fill="#3a2a1a"/><rect y="44" width="74" height="80" fill="${coat}"/><rect x="48" y="100" width="24" height="40" fill="${bag}"/><rect x="22" y="124" width="30" height="52" fill="#3f4a5c"/></g>` });
 }
-function dressing(): Panel[] {
+export function dressing(): Panel[] {
   const postFace = '#3d444e';
   const board = [...box({ id: 'board-post', x: 592, z: -34, w: 12, h: 120, d: 12, stock: 'greyboard', c: postFace, noTop: true }),
     ...box({ id: 'board', x: 592, z: -34, y: 120, w: 160, h: 82, d: 14, stock: 'cover', c: CREAM, noTop: true, front: `<rect x="5" y="5" width="150" height="72" fill="none" stroke="${BLUE}" stroke-width="2.5"/><text x="80" y="50" text-anchor="middle" font-family="Fredoka" font-weight="600" font-size="24" fill="${DEEP}">Blibli.com</text>` })];
@@ -137,7 +97,7 @@ function dressing(): Panel[] {
 /* ---------- the promenade around the shop ---------- */
 // Enclosed surroundings: the buildings closing the plaza on the left, right and back right, each a flat facade dressed
 // in carved relief (stalls, awnings, balconies, signs, lamps, window boxes). Open surroundings: the river gate.
-function surroundings(): Panel[] {
+export function surroundings(): Panel[] {
   // Left: a white two-storey waterfront building with a souvenir stall, a boat-tour office and a balcony restaurant.
   const L = frame(-940, 270, 78), LW = 550, LH = 430;
   const lFront: Panel = { id: 'left-front', stock: 'cover', c: '#f4ece0', w: LW, h: LH, o: L.o, u: L.u, v: [0, 1, 0], edge: 'cut', density: .9,
@@ -188,8 +148,8 @@ function surroundings(): Panel[] {
   const palms = [...palm('palm-a', -760, 200, 380, 24, 10), ...planter('palm-a-bed', -760, 200, 96), ...palm('palm-b', -400, -230, 420, -26, 40), ...planter('palm-b-bed', -400, -230, 96),
     ...palm('palm-c', 880, -170, 400, -20, 70), ...planter('palm-c-bed', 880, -170, 96)];
   // String lights from the white building to the café, over the walk.
-  const la = fat(L, 140, 360, 4), lb = fat(L, 470, 380, 4), ra = fat(R, 470, 360, 4), rb = fat(R, 150, 380, 4);
-  const lights = [festoon('lights-a', la, [ra[0], la[1], ra[2]], 70), festoon('lights-b', lb, [rb[0], lb[1], rb[2]], 60), festoon('lights-c', [430, 400, -60], [fat(R, 330, 400, 4)[0], 400, fat(R, 330, 400, 4)[2]], 40)];
+  const la = fat(L, 140, 408, 4), lb = fat(L, 470, 420, 4), ra = fat(R, 470, 392, 4), rb = fat(R, 150, 396, 4);
+  const lights = [festoon('lights-a', la, [ra[0], la[1], ra[2]], 40), festoon('lights-b', lb, [rb[0], lb[1], rb[2]], 34), festoon('lights-c', [430, 400, -60], [fat(R, 330, 400, 4)[0], 400, fat(R, 330, 400, 4)[2]], 40)];
   return [lFront, lEnd, ...lRelief, rFront, ...rRelief, bFront, ...bRelief, ...gate, ...palms, ...lights, ...riverView(),
     ...ticketKiosk('ticket', -800, -60, 62), ...clothesStall('clothes', 720, -190),
     ...parasolTable('cafe-a', 790, 150, '#d8322f'), ...parasolTable('cafe-b', 930, 20, CREAM, 1),
@@ -206,14 +166,3 @@ function surroundings(): Panel[] {
     ...shopper('shopper-e', -180, 40, { coat: '#2bb5b8', legs: '#c8915a', skin: '#a8714f', hair: '#1d1a17', style: 'shorts', pack: CORAL, hat: '#f4f1ea' , build: 'average', face: 'cool'}, true, .95, 0, false)];
 }
 const unitV = (a: V3): V3 => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2] / l]; };
-export function street(): Scene {
-  const panels = heroPanels().filter(p => !p.id.startsWith('tuft-3') && p.id !== 'post-top').map(p => {
-    if (p.id.startsWith('foot-')) return { ...p, decal: 'lawn' };
-    if (p.id === 'slot-flap') return { ...p, motion: { when: 'mailbox', edge: 'top', deg: -38 } as Panel['motion'] };
-    if (p.id === 'letter') return { ...p, motion: { when: 'mailbox', slide: [0, -14, 0] as V3 } };
-    if (p.id === 'flag') return { ...p, motion: { when: 'mailbox', edge: 'left', deg: -20 } as Panel['motion'] };
-    if (p.id === 'playwright-flap-l') return { ...p, motion: { when: 'parcels', edge: 'left', deg: -30 } as Panel['motion'] };
-    return p;
-  });
-  return { id: 'street', density: 2.1, camera: { zoom: 1, x0: -300, x1: 300 }, light: { sun: 2.6, sky: .62, skyColor: [.86, .92, 1] }, panels: [...backdrop(), ...plaza(), ...surroundings(), ...shop(), ...dressing().filter(p => !/^(trunk|crown|lamp-|hydrant|bin-|walker-|shrub-e)/.test(p.id) && !/^bin$/.test(p.id)), ...panels] };
-}

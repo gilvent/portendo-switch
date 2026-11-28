@@ -16,7 +16,7 @@ export function greyManifest(scene: Scene): Manifest {
   const far = new Set(scene.panels.filter(p => p.backdrop).map(p => p.id));
   const quads: Quad[] = scene.panels.filter(p => !p.ghost && !far.has(p.id) && !(p.decal && far.has(p.decal))).map(p => {
     const k = shade(p), plain = !p.mask && !p.print;
-    return { id: p.id, o: [...p.o], u: [...p.u], v: [...p.v], w: p.w, h: p.h, x: 0, y: 0, pw: p.w, ph: p.h, c: p.c, solid: !p.mask, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, actor: p.actor ?? null, tint: p.tint ?? null, shade: k, img: plain || p.tint ? undefined : picture(p, k) };
+    return { id: p.id, o: [...p.o], u: [...p.u], v: [...p.v], w: p.w, h: p.h, x: 0, y: 0, pw: p.w, ph: p.h, c: p.c, solid: !p.mask, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, actor: p.actor ?? null, tint: p.tint ?? null, round: p.round, shade: k, img: plain || p.tint ? undefined : picture(p, k) };
   });
   return { atlas: { w: 1, h: 1 }, runs: scene.runs ?? [], quads, actors: scene.actors };
 }

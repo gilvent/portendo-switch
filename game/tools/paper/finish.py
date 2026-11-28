@@ -196,7 +196,7 @@ def seen(p):
     return any(np.dot(np.array(p["n"]), cam - c) > 0 for cam in CAMERAS for c in corners)
 
 
-keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group", "show")
+keys = ("id", "o", "u", "v", "w", "h", "x", "y", "pw", "ph", "c", "solid", "motion", "group", "show", "actor", "tint", "round")
 def tiles(q, n):
     if n <= 1:
         return [q]
@@ -216,6 +216,6 @@ for p in L["panels"]:
     if p["backdrop"]:
         crop = rgb[p["y"]:p["y"] + p["ph"], p["x"]:p["x"] + p["pw"]]
         Image.fromarray((crop * 255 + 0.5).astype(np.uint8), "RGB").save(OUT / "backdrop.webp", quality=78, method=6)
-manifest = {"atlas": L["atlas"], "runs": L["runs"], "quads": quads}
+manifest = {"atlas": L["atlas"], "runs": L["runs"], "quads": quads, "actors": L.get("actors", {})}
 (OUT / "manifest.json").write_text(json.dumps(manifest, separators=(",", ":")))
 print(L["id"], "quads", len(quads), "atlas", L["atlas"]["w"], L["atlas"]["h"], "kb", (OUT / "atlas.webp").stat().st_size // 1024)

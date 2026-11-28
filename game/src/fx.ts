@@ -23,6 +23,8 @@ export type Fx = {
   shake(px: number): void;
   // Every sheet whose id starts with `prefix` hops `lift` units together.
   jolt(prefix: string, lift?: number): void;
+  // Every sheet whose id starts with `prefix` is thrown `dx` units sideways and comes back, as loose things do when a train brakes.
+  shove(prefix: string, dx: number): void;
   // Set by the scene: called every frame with where he is, for the toys that work on presence (toys/box.ts).
   frame?: (x: number, z: number, y: number, speed: number, dt: number) => void;
 };
@@ -60,6 +62,7 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
   const fx: Fx = {
     flash() { if (!reducedMotion()) white.animate({ opacity: [.92, .7, .3, 0] }, { duration: 300, easing: 'steps(4,end)' }); },
     shake(px) { if (!reducedMotion()) stage?.animate({ translate: ['0 0', `${px}px ${-px}px`, `${-px * .6}px ${px * .5}px`, `${px * .3}px 0`, '0 0'] }, { duration: 220, easing: 'steps(5,end)' }); },
+    shove(prefix, dx) { if (!reducedMotion()) for (const el of scene.querySelectorAll<HTMLElement>(`.pp[data-q^="${prefix}"]`)) el.animate({ translate: ['0 0', `${dx}px 0`, `${(-dx * .3).toFixed(1)}px 0`, '0 0'] }, { duration: 620, easing: 'steps(9,end)' }); },
     jolt(prefix, lift = 7) { if (!reducedMotion()) jump(scene.querySelectorAll<HTMLElement>(`.pp[data-q^="${prefix}"]`), lift); },
     dust(x, z, dir, n = 2) {
       if (reducedMotion()) return;

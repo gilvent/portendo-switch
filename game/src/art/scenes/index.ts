@@ -1,5 +1,6 @@
 import type { Scene } from '../kit.ts';
-import { shop, storeroom } from './rooms.ts';
-import { street } from './street.ts';
+import { floor } from './blibli/floor.ts';
+import { front } from './blibli/front.ts';
 import { train } from './train.ts';
-export const SCENES: Record<string, Scene> = { street: street(), shop: shop(), storeroom: storeroom(), train: train() };
+// The spaces that are baked (tools/paper/build.ts), by their art id.
+export const SCENES: Record<string, Scene> = { street: front(), shop: floor(), train: train() };

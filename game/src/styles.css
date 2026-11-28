@@ -390,3 +390,20 @@ button { font:inherit; cursor:pointer; }
 .actor-rig { will-change:transform; }
 .actor-shadow { position:absolute; left:0; top:0; display:block; border-radius:50%; background:rgba(10,13,18,.26); box-shadow:0 0 8px 5px rgba(10,13,18,.12); pointer-events:none; transform:translate3d(0,var(--drop),0) rotateX(90deg); }
 .flash { position:absolute; inset:0; z-index:5; background:#fffdf4; opacity:0; pointer-events:none; }
+/* ---------- the platform, felt: the train's wind, the boards it swings, the sleeper it wakes ---------- */
+.pf-hang { transform-box:fill-box; transform-origin:50% 0; }
+[data-train="coming"] .pf-hang { animation:pf-swing 2.6s .7s ease-in-out both; }
+[data-train="coming"] .pf-hang-b { animation-delay:.95s; animation-duration:2.3s; }
+@keyframes pf-swing { 0%,100% { transform:none; } 14% { transform:rotate(2.4deg); } 32% { transform:rotate(-1.8deg); } 50% { transform:rotate(1.2deg); } 68% { transform:rotate(-.7deg); } 84% { transform:rotate(.3deg); } }
+.pf-scrap { opacity:0; transform-box:fill-box; transform-origin:50% 50%; }
+[data-train="coming"] .pf-scrap { animation:pf-blow 1.5s steps(14,end) both; }
+@keyframes pf-blow { 0% { opacity:1; transform:translate(0,0) rotate(0); } 60% { opacity:1; transform:translate(560px,-34px) rotate(500deg); } 100% { opacity:0; transform:translate(900px,-10px) rotate(840deg); } }
+[data-train="coming"].platform { animation:pf-rumble 1s .9s steps(10,end) both; }
+@keyframes pf-rumble { 0%,100% { translate:0 0; } 20% { translate:1.2px -.8px; } 40% { translate:-1px .9px; } 60% { translate:.9px .6px; } 80% { translate:-.6px -.5px; } }
+.pf-oh { opacity:0; transform-box:fill-box; transform-origin:0 100%; }
+[data-train="coming"] .pf-oh { animation:pf-zz 1.2s 1.2s steps(10,end) both; }
+[data-startle] .pf-oh { animation:pf-zz 1.2s steps(10,end) both; }
+[data-startle] .pf-zz,[data-train="coming"] .pf-zz { animation:none; }
+[data-startle] .pf-sleeper { animation:pf-start .5s steps(6,end); }
+@keyframes pf-start { 30% { transform:translateY(-9px) scaleY(1.06); } 60% { transform:translateY(0) scaleY(.94); } }
+@media (prefers-reduced-motion:reduce) { .pf-hang,.pf-scrap,.pf-oh,[data-train="coming"].platform,[data-startle] .pf-sleeper { animation:none !important; } }

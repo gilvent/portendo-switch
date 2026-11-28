@@ -54,6 +54,7 @@ export default function App() {
     const here = gameRef.current.place;
     // On the platform: the gate opens once and stays open, and the doors take him only when the train is standing.
     if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && here.near && (here.stop === 'gate' ? gameRef.current.toys['intro/gate'] === 1 : !trainIn.current)) return;
+    if (x.a === 'confirm' && here.k === 'walk' && here.world === 'intro' && !here.near && gameRef.current.controller.mode === 'handheld') { hero.current.jump = true; return; }
     if (x.a === 'confirm' && here.k === 'letter') {
       // A turns the catalog's leaves; on any other letter it puts the letter down, like B.
       const l = stopOf(content, here.world, here.stop)?.action, turns = l?.kind === 'letter' && content.worlds[here.world].letters.find(k => k.id === l.letter)?.blocks.some(k => k.kind === 'specSheet');
@@ -84,6 +85,7 @@ export default function App() {
       if (door?.action.kind === 'ride') {
         const later = (ms: number, f: () => void) => { timers.current.push(window.setTimeout(f, ms)); };
         busy.current = true; held.current.clear(); target.current = null;
+        hero.current.kick = 15; hero.current.sy = .9; hero.current.vs = 2;
         setArrival(1);
         later(450, () => setArrival(2));
         later(950, () => { exit.current = { x: door.x, z: -205, then: () => {
@@ -283,7 +285,8 @@ export default function App() {
       if (p.world === 'intro') {
         const el = introRef.current, screen = el?.parentElement;
         if (el && screen) {
-          el.style.transform = `translate3d(${((n.x + 420) / 840 * 100).toFixed(2)}cqw,${-bob}px,0)`;
+          el.style.transform = `translate3d(${((n.x + 420) / 840 * 100).toFixed(2)}cqw,${(-bob - h.y * .5).toFixed(1)}px,0) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
+          if (h.y > 0 && Math.abs(n.x - BENCH_X) < 70 && !screen.hasAttribute('data-startle')) { screen.setAttribute('data-startle', ''); sound('pop'); window.setTimeout(() => screen.removeAttribute('data-startle'), 1300); }
           // The toy theatre's layers slide against each other as he crosses; he turns over like a card; the sleeper stirs.
           screen.style.setProperty('--par', (n.x / 420).toFixed(3)); el.style.setProperty('--f', String(facing.current)); el.dataset.face = String(facing.current);
           screen.toggleAttribute('data-near-bench', Math.abs(n.x - BENCH_X) < 44);
@@ -346,6 +349,7 @@ export default function App() {
     teleport('mrt', s);
     // He comes up the aisle from the left and stops at the doors.
     walker.current = reducedMotion() ? { x: s.x, z: s.z, vx: 0, vz: 0 } : { x: s.x - 260, z: 50, vx: 0, vz: 0 };
+    hero.current.kick = -12;
     dispatch({ a: 'dockDone' });
     if (!reducedMotion()) target.current = { stop: s, open: false };
   }, [dispatch, teleport]);

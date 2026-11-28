@@ -159,7 +159,8 @@ def build(name, panels, phantom):
 # (finish.py lights them evenly and works out the shadows they throw on each other itself).
 BY_ID = {p["id"]: p for p in L["panels"]}
 far = lambda p: bool(p.get("backdrop") or (p.get("decal") and BY_ID[p["decal"]].get("backdrop")))
-is_phantom = lambda p: bool(p.get("show") or p.get("group") or far(p))
+# An actor is moved by a toy script at run time, so it is a phantom too: lit where it rests, casting no shadow there.
+is_phantom = lambda p: bool(p.get("show") or p.get("group") or p.get("actor") or far(p))
 solid_panels = [p for p in L["panels"] if not is_phantom(p)]
 phantom_panels = [p for p in L["panels"] if is_phantom(p)]
 objs = [build("paper", solid_panels, False)]

@@ -6,7 +6,7 @@ export const at = (x: number, z: number, y = 0, rot = 0) => ({ transform: `trans
 
 // actor: the live group a toy script moves (toys/rig.ts). tint: the sheet's colour follows a toy's state. img: the
 // sheet's own picture, when the scene is drawn unbaked (grey.ts) and there is no atlas.
-export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null; show?: Show | null; actor?: string | null; tint?: Tint | null; img?: string; shade?: number };
+export type Quad = { id: string; o: number[]; u: number[]; v: number[]; w: number; h: number; x: number; y: number; pw: number; ph: number; c: string; solid: boolean; motion: Motion | null; group: string | null; show?: Show | null; actor?: string | null; tint?: Tint | null; round?: number; img?: string; shade?: number };
 // A toy's state by name. A scene sees its own world's toys under their short names and every world's under
 // `world/toy`, so a sheet outside the shop can follow a choice made inside it.
 export type Toys = Record<string, number>;
@@ -41,7 +41,7 @@ function quadStyle(q: Quad, url: string, atlas: Manifest['atlas'], origin?: read
     : url ? { backgroundImage: `url(${url})`, backgroundPosition: `${-q.x}px ${-q.y}px`, backgroundSize: `${atlas.w}px ${atlas.h}px`, backgroundColor: tint ?? (q.solid ? q.c : undefined), backgroundBlendMode: tint ? 'multiply' : undefined }
     : { backgroundColor: shaded(tint ?? q.c, q.shade) };
   return {
-    width: q.pw, height: q.ph, ...paint,
+    width: q.pw, height: q.ph, ...paint, borderRadius: q.round ? q.round * q.pw / q.w : undefined,
     ...(q.motion?.spin ? { transform: rest, '--a': `${rest} ${spun(q, 0)}`, '--b': `${rest} ${spun(q, -360)}`, animationDuration: `${q.motion.spin}s` } as CSSProperties : q.motion?.swing ? { transform: rest, '--a': `${rest} ${swung(q, -q.motion.swing)}`, '--b': `${rest} ${swung(q, q.motion.swing)}` } as CSSProperties : q.motion ? { '--rest': rest, '--on': `${rest} ${moved(q, q.motion)}` } as CSSProperties : { transform: rest })
   };
 }
@@ -113,7 +113,7 @@ export function PaperScene({ manifest, url, near, toys, art }: { manifest: Manif
       <StaticQuads m={manifest} url={url} amb={amb} />
       {manifest.quads.filter(q => free(q) && !q.motion && !q.group && !q.show && q.tint).map(q => <i key={q.id} className="pp" data-q={q.id} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas, undefined, toys)} />)}
       {manifest.quads.filter(q => free(q) && !q.motion && !q.group && q.show && shown(q, toys)).map(q => <i key={q.id} className="pp pop" {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas, undefined, toys)} data-testid={`show-${q.id}`} />)}
-      {manifest.quads.filter(q => free(q) && q.motion?.swing).map((q, i) => <i key={q.id} className="pp swings" style={{ ...quadStyle(q, url, manifest.atlas), animationDelay: `${-(i * 0.37 % 1.4).toFixed(2)}s` }} />)}
+      {manifest.quads.filter(q => free(q) && q.motion?.swing).map((q, i) => <i key={q.id} className="pp swings" data-q={q.id} style={{ ...quadStyle(q, url, manifest.atlas), animationDelay: `${-(i * 0.37 % 1.4).toFixed(2)}s` }} />)}
       {manifest.quads.filter(q => free(q) && q.motion?.spin).map(q => <i key={q.id} className="pp spins" style={quadStyle(q, url, manifest.atlas)} />)}
       {manifest.quads.filter(q => free(q) && q.motion && !q.motion.swing && !q.motion.spin && shown(q, toys)).map(q => <i key={q.id} className={`pp moves${playing(q.motion!, near, toys) ? ' on' : ''}`} {...tag(q, amb)} style={quadStyle(q, url, manifest.atlas, undefined, toys)} data-testid={`move-${q.id}`} />)}
       <Runs m={manifest} url={url} />

@@ -10,7 +10,7 @@ const T: Record<string, Tech> = {
 };
 const stack = (items: Tech[]) => ({ id: 'stack', title: 'Tech Stack', surface: 'label' as const, blocks: [{ kind: 'tech' as const, items }] });
 const B = { x0: -700, x1: 700, z0: -220, z1: 170 };
-const out = (x = -700): Stop => ({ id: 'way-out', label: 'Back to the MRT', x, z: 120, reach: 100, action: { kind: 'road', to: 'mrt', stop: 'door' } });
+const out = (x = -700): Stop => ({ id: 'way-out', label: 'Back to the MRT', x, z: 120, reach: 90, action: { kind: 'road', to: 'mrt', stop: 'door' } });
 export const content: Content = validateContent({ worlds: {
   // The handheld's screen (Platform.tsx): the station platform. The gate opens on A, which calls the train; boarding
   // at its door docks the console. `gate` and `road-end` stand where Platform.tsx draws the gate and the door.
@@ -31,18 +31,18 @@ export const content: Content = validateContent({ worlds: {
         { label: 'Twitter', href: 'https://twitter.com/alfonsiusalvaro', icon: 'brand/twitter.png' }, { label: 'GitHub', href: 'https://github.com/gilvent', icon: 'brand/github.png' } ] }] } ] },
   // The shopfront on the promenade: product reviews. Left to right in the order of the loop: the review wall the
   // shoppers read, the door, the photo string, then the photo spot and the writing stand (docs/BLIBLI_DESIGN.md).
-  blibli: { id: 'blibli', art: 'street', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -300, x1: 560 }, bounds: { x0: -720, x1: 860, z0: -30, z1: 190 },
-    solid: [{ x0: F.table.x - 60, x1: F.table.x + 60, z0: -60, z1: F.table.z + 32 }, { x0: F.stand.x - 35, x1: F.stand.x + 35, z0: F.stand.z - 23, z1: F.stand.z + 23 }, { x0: F.camera.x - 14, x1: F.camera.x + 14, z0: F.camera.z - 12, z1: F.camera.z + 12 }],
+  blibli: { id: 'blibli', art: 'street', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -340, x1: 340 }, bounds: { x0: -680, x1: 700, z0: -30, z1: 190 },
+    solid: [{ x0: F.table.x - 62, x1: F.table.x + 62, z0: F.table.z - 33, z1: F.table.z + 33 }, { x0: F.stand.x - 37, x1: F.stand.x + 37, z0: F.stand.z - 23, z1: F.stand.z + 23 }, { x0: F.camera.x - 14, x1: F.camera.x + 14, z0: F.camera.z - 12, z1: F.camera.z + 12 }],
     title: 'Blibli.com', path: 'store', url: 'https://blibli.com', role: 'Front-end Developer @', color: '#0092da', logo: 'brand/blibli-white.svg',
     description: 'An indonesian e-commerce with wide range of products from both offline business to online.',
     stops: [
-      out(-720),
-      { id: 'site-board', label: 'Visit Blibli.com', x: F.siteBoard.x, z: F.siteBoard.z + 50, reach: 70, action: { kind: 'link', href: 'https://blibli.com' } },
-      { id: 'wall', label: 'Review wall', x: F.board.x + F.board.w / 2, z: 30, mark: F.board.y + F.board.h - 6, focus: 1.25, gesture: 'lean', action: { kind: 'toy', toy: 'filter', states: 3 } },
-      { id: 'shop-door', label: 'Enter the store', x: F.door.x, z: -30, reach: 80, action: { kind: 'road', to: 'blibli-shop', stop: 'street-door' } },
-      { id: 'gallery', label: 'Photo string', x: F.string.x + 40, z: 14, look: F.string.x, reach: 76, mark: F.string.y + F.string.cell + 40, focus: 1.3, gesture: 'lean', action: { kind: 'toy', toy: 'gallery', states: 2 } },
-      { id: 'camera', label: 'Instant camera', x: F.camera.x - 66, z: F.camera.z + 26, look: F.camera.x, reach: 70, mark: F.camera.y + 110, focus: 1.3, action: { kind: 'toy', toy: 'photo', states: 4, wrapTo: 2 } },
-      { id: 'stars', label: 'Review card', x: F.stand.x - 84, z: F.stand.z + 4, look: F.stand.x, reach: 70, mark: F.stand.top + 150, focus: 1.6, action: { kind: 'toy', toy: 'rating', states: 6, wrapTo: 1 } } ],
+      out(F.out.x),
+      { id: 'site-board', label: 'Visit Blibli.com', x: F.siteBoard.x, z: 26, reach: 64, mark: 210, action: { kind: 'link', href: 'https://blibli.com' } },
+      { id: 'wall', label: 'Review wall', x: F.board.x + F.board.w / 2, z: 30, mark: F.board.y + F.board.h + 76, focus: 1.25, gesture: 'lean', action: { kind: 'toy', toy: 'filter', states: 3 } },
+      { id: 'shop-door', label: 'Enter the store', x: F.door.x, z: -30, reach: 70, action: { kind: 'road', to: 'blibli-shop', stop: 'street-door' } },
+      { id: 'gallery', label: 'Photo string', x: F.string.x + 116, z: 10, look: F.string.x, reach: 70, mark: F.string.y + F.string.cell + 44, focus: 1.3, gesture: 'lean', action: { kind: 'toy', toy: 'gallery', states: 2 } },
+      { id: 'camera', label: 'Instant camera', x: F.camera.x + 70, z: F.camera.z + 34, look: F.camera.x, reach: 70, mark: F.camera.y + 110, focus: 1.3, action: { kind: 'toy', toy: 'photo', states: 4, wrapTo: 2 } },
+      { id: 'stars', label: 'Review card', x: F.stand.x + 82, z: F.stand.z + 8, look: F.stand.x, reach: 70, mark: F.stand.top + 150, focus: 1.6, action: { kind: 'toy', toy: 'rating', states: 6, wrapTo: 1 } } ],
     letters: [],
     encoded: [
       { fact: 'Front-end Developer @ Blibli.com: client side features related to product detail and product review.', at: ['wall', 'shop-door'] },
@@ -56,7 +56,7 @@ export const content: Content = validateContent({ worlds: {
       { fact: 'User generated images vary in ratio. Consider all possibilities when developing the UI components displaying these images!', at: ['gallery'] } ] },
   // The shop floor: the product detail page, played instead of read. Every stop is one part of the page.
   'blibli-shop': { id: 'blibli-shop', art: 'shop', back: { world: 'blibli', stop: 'shop-door' }, camera: { zoom: .8, zoomWide: .96, x0: -30, x1: 30 }, bounds: { x0: -470, x1: 470, z0: -180, z1: 190 },
-    solid: [{ x0: P.showcase.x - 58, x1: P.showcase.x + 58, z0: -240, z1: P.showcase.z + 40 }, { x0: P.promo.x - 7, x1: P.promo.x + 7, z0: -240, z1: P.promo.z + 7 }, { x0: P.catalog.x - 48, x1: P.catalog.x + 48, z0: -240, z1: P.catalog.z + 28 }, { x0: -423, x1: -319, z0: 42, z1: 94 }, { x0: P.basket.x - 62, x1: P.basket.x + 62, z0: P.basket.z - 36, z1: P.basket.z + 36 }],
+    solid: [{ x0: P.showcase.x - 58, x1: P.showcase.x + 58, z0: -240, z1: P.showcase.z + 40 }, { x0: P.promo.x - 7, x1: P.promo.x + 7, z0: -240, z1: P.promo.z + 7 }, { x0: P.catalog.x - 48, x1: P.catalog.x + 48, z0: -240, z1: P.catalog.z + 28 }, { x0: -377, x1: -273, z0: 42, z1: 94 }, { x0: P.basket.x - 62, x1: P.basket.x + 62, z0: P.basket.z - 36, z1: P.basket.z + 36 }],
     title: 'Blibli store', path: 'store', color: '#0092da',
     stops: [
       { id: 'street-door', label: 'Back to the street', x: P.door.x, z: P.door.z, reach: 60, action: { kind: 'road', to: 'blibli', stop: 'shop-door' } },

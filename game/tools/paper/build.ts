@@ -57,7 +57,7 @@ async function build(scene: Scene, samples: number) {
   const WORK = join(HERE, '.work', scene.id), OUT = join(GAME, 'src/art/baked', scene.id);
   mkdirSync(WORK, { recursive: true }); mkdirSync(OUT, { recursive: true });
   const ids = new Set<string>();
-  for (const p of scene.panels) { if (ids.has(p.id)) throw new Error(`${scene.id}: duplicate panel ${p.id}`); ids.add(p.id); if (p.decal && !scene.panels.some(q => q.id === p.decal)) throw new Error(`${p.id}: decal parent ${p.decal} missing`); }
+  for (const p of scene.panels) { if (ids.has(p.id)) throw new Error(`${scene.id}: duplicate panel ${p.id}`); ids.add(p.id); if (p.actor && !scene.actors?.[p.actor]) throw new Error(`${p.id}: actor ${p.actor} has no pivot`); if (p.tint && p.mask) throw new Error(`${p.id}: a tinted sheet cannot be cut (use round)`); if (p.decal && !scene.panels.some(q => q.id === p.decal)) throw new Error(`${p.id}: decal parent ${p.decal} missing`); }
   const { slots, height } = pack(scene.panels, scene.density ?? DENSITY);
   const html = `<!doctype html><html><head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Caveat:wght@700&display=swap"><style>html,body{margin:0;background:transparent}svg{overflow:hidden}</style></head><body>
 <svg width="0" height="0" style="position:absolute"><filter id="crease" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="1.2"/></filter></svg>
@@ -72,8 +72,8 @@ async function build(scene: Scene, samples: number) {
   await page.screenshot({ path: join(WORK, 'albedo.png'), omitBackground: true });
   await browser.close();
   const layout = {
-    id: scene.id, atlas: { w: ATLAS_W, h: height }, sunToLight: SUN_TO_LIGHT, samples, light: scene.light, lamps: scene.lamps ?? [], camera: scene.camera, runs: scene.runs ?? [],
-    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, view: !!p.view, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, keep: !!p.keep, split: p.split ?? 1, x, y, pw, ph, n: normal(p) }))
+    id: scene.id, atlas: { w: ATLAS_W, h: height }, sunToLight: SUN_TO_LIGHT, samples, actors: scene.actors ?? {}, light: scene.light, lamps: scene.lamps ?? [], camera: scene.camera, runs: scene.runs ?? [],
+    panels: slots.map(({ panel: p, x, y, pw, ph }) => ({ id: p.id, stock: p.stock, transl: STOCK[p.stock].transl, emit: p.emit ?? 0, c: p.c, solid: !p.mask, o: p.o, u: p.u, v: p.v, w: p.w, h: p.h, ghost: !!p.ghost, backdrop: !!p.backdrop, decal: p.decal ?? null, view: !!p.view, motion: p.motion ?? null, group: p.group ?? null, show: p.show ?? null, actor: p.actor ?? null, tint: p.tint ?? null, round: p.round ?? 0, keep: !!p.keep || !!p.actor, split: p.split ?? 1, x, y, pw, ph, n: normal(p) }))
   };
   writeFileSync(join(WORK, 'layout.json'), JSON.stringify(layout));
   if (PREVIEW) execFileSync('python3', ['-c', `import numpy as n;n.save(${JSON.stringify(join(WORK, 'light.npy'))},n.full((${Math.round(height / 2)},${ATLAS_W / 2},3),.82,dtype=n.float32))`]);

@@ -41,8 +41,9 @@ export default function Scene({ world, nearStop, toys: all, stamps, line, arriva
     const t: Record<string, number> = { ...all }, own = `${world.id}/`;
     for (const [k, v] of Object.entries(all)) if (k.startsWith(own)) t[k.slice(own.length)] = v;
     for (const k of stamps) if (k.startsWith(own)) t[`done:${k.slice(own.length)}`] = 1;
+    t.arrival = arrival;
     return t;
-  }, [all, stamps, world.id]);
+  }, [all, stamps, world.id, arrival]);
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
   const cards = useMemo(() => (drawn ? [] : scenery(world)), [world, drawn]);
@@ -72,11 +73,11 @@ export default function Scene({ world, nearStop, toys: all, stamps, line, arriva
     const make = TOYBOX[world.art], fx = fxRef.current;
     if (!make || !root.current || !fx) return;
     const rig = makeRig(root.current, reducedMotion()), box = make();
-    const ctx: Ctx = { rig, fx, toys, hero: { x: 0, z: 0, y: 0, speed: 0 }, say: fx.say, sfx: sound };
+    const ctx: Ctx = { rig, fx, toys, hero: { x: 0, z: 0, y: 0, speed: 0 }, root: root.current, say: fx.say, sfx: sound };
     play.current = { ctx, sync: first => box.sync(ctx, first), near: stop => box.near?.(ctx, stop) };
     box.sync(ctx, true);
     fx.frame = (x, z, y, speed, dt) => { ctx.hero.x = x; ctx.hero.z = z; ctx.hero.y = y; ctx.hero.speed = speed; box.frame?.(ctx, dt); };
-    return () => { rig.kill(); play.current = null; fx.frame = undefined; };
+    return () => { rig.kill(); box.end?.(); play.current = null; fx.frame = undefined; };
   }, [world.art, fxRef]);
   useEffect(() => { const p = play.current; if (!p || p.ctx.toys === toys) return; p.ctx.toys = toys; p.sync(false); }, [toys]);
   // Coming into reach of a stop stirs its toy. Not when the space opens: he is put down at a stop then.

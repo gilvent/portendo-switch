@@ -16,6 +16,8 @@ export type Panel = {
   // The sheet takes its colour from a toy's state: `colors[state]` is multiplied over it. Only for uncut (unmasked)
   // sheets with a pale print, so one baked sheet serves every colour.
   tint?: Tint;
+  // Rounded corners, in units, for a sheet that cannot carry a cut mask because it is tinted.
+  round?: number;
 };
 export type Tint = { toy: string; colors: readonly string[] };
 // An actor's pivot is the point its script turns and scales it about; a child actor (`parent`) rides on another.

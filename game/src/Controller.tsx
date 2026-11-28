@@ -4,6 +4,7 @@ import type { Action, ControllerMode } from './game.ts';
 import { reducedMotion } from './light.ts';
 import Hero from './art/Hero.tsx';
 import Platform, { TRAIN_MS } from './Platform.tsx';
+import { play as sound } from './sfx.ts';
 
 // near: which of the platform's two stops he stands at. gate: the ticket gate is open. trainIn: set once the train it
 // called stands at the platform, which is when boarding (docking) is allowed. onScreenTap: a tap on the handheld's
@@ -17,6 +18,8 @@ export default function Controller({ rigRef, mode, visible, lit, near, gate, tra
   const [arrived, setArrived] = useState(false);
   useEffect(() => {
     if (!gate) { setArrived(false); trainIn.current = false; return; }
+    // The pass beeps the gate open; the train is heard before it is seen, and its doors chime when it stands.
+    if (!reducedMotion()) { sound('beep'); sound('arrive', .15); sound('slide', TRAIN_MS / 1000 - .1); sound('chime', TRAIN_MS / 1000); }
     const t = window.setTimeout(() => { setArrived(true); trainIn.current = true; }, reducedMotion() ? 0 : TRAIN_MS);
     return () => clearTimeout(t);
   }, [gate, trainIn]);
@@ -43,6 +46,7 @@ export default function Controller({ rigRef, mode, visible, lit, near, gate, tra
     if (reducedMotion()) { finished(); return; }
     if (!body.current || !left.current || !right.current || !slotC.current || !slotUp.current || !slotL.current || !slotR.current || !off.current || !dockBack.current || !dockFront.current || !led.current) throw new Error('controller parts missing at docking');
     // Like the real thing: the side controllers slide up off their rails, the console is carried over the dock and lowered into the slot, then the TV wakes.
+    sound('slide', .3); sound('thump', 1.14); sound('pop', 1.4);
     const tl = gsap.timeline({ onComplete: finished });
     tl.to([left.current, right.current], { y: '-=46', duration: .22, ease: 'power2.out' })
       .to(left.current, { ...toSlot(left.current, slotL.current), duration: .55, ease: 'power3.inOut' }, .2)

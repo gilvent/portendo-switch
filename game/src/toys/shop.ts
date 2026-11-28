@@ -7,7 +7,7 @@ const P = F.promo, R = P.reel, CORAL = '#e8552d';
 // How long after the press his head reaches the reel: the crouch, then the rise.
 export const KNOCK = .2;
 // The coupon stuck on the tag, as an offset from where it hangs under the reel.
-const STUCK = { x: P.x + 20 - R.x, y: P.top + 44 - R.y, z: P.z + 10 - R.z - 1, rz: -14 };
+const STUCK = { x: P.x + 12 - R.x, y: P.top + 34 - R.y, z: P.z + 10.5 - R.z - 16, rz: -14 };
 const LEAVES = ['cat-cover', 'cat-leaf-1', 'cat-leaf-2'], TURNED = [-166, -158, -150];
 const slot = (k: number) => { const b = F.stock.boxes[F.stock.order[k]], s = F.basket.slots[k]; return { x: s[0] - b[0], y: s[1] - b[1], z: s[2] - b[2] }; };
 

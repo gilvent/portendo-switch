@@ -14,7 +14,7 @@ const keeps = (w: Wall, i: number) => { const r = i ? F.reviews[i] : { photo: w.
 const cardXY = (i: number) => [B.cols[i % 3], B.rows[Math.floor(i / 3)]] as const;
 
 export function front(): Toybox {
-  const hang = hangers([{ actor: 'bell', x: F.door.x, z: F.wall.z + 40, y: F.door.h + 16, r: 60, sound: 'ding' }]);
+  const hang = hangers([{ actor: 'bell', x: F.door.x, z: F.wall.z + 50, y: F.door.h + 8, r: 60, sound: 'ding' }]);
   let doorOpen = false, seen = '';
   const flown = [0, 0];
   const mine = (t: Record<string, number>) => `${t.rating ?? 0}|${(t.photo ?? 0) >= 2}`;
@@ -64,9 +64,11 @@ export function front(): Toybox {
       rest: c => c.rig.set('stamp', REST),
       // The rubber stamp comes down on his card. The star itself is a sheet that follows the count (art/fold.tsx).
       play: (c, tl, from, n) => {
-        tl.to('stamp', { y: 12 }, .05, 0, 'power2.out').to('stamp', { y: -40 }, .06, .05, 'power3.in')
-          .call(() => { c.sfx(from === 5 ? 'peel' : 'thump'); c.fx.shake(3); c.fx.scraps(F.stand.x - 20 + n * 9, F.stand.top + 26, F.stand.z + 14, [SUN, '#fff4e2'], 5); }, .11)
-          .to('stamp', { sy: .8 }, .04, .11).to('stamp', { sy: 1, y: 0 }, .26, .17, 'back.out(2.6)');
+        // Off its ink pad, down on the card, and back.
+        const [px, py, pz] = F.stand.pad, [hx, hy, hz] = F.stand.hit, on = { x: hx - px, y: hy - py, z: hz - pz };
+        tl.arc('stamp', on, 30, .11, 0)
+          .call(() => { c.sfx(from === 5 ? 'peel' : 'thump'); c.fx.shake(3); c.fx.scraps(F.stand.x - 24 + n * 10, F.stand.top + 24, F.stand.z + 12, [SUN, '#fff4e2'], 5); }, .11)
+          .to('stamp', { sy: .7 }, .04, .11).to('stamp', { sy: 1 }, .1, .15, 'back.out(3)').arc('stamp', { x: 0, y: 0, z: 0 }, 26, .2, .2).squash('stamp', .86, .4, .16);
       }
     })
   ]);
@@ -83,7 +85,7 @@ export function front(): Toybox {
       hang.frame(c);
       const h = c.hero, d = F.door, now = performance.now();
       // The door opens as he comes and shuts behind him; the bell over it swings.
-      const at = Math.abs(h.x - d.x) < 120 && h.z < 70;
+      const at = Math.abs(h.x - d.x) < 110 && h.z < 60;
       if (at !== doorOpen) {
         doorOpen = at;
         c.rig.play('door', tl => { tl.call(() => c.sfx(at ? 'ding' : 'tap'), at ? .08 : .2).to('door-l', { ry: at ? 78 : 0 }, .3, 0, at ? 'back.out(1.6)' : 'power2.in').to('door-r', { ry: at ? -78 : 0 }, .3, .03, at ? 'back.out(1.6)' : 'power2.in'); }, () => { c.rig.set('door-l', { ry: at ? 78 : 0 }); c.rig.set('door-r', { ry: at ? -78 : 0 }); });
@@ -94,7 +96,7 @@ export function front(): Toybox {
       if (sig !== seen && Math.abs(h.x - (B.x + B.w / 2)) < 330) {
         seen = sig;
         const [x, y] = cardXY(0), on = keeps({ f: c.toys.filter ?? 0, photo: (c.toys.photo ?? 0) >= 2, stars: c.toys.rating ?? 0 }, 0);
-        if (on) c.rig.play('mine', tl => { tl.set('card-0', { ...REST, show: true, y: 70, rz: -14 }, 0).to('card-0', { y: 0 }, .26, .12, 'power2.in').to('card-0', { rz: 5 }, .1, .38).to('card-0', { rz: 0 }, .16, undefined, 'back.out(3)').call(() => { c.sfx('thump'); c.fx.scraps(x, y, F.wall.z + 12, [SUN, '#0092da', '#fff4e2'], 8); answer(c, ['!', '♪']); }, .38); }, () => c.rig.set('card-0', { ...REST, show: true }));
+        if (on) c.rig.play('mine', tl => { tl.set('card-0', { ...REST, show: true, y: 60, rz: -14 }, 0).to('card-0', { y: 0 }, .26, .12, 'power2.in').to('card-0', { rz: 5 }, .1, .38).to('card-0', { rz: 0 }, .16, undefined, 'back.out(3)').call(() => { c.sfx('thump'); c.fx.scraps(x, y, F.wall.z + 12, [SUN, '#0092da', '#fff4e2'], 8); answer(c, ['!', '♪']); }, .38); }, () => c.rig.set('card-0', { ...REST, show: true }));
       }
       // Pigeons take off when he runs or jumps at them, and come back when he has gone.
       F.pigeons.forEach((p, i) => {
