@@ -389,3 +389,20 @@ camera 0.35 m in 150 ms (was 4.7 m). `tests/play.mjs` reaches Blibli at 23.8 s, 
 and the star, a tap grabs a strap on a phone, all with no errors. Still to do: one listening pass on a laptop and a
 phone, expecting to trim levels rather than timings.
 
+
+### Pass 5: M6, the hurry path on a phone with sound off
+
+Scripted as a first-time visitor on an iPhone 13 viewport, taps only, muted before load (`hurry.mjs` in the session's
+scratch; the steps: tap the gate, tap the ticket corner, tap the ticket to flip it, tap the doors, ride, tap the doors).
+
+| Measure | Target | Portrait | Landscape |
+|---|---|---|---|
+| Name and trade on screen, no input | 0 s | yes (the station sign) | yes |
+| Contact side of the ticket, Email link tappable (44 px) | about 7 s | 7.5 s | 8.6 s |
+| Standing in Blibli | under 60 s | 25.2 s | 27.2 s |
+| Page errors | none | none | none |
+
+Found and fixed: in portrait the console was wider than the phone and cut off A, B and X (the console's height is now
+`min(62vh, 38vw)`, so the whole console fits). The one-page link was a 17 px target and is 43 px on touch screens. The
+one-page version itself fits a phone with no sideways scroll and puts contact first. Every audio warning has a visual
+twin since pass 4, and haptics carry the punch and the brace where the phone supports them.

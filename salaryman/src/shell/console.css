@@ -3,11 +3,11 @@
 html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; font-family: Fredoka, system-ui, sans-serif; color: var(--ink); -webkit-tap-highlight-color: transparent; }
 #app { position: fixed; inset: 0; }
 .shell { position: absolute; inset: 0; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
-.console { position: absolute; left: 50%; top: 46%; translate: -50% -50%; display: flex; align-items: stretch; height: min(62vh, 44vw); max-width: 96vw;
+.console { position: absolute; left: 50%; top: 46%; translate: -50% -50%; display: flex; align-items: stretch; height: min(62vh, 38vw); max-width: 96vw;
   transition: transform .65s cubic-bezier(.6,-0.2,.7,1), opacity .4s .3s; filter: drop-shadow(0 18px 26px #0008); }
 .bezel { aspect-ratio: 16 / 9; height: 100%; background: #2b2f36; border-radius: 10px; padding: 3.2%; display: flex; }
 .slot { flex: 1; border-radius: 4px; background: #000; }
-.joy { width: calc(min(62vh, 44vw) * .36); position: relative; background: linear-gradient(160deg, #f1f3f6, var(--shell) 45%, var(--shell-d)); }
+.joy { width: calc(min(62vh, 38vw) * .36); position: relative; background: linear-gradient(160deg, #f1f3f6, var(--shell) 45%, var(--shell-d)); }
 .joy-l { border-radius: 48% 8px 8px 48% / 26% 8px 8px 26%; }
 .joy-r { border-radius: 8px 48% 48% 8px / 8px 26% 26% 8px; }
 .joy-minus, .joy-plus { position: absolute; top: 7%; font-style: normal; font-weight: 700; font-size: 22px; color: #6b727c; }
@@ -56,3 +56,5 @@ html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; f
 .mute-docked[data-muted="true"] { background: #9aa0a8; text-decoration: line-through; }
 .shell[data-mode="docked"] .mute-docked { display: block; }
 @media (pointer: coarse) { .mute-docked { width: 44px; height: 44px; } }
+/* On a touch screen the way out of the fiction is a thumb-sized target. */
+@media (pointer: coarse) { .hurry { padding: 13px 16px; bottom: 64px; white-space: nowrap; } }
