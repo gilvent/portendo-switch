@@ -365,7 +365,7 @@ button { font:inherit; cursor:pointer; }
 .flipper { position:absolute; left:0; top:0; width:0; height:0; transform:scaleX(var(--f,1)); transition:transform .2s steps(4,end); animation:pf-arrive .7s steps(7,end) backwards; }
 @keyframes pf-arrive { from { translate:-34px -30px; opacity:0; } 30% { opacity:1; } }
 .prompt.at-gate { left:calc(29.8% - 18px); top:36%; }
-.prompt.end { left:calc(86.9% - 18px); right:auto; top:21%; }
+.prompt.end { left:calc(86.9% - 18px); right:auto; top:22.5%; }
 /* He is drawn at the platform's own scale whatever the console's size: 100cqw is the scene's 840 units. */
 @supports (scale:tan(atan2(1px,1px))) { .mini-courier > .flipper { zoom:1; scale:calc(tan(atan2(100cqw,840px)) * .92); } }
 /* Boarding is docking: he steps in, the doors shut, and the train pulls out as the console goes to the dock. */
@@ -385,3 +385,65 @@ button { font:inherit; cursor:pointer; }
 @keyframes pass-land { from { opacity:0; scale:1.5; } }
 @media (prefers-reduced-motion:reduce) { .pf-train,.pf-sleeper,.pf-zz,.pf-here,.pf-status,.flipper,.pass-pop,.stamps.fresh,.controller[data-mode="docking"] .mini-courier,.controller[data-mode="docking"] .pf-train { animation:none; } .pf-leaf,.pf-paddle,.flipper { transition:none; } .pass-pop { display:none; } [data-train="coming"] .pf-train { transform:none; } }
 .screen .prompt { width:clamp(18px,4.4cqw,36px); height:clamp(18px,4.4cqw,36px); margin-left:0; font-size:clamp(10px,2.2cqw,18px); }
+/* ---------- live paper: things the game moves by its own physics (fold.tsx, src/mrt) ---------- */
+.live { position:absolute; left:0; top:0; width:0; height:0; transform-style:preserve-3d; will-change:transform; transform:translate3d(var(--lx,0px),var(--ly,0px),var(--lz,0px)) rotateZ(var(--lr,0deg)) scale(var(--lsx,1),var(--lsy,1)); }
+/* ---------- the platform's dynamics (Platform.tsx) ---------- */
+.prompt.at-map { left:calc(63.3% - 18px); top:22%; }
+.pf-line { opacity:.34; transition:opacity .2s steps(3,end); } .pf-line[data-on] { opacity:1; }
+.pf-stop { transform-box:fill-box; transform-origin:50% 30%; } .pf-line[data-on] .pf-stop { animation:pf-pop .5s .45s steps(6,end) backwards; }
+@keyframes pf-pop { from { transform:scale(.6); } 50% { transform:scale(1.25); } }
+.pf-lamp-0 { transform:translate(92px,0); animation:pf-run-0 .5s steps(6,end); } .pf-lamp-1 { transform:translate(92px,58px); animation:pf-run-1 .6s steps(8,end); }
+@keyframes pf-run-0 { from { transform:none; } } @keyframes pf-run-1 { from { transform:none; } 45% { transform:translate(0,50px); } 55% { transform:translate(10px,58px); } }
+[data-denied] .pf-paddle { animation:pf-rattle .4s steps(8,end); } [data-denied] .pf-reader { fill:#ff3b2f; }
+@keyframes pf-rattle { 25% { transform:rotate(7deg); } 50% { transform:rotate(-5deg); } 75% { transform:rotate(4deg); } }
+.pf-bang { opacity:0; } [data-startled] .pf-z { opacity:0; } [data-startled] .pf-bang { opacity:1; }
+[data-startled] .pf-zz { animation:pf-zz 1.4s steps(12,end) both; } [data-startled] .pf-sleeper { animation:pf-start .5s steps(6,end); }
+@keyframes pf-start { 30% { transform:translateY(-12px) scaleY(1.08); } 60% { transform:translateY(0) scaleY(.94); } }
+.pf-fx path { opacity:0; }
+.pass-pop em { font-style:normal; font-size:14px; line-height:18px; color:#5a626d; }
+@media (prefers-reduced-motion:reduce) { .pf-lamp,.pf-stop,.pf-line { animation:none !important; transition:none; } }
+/* ---------- the car's live layer (Car.tsx) ---------- */
+/* Live sheets are not baked, so they carry their own grain: the same fibre the atlas prints, laid over their colour. */
+:root { --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .06 0 0 0 0 .02 1.5 0 0 0 -.62'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)' opacity='.2'/%3E%3C/svg%3E"); }
+/* The station past the far windows: the platform he would step out onto, seen from the track. Its wall is tiled, the
+   two line colours run along it as they do on the handheld's platform, pillars stand every 320, and the roof is dark. */
+.station { position:absolute; left:0; top:0; z-index:2; pointer-events:none; will-change:transform; background:
+  var(--grain),
+  linear-gradient(180deg,#2c3138 0 150px,#3d444e 150px 166px,#fff4d6 166px 174px,transparent 174px 388px,#e8552d 388px 397px,transparent 397px 400px,#35b58a 400px 409px,transparent 409px 600px,#f6b73c 600px 611px,#6f7882 611px 616px,#4a5059 616px),
+  repeating-linear-gradient(90deg,transparent 0 290px,#fffaf0 290px 293px,#c3ccd4 293px 311px,#aab3bc 311px 320px),
+  repeating-linear-gradient(90deg,transparent 0 78px,#c9d2da 78px 80px),
+  repeating-linear-gradient(180deg,transparent 0 54px,#c9d2da 54px 56px),
+  #dfe5ea; }
+.st-at { position:absolute; width:0; height:0; }
+.st-board { position:absolute; left:0; top:0; width:122px; height:44px; display:none; align-items:center; justify-content:center; background:var(--grain),#fffaf0; border:3px solid #fff; border-radius:6px; box-shadow:3px 5px 0 rgba(10,13,18,.22),inset 0 -8px 0 var(--c); font:600 20px/1 Fredoka,system-ui,sans-serif; color:#23272d; padding-bottom:7px; box-sizing:border-box; white-space:nowrap; }
+.st-board::before,.st-board::after { content:""; position:absolute; top:-200px; width:4px; height:197px; background:#3d444e; } .st-board::before { left:16px; } .st-board::after { right:16px; }
+.station[data-which="0"] .st-board[data-which="0"],.station[data-which="1"] .st-board[data-which="1"] { display:flex; }
+/* The poster roll. */
+.roll { position:absolute; left:0; top:0; transform-origin:0 0; overflow:hidden; background:#fffaf0; pointer-events:none; }
+.roll-strip { transition:transform .5s steps(7,end); }
+.roll-face { position:relative; margin:0; display:flex; align-items:center; justify-content:center; gap:10px; font:600 19px/1 Fredoka,system-ui,sans-serif; color:#23272d; white-space:nowrap; box-shadow:inset 0 -1.5px 0 rgba(10,13,18,.25); }
+.roll-0 { background:var(--grain),#f6b73c; } .roll-1 { background:var(--grain),linear-gradient(90deg,#e8552d 0 16px,#fffaf0 16px calc(100% - 16px),#35b58a calc(100% - 16px)); font-size:24px; } .roll-2 { background:var(--grain),#bfe6dc; font-size:16px; }
+.roll-me { height:40px; flex:none; } .roll-web { height:30px; flex:none; filter:drop-shadow(1.5px 2.5px 0 rgba(10,13,18,.2)); }
+@media (prefers-reduced-motion:reduce) { .roll-strip { transition:none; } }
+/* ---------- the platform as paper (Platform.tsx) ---------- */
+.pf-grain { position:absolute; inset:0; pointer-events:none; background:var(--grain); background-size:200px 200px; opacity:.9; box-shadow:inset 0 0 0 1px rgba(10,13,18,.2),inset 0 14px 22px -12px rgba(10,13,18,.5),inset 0 -10px 18px -12px rgba(10,13,18,.35); }
+.controller[data-mode="docked"] .pf-grain { display:none; }
+[data-gate="open"] .pf-paddle-far { transform:scaleX(.1); }
+@media (max-width:560px) { .stamps { top:58px; } }
+/* ---------- finds: the pass's count for this place, and the tag that names a find (App.tsx) ---------- */
+.pips { display:flex; align-items:center; gap:3px; margin-top:4px; }
+.pips i { width:8px; height:8px; box-sizing:border-box; border-radius:50%; border:1.5px solid #a9b0b9; }
+.pips i.on { background:#e8552d; border-color:#e8552d; }
+.pips i.star { width:12px; height:12px; border:0; border-radius:0; background:#cfd4da; clip-path:polygon(50% 0,62% 34%,98% 36%,69% 58%,80% 94%,50% 72%,20% 94%,31% 58%,2% 36%,38% 34%); }
+.pips i.star.on { background:#f0a51e; }
+.pips i + i.star { margin-left:1px; } .pips i:not(.star) + i.star { margin-left:6px; }
+.found { position:fixed; z-index:36; left:12px; top:118px; margin:0; display:flex; align-items:center; gap:6px; padding:5px 12px 6px 8px; background:#fffaf0; color:#23272d; border-radius:4px; font-size:14px; line-height:18px; font-weight:600; box-shadow:var(--shadow-sm); pointer-events:none; transform-origin:0 50%; animation:found 2.6s steps(26,end) both; }
+.found i { width:16px; height:16px; background:#f0a51e; clip-path:polygon(50% 0,62% 34%,98% 36%,69% 58%,80% 94%,50% 72%,20% 94%,31% 58%,2% 36%,38% 34%); animation:found-spin .5s steps(6,end); }
+@keyframes found { 0% { transform:translateX(-30px) scale(.4) rotate(-8deg); opacity:0; } 7% { transform:scale(1.12) rotate(2deg); opacity:1; } 12%,86% { transform:none; opacity:1; } 100% { transform:translateY(-10px); opacity:0; } }
+@keyframes found-spin { from { transform:rotate(-180deg) scale(.3); } }
+@media (max-width:560px) { .found { top:128px; } }
+@media (prefers-reduced-motion:reduce) { .found,.found i { animation:none; } }
+/* A button held, by a finger or by its key: it goes down into the controller. */
+.pad:active,.pad[data-down] { translate:0 3px; box-shadow:0 1px 0 #171b22,0 3px 3px rgba(0,0,0,.35); }
+.pad.lit:active,.pad.lit[data-down] { box-shadow:0 1px 0 #6a1c0c,0 3px 3px rgba(0,0,0,.35); }
+.nub { transition:transform .06s linear; }

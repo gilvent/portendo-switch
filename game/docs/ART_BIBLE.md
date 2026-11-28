@@ -137,14 +137,20 @@ The game opens inside the front car of an MRT train running underground (`scenes
 
 ![The car behind](spaces/mrt-rear.png)
 
+![Standing at a stop](spaces/mrt-station.png)
+
 - **What is built.** Three pieces of one train, standing at one height. In the middle, the passenger car, cut open along its near side: its inside, its underframe in section along the cut with two bogies, and its roof in section over the cove. To the right, the driving cab; to the left, past the gangway bellows, the next car. Those two are closed and seen from outside, 2.5D: a shell with glass windows that show nothing through them, a roof line seen side on with its housings, and a bogie.
 - **Closed pieces are boxes, not cards.** The cab and the next car each carry a roof: a sheet lying across the full depth of the car from the top of the near side, with its housings standing on it as folded boxes. The train's camera looks down from above roof height (`perspective-origin` on `.art-train`), so the roof shows as a lid receding from the side sheet. A closed piece must never show as a side sheet alone, and its glass shows nothing through it. Roof faces are marked `keep`, because the bake's guess at the game camera sits lower than this scene's and would cull them.
 - **The passenger car stays open.** Only its roof in section shows, over the cove at the back.
 - **The tunnel is live, not baked** (`.bore`, `.bed` in `styles.css`). Behind the whole train stands the tunnel's far wall, nearly black, with rings, cable runs, work lamps and marker boards rushing back. Under it lies the track bed: two rails and sleepers streaking by. The headlight throws a beam down the tunnel ahead, and the lamps' light sweeps over the car floor.
-- **Everything that says "moving" runs at one speed.** The tunnel, the sleepers, the eight wheels (their own sheets, turning), the car's sway and its knock over rail joints, and the swinging hand straps are looping animations whose rate `Scene.tsx` sets from the train's speed. The train pulls away as the scene opens, cruises, and brakes to a stand when it reaches the chosen stop. Reduced motion holds all of it still.
+- **Everything that says "moving" runs at one speed.** The tunnel, the sleepers, the eight wheels (their own sheets, turning), and the car's sway and its knock over rail joints are looping animations whose rate `src/mrt/Car.tsx` sets from the train's speed. The train pulls away as the scene opens, cruises with small notches of power and brake, and brakes to a stand when a stop is asked for. Reduced motion holds all of it still.
+- **Everything loose is live** (`docs/MRT_DESIGN.md`, `src/mrt/sim.ts`). The ten hand straps, the help point's handset and the drinks can are cut and baked like everything else, but as *live sheets* (`motion: { live, pivot }` in `kit.ts`): lit, casting no shadow, and moved every frame by the game's own physics. The straps and the handset are pendulums; the can rolls. The train's acceleration drives all of them, and so do his head, his feet and a finger. They are redrawn fifteen times a second, in steps, like every other moving sheet.
+- **The strap rail runs over the aisle**, not along the windows, held off the back wall by two brackets each. A strap must be over floor he can stand on, clear of the back wall's stops, for a jump to reach it. The rail has no ceiling hangers: from the game camera a hanger would cross the posters on the cove (checklist 5.3). It hangs high enough that the straps stay above the faces of the seated row.
+- **The station is live** (`.station` in `styles.css`). When a stop is asked for, the platform he will step out onto slides up to the far windows from the front of the train and stands exactly when the train does: tiled wall, the two line colours, pillars, and name boards in the stop's own colour. One board stands square in the doorway; none stand behind the straps. When the car opens, the station he boarded at slides away the same way. It is drawn on the tunnel wall's own sheet, over its ribs and lamps, not as a sheet of its own in front of it: two very large sheets a few units apart are more than a browser's depth sorting can be trusted with.
 - No sun reaches the car. It is lit by its own ceiling strips, baked as lamps.
 - The passengers and the driver are the street's cast (`shopper` in `promenade.ts`): same cut, builds and faces. Seated ones stand at the bench's front edge, lifted so the hips meet the cushion.
-- The destination sign over the door is the one piece of live type in a paper scene: the bake carries its dark casing, the game sets the amber text. Its arrows (or B at the doors) turn it between the stops the line serves, Blibli.com and Moperty. Pressing the name (or A at the doors) stops the train, brings the platform's light up behind the windows, opens the doors and walks the salaryman out, and the scene swaps.
+- The destination sign over the door is the one piece of live type in a paper scene: the bake carries its dark casing, the game sets the amber text. Its arrows (or B at the doors) turn it between the stops the line serves, Blibli.com and Moperty. So does A at the line map on the cove, which draws the same two lines as the platform's. Pressing the name (or A at the doors) brakes the train into the station; only when it stands do the doors open and the salaryman walk out, and the scene swaps.
+- The poster roll on the cove is a baked box with a roller top and bottom; the roll behind its window is live type, three posters wound on one at a time. Live sheets that are not baked (the roll, the station, its boards) carry the atlas's grain as a CSS layer (`--grain`).
 - The floor is cut into narrow tiles. In a tall, narrow view the browser can drop the part of a wide floor quad that crosses the left edge of the screen; narrow tiles keep that to a hairline.
 
 ### Outside and inside match
@@ -186,7 +192,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | Space | Quad limit, enforced by the journey test |
 |---|---|
 | Street (riverside promenade) | 210 (uses 209) |
-| MRT car | 140 (uses 124) |
+| MRT car | 140 (uses 133) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
 
@@ -217,7 +223,7 @@ A loop rocks one sheet between two poses in four stepped frames. Each sheet take
 | Space | What moves on its own |
 |---|---|
 | Street | Flags and gate bunting, festoon lights, palm fronds and tree leaves, bushes and tufts, the clothes rail, the river and its boat, shoppers breathing, the hawker bouncing as he shouts, pigeons and roof birds pecking, two cut gulls crossing the sky |
-| MRT car | Passengers breathing (the sleeper deeper and slower), on top of the train's own motion |
+| MRT car | Passengers breathing (the sleeper deeper and slower), on top of the train's own motion and of everything it swings and rolls (`docs/MRT_DESIGN.md`) |
 | Outlet | Bunting, pendant lamps, the plant, the clerk, the promo burst |
 | Store-room | Pendant lamps, the packer, the roller, on top of the belts |
 
@@ -269,16 +275,22 @@ Three blind playtests (a fresh player given only the address) set these rules; t
 
 ## The platform: the handheld's screen
 
-The site opens on the handheld, and its screen is the MRT platform the salaryman waits on (`src/Platform.tsx`). Boarding the train is docking the console, and the big screen wakes inside that train as it pulls away, so the entry and the game are one journey.
+![The platform](spaces/platform.png)
+
+The site opens on the handheld, and its screen is the MRT platform he waits on (`src/Platform.tsx`). Boarding the train is docking the console, and the big screen wakes inside that train as it pulls away, so the entry and the game are one journey. What each thing on it does, and why, is in `docs/MRT_DESIGN.md`; this is how it is made.
 
 - **A toy theatre, not a diorama.** Flat cut layers in one live SVG, 840 by 472, in the walk's own x. Nothing is baked. The far wall drifts with him and what hangs from the roof drifts against him (`--par`), which is all the depth a toy theatre has; docking opens it into the 3D spaces.
-- **The name board** hangs from the roof and carries the name only. It is the page's headline.
-- **The ticket gate** stops him until A taps his commuter pass. The pass pops up, then goes to the corner and is the stamp card for the rest of the game. The gate is not a stamp.
-- **The line map** shows two lines that meet at this station, marked "You are here": the Work line (coral) and the Side projects line (mint). Its stops are read from `content.ts`; a stub past the last stop says the line goes on. The interchange is not a place to visit.
+- **Still paper.** Every piece has its white core along the cut, a shadow onto the layer behind, and a lit and a shaded face where it is folded: the stairs' treads and risers, the gate cabinets' lids and returns, the bench's seat, the far wall's pilasters. One sheet of grain (`--grain`) and the shade of the theatre's frame lie over all the layers at once.
+- **Underground.** There is no sky and no time of day in it (checklist 1.4): the far wall is the tiled wall across the track, with the track pit at its foot. The departure board still shows the visitor's own time.
+- **The name board** hangs from the roof and carries the name only. It is the page's headline, and it hangs at a real board's height, which is within reach of his jump.
+- **What hangs, swings.** The name board and the departure board hang on pendulums (`sim.ts`). The wind of the train coming in and going out swings them, leans him and blows scraps of paper down the platform; a jump under the name board knocks it, and stops his rise; a finger knocks either.
+- **The ticket gate** stops him until A taps his commuter pass; walking into it shut rattles its paddles. The pass pops up with his name and his trade, then goes to the corner and is the stamp card for the rest of the game. The gate is not a stamp.
+- **The line map** shows two lines that meet at this station, marked "You are here": the Work line (coral) and the Side projects line (mint). A turns its lamp to the other line, the departure board names that stop, and the train's own sign takes it. Its stops are read from `content.ts`.
 - **The train** is called by the gate. It comes in from the left, the way it runs on the big screen, brakes in stepped frames and opens the door of its front car on the mark. He can board only once it stands.
-- **The departure board** shows the visitor's own time and the next thing to do. The hour also sets the sky in the high windows and a wash over the platform: morning, day, evening, night.
 - **Boarding:** he steps in, the doors shut, the train pulls out as the console goes to the dock, and the dock's light turns green.
-- A commuter sleeps on the bench and answers with a "z" as he passes. A tap on the screen walks him there, or presses A when he stands at the gate or the door.
-- Under reduced motion the train is already standing when the gate opens, and nothing slides.
+- A commuter sleeps on the bench and answers with a "z" as he passes; a jump beside him, or a finger, starts him awake. A tap on the screen walks him there, or presses A when he stands at something.
+- Under reduced motion the train is already standing when the gate opens, and nothing slides, swings or blows.
 
-The in-car route map is baked and still draws one line; it needs a re-bake to match the platform's two.
+## The greybox
+
+`?graybox` in the address draws any baked space straight from its recipe (`src/mrt/graybox.tsx`): every sheet a plain cut shape in a grey that only says which way it faces, live sheets in a warm tone. No bake, no print. The MRT's play was tuned in it before any of its paper was cut, and it stays so a change to how something plays can be judged without the art in the way. The recipes load only when it is asked for.

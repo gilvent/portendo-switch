@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MutableRefObject, type RefObject } from 'react';
-import gsap from 'gsap';
 import type { Stop, World } from './schema.ts';
 import { reducedMotion, shadowFilter } from './light.ts';
 import Hero from './art/Hero.tsx';
@@ -7,10 +6,10 @@ import { WORLD_ART, WORLD_BACKDROP } from './art/blibli.tsx';
 import { at } from './art/fold.tsx';
 import { ambientOf, hash } from './art/ambient.ts';
 import { makeFx, type Fx } from './fx.ts';
-import { BED, BORE, CAB, CAR, DOOR, SIGN, TUNNEL } from './art/scenes/car.ts';
+import { BED, BORE, CAB, CAR, DOOR, SIGN } from './art/scenes/car.ts';
+import Car from './mrt/Car.tsx';
+import { content } from './content.ts';
 
-// The looping animations that are the train's motion (styles.css): they all follow its speed.
-const RUNS = new Set(['bore-rush', 'wheel-spin', 'car-sway', 'car-jolt', 'strap-swing', 'beam-flicker']);
 let seed = 11;
 const rnd = (a: number, b: number) => { seed = (seed * 16807) % 2147483647; return a + (seed / 2147483647) * (b - a); };
 type Card = { x: number; z: number; w: number; h: number; g: number };
@@ -26,25 +25,15 @@ function scenery(w: World): Card[] {
 // at the chosen stop, 2 once its doors are open.
 // fold: the page turn between spaces. 'out' folds this space's paper flat and closes the page over it; 'in' opens the
 // page and pops the paper up. A space also pops up when it is first shown.
-type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
+type Props = { world: World; nearStop: string | null; toys: Record<string, number>; line: number; arrival: number; fold: 'out' | 'in' | null; open: boolean; awake: boolean; from: { name: string; color: string }; onStood: () => void; onLine: (step: 1 | -1) => void; stageRef: RefObject<HTMLDivElement>; courierRef: RefObject<HTMLDivElement>; flipRef: RefObject<HTMLDivElement>; poseRef: RefObject<HTMLDivElement>; skyRef: RefObject<HTMLDivElement>; fxRef: MutableRefObject<Fx | null>; onStop: (s: Stop) => void };
 
-export default function Scene({ world, nearStop, toys, line, arrival, fold, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
+export default function Scene({ world, nearStop, toys, line, arrival, fold, open, awake, from, onStood, onLine, stageRef, courierRef, flipRef, poseRef, skyRef, fxRef, onStop }: Props) {
   const drawn = world.art !== 'blockout';
   const Art = drawn ? WORLD_ART[world.art] : null;
   if (drawn && !Art) throw new Error(`no art for ${world.art}`);
   const cards = useMemo(() => (drawn ? [] : scenery(world)), [world, drawn]);
   const doors = world.stops.find(s => s.action.kind === 'ride'), ride = doors?.action.kind === 'ride' ? doors.action : null, dest = ride?.to[line % ride.to.length];
   const train = world.art === 'train', root = useRef<HTMLDivElement>(null);
-  // The train's speed: every looping motion in the scene (tunnel, sleepers, wheels, sway, straps) plays at one rate.
-  // It pulls away as the scene opens, and brakes to a stand when it reaches the chosen stop.
-  const speed = useRef({ v: 0 });
-  useEffect(() => {
-    if (!train || !root.current || reducedMotion()) return;
-    const el = root.current, apply = () => { for (const a of el.getAnimations({ subtree: true })) if (a instanceof CSSAnimation && RUNS.has(a.animationName)) a.playbackRate = Math.max(.001, speed.current.v); el.style.setProperty('--speed', speed.current.v.toFixed(3)); };
-    const t = gsap.to(speed.current, arrival ? { v: 0, duration: .55, ease: 'power2.out', onUpdate: apply } : { v: 1, duration: 2.2, ease: 'power1.inOut', onUpdate: apply });
-    apply();
-    return () => { t.kill(); };
-  }, [train, arrival > 0]);
   const b = world.bounds, bits = useRef<HTMLDivElement>(null);
   // The live paper bits (dust, scraps, tags) and the hop of whatever the salaryman brushes past.
   useEffect(() => {
@@ -74,13 +63,13 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
         {train && <>
           <div className="bore" aria-hidden="true" style={{ width: BORE.w, height: BORE.top + BED, transform: `translate3d(${BORE.x}px,${-BORE.top}px,${BORE.z}px)` }}><i className="rush bore-ribs" /><i className="bore-cables" /><i className="rush bore-lamps" /><i className="rush bore-signs" /></div>
           <div className="bed" aria-hidden="true" style={{ width: BORE.w, height: BORE.near - BORE.z, transform: `translate3d(${BORE.x}px,${BED}px,${BORE.z}px) rotateX(90deg)` }}><i className="rush bed-sleepers" /><i className="bed-rails" /></div>
-          <div className="platform-light" aria-hidden="true" style={{ width: TUNNEL.w, height: TUNNEL.h, transform: `translate3d(${TUNNEL.x}px,${-(TUNNEL.y + TUNNEL.h)}px,${TUNNEL.z}px)` }} />
           <div className="floor-light" aria-hidden="true" style={{ width: CAR.W, height: CAR.D - 60, transform: `translate3d(${-CAR.W / 2}px,-1px,${-CAR.D / 2 + 60}px) rotateX(90deg)` }}><i className="rush" /></div>
           <div className="beam" aria-hidden="true" style={{ width: 1100, height: 340, transform: `translate3d(${CAB.x + CAB.w - 6}px,${-(CAB.light + 170)}px,${CAR.D / 2 - 20}px)` }} />
         </>}
         {!drawn && <div className="floor" style={{ width: b.x1 - b.x0 + 2400, height: 3000, left: b.x0 - 1200, top: -1500, transform: `translateZ(${b.z0 + 1300}px) rotateX(90deg)` }} />}
         {cards.map((c, i) => <div key={i} className="prop" style={at(c.x, c.z)}><div className="card" style={{ width: c.w, height: c.h, marginLeft: -c.w / 2, background: `rgb(${c.g},${c.g + 3},${c.g + 8})` }} /></div>)}
         {Art && <Art near={nearStop} toys={toys} />}
+        {train && dest && <Car root={root} fx={fxRef} arrival={arrival} onStood={onStood} awake={awake} open={open} roll={toys.roll ?? 0} posters={world.encoded?.filter(e => e.at.includes('poster')).map(e => e.fact) ?? []} station={{ name: dest.label, color: content.worlds[dest.world].color }} home={from} />}
         {!drawn && world.solid.map((r, i) => <div key={i} className="prop" style={at((r.x0 + r.x1) / 2, r.z0)}><div className="card" style={{ width: r.x1 - r.x0, height: 150, marginLeft: -(r.x1 - r.x0) / 2, background: '#7f8792' }} /></div>)}
         {world.stops.map(s => (
           // The tap area and its marker stand at the thing being used (`look`), not where the salaryman stands to use it.
