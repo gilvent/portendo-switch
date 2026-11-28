@@ -3,6 +3,7 @@ import type { Game } from './game.ts';
 import type { Shell } from '../shell/console.ts';
 import { sfx } from './sfx.ts';
 import './ticket.css';
+import { back, corner, cornerHole, front, type Row } from './ticketArt.ts';
 
 // The one meta object. Printed at the gate, it is his card: the front is the line, a row of hole outlines per station
 // (how many, never which); the back is how to reach him. Every fact found punches a hole, and its chad falls out.
@@ -26,33 +27,28 @@ export class Ticket {
       if (e === 'ticket-print') this.print();
       if (e === 'punch') this.punched(d as { row: string; star: boolean });
       if (e === 'place') this.drawCorner();
+      if (e === 'tap-out') setTimeout(() => this.bite(), 450);
       if (e === 'ticket') this.state === 'front' ? this.open('back') : this.state === 'back' ? this.close() : this.open('front');
       if (e === 'back' && (this.state === 'front' || this.state === 'back')) this.close();
     });
   }
-  private holes(id: string, n = 0) {
-    const r = row(id), got = this.g.save.holes.filter(h => h.startsWith(`${id}/`));
-    const punchedStar = got.filter(h => h.endsWith('*')).length, punchedRound = got.length - punchedStar;
-    let s = '';
-    for (let i = 0; i < r.round; i++) s += `<i class="hole${i < punchedRound ? ' on' : ''}${i === punchedRound - 1 && n === 1 ? ' new' : ''}"></i>`;
-    for (let i = 0; i < r.star; i++) s += `<i class="hole star${i < punchedStar ? ' on' : ''}${n === 2 ? ' new' : ''}"></i>`;
-    return s;
+  private rowData(id: string): Row {
+    const r = row(id), got = this.g.save.holes.filter(h => h.startsWith(`${id}/`)), st = got.filter(h => h.endsWith('*')).length;
+    return { label: r.label, round: r.round, star: r.star, gotRound: got.length - st, gotStar: st };
   }
+  private bitten = false;
   private drawFront() {
-    this.big.querySelector('.tk-front')!.innerHTML = `<header><span>MRT · Day pass</span><span>No. 0042</span></header>
-      <h2>${PERSON.name}</h2><p class="tk-trade">${PERSON.trade}</p>
-      <ol class="tk-rows">${ROWS.map(r => `<li><span>${r.label}</span><span class="holes">${this.holes(r.id)}</span></li>`).join('')}</ol>
-      <footer>Flip for contact ↻</footer>`;
+    this.big.querySelector('.tk-front')!.innerHTML = front(PERSON, ROWS.map(r => this.rowData(r.id)), { bite: this.bitten });
   }
   private drawBack() {
-    this.big.querySelector('.tk-back')!.innerHTML = `<header><span>Get in touch</span></header><h2>${PERSON.name}</h2><p class="tk-trade">${PERSON.trade}</p>
-      <ul class="tk-links">${PERSON.links.map(l => `<li><a href="${l.href}" target="_blank" rel="noopener" data-testid="link-${l.label.toLowerCase()}"><b>${l.label}</b> ${l.text}</a></li>`).join('')}</ul>`;
+    this.big.querySelector('.tk-back')!.innerHTML = `${back({ bite: this.bitten })}<div class="tk-contact"><header>Get in touch</header><h2>${PERSON.name}</h2><p class="tk-trade">${PERSON.trade}</p>
+      <ul class="tk-links">${PERSON.links.map(l => `<li><a href="${l.href}" target="_blank" rel="noopener" data-testid="link-${l.label.toLowerCase()}"><b>${l.label}</b> ${l.text}</a></li>`).join('')}</ul></div>`;
   }
-  drawCorner(n = 0) {
+  drawCorner() {
     if (!this.g.save.ticket) { this.corner.hidden = true; return; }
     this.corner.hidden = false;
-    const id = rowOf(this.g.place?.id ?? 'line'), r = row(id);
-    this.corner.innerHTML = `<small>${r.label}</small><span class="holes">${this.holes(id, n)}</span>`;
+    if (this.state === 'none') { this.state = 'corner'; this.el.dataset.state = 'corner'; }
+    this.corner.innerHTML = corner(this.rowData(rowOf(this.g.place?.id ?? 'line')));
   }
   private hint() {
     const src = (window as unknown as { __input?: { source: string } }).__input?.source;
@@ -75,8 +71,21 @@ export class Ticket {
     setTimeout(() => { this.state = 'back'; this.el.dataset.state = 'taken-back'; sfx.fold(); }, 800);
   }
   close() { this.state = 'corner'; this.el.dataset.state = 'corner'; sfx.fold(); this.drawCorner(); }
+  // The punch, on the corner (and the big ticket when it is up): the sheet dips under the jaw, the hole is cut on
+  // the next frame and its chad falls away turning, the sheet springs back in two frames.
   private punched(d: { row: string; star: boolean }) {
-    this.drawCorner(d.star ? 2 : 1); this.drawFront();
-    this.corner.classList.remove('kachunk'); void this.corner.offsetWidth; this.corner.classList.add('kachunk');
+    const id = rowOf(this.g.place?.id ?? 'line'), here = d.row === id;
+    for (const el of [this.corner, this.big.querySelector<HTMLElement>('.tk-card')!]) { el.classList.remove('dip'); void el.offsetWidth; el.classList.add('dip'); }
+    const at = here ? cornerHole(this.rowData(id), d.star) : null;
+    if (at) { const jaw = document.createElement('i'); jaw.className = 'tk-jaw'; jaw.style.left = `${at.x}px`; jaw.style.top = `${at.y}px`; this.corner.appendChild(jaw); }
+    setTimeout(() => {
+      this.drawCorner(); this.drawFront();
+      if (!at) return;
+      const chad = document.createElement('i'); chad.className = `tk-chad${d.star ? ' star' : ''}`; chad.style.left = `${at.x}px`; chad.style.top = `${at.y}px`;
+      this.corner.appendChild(chad); setTimeout(() => chad.remove(), 950);
+    }, 83);
   }
+  // The gate keeps it: a bite out of its bottom edge.
+  bite() { this.bitten = true; this.drawFront(); this.drawBack(); }
+
 }

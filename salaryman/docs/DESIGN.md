@@ -406,3 +406,25 @@ Found and fixed: in portrait the console was wider than the phone and cut off A,
 `min(62vh, 38vw)`, so the whole console fits). The one-page link was a 17 px target and is 43 px on touch screens. The
 one-page version itself fits a phone with no sideways scroll and puts contact first. Every audio warning has a visual
 twin since pass 4, and haptics carry the punch and the brace where the phone supports them.
+
+### Pass 6: M5, paper art where the design leans on it
+
+From a Fable 5.2 (xhigh) art spec, prototyped in the running page before it was built. The art guide (the Paper Diorama
+Checklist) is reference only; its "telling the project" rules bind. Where it conflicts with the owner's steer, the
+steer wins: scenes carry the company's theme rather than one fact per interaction (its 7.2), and the terminus is
+at night (its 1.4).
+
+| Item | Job | What it is now |
+|---|---|---|
+| Coral | One meaning | Coral is only on what A works: tabs, gate paddles, strap rings in the hold window, the door bars, the prompt, the ticket. Wall bands and the train stripe are mint, the car's trim dark, the shop's reds crimson, the terminus's line colour mint |
+| The tab | Discovery: one mark that says "this does something" | A movable book's pull-tab: a coral tongue with a round end and two cream chevrons, out of a dark slot with a cream lip, tilted 12° so it lights and casts. It previews its verb (out, in, out, in, 83 ms each) and jumps out one frame on use. 40 × 51 px at 1280×720 (was 31 × 25). Tabs never stand where he stands; the gate's reader carries the first one |
+| The ticket | Sensation: card stock you can feel; the contact card worth keeping | One die-cut SVG sheet in two inks: a coral header and tear-off stub ("FLIP"), a clipped corner, a nick at the perforation, fibre grain, a lip for its thickness. Holes are really cut, so the scene shows through. The punch is poses: the sheet dips under a jaw, the hole is cut on the next frame, the chad falls turning, the sheet springs back. The corner HUD is a torn piece of the same card. The back is the sheet turned over. The gate bites it at tap-out. The end card is heavier white stock with a coral edge, and the day's ticket is tucked under it as a stub with its real holes |
+| The station pop-up | Discovery: the place announces itself before the doors open | Two cut sheets hinged behind the car stand up over the roofline as it brakes (the back first, the front upright on the stop) and fold on the pull-away: a shop front with a striped awning, then bags and parcels; houses with sale and rent boards; a stone yard; the town at night. The car's sign is the caption. The station lights itself and its columns cross the windows as it slides in |
+| The edge-on squeeze | Challenge's release: "I only just made it" | A real turn about his vertical axis. With time to spare he half-turns in 380 ms. With the doors closing: six frames of 83 ms in which he becomes the white line of his own card, the doors pinch on it, and he is through. His shadow stays figure-shaped |
+| The crumple | The soft fail as a gag | His sheet is six columns of real geometry that fold into pleats against the wall, so the sun bands them; it holds, springs open, and the creases stay for two seconds. He no longer goes half into the wall |
+
+Not yet done, in order (the "rest"): the hero to the guide's §6.2 (a bored salaryman with a suit, a loosened tie, a
+briefcase and heavy lids; this reverses an earlier choice of the spiky-crop figure, so it waits for the owner),
+people as one family in three builds with their own expressions, the car interior as relief, the shop's objects as
+folded volumes turned to the camera, then the platform and terminus pieces. Also from the spec, not built: the ticket
+feeding out of the gate's reader at print time.

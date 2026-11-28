@@ -1,9 +1,13 @@
 .endcard { position: absolute; inset: 0; display: grid; place-items: center; z-index: 6; pointer-events: none; background: #0000; transition: background .6s; }
 .endcard.in { pointer-events: auto; background: #0008; }
-.ec-card { width: min(88%, 520px); background: #fff6e3; border-radius: 10px; padding: 3.2% 4.5%; font-family: Fredoka, sans-serif; color: #23262b; box-shadow: 0 12px 30px #0008;
-  transform: translateY(40px) rotate(-3deg) scale(.9); opacity: 0; transition: transform .6s cubic-bezier(.3,1.5,.5,1), opacity .3s; }
-.endcard.in .ec-card { transform: none; opacity: 1; }
-.ec-card.gold { box-shadow: 0 0 0 4px #f6b73c, 0 12px 30px #0008; }
+.ec-wrap { width: min(88%, 520px); display: grid; justify-items: start; isolation: isolate; transform: translateY(40px) rotate(-3deg) scale(.9); opacity: 0; transition: transform .6s cubic-bezier(.3,1.5,.5,1), opacity .3s; }
+.endcard.in .ec-wrap { transform: none; opacity: 1; }
+/* The business card: whiter, heavier stock than the ticket, a lip for its thickness, a coral band down its edge. */
+.ec-card { width: 100%; box-sizing: border-box; background: #fffdf6 linear-gradient(90deg, #e8552d 0 10px, #0000 10px); border-radius: 6px; padding: 3.2% 4.5% 3.2% calc(4.5% + 10px); font-family: Fredoka, sans-serif; color: #23262b;
+  filter: drop-shadow(0 2.5px 0 #cfc7b4) drop-shadow(0 12px 18px #0007); }
+.ec-card.gold { box-shadow: 0 0 0 3px #f6b73c; }
+.ec-stub { margin: -10px 0 0 18px; z-index: -1; rotate: -1.2deg; max-width: 100%; overflow: hidden; filter: drop-shadow(0 1.5px 0 #b9a27a) drop-shadow(0 6px 8px #0006); }
+.ec-stub svg { display: block; max-width: 100%; height: auto; }
 .ec-card h2 { margin: 0; font: 700 clamp(18px, 3.6vw, 34px) Fredoka, sans-serif; }
 .ec-trade { margin: 0 0 6px; color: #62676f; font-size: clamp(11px, 1.5vw, 15px); }
 .ec-card ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
@@ -23,11 +27,11 @@
 /* A phone: the card leaves the little screen and takes the whole viewport, links big enough for a thumb. */
 @media (max-width: 700px), (max-height: 500px) {
   .endcard { position: fixed; z-index: 20; }
-  .ec-card { width: 92vw; padding: 20px 18px; }
+  .ec-wrap { width: 92vw; } .ec-card { padding: 20px 18px 20px 28px; }
   .ec-card h2 { font-size: 26px; } .ec-trade { font-size: 15px; }
   .ec-card ul { gap: 8px; }
   .ec-card a { font-size: 16px; min-height: 44px; display: flex; align-items: center; }
   .ec-note { font-size: 14px; } .ec-again { font-size: 16px; min-height: 44px; padding: 8px 22px; }
 }
 @media (max-width: 700px) { .ec-card ul { grid-template-columns: 1fr; } }
-@media (max-height: 500px) { .ec-card { padding: 12px 18px; } .ec-card h2 { font-size: 22px; } }
+@media (max-height: 500px) { .ec-card { padding: 12px 18px 12px 28px; } .ec-card h2 { font-size: 22px; } }

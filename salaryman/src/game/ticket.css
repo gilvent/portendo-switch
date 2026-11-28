@@ -1,6 +1,6 @@
 .ticket-layer { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
-.ticket-corner { pointer-events: auto; position: absolute; left: 12px; top: 12px; display: flex; flex-direction: column; gap: 4px; padding: 7px 10px 8px; border: 0; border-radius: 6px; cursor: pointer;
-  background: #fff6e3; box-shadow: 0 3px 0 #0003, inset 0 0 0 1px #0001; font: 600 11px Fredoka, sans-serif; color: #62676f; text-align: left; transition: transform .3s, opacity .3s; transform-origin: 0 0; }
+.ticket-corner { pointer-events: auto; position: absolute; left: 0; top: 0; display: block; padding: 0; border: 0; background: none; cursor: pointer; line-height: 0;
+  transition: transform .3s, opacity .3s; transform-origin: 0 0; }
 .ticket-corner[hidden] { display: none; }
 .ticket-layer:not([data-state="corner"]) .ticket-corner { opacity: 0; transform: scale(.8); pointer-events: none; }
 .ticket-corner.kachunk { animation: kachunk .45s cubic-bezier(.3,1.8,.5,1); }
@@ -22,10 +22,15 @@
 .ticket-layer[data-state="print"] .tk-card { animation: print 1.4s cubic-bezier(.3,1.2,.5,1) forwards; }
 @keyframes print { 0% { transform: translate(-45%, -20%) scale(.62, .12); opacity: 0; } 20% { transform: translate(-45%, -35%) scale(.62); opacity: 1; } 78% { transform: translate(-45%, -35%) scale(.62); opacity: 1; } 100% { transform: translate(-95%, -95%) scale(.2); opacity: 0; } }
 .ticket-layer[data-state="back"] .tk-card { transform: rotateY(180deg); }
-.tk-face { position: absolute; inset: 0; backface-visibility: hidden; background: #fff6e3; border-radius: 10px; padding: 4.5% 6%; box-shadow: 0 10px 30px #0006; display: flex; flex-direction: column; font-family: Fredoka, sans-serif; color: #23262b;
-  background-image: radial-gradient(circle at 0 50%, #0000 9px, #fff6e3 10px), radial-gradient(circle at 100% 50%, #0000 9px, #fff6e3 10px); }
+.tk-face { position: absolute; inset: 0; backface-visibility: hidden; font-family: Fredoka, sans-serif; color: #23262b; }
+/* The card is the SVG: cut outline, real holes, grain. Its lip (the stock's thickness) and shadow are a filter on the
+   SVG itself; on .tk-card it would flatten the 3D flip. */
+.tkp { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 1.5px 0 #b9a27a) drop-shadow(0 8px 12px #0007); }
+.ticket-corner .tkp { position: static; width: auto; height: auto; filter: drop-shadow(0 1.5px 0 #b9a27a) drop-shadow(0 3px 4px #0005); }
+.tk-contact { position: absolute; left: 28%; right: 5%; top: 5%; bottom: 6%; display: flex; flex-direction: column; }
+.tk-contact header { font: 600 11px Fredoka, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #e8552d; border-bottom: 2px dashed #e4d6b8; padding-bottom: 4px; }
 .tk-back { transform: rotateY(180deg); }
-.tk-face header { display: flex; justify-content: space-between; font: 600 11px Fredoka, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #e8552d; border-bottom: 2px dashed #e4d6b8; padding-bottom: 4px; }
+.tk-face header.old { display: flex; justify-content: space-between; font: 600 11px Fredoka, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #e8552d; border-bottom: 2px dashed #e4d6b8; padding-bottom: 4px; }
 .tk-face h2 { margin: 6px 0 0; font: 700 clamp(18px, 3.2vw, 28px) Fredoka, sans-serif; }
 .tk-trade { margin: 0 0 4px; color: #62676f; font-size: 13px; }
 .tk-rows { list-style: none; margin: auto 0 0; padding: 0; display: grid; gap: 4px; font-size: 12px; }
@@ -52,4 +57,16 @@
   .tk-card { width: 92vw; max-width: 420px; }
   .ticket-layer[data-state="back"] .tk-card { aspect-ratio: auto; min-height: 300px; }
   .tk-links a { font-size: 16px; min-height: 44px; display: flex; align-items: center; }
+  .ticket-layer[data-state="back"] .tk-contact { inset: 0; padding: 14px 16px; background: #fff6e3; border-radius: 10px; }
 }
+
+/* The punch: stop-motion poses, 83 ms each (the sheet dips under the jaw, the hole is cut, it springs back). */
+.dip { animation: dip .333s step-end; }
+@keyframes dip { 0% { translate: 0 3px; rotate: -3deg; } 25% { translate: 0 0; rotate: 0deg; } 50% { translate: 0 -2px; rotate: 1.5deg; } 75% { translate: 0 1px; rotate: -.6deg; } 100% { translate: 0 0; rotate: 0deg; } }
+.tk-jaw { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: #23262bcc; animation: jaw .083s step-end forwards; pointer-events: none; }
+@keyframes jaw { to { opacity: 0; } }
+.tk-chad { position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: #fff6e3; box-shadow: inset 0 0 0 1.3px #e8552d66; pointer-events: none;
+  animation: chad2 .9s steps(11) forwards; }
+.tk-chad.star { border-radius: 1px; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+@keyframes chad2 { to { transform: translate(6px, 66px) rotateX(620deg) rotate(40deg); } }
+@media (prefers-reduced-motion: reduce) { .dip { animation: none; } .tk-chad { animation: none; transform: translateY(10px); } }
