@@ -1,94 +1,124 @@
-# The MRT: game design
+# The MRT: opening and hub
 
 The commute that opens the site: the platform on the handheld's screen, boarding (which docks the console), and the
-inside of the MRT car on the big screen. It was rebuilt in three passes, in this order, and each pass had to hold
-before the next began:
+inside of the MRT car on the big screen, which is the hub. This is its sheet in the three layers of `GAME_DESIGN.md`,
+bottom up. It was built in that order too: rules first, then a greybox with no art (`?graybox`) to tune what the rules
+do, then the feel, and only then the paper (`ART_BIBLE.md`).
 
-1. **Mechanics**: the rules. What the player can do, what each thing does back, and the systems underneath.
-2. **Dynamics**: the rules running. A greybox with no art (`?graybox`), tuned until the play itself is fun.
-3. **Aesthetics**: the paper. The look is applied last, by the Paper Diorama Checklist and `ART_BIBLE.md`.
+## 1. Mechanics
 
-The art bible says how things look. This file says how they play.
+### Systems (`src/mrt/sim.ts`)
 
-## Pillars
+- **The train.** One state: speed `v` and acceleration `a`. It pulls away when the car opens, cruises with small
+  notches of power and brake, brakes to a stand when a stop is asked for, and lets go all at once as it stands.
+- **Pendulums.** Anything that hangs: the car's ten hand straps and the help point's handset; the platform's two
+  hanging boards. Pushed by `-a` in the car, by the train's wind on the platform, and by his head or a finger.
+- **A roller.** The drinks can: rolls freely along the car, hardly across it. Pushed by `-a`, kicked by his feet,
+  thrown back by the end walls, flattened by a landing, and springs back.
+- **Him.** `-a` leans him and slides his feet; in the air the car changes speed under him. Stepping onto the train as
+  it pulls away throws him down the car.
 
-- **Everything answers.** If the player can reach it, bump it, jump into it or tap it, it does something, in the same
-  frame, the way that thing would if it were made of paper.
-- **One button, many answers.** A is "use". No two things answer it the same way, and each answer carries one fact
-  about whose site this is. Nothing is explained in a panel of text.
-- **The commute is the tutorial.** Walk, use, jump and back are each needed once, in that order, before the first
-  project. No instruction is ever given that the scene does not also give.
-- **One force, many toys.** The train's acceleration is a single number. Every loose thing in the car reads it. The
-  player never controls it directly, only by riding, so the car feels alive without a second system to learn.
-- **Not a game inside the game.** No score, no timer, no fail state. Interactions are small (checklist 7.5).
+### The platform (handheld)
 
-## Verbs
-
-| Verb | Input | Rule |
+| Thing | Kind | Rule |
 |---|---|---|
-| Walk | stick, arrows, tap a spot | Handheld: along the platform. Docked: on the car floor, eased, with a dead stop at a thing to use. |
-| Use | A, Enter, tap the thing | Acts on the nearest thing in reach. Its marker shows it; the prompt shows when A will work. |
-| Jump | A with nothing in reach | Both screens. His head **bonks** anything hanging in its path. In the car a jump is also affected by the train: brake while he is in the air and the floor moves under him. |
-| Back | B, Esc | Puts down what is open. At the doors it turns the destination. With nothing open it asks, then leaves. |
-| Bump | walking into things | Loose things are pushed; standing things and people answer. |
-| Tap | pointer on any paper | Whatever is under the finger answers, wherever he stands. |
+| Ticket gate | Stop | Shut, it stops him. A taps the pass: it opens, the pass pops up with his name and trade, the train is called |
+| Line map | Stop | A turns its lamp to the other line. The departure board and the train's own sign take that stop |
+| Train door | Stop | Usable only when the train stands. A boards, which docks the console |
+| The gate says no | Find | Walk into the shut gate |
+| The name board swings | Find | Jump under it (his head knocks it and his rise stops), or a finger |
+| The commuter wakes | Find | Jump beside the sleeper, or a finger |
+| Departure board | - | Always says the next thing to do |
 
-## Systems
+### The car (docked)
 
-**The train** (`src/mrt/sim.ts`). One state: speed `v` (0 to 1) and acceleration `a`. It pulls away when the car
-opens, cruises with small notches of power and brake a few seconds apart, brakes to a stand when a stop is asked for,
-and gives one last lurch as it stops. Everything that says "moving" (tunnel, sleepers, wheels, sway) plays at `v`.
-Everything loose is pushed by `-a`.
+| Thing | Kind | Rule |
+|---|---|---|
+| Doors | Stop (a door) | A asks for the stop on the sign. B turns the sign |
+| Poster roll | Stop | A winds on one poster of three: a greeting, his name, what he does |
+| Line map | Stop | A turns the sign to the other stop; its lamp moves |
+| Help point | Stop | A lifts the handset and opens the contact card |
+| A strap to swing | Find | Jump anywhere under a rail, or a finger |
+| A can to kick | Find | Walk into the can, or a finger |
+| A can to flatten | Find | Land on it |
+| The roll comes round | Find | Wind the poster roll back to its first poster |
+| The whole carriage | Find | Brush past every passenger who answers |
+| Passengers, suitcase, bag | Touchable | Each answers a bump in its own way |
 
-**Pendulums.** Anything that hangs is a damped pendulum with its own length and damping, so no two swing in step:
-the car's hand straps and the help point's handset; the platform's hanging signs. They are driven by the train's `-a`,
-by a bonk from his head, by the wind of a train arriving, and by a tap.
+## 2. Dynamics
 
-**Rollers.** The drinks can on the car floor rolls freely along the car and hardly at all across it. It is kicked by
-his feet, pushed by `-a`, knocks back off the end walls, and is flattened when he lands on it (it springs back).
+What happens when those rules run, in the order a first-time player meets it.
 
-**Him.** The same `-a` leans him and slides his feet a little on a hard brake or a start. In the air he keeps his own
-speed while the car changes its speed under him.
+1. **He walks right and the gate stops him.** The paddles rattle, the reader buzzes, and the first star is found
+   before anything has been explained: unmarked things answer, and the game keeps count.
+2. **A opens the gate and the wait begins.** The train takes about two seconds. In that time A does nothing useful, so
+   it is a jump, and he is standing under the name board: the second find is the likeliest next press.
+3. **The train arrives as weather.** Its wind swings both boards, leans him, blows scraps down the platform and shakes
+   the screen. Nothing was pressed; the place did it.
+4. **Boarding is a change of scale.** The handheld's flat theatre folds into the dock and opens as a room.
+5. **The train throws him.** It is already pulling away: he slides down the car with the straps swinging back and the
+   can rolling past, and stops under the poster roll with A lit. The hub's first answer is who this is.
+6. **The way out is behind him.** The doors are marked and their sign is lit. Walking back to them crosses the can's
+   path and passes under the rail.
+7. **Asking for a stop moves the whole car.** Chime, brake: every strap swings forward, the can rolls forward, he
+   slides, the station comes up to the windows; then the brake lets go, everything swings back, every passenger jolts
+   in turn, and only then do the doors open.
 
-**Sound** (`src/sfx.ts`). Every answer has a short synthesised sound of its own. One button mutes all of it.
+Two speeds run through this. **In a hurry:** hold right, A at the gate, A at the door, walk back, A at the doors: the
+first project in three presses and about fifteen seconds. **Wandering:** three stars on the platform and five in the car,
+none of them needed.
 
-Under reduced motion nothing swings, rolls, slides or blows: every toy steps straight to its end state.
+## 3. Aesthetics
 
-## The platform (handheld)
+### Discovery
 
-A one-way funnel of about twenty seconds, each beat gated by the one before.
+| Moment | What is found | Why it lands |
+|---|---|---|
+| The shut gate | Unmarked things answer | It happens by accident, within three seconds |
+| The pass | His name and trade | It is the answer to the first A |
+| The line map | The site has two lines: work, and side projects | Choosing one changes where the train goes |
+| The dock | The game is bigger than the screen it started on | A change of dimension, once |
+| The poster roll | Who he is, a line at a time | He is thrown at it; each A shows one more |
+| Stars | Eight things nothing points at | The pass shows how many are left, never which |
+| The station at the windows | Where a project is, before the doors open | It arrives in the stop's own colour and name |
 
-| Beat | Thing | A does | Also answers | Teaches / tells |
-|---|---|---|---|---|
-| 1 | Stairs | (he arrives down them) | | Walk |
-| 2 | **Ticket gate** | Taps his pass: the reader turns green, the paddles drop, the pass pops up, the train is called | Walking into it shut: the paddles rattle, the reader buzzes | Use. The pass is his name and his trade |
-| 3 | **Line map** | Turns the lamp to the other line: its stops light one after another, and the departure board and the train's own sign take that destination | | What is on the site: a Work line and a Side projects line |
-| 3 | Bench sleeper | | Walking past: "z". A jump beside him: he starts awake | |
-| 3 | Platform sign | | A jump under it: his head bonks it and it swings | Jump |
-| 3 | The train arriving | | Its wind swings every hanging sign, leans him, and blows scraps along the platform | |
-| 4 | **Train door** | Boards: he steps in, the doors shut, the train pulls out, the console goes to the dock | | Boarding is docking |
+### Sensation
 
-The departure board always says the next thing to do. The gate cannot be passed shut, and the door cannot be used
-until the train stands.
+| Sense | What carries it |
+|---|---|
+| Eye | Real pendulums and a real roller, redrawn in steps like stop-motion; squash and stretch on him; scraps and dust; the camera knocking when the train stands, on a hard landing, when the can is crushed |
+| Ear | A sound for every answer; the train's rumble, as loud as it is fast; two knocks at each rail joint; a footstep to each stride; a chime before the brake; three rising notes for a star |
+| Hand | The on-screen button goes down with its key and the stick tips with the arrows; a phone buzzes on a knock, a crunch, a stamp, a star |
 
-## The car (docked)
+### Challenge: the whole of it
 
-The hub. He comes in through the door he boarded by as the train pulls away, and the pull-away shoves him and
-everything loose toward the back.
+Four things to work out, each with its hint already on screen. There is no fifth.
 
-| Thing | A does | Also answers | Tells |
-|---|---|---|---|
-| **Doors** | Asks for the stop on the sign: chime, brake, the station slides up to the windows, the doors open, he walks out | B turns the sign | Where the projects are |
-| **Line map** | Turns the sign to the other stop: the map's lamp runs to it | The sign's arrows, for a pointer | The same two lines as the platform |
-| **Poster roll** | Winds the roll on one poster: three in all | | Who he is and what he does |
-| **Help point** | Lifts the handset and opens the contact card | The handset swings on its cord with the train | How to reach him |
-| Hand straps | | A jump bonks them; the train swings all of them | |
-| Drinks can | | Kicked, rolled by the train, flattened by a landing | |
-| Passengers | | Each answers a bump in their own way; all of them jolt when the train stops | |
-| Suitcase, bag | | Hop when bumped | |
+| To work out | Hint |
+|---|---|
+| How to move | The legend; the lit stick, which tips when an arrow is pressed |
+| What A is for | The gate will not let him by; the departure board says to tap the pass; A is prompted there |
+| How to board | The door mark on the floor; the departure board; A is prompted at the door |
+| Where to go in the car | The doors keep their pennant; the sign over them is the only lit thing in the car |
+
+Nothing here is timed. The gate cannot be failed, only not yet opened. A jump cannot miss a strap.
 
 ## Tuning
 
-The numbers that make it feel right live at the top of `src/mrt/sim.ts`, and the journey test holds the ones that
-matter: a jump under a strap swings it, a brake swings all of them the same way and rolls the can forward, the can
-comes back off the end wall, and under reduced motion none of it moves.
+The numbers that make it feel right are at the top of `src/mrt/sim.ts`, and `SHOVE` in `App.tsx`. The journey test
+reads the physics from the game and holds what matters: the first star comes from the gate; a jump under a rail swings
+a strap; a brake swings all of them one way and rolls the can; the doors wait for the train to stand; boarding leaves
+him under the poster roll and out of reach of the doors; each find counts once; under reduced motion none of it moves.
+
+## What changed between passes, and why
+
+- **The car opened with "Get off" already prompted.** A player pressing A never saw the hub. Now the pull-away throws
+  him to the poster roll: the first answer in the car is an introduction, and leaving costs one short walk.
+- **Finds were unrecorded.** Bonking a strap was fun once and then forgotten. Stars on the pass, with the count
+  showing and the names hidden, make each one a discovery and the missing ones a question.
+- **Answers were only seen.** Sound came first; then the rumble, the rail joints, footsteps, the buzz and the camera
+  knock, so that heavy things feel heavy.
+- **The controller was a picture.** It now moves with the keyboard, which removed the one piece of reading a new player
+  had to do.
+- **Strap rail by the windows.** It sat inside the reach of the back wall's stops, so A there used a stop instead of
+  jumping. It moved over the aisle.

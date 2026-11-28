@@ -1,5 +1,7 @@
-// Every answer has a sound of its own, synthesised: no samples. Nothing plays before the player has pressed
-// something (browsers do not allow it, and neither should a portfolio), and one switch mutes all of it.
+// Sensation, by ear and by hand. Every answer has a sound of its own, synthesised: no samples. The harder ones are
+// also felt, on a phone that can buzz. The train has a bed of rumble under everything, as loud as it is fast. Nothing
+// plays before the player has pressed something (browsers do not allow it, and neither should a portfolio), and one
+// switch mutes all of it.
 type Tone = { f: number; to?: number; d: number; type?: OscillatorType; v?: number; at?: number };
 type Hiss = { d: number; f: number; to?: number; q?: number; v?: number; at?: number };
 let ctx: AudioContext | null = null, out: GainNode | null = null, buf: AudioBuffer | null = null;
@@ -58,15 +60,34 @@ const SOUNDS = {
   jump: () => tone({ f: 300, to: 620, d: .13, type: 'triangle', v: .22 }),
   land: () => { tone({ f: 150, to: 80, d: .08, v: .4 }); hiss({ d: .05, f: 700, q: 1, v: .25 }); },
   use: () => tone({ f: 660, to: 990, d: .08, type: 'triangle', v: .25 }),
-  stamp: () => { tone({ f: 110, to: 70, d: .1, v: .6 }); hiss({ d: .06, f: 1000, q: 1, v: .4 }); }
+  stamp: () => { tone({ f: 110, to: 70, d: .1, v: .6 }); hiss({ d: .06, f: 1000, q: 1, v: .4 }); },
+  step: () => hiss({ d: .03, f: 1100, q: 1.4, v: .1 }),
+  // A find: three bright notes going up.
+  find: () => { [1047, 1319, 1568].forEach((f, i) => tone({ f, d: .22, type: 'sine', v: .3, at: i * .07 })); tone({ f: 2093, d: .3, type: 'triangle', v: .12, at: .21 }); },
+  // Wheels over a rail joint: two knocks.
+  joint: () => { tone({ f: 95, to: 60, d: .06, v: .32 }); tone({ f: 85, to: 55, d: .06, v: .24, at: .11 }); }
 };
+// What the hand feels, in milliseconds on and off, for the sounds that are a knock.
+const BUZZ: Partial<Record<keyof typeof SOUNDS, number | number[]>> = { beep: 12, deny: [30, 40, 30], bonk: 18, ting: 8, clank: 14, crunch: [10, 30, 20], land: 8, stamp: 24, find: [12, 40, 12], doors: 10, clack: 10 };
 export type Sound = keyof typeof SOUNDS;
 // `gap`: the same sound will not start again within this many milliseconds (a can rattling along a wall).
 export function play(name: Sound, gap = 40) {
   const now = performance.now();
   if (now - (last.get(name) ?? -1e9) < gap) return;
   last.set(name, now);
-  try { SOUNDS[name](); } catch { /* a sound is never worth an error */ }
+  try { SOUNDS[name](); const b = BUZZ[name]; if (b && !muted && navigator.userActivation?.hasBeenActive) navigator.vibrate?.(b); } catch { /* a sound is never worth an error */ }
+}
+// The train's bed: a low rumble whose loudness follows `v`, 0..1. It starts with the first call and stays for the page.
+let rumble: GainNode | null = null;
+export function bed(v: number) {
+  const c = ready();
+  if (!c || !out || !buf) return;
+  if (!rumble) {
+    const n = c.createBufferSource(), flt = c.createBiquadFilter(); rumble = c.createGain();
+    n.buffer = buf; n.loop = true; flt.type = 'lowpass'; flt.frequency.value = 150; rumble.gain.value = 0;
+    n.connect(flt).connect(rumble).connect(out); n.start();
+  }
+  rumble.gain.setTargetAtTime(Math.max(0, v) * .5, c.currentTime, .15);
 }
 export const isMuted = () => muted;
-export function setMuted(m: boolean) { muted = m; try { localStorage.setItem('mute', m ? '1' : '0'); } catch { /* private mode */ } if (m && ctx) void ctx.suspend(); }
+export function setMuted(m: boolean) { muted = m; if (m && rumble && ctx) rumble.gain.setTargetAtTime(0, ctx.currentTime, .05); try { localStorage.setItem('mute', m ? '1' : '0'); } catch { /* private mode */ } if (m && ctx) void ctx.suspend(); }

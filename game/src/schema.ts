@@ -38,6 +38,9 @@ export type World = {
   offLine?: boolean;
   url?: string; role?: string; description?: string; logo?: string; color: string;
   stops: Stop[]; letters: Letter[];
+  // Things here that answer but are not marked: nothing points at them, and nothing has to be done with them. The first
+  // time one is set off it is a find, and the pass keeps count. `label` is what the pass calls it once it is found.
+  finds?: { id: string; label: string }[];
   // Facts this world shows by play instead of text: each names the stops where it is acted out. Never displayed.
   encoded?: { fact: string; at: string[] }[];
 };
@@ -80,6 +83,7 @@ export function validateContent(c: Content): Content {
     w.stops.forEach((s, i) => { if (s.action.kind === 'road') { const t = c.worlds[s.action.to]; if (!t) fail(`worlds.${id}.stops[${i}].action.to`, `unknown world ${s.action.to}`); else if (!t.stops.some(x => x.id === (s.action as { stop: string }).stop)) fail(`worlds.${id}.stops[${i}].action.stop`, 'unknown arrival stop'); } });
     if (w.back && !c.worlds[w.back.world]?.stops.some(x => x.id === w.back?.stop)) fail(`worlds.${id}.back`, 'unknown stop');
     for (const l of letterIds) if (!used.has(l)) fail(`worlds.${id}.letters.${l}`, 'no stop opens this letter');
+    w.finds?.forEach((f, i) => { if (!f.id || !f.label) fail(`worlds.${id}.finds[${i}]`, 'needs an id and a label'); if (w.finds!.findIndex(k => k.id === f.id) !== i) fail(`worlds.${id}.finds[${i}].id`, `duplicate ${f.id}`); });
     w.encoded?.forEach((e, i) => { if (!e.fact) fail(`worlds.${id}.encoded[${i}].fact`, 'missing'); for (const a of e.at) if (!stopIds.has(a)) fail(`worlds.${id}.encoded[${i}].at`, `unknown stop ${a}`); });
   }
   return c;

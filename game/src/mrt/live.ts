@@ -12,5 +12,9 @@ export const hero = {
 };
 // The train's motion as the car feels it. App reads `a` to slide and lean him.
 export const ride = { a: 0, v: 0 };
+// A live layer reports an unmarked thing set off (schema.ts: World.finds); App records it. And a jolt for the camera:
+// a layer adds to `shake.v`, App spends it.
+export const finds = { report: (_world: 'intro' | 'mrt', _id: string) => {} };
+export const shake = { v: 0 };
 // The platform's wind, -1..1: App leans him by it.
 export const wind = { x: 0 };

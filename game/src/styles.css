@@ -430,3 +430,20 @@ button { font:inherit; cursor:pointer; }
 .controller[data-mode="docked"] .pf-grain { display:none; }
 [data-gate="open"] .pf-paddle-far { transform:scaleX(.1); }
 @media (max-width:560px) { .stamps { top:58px; } }
+/* ---------- finds: the pass's count for this place, and the tag that names a find (App.tsx) ---------- */
+.pips { display:flex; align-items:center; gap:3px; margin-top:4px; }
+.pips i { width:8px; height:8px; box-sizing:border-box; border-radius:50%; border:1.5px solid #a9b0b9; }
+.pips i.on { background:#e8552d; border-color:#e8552d; }
+.pips i.star { width:12px; height:12px; border:0; border-radius:0; background:#cfd4da; clip-path:polygon(50% 0,62% 34%,98% 36%,69% 58%,80% 94%,50% 72%,20% 94%,31% 58%,2% 36%,38% 34%); }
+.pips i.star.on { background:#f0a51e; }
+.pips i + i.star { margin-left:1px; } .pips i:not(.star) + i.star { margin-left:6px; }
+.found { position:fixed; z-index:36; left:12px; top:118px; margin:0; display:flex; align-items:center; gap:6px; padding:5px 12px 6px 8px; background:#fffaf0; color:#23272d; border-radius:4px; font-size:14px; line-height:18px; font-weight:600; box-shadow:var(--shadow-sm); pointer-events:none; transform-origin:0 50%; animation:found 2.6s steps(26,end) both; }
+.found i { width:16px; height:16px; background:#f0a51e; clip-path:polygon(50% 0,62% 34%,98% 36%,69% 58%,80% 94%,50% 72%,20% 94%,31% 58%,2% 36%,38% 34%); animation:found-spin .5s steps(6,end); }
+@keyframes found { 0% { transform:translateX(-30px) scale(.4) rotate(-8deg); opacity:0; } 7% { transform:scale(1.12) rotate(2deg); opacity:1; } 12%,86% { transform:none; opacity:1; } 100% { transform:translateY(-10px); opacity:0; } }
+@keyframes found-spin { from { transform:rotate(-180deg) scale(.3); } }
+@media (max-width:560px) { .found { top:128px; } }
+@media (prefers-reduced-motion:reduce) { .found,.found i { animation:none; } }
+/* A button held, by a finger or by its key: it goes down into the controller. */
+.pad:active,.pad[data-down] { translate:0 3px; box-shadow:0 1px 0 #171b22,0 3px 3px rgba(0,0,0,.35); }
+.pad.lit:active,.pad.lit[data-down] { box-shadow:0 1px 0 #6a1c0c,0 3px 3px rgba(0,0,0,.35); }
+.nub { transition:transform .06s linear; }

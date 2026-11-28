@@ -11,7 +11,7 @@ import { content } from './content.ts';
 import { reducedMotion } from './light.ts';
 import { SalarymanArt, SEAT } from './art/Salaryman.tsx';
 import { pend, resting, stepPend, type Pend } from './mrt/sim.ts';
-import { hero, wind } from './mrt/live.ts';
+import { finds, hero, wind } from './mrt/live.ts';
 import { play } from './sfx.ts';
 
 export const GATE_X = -170, DOOR_X = 310, BENCH_X = -75, MAP_X = 112;
@@ -80,7 +80,7 @@ export default function Platform({ gate, arrived, near, line, leaving }: Props) 
       // His head, on the way up, under the name board.
       const head = FEET - TALL - hero.y * .92, hx = sx(hero.x);
       if (hero.air && hero.vy > 0 && head < NAME.y + NAME.h + 3 && hx > NAME.x - 6 && hx < NAME.x + NAME.w + 6 && t - bonked > 400) {
-        bonked = t; hero.bonk = 1; play('bonk', 0);
+        bonked = t; hero.bonk = 1; play('bonk', 0); finds.report('intro', 'board');
         // Hit off-centre, it swings away from him; dead centre, the way he was going.
         P[0].p.om += ((hx - P[0].cx) / (NAME.w / 2) * -1.6 + (hero.vx > 20 ? .9 : hero.vx < -20 ? -.9 : .5));
         const s = fxRef.current?.children[0]; if (s) for (let i = 0; i < 3; i++) (fxRef.current!.children[i] as SVGElement).animate([{ transform: `translate(${hx}px,${NAME.y + NAME.h}px)`, opacity: 1 }, { transform: `translate(${hx + (i - 1) * 46}px,${NAME.y + NAME.h + 40 - i * 9}px) rotate(${(i - 1) * 200}deg)`, opacity: 0 }], { duration: 420, easing: 'steps(6,end)' });
@@ -91,18 +91,21 @@ export default function Platform({ gate, arrived, near, line, leaving }: Props) 
         get()?.setAttribute('transform', `rotate(${(-p.th * 57.3).toFixed(2)} ${cx} ${ROOF})`);
       }
       if (!el) return;
+      // The train going by shakes the whole theatre a little.
+      const rumble = g > .1 && g < 1.7 ? Math.sin(Math.min(1, (g - .1) / .4) * Math.min(1, (1.7 - g) / .8) * Math.PI / 2) * 1.8 : 0;
+      el.style.translate = rumble ? `${(Math.sin(t / 19) * rumble).toFixed(2)}px ${(Math.cos(t / 13) * rumble).toFixed(2)}px` : '';
       // Walking into the shut gate: its paddles rattle and the reader says no.
       const pushing = el.dataset.gate === 'shut' && hero.x > GATE_X - 34 && hero.vx === 0 && hero.facing > 0 && hero.pushing;
-      if (pushing && !pushed) { play('rattle'); play('deny', 400); el.toggleAttribute('data-denied', true); window.setTimeout(() => el.toggleAttribute('data-denied', false), 420); }
+      if (pushing && !pushed) { finds.report('intro', 'gate'); play('rattle'); play('deny', 400); el.toggleAttribute('data-denied', true); window.setTimeout(() => el.toggleAttribute('data-denied', false), 420); }
       pushed = pushing;
       // A jump beside the sleeper starts him awake.
-      if (hero.jumps !== jumps) { jumps = hero.jumps; if (Math.abs(hero.x - BENCH_X) < 80 && t - startled > 1600) { startled = t; play('pop'); el.toggleAttribute('data-startled', true); window.setTimeout(() => el.toggleAttribute('data-startled', false), 1500); } }
+      if (hero.jumps !== jumps) { jumps = hero.jumps; if (Math.abs(hero.x - BENCH_X) < 80 && t - startled > 1600) { startled = t; play('pop'); finds.report('intro', 'sleeper'); el.toggleAttribute('data-startled', true); window.setTimeout(() => el.toggleAttribute('data-startled', false), 1500); } }
     };
     // A finger does what his head does: it knocks the boards, and it wakes the sleeper.
     onTap = (x, y) => {
       const hit = (b: typeof NAME) => x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h, el = root.current;
-      if (hit(NAME) || hit(BOARD)) { const k = hit(NAME) ? P[0] : P[1]; k.p.om += x < k.cx ? 1.4 : -1.4; play('bonk', 0); return true; }
-      if (el && Math.abs(x - sx(BENCH_X)) < 40 && y > 270 && y < 350) { startled = performance.now(); play('pop'); el.toggleAttribute('data-startled', true); window.setTimeout(() => el.toggleAttribute('data-startled', false), 1500); return true; }
+      if (hit(NAME) || hit(BOARD)) { const k = hit(NAME) ? P[0] : P[1]; k.p.om += x < k.cx ? 1.4 : -1.4; play('bonk', 0); if (k === P[0]) finds.report('intro', 'board'); return true; }
+      if (el && Math.abs(x - sx(BENCH_X)) < 40 && y > 270 && y < 350) { startled = performance.now(); play('pop'); finds.report('intro', 'sleeper'); el.toggleAttribute('data-startled', true); window.setTimeout(() => el.toggleAttribute('data-startled', false), 1500); return true; }
       return false;
     };
     gsap.ticker.add(tick);

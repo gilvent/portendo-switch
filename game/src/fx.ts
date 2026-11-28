@@ -19,6 +19,8 @@ export type Fx = {
   tap(cx: number, cy: number): void;
   // One touchable hops, by name, as if he had brushed it; `says` overrides what it says.
   nudge(name: string, says?: string): void;
+  // Told whenever he (or a finger) sets a touchable off, by its name.
+  onTouch: ((name: string) => void) | null;
 };
 
 let seed = 7;
@@ -50,6 +52,7 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
   const jump = (els: Iterable<HTMLElement>, L: number) => { for (const el of els) el.animate({ translate: ['0 0', `0 ${-L}px`, '0 0', `0 ${(-L * .35).toFixed(1)}px`, '0 0'] }, { duration: 460, easing: 'steps(9,end)' }); };
   let tapped = -1e9;
   const fx: Fx = {
+    onTouch: null,
     dust(x, z, dir, n = 2) {
       if (reducedMotion()) return;
       for (let i = 0; i < n; i++) { const d = dir || (i % 2 ? 1 : -1); fly('bit dust', x + rnd(-8, 8), rnd(3, 7), z + rnd(2, 10), d * rnd(40, 110), rnd(50, 120), rnd(-10, 20), rnd(6, 10), DUST[i % DUST.length], rnd(340, 460), 0, 420); }
@@ -74,7 +77,7 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
       // A live thing (src/mrt) is told, so its own physics can answer too.
       const live = el.closest<HTMLElement>('[data-live]'); if (live) scene.dispatchEvent(new CustomEvent('live-tap', { detail: live.dataset.live }));
       const t = amb.touch.find(k => k.name === el.dataset.g), x = +(el.dataset.x ?? 0), z = +(el.dataset.z ?? 0);
-      if (t) { last.set(t.name, now); hop(t); if (t.says) fx.say(t.x, t.top ?? 120, t.z, t.says); else fx.dust(t.x, t.z + 8, 0, 2); return; }
+      if (t) { last.set(t.name, now); hop(t); fx.onTouch?.(t.name); if (t.says) fx.say(t.x, t.top ?? 120, t.z, t.says); else fx.dust(t.x, t.z + 8, 0, 2); return; }
       if (el.dataset.big !== undefined) { jump([el], 2.5); return; }
       jump([...scene.querySelectorAll<HTMLElement>('.pp:not([data-big])')].filter(e => e === el || Math.hypot(+(e.dataset.x ?? 0) - x, +(e.dataset.z ?? 0) - z) < 64), 7);
       fx.dust(x, z + 10, 0, 2);
@@ -91,7 +94,7 @@ export function makeFx(layer: HTMLElement, scene: HTMLElement, amb: Ambient): Fx
       for (const t of amb.touch) {
         const r = t.r ?? 62;
         if (Math.abs(t.x - x) > r || Math.hypot(t.x - x, t.z - z) > r || now - (last.get(t.name) ?? -1e9) < 1500) continue;
-        last.set(t.name, now); hop(t);
+        last.set(t.name, now); hop(t); fx.onTouch?.(t.name);
         if (t.says) fx.say(t.x, t.top ?? 120, t.z, t.says);
         else fx.dust(t.x, t.z + 8, 0, 2);
       }

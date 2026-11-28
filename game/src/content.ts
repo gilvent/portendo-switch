@@ -19,7 +19,8 @@ export const content: Content = validateContent({ worlds: {
   intro: { id: 'intro', art: 'blockout', bounds: { x0: -380, x1: 380, z0: 0, z1: 0 }, solid: [], title: 'Platform', path: 'round', color: '#8d95a0',
     stops: [{ id: 'gate', label: 'Ticket gate', x: -204, z: 0, reach: 56, action: { kind: 'toy', toy: 'gate', states: 2 } },
       { id: 'map', label: 'Line map', x: 112, z: 0, reach: 62, action: { kind: 'toy', toy: 'map', states: 2 } },
-      { id: 'road-end', label: 'Board the train', x: 310, z: 0, reach: 70, action: { kind: 'dock' } }], letters: [] },
+      { id: 'road-end', label: 'Board the train', x: 310, z: 0, reach: 70, action: { kind: 'dock' } }], letters: [],
+    finds: [{ id: 'gate', label: 'The gate says no' }, { id: 'board', label: 'The name board swings' }, { id: 'sleeper', label: 'The commuter wakes' }] },
   // Home: the inside of an MRT car on its way (docs/MRT_DESIGN.md). The doors get off at the stop the sign shows; the
   // line map turns the sign; the poster roll winds on; the help point is how to reach him.
   mrt: { id: 'mrt', art: 'train', camera: { zoom: 1.12, x0: -320, x1: 480, lift: 210, liftTall: 130, ahead: 190 }, bounds: { x0: -430, x1: 430, z0: -40, z1: 110 }, solid: [{ x0: -470, x1: -420, z0: -80, z1: -28 }, { x0: 418, x1: 470, z0: -90, z1: -46 }], title: 'MRT', path: 'round', color: '#8d95a0',
@@ -33,6 +34,7 @@ export const content: Content = validateContent({ worlds: {
       { id: 'contact', title: 'Get in touch', surface: 'note', blocks: [{ kind: 'links', items: [
         { label: 'Email', href: 'mailto:alvarolukmanto@gmail.com', icon: 'brand/gmail.png' }, { label: 'LinkedIn', href: 'https://linkedin.com/in/alvaro-lukmanto', icon: 'brand/linkedin.png' },
         { label: 'Twitter', href: 'https://twitter.com/alfonsiusalvaro', icon: 'brand/twitter.png' }, { label: 'GitHub', href: 'https://github.com/gilvent', icon: 'brand/github.png' } ] }] } ],
+    finds: [{ id: 'strap', label: 'A strap to swing' }, { id: 'can', label: 'A can to kick' }, { id: 'flat', label: 'A can to flatten' }, { id: 'roll', label: 'The roll comes round' }, { id: 'everyone', label: 'The whole carriage' }],
     // What the poster roll shows, one poster to a turn (Car.tsx prints them).
     encoded: [{ fact: 'Hey there!', at: ['poster'] }, { fact: 'I am Alvaro.', at: ['poster'] }, { fact: 'I develop Web Frontends.', at: ['poster'] }] },
   blibli: { id: 'blibli', art: 'street', back: { world: 'mrt', stop: 'door' }, camera: { zoom: 1, x0: -300, x1: 300 }, bounds: { x0: -700, x1: 620, z0: -30, z1: 180 },

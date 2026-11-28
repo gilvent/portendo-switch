@@ -213,7 +213,9 @@ export function train(): Scene {
     const pri = x < -300, band = pri ? '#c9861f' : '#5d6670';
     return { id: `strap-${i}`, stock: 'cover', c: pri ? SUN : '#f4f6f8', w: 20, h: SL, o: [x - 10, RAIL_Y + 4 - SL, RAIL_Z + 1.5], u: [1, 0, 0], v: [0, 1, 0], edge: 'cut', density: 3,
       mask: `<path fill-rule="evenodd" d="M7 0H13V${SL - 34}H7Z M5 ${SL - 36}H15V${SL - 26}H5Z M10 ${SL - 28}L20 ${SL - 12}Q20 ${SL} 10 ${SL}Q0 ${SL} 0 ${SL - 12}Z M10 ${SL - 21}L5 ${SL - 12}Q5 ${SL - 5} 10 ${SL - 5}Q15 ${SL - 5} 15 ${SL - 12}Z" fill="#fff"/>`,
-      print: `<rect width="20" height="${SL}" fill="${pri ? SUN : '#f4f6f8'}"/><rect x="7" width="6" height="${SL - 34}" fill="${band}"/><rect x="5" y="${SL - 36}" width="10" height="10" fill="${band}"/>`,
+      print: `<rect width="20" height="${SL}" fill="${pri ? SUN : '#f4f6f8'}"/><rect x="7" width="6" height="${SL - 34}" fill="${band}"/><rect x="5" y="${SL - 36}" width="10" height="10" fill="${band}"/>`
+        // The ring's two cut edges are inked, so it reads against a pale station wall as well as against the tunnel.
+        + `<path d="M10 ${SL - 28}L20 ${SL - 12}Q20 ${SL} 10 ${SL}Q0 ${SL} 0 ${SL - 12}Z" fill="none" stroke="${band}" stroke-width="2.6"/><path d="M10 ${SL - 21}L5 ${SL - 12}Q5 ${SL - 5} 10 ${SL - 5}Q15 ${SL - 5} 15 ${SL - 12}Z" fill="none" stroke="${band}" stroke-width="2"/>`,
       motion: { live: `strap-${i}`, pivot: [x, RAIL_Y + 4, RAIL_Z + 1.5] } };
   };
   const straps = STRAP.xs.map(strap);

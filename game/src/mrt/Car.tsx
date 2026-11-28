@@ -6,34 +6,38 @@ import { createPortal } from 'react-dom';
 import gsap from 'gsap';
 import { reducedMotion } from '../light.ts';
 import type { Fx } from '../fx.ts';
-import { play } from '../sfx.ts';
+import { bed, play } from '../sfx.ts';
 import { BED, BORE, CAN, CAR, HANDSET, RAIL, ROLL, STRAP } from '../art/scenes/car.ts';
 import { matrix } from '../art/fold.tsx';
 import { HERO_HEIGHT } from '../art/Hero.tsx';
 import { HERO_ART } from '../art/heroArt.ts';
 import { brake, depart, newTrain, pend, resting, stepCan, stepPend, stepTrain, TUNE, type Can, type Pend, type Train } from './sim.ts';
-import { hero, ride } from './live.ts';
+import { finds, hero, ride, shake } from './live.ts';
 
 // The looping animations that are the train's motion (styles.css): they all play at its speed.
 const RUNS = new Set(['bore-rush', 'wheel-spin', 'car-sway', 'car-jolt', 'beam-flicker']);
 // How fast the station passes the windows at line speed, units/s, and how far its sheet reaches either side of the door.
 const PASS = 4200, STN = { x: -1400, w: 4160 };
 const STEP = 1 / 15, DEG = 180 / Math.PI, FLOOR = { x0: -414, x1: 408, z0: -34, z1: 104 };
-const SPLASH = ['#e8552d', '#fff4e2', '#d9dee3'];
+const SPLASH = ['#e8552d', '#fff4e2', '#d9dee3'], CAN_START = 150;
 // Who looks up when the can hits the wall at their end of the car.
 const WITNESS = { left: 'kid', right: 'strap' };
+// The passengers who answer a bump. Bumping every one of them is a find: he has walked the whole carriage.
+const CARRIAGE = ['kid', 'sleeper', 'student', 'grandpa', 'office', 'strap'];
 
 export type Station = { name: string; color: string };
 // arrival: 0 while the train runs, 1 once a stop is asked for, 2 once the doors are open. station: the stop the sign
 // shows. home: the station he boarded at. open: the help point's card is up. roll: which poster the roll shows.
-type Props = { root: RefObject<HTMLDivElement>; fx: MutableRefObject<Fx | null>; arrival: number; station: Station; home: Station; open: boolean; roll: number; posters: string[]; onStood: () => void };
+// awake: the big screen is on. Until then (he is still on the handheld's platform) the car stands and nothing in it runs:
+// the train pulls away the moment he is aboard, not before.
+type Props = { root: RefObject<HTMLDivElement>; fx: MutableRefObject<Fx | null>; arrival: number; station: Station; home: Station; open: boolean; roll: number; posters: string[]; onStood: () => void; awake: boolean };
 
 // A live sheet lying on the cove, the leaning upper wall: [x, y] from the cove's lower left, as train.ts places prints.
 const COVE_LEN = Math.hypot(CAR.CEIL - CAR.H, CAR.COVE_IN), COVE_V = [0, (CAR.CEIL - CAR.H) / COVE_LEN, CAR.COVE_IN / COVE_LEN], COVE_N = [0, -COVE_V[2], COVE_V[1]];
 const onCove = (x: number, y: number, w: number, h: number, gap: number): CSSProperties => ({ width: w, height: h, transform: matrix({ o: [x, CAR.H + COVE_V[1] * y + COVE_N[1] * gap, -CAR.D / 2 + COVE_V[2] * y + COVE_N[2] * gap], u: [1, 0, 0], v: COVE_V, h }) });
 const ROLL_H = COVE_LEN - 32 - 12;
 
-export default function Car({ root, fx, arrival, station, home, open, roll, posters, onStood }: Props) {
+export default function Car({ root, fx, arrival, station, home, open, roll, posters, onStood, awake }: Props) {
   const stood = useRef(onStood); stood.current = onStood;
   const sim = useRef<{ train: Train; straps: Pend[]; bonked: number[]; handset: Pend; can: Can; kicked: number; landings: number; s: number; shown: number; popped: number; stir: number } | null>(null);
   const stationRef = useRef<HTMLDivElement>(null), arriving = useRef(arrival);
@@ -76,9 +80,14 @@ export default function Car({ root, fx, arrival, station, home, open, roll, post
       if (e.dataset.which !== String(S.shown)) { e.dataset.which = String(S.shown); e.style.visibility = S.shown < 0 ? 'hidden' : 'visible'; }
       if (S.shown >= 0) e.style.transform = `translate3d(${(STN.x - BORE.x + S.s).toFixed(1)}px,0,0)`;
     };
-    if (calm) { ride.a = 0; ride.v = 0; return; }
-    // The car opens standing at the station he boarded from, and pulls away at once.
+    const met = new Set<string>(), heard = (name: string) => { if (CARRIAGE.includes(name)) { met.add(name); if (met.size === CARRIAGE.length) finds.report('mrt', 'everyone'); } };
+    let joint = 0;
+    if (calm || !awake) { ride.a = 0; ride.v = 0; return; }
+    S.landings = hero.landings;
+    // The car opens standing at the station he boarded from, and pulls away at once. The can starts toward the front, so
+    // the pull-away rolls it back down the aisle past him: nothing points at it, but it is hard to miss.
     showStation(0); depart(S.train); play('leave');
+    if (S.can.x === CAN.x && !S.can.turn) { S.can.x = CAN_START; S.stir = performance.now(); }
     // A slow frame is stepped in several short ones, so the car keeps real time on a slow device.
     let since = 0;
     const tick = (_t: number, delta: number) => { let left = Math.min(delta / 1000, .25); since += left; const show = since >= STEP; if (show) since = 0; while (left > 1e-4) { const dt = Math.min(left, 1 / 50); left -= dt; frame(dt, left <= 1e-4, show); } };
@@ -86,9 +95,13 @@ export default function Car({ root, fx, arrival, station, home, open, roll, post
       const draw = last && show;
       const now = performance.now(), T = S.train;
       if (lives.size < STRAP.xs.length && now - looked > 400) { looked = now; find(); }
+      if (fx.current && fx.current.onTouch !== heard) fx.current.onTouch = heard;
       if (arriving.current && T.mode !== 'brake' && T.mode !== 'stand') { brake(T); S.s = stoppingDistance() * PASS; showStation(1); play('chime'); play('brake'); }
       stepTrain(T, dt, rand);
       ride.a = T.a; ride.v = T.v;
+      // What the ride sounds like: a rumble as loud as it is fast, and two knocks at every rail joint.
+      if (draw) bed(T.v);
+      if ((joint += T.v * dt / .92) >= 1) { joint -= 1; if (T.v > .2) play('joint', 0); }
       if (Math.abs(T.v - rate) > .012 || (T.v === 0) !== (rate === 0) || (T.v === 1) !== (rate === 1)) setRate(T.v);
       // The station: ahead of the train while it brakes, falling behind as it pulls away.
       if (S.shown >= 0) {
@@ -98,7 +111,7 @@ export default function Car({ root, fx, arrival, station, home, open, roll, post
       }
       if (last) place();
       // The moment it stands, everybody jolts, one after another down the car.
-      if (phase === 'brake' && T.mode === 'stand') stood.current();
+      if (phase === 'brake' && T.mode === 'stand') { stood.current(); shake.v += 7; }
       if (phase === 'brake' && T.mode === 'stand') ['strap', 'office', 'grandpa', 'student', 'sleeper', 'kid'].forEach((n, i) => window.setTimeout(() => fx.current?.nudge(n, n === 'sleeper' ? '!' : undefined), i * 55));
       phase = T.mode;
 
@@ -109,7 +122,7 @@ export default function Car({ root, fx, arrival, station, home, open, roll, post
         const x = STRAP.xs[i];
         // A bonk: his head, on the way up, under this strap.
         if (hero.air && hero.vy > 0 && Math.abs(hero.z - RAIL.z) < 62 && head > ring && Math.abs(hero.x - x) < 30 && i === under && now - S.bonked[i] > 350) {
-          S.bonked[i] = now; p.om += (hero.vx < -30 ? -1 : hero.vx > 30 ? 1 : i % 2 ? 1 : -1) * (5.5 + Math.abs(hero.vx) / 110); hero.bonk = 2; play('ting', 0);
+          S.bonked[i] = now; p.om += (hero.vx < -30 ? -1 : hero.vx > 30 ? 1 : i % 2 ? 1 : -1) * (5.5 + Math.abs(hero.vx) / 110); hero.bonk = 2; play('ting', 0); finds.report('mrt', 'strap');
           fx.current?.scraps(x, ring + 8, RAIL.z + 8, SPLASH, 3);
         }
         if (ax || !resting(p)) stepPend(p, ax, dt);
@@ -122,16 +135,16 @@ export default function Car({ root, fx, arrival, station, home, open, roll, post
       const c = S.can, was = c.flat, dx = c.x - hero.x, dz = c.z - hero.z, close = Math.abs(dx) < 27 && Math.abs(dz) < 24;
       if (hero.landings !== S.landings) {
         S.landings = hero.landings;
-        if (close && Math.abs(dx) < 20 && c.flat <= 0) { c.flat = TUNE.can.flat; play('crunch'); fx.current?.scraps(c.x, 6, c.z + 6, SPLASH, 6); }
+        if (close && Math.abs(dx) < 20 && c.flat <= 0) { c.flat = TUNE.can.flat; play('crunch'); shake.v += 4; finds.report('mrt', 'flat'); fx.current?.scraps(c.x, 6, c.z + 6, SPLASH, 6); }
       }
       if (close && c.flat <= 0 && hero.y < 12 && now - S.kicked > 140) {
-        if (hero.vx * dx > 0 && Math.abs(hero.vx) > 40 && Math.abs(hero.vx) > Math.abs(c.vx) * .9) { c.vx = hero.vx * TUNE.can.kick + Math.sign(dx) * 30; c.vz += hero.vz * .35; S.kicked = now; play('clink'); }
+        if (hero.vx * dx > 0 && Math.abs(hero.vx) > 40 && Math.abs(hero.vx) > Math.abs(c.vx) * .9) { c.vx = hero.vx * TUNE.can.kick + Math.sign(dx) * 30; c.vz += hero.vz * .35; S.kicked = now; play('clink'); finds.report('mrt', 'can'); }
         else if (c.vx * dx < 0 && Math.abs(c.vx) > 30) { c.vx *= -.4; S.kicked = now; play('clink'); }
-        else if (hero.vz * dz > 0 && Math.abs(hero.vz) > 60) { c.vz = hero.vz * .9; c.vx += dx * 2; S.kicked = now; play('clink'); }
+        else if (hero.vz * dz > 0 && Math.abs(hero.vz) > 60) { c.vz = hero.vz * .9; c.vx += dx * 2; S.kicked = now; play('clink'); finds.report('mrt', 'can'); }
       }
       const moving = c.vx || c.vz || c.flat > 0 || was > 0 || Math.abs(ax * TUNE.can.share) > TUNE.can.still;
       const hit = stepCan(c, -ax, dt, FLOOR);
-      if (hit) { play('clank'); fx.current?.dust(c.x, c.z, c.x < 0 ? 1 : -1, 3); if (hit > 180) fx.current?.nudge(c.x < 0 ? WITNESS.left : WITNESS.right, '!'); }
+      if (hit) { play('clank'); fx.current?.dust(c.x, c.z, c.x < 0 ? 1 : -1, 3); if (hit > 180) shake.v += 2; if (hit > 180) fx.current?.nudge(c.x < 0 ? WITNESS.left : WITNESS.right, '!'); }
       if (was > 0 && c.flat <= 0) { S.popped = now; play('pop'); }
       if (moving) S.stir = now;
       if (draw && now - Math.max(S.stir, S.popped) < 500) {
@@ -144,16 +157,18 @@ export default function Car({ root, fx, arrival, station, home, open, roll, post
     // A finger on a live thing: straps and the handset swing, the can is flicked along the car.
     const tapped = (e: Event) => {
       const name = (e as CustomEvent<string>).detail, i = +name.slice(6);
-      if (name.startsWith('strap-')) { S.straps[i].om += i % 2 ? 6 : -6; play('ting', 0); }
+      if (name.startsWith('strap-')) { S.straps[i].om += i % 2 ? 6 : -6; play('ting', 0); finds.report('mrt', 'strap'); }
       else if (name === 'handset') { S.handset.om += 6; play('ting', 0); }
-      else if (name.startsWith('can') && S.can.flat <= 0) { S.can.vx = (S.can.x > hero.x ? 1 : -1) * 300; play('clink', 0); }
+      else if (name.startsWith('can') && S.can.flat <= 0) { S.can.vx = (S.can.x > hero.x ? 1 : -1) * 300; play('clink', 0); finds.report('mrt', 'can'); }
     };
     el.addEventListener('live-tap', tapped);
     gsap.ticker.add(tick);
-    return () => { gsap.ticker.remove(tick); el.removeEventListener('live-tap', tapped); ride.a = 0; ride.v = 0; };
-  }, [root, fx]);
+    return () => { gsap.ticker.remove(tick); el.removeEventListener('live-tap', tapped); ride.a = 0; ride.v = 0; bed(0); if (fx.current?.onTouch === heard) fx.current.onTouch = null; };
+  }, [root, fx, awake]);
 
-  useEffect(() => { if (roll) play('flap'); }, [roll]);
+  // Wound all the way round to the first poster again: a find.
+  const wound = useRef(roll);
+  useEffect(() => { if (roll !== wound.current) { play('flap'); if (roll === 0 && wound.current === posters.length - 1) finds.report('mrt', 'roll'); wound.current = roll; } }, [roll, posters.length]);
   // The sign turning to another stop.
   const named = useRef(station.name);
   useEffect(() => { if (named.current !== station.name) { named.current = station.name; play('flap'); } }, [station.name]);

@@ -10,7 +10,7 @@ import { BENCH_X, GATE_X } from './Platform.tsx';
 import Scene from './Scene.tsx';
 import Controller from './Controller.tsx';
 import LetterView from './LetterView.tsx';
-import { hero as live, ride, wind } from './mrt/live.ts';
+import { finds, hero as live, ride, shake, wind } from './mrt/live.ts';
 import { TUNE } from './mrt/sim.ts';
 import { isMuted, play, setMuted } from './sfx.ts';
 import RouteSheet from './RouteSheet.tsx';
@@ -22,6 +22,10 @@ const spotOf = (g: Game): Spot => (g.place.k === 'routeSheet' ? g.place.back : g
 // jumps, a stretch as he goes, a squash when he lands or pulls up. `sy` is his height (1 at rest) on a springy return.
 const WINDUP = .06, CROUCH = .07, JUMP = 560, FALL = 1900, SPRING = 420, DAMP = 21, DEAD = 16;
 const SCRAPS = ['#e8552d', '#fff4e2', '#f6b73c'];
+// Boarding the train as it pulls away throws him toward the back of the car, this fast at first (units/s). He comes to
+// a stand out of reach of the doors and under the poster roll: the first thing a new player meets in the car is the
+// poster that says who this is, and the first thing he does after it is walk the car.
+const SHOVE = -690, SHOVE_GRIP = 3.1;
 // Changing space: the standing paper folds flat and the page closes (FOLD_OUT), then the next page opens and its
 // paper pops up (FOLD_IN).
 const FOLD_OUT = 360, FOLD_IN = 620;
@@ -45,7 +49,7 @@ export default function App() {
   const fxRef = useRef<Fx | null>(null);
   const skyRef = useRef<HTMLDivElement>(null);
   const poseRef = useRef<HTMLDivElement>(null);
-  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0, drift: 0 });
+  const hero = useRef({ sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, moved: false, steps: 0, look: 0, jump: false, lean: 0, drift: 0, shove: 0 });
   const [muted, setMute] = useState(isMuted);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -171,7 +175,7 @@ export default function App() {
   useEffect(() => {
     if (!world || world === prevWorld.current || spot.k === 'lost') return;
     prevWorld.current = world;
-    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0, drift: 0 });
+    facing.current = 1; wasUnseen.current = false; Object.assign(hero.current, { sy: 1, vs: 0, y: 0, vy: 0, air: false, crouch: 0, windup: 0, look: 0, jump: false, lean: 0, drift: 0, shove: 0 });
     held.current.clear();
     stickSpent.current = true;
     target.current = null;
@@ -180,6 +184,8 @@ export default function App() {
     if (!s) throw new Error(`no stop ${spot.stop} in ${spot.world}`);
     walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 };
     lastNear.current = s.id;
+    // Stepping onto the train: it pulls away under him and throws him down the car (see the tick).
+    if (s.action.kind === 'ride' && !reducedMotion()) hero.current.shove = SHOVE;
     const k = content.worlds[world].camera; cam.current.x = k ? Math.min(k.x1, Math.max(k.x0, k.ahead === undefined ? 0 : s.x + (cam.current.tall ? 0 : k.ahead))) : s.x; cam.current.z = 0;
   }, [spawnKey]);
 
@@ -253,7 +259,8 @@ export default function App() {
       // In the car the train's own acceleration moves him: a little on his feet, a lot in the air.
       if (p.world === 'mrt' && !calm) {
         h.drift = h.air ? h.drift - ride.a * TUNE.hero.air * dt : 0;
-        const dx = (h.air ? h.drift : -ride.a * TUNE.hero.slide) * dt;
+        if (Math.abs(h.shove) > 6) { h.shove *= Math.exp(-SHOVE_GRIP * dt); if (!h.air && Math.random() < dt * 14) fx?.dust(n.x + 8, n.z, 1, 1); } else h.shove = 0;
+        const dx = (h.air ? h.drift : -ride.a * TUNE.hero.slide + h.shove) * dt;
         if (dx) n = { ...n, x: Math.min(w.bounds.x1, Math.max(w.bounds.x0, n.x + dx)) };
       }
       // The shut ticket gate stops him.
@@ -285,16 +292,16 @@ export default function App() {
       // A bonk: his head met something hard, so his rise ends there.
       if (live.bonk === 1 && h.air) { h.vy = Math.min(h.vy, -60); h.sy = .86; h.vs = 0; }
       live.bonk = 0;
-      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); if (hard > .5) { live.landings++; play('land'); } } }
+      if (h.air) { h.vy -= FALL * dt; h.y += h.vy * dt; if (h.y <= 0) { const hard = Math.min(1, -h.vy / JUMP); h.y = 0; h.vy = 0; h.air = false; h.sy = 1 - .3 * hard; h.vs = 0; fx?.dust(n.x, n.z, 0, hard > .6 ? 4 : 2); if (hard > .5) { live.landings++; play('land'); if (p.world !== 'intro') shake.v += 2.5; } } }
       Object.assign(live, { x: n.x, z: n.z, vx: n.vx, vz: n.vz, y: h.y, vy: h.vy, air: h.air, facing: facing.current });
       h.vs += (-(h.sy - 1) * SPRING - h.vs * DAMP) * dt; h.sy = Math.min(1.3, Math.max(.6, h.sy + h.vs * dt));
       const before = phase.current;
       phase.current += speed * dt * 16;
       // Footsteps: every other stride kicks a dot of dust out behind him.
-      if (!h.air && speed > .6 && Math.floor(phase.current / Math.PI) !== Math.floor(before / Math.PI) && ++h.steps % 2 === 0) fx?.dust(n.x - facing.current * 10, n.z, -facing.current, 1);
+      if (!h.air && speed > .6 && Math.floor(phase.current / Math.PI) !== Math.floor(before / Math.PI)) { play('step', 0); if (++h.steps % 2 === 0) fx?.dust(n.x - facing.current * 10, n.z, -facing.current, 1); }
       fx?.touch(n.x, n.z, speed > .2 || h.air);
       const bob = calm || h.air ? 0 : Math.abs(Math.sin(phase.current)) * 9 * speed;
-      const blown = p.world === 'mrt' ? -ride.a * TUNE.hero.lean : p.world === 'intro' ? wind.x * 9 : 0;
+      const blown = p.world === 'mrt' ? -ride.a * TUNE.hero.lean + h.shove / SHOVE * -13 : p.world === 'intro' ? wind.x * 9 : 0;
       h.lean += ((calm ? 0 : (held0 ? -Math.sign(ix || 1) * 7 : (n.vx / MAX_SPEED) * 6) + blown) - h.lean) * Math.min(1, dt * 18);
       const lean = h.lean, sy = calm ? 1 : h.sy, sx = 1 + (1 - sy) * .55;
       const rx = calm ? 0 : -n.vz / MAX_SPEED * 1.4, ry = calm ? 0 : n.vx / MAX_SPEED * 2.2, rk = 1 - Math.exp(-6 * dt);
@@ -333,7 +340,9 @@ export default function App() {
       // The far backdrop slides a little against the scene: the furthest layer of the parallax.
       if (skyRef.current) skyRef.current.style.transform = `translate3d(${(-c.x * .1 * c.scale).toFixed(1)}px,0,0)`;
       const zs = (c.scale * zoomOf(p.world) * c.focus).toFixed(4);
-      if (stageRef.current) stageRef.current.style.transform = `translate3d(0,${(liftOf(p.world) * c.scale * (1 + (c.focus - 1) * 1.6)).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
+      // A jolt (a hard landing, the train standing): the view knocks and settles.
+      const jolt = calm || shake.v < .15 ? 0 : Math.sin(performance.now() / 21) * shake.v; shake.v = calm ? 0 : shake.v * Math.exp(-7 * dt);
+      if (stageRef.current) stageRef.current.style.transform = `translate3d(${(jolt * .6).toFixed(1)}px,${(liftOf(p.world) * c.scale * (1 + (c.focus - 1) * 1.6) + jolt).toFixed(1)}px,${(-260 - c.z * .5).toFixed(1)}px) scale3d(${zs},${zs},${zs}) rotateX(-13deg) translate3d(${(-c.x).toFixed(1)}px,0,${(-c.z * .35).toFixed(1)}px)`;
     };
     gsap.ticker.add(tick);
     return () => gsap.ticker.remove(tick);
@@ -367,21 +376,38 @@ export default function App() {
     teleport('mrt', s);
     // He has just come in by these doors. The train pulls away under him at once (Car.tsx).
     walker.current = { x: s.x, z: s.z + 12, vx: 0, vz: 0 };
+    if (!reducedMotion()) hero.current.shove = SHOVE;
     dispatch({ a: 'dockDone' });
   }, [dispatch, teleport]);
 
+  // A find: the pass takes a star, and for a moment a tag says what was found.
+  useEffect(() => { finds.report = (world, id) => dispatch({ a: 'find', world, id }); return () => { finds.report = () => {}; }; }, [dispatch]);
+  const foundN = useRef(0), [tag, setTag] = useState<{ n: number; label: string } | null>(null);
+  useEffect(() => {
+    if (game.finds.length <= foundN.current) { foundN.current = game.finds.length; return; }
+    foundN.current = game.finds.length; play('find');
+    const [w, id] = game.finds[game.finds.length - 1].split('/'), label = content.worlds[w as WorldId].finds?.find(f => f.id === id)?.label ?? '';
+    setTag({ n: game.finds.length, label });
+    const t = window.setTimeout(() => setTag(null), 2600); return () => clearTimeout(t);
+  }, [game.finds.length]);
   // Every stamp lands with a thump.
   const stamped = useRef(0);
   useEffect(() => { if (game.stamps.length > stamped.current) play('stamp'); stamped.current = game.stamps.length; }, [game.stamps.length]);
+  // The pass's count for the place he is in: its things to use, and its finds.
+  const here = useMemo(() => {
+    if (spot.k === 'lost') return null;
+    const w = content.worlds[spot.world], stops = w.stops.filter(s => s.action.kind === 'letter' || (s.action.kind === 'toy' && w.id !== 'intro')).map(s => ({ id: s.id, on: game.stamps.includes(`${w.id}/${s.id}`) })), fs = (w.finds ?? []).map(f => ({ id: f.id, on: game.finds.includes(`${w.id}/${f.id}`) }));
+    return stops.length + fs.length ? { stops, finds: fs, used: stops.filter(s => s.on).length, found: fs.filter(f => f.on).length } : null;
+  }, [spot.k === 'lost' ? null : spot.world, game.stamps.length, game.finds.length]);
   const openStop = useMemo(() => (spot.k === 'letter' ? stopOf(content, spot.world, spot.stop) : undefined), [spot]);
   const nearStop = spot.k === 'walk' && spot.near ? spot.stop : null;
   const lit = game.place.k === 'letter' ? 'B' : nearStop && spot.k === 'walk' ? 'A' : game.place.k === 'walk' ? 'stick' : null;
 
   return (
     <div className="app" data-reading={spot.k === 'letter' && game.place.k === 'letter' ? openStop?.action.kind === 'letter' ? 'yes' : undefined : undefined} data-testid="app" data-ctrl={game.controller.visible ? 'shown' : 'hidden'}>
-      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} open={game.place.k === 'letter' && shown === 'mrt'} from={boardedAt.current} onStood={() => stood.current?.()} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
+      {shown && <Scene key={shown} world={content.worlds[shown]} nearStop={arrival || shown !== world ? null : nearStop} toys={arrival > 1 ? { ...toysOf(game, shown), doors: 1 } : toysOf(game, shown)} line={lineOf(content, game, shown)} arrival={arrival} fold={fold} open={game.place.k === 'letter' && shown === 'mrt'} from={boardedAt.current} awake={mode === 'docked'} onStood={() => stood.current?.()} onLine={step => dispatch({ a: 'line', step })} stageRef={stageRef} courierRef={courierRef} flipRef={flipRef} poseRef={poseRef} skyRef={skyRef} fxRef={fxRef} onStop={onStop} />}
       <Controller rigRef={rigRef} mode={mode} visible={game.controller.visible} lit={lit} near={spot.k === 'walk' && spot.world === 'intro' && spot.near ? spot.stop === 'gate' ? 'gate' : spot.stop === 'map' ? 'map' : 'door' : null} gate={gateOpen} line={game.toys['intro/map'] ?? 0} trainIn={trainIn} onScreenTap={x => { const g = gameRef.current.place; if (g.k !== 'walk' || g.world !== 'intro') return; if (g.near && Math.abs((stopOf(content, 'intro', g.stop)?.x ?? 1e9) - x) < 120) dispatch({ a: 'confirm' }); else introGo.current = x; }} introRef={introRef} stick={stick} stickSpent={stickSpent} dispatch={dispatch} onDockDone={onDockDone} />
-      {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={leaving} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
+      {leaving > 0 && game.place.k === 'walk' && <p className="leave" key={`leave-${leaving}`} data-testid="leave-ask">Press <b>B</b> again to leave {content.worlds[game.place.world].title}</p>}
       {showFps && <b className="fps" ref={fpsRef} data-testid="fps" />}
       <div className="corner">
         <button data-testid="toggle-sound" aria-pressed={!muted} onClick={e => { if (e.detail) e.currentTarget.blur(); setMuted(!muted); setMute(!muted); }}>{muted ? 'Sound off' : 'Sound on'}</button>
@@ -390,7 +416,11 @@ export default function App() {
       </div>
       {game.place.k === 'walk' && <p className="keys" data-testid="keys"><b>← ↑ ↓ →</b> walk <b>A</b> or <b>Enter</b> use, jump <b>B</b> or <b>Esc</b> close, leave</p>}
       {/* The commuter pass he tapped at the gate is the stamp card: every letter read and toy used stamps it. */}
-      {(mode === 'docked' || gateOpen) && game.place.k !== 'lost' && <div className={`stamps${mode === 'docked' ? '' : ' fresh'}`} key={game.stamps.length} data-testid="stamps"><b>Alvaro L.</b>{game.stamps.length} of {STAMPS} stamps</div>}
+      {(mode === 'docked' || gateOpen) && game.place.k !== 'lost' && <div className={`stamps${mode === 'docked' ? '' : ' fresh'}`} key={`pass-${game.stamps.length + game.finds.length}`} data-testid="stamps"><b>Alvaro L.</b>{game.stamps.length} of {STAMPS} stamps
+        {/* What this place still holds: a dot for each thing to use, a star for each thing nothing points at. */}
+        {here && <span className="pips" data-testid="pips" role="img" aria-label={`Here: ${here.used} of ${here.stops.length} used, ${here.found} of ${here.finds.length} found`}>{here.stops.map(s => <i key={s.id} className={s.on ? 'on' : undefined} />)}{here.finds.map(f => <i key={f.id} className={`star${f.on ? ' on' : ''}`} />)}</span>}
+      </div>}
+      {tag && <p className="found" key={`found-${tag.n}`} data-testid="found" role="status"><i />Found: {tag.label}</p>}
       {spot.k === 'letter' && game.place.k === 'letter' && openStop?.action.kind === 'letter' && <LetterView ref={letterRef} toys={toysOf(game, spot.world)} world={spot.world} stop={spot.stop} letterId={openStop.action.letter} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'routeSheet' && <RouteSheet onGo={p => { const k = p.k === 'walk' ? p : p; if (k.k !== 'lost') { const s = stopOf(content, k.world, k.stop); if (s) { if (k.world !== prevWorld.current) { teleport(k.world, s); } else { walker.current = { x: s.x, z: s.z, vx: 0, vz: 0 }; lastNear.current = s.id; } } } dispatch({ a: 'goto', place: p }); }} onClose={() => dispatch({ a: 'back' })} />}
       {game.place.k === 'lost' && <section className="sheet" data-testid="lost"><h1>Wrong stop</h1><p>No line runs to {game.place.path}.</p><button data-testid="lost-home" onClick={() => dispatch({ a: 'confirm' })}>Back on the train</button></section>}

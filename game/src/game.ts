@@ -7,12 +7,15 @@ export type Spot =
 export type Place = Spot | { k: 'routeSheet'; back: Spot };
 export type ControllerMode = 'handheld' | 'docking' | 'docked';
 // toys: the state of every in-scene interactive piece, keyed `${world}/${toy}`. Missing means state 0.
-export type Game = { place: Place; controller: { mode: ControllerMode; visible: boolean }; stamps: string[]; toys: Record<string, number> };
+// finds: the unmarked things he has set off, as `${world}/${find}` (schema.ts: World.finds), in the order found.
+export type Game = { place: Place; controller: { mode: ControllerMode; visible: boolean }; stamps: string[]; finds: string[]; toys: Record<string, number> };
 export type Action =
   | { a: 'arrive'; stop: string | null } | { a: 'confirm' } | { a: 'back' } | { a: 'map' }
   | { a: 'toggleController' } | { a: 'dockDone' } | { a: 'goto'; place: Spot }
   // Turn the destination sign over the train doors to the next (or previous) stop.
-  | { a: 'line'; step: 1 | -1 };
+  | { a: 'line'; step: 1 | -1 }
+  // He set off one of a world's unmarked things. It counts once.
+  | { a: 'find'; world: WorldId; id: string };
 export type Effect = { open: string } | null;
 
 const INTRO: Spot = { k: 'walk', world: 'intro', stop: 'road-end', near: false };
@@ -57,12 +60,13 @@ export function parsePath(c: Content, path: string): Place {
 }
 export const start = (c: Content, path: string, visible = true): Game => {
   const place = parsePath(c, path);
-  return { place, controller: { mode: place === INTRO ? 'handheld' : 'docked', visible }, stamps: [], toys: {} };
+  return { place, controller: { mode: place === INTRO ? 'handheld' : 'docked', visible }, stamps: [], finds: [], toys: {} };
 };
 const docked = (g: Game, place: Place): Game => ({ ...g, place, controller: { ...g.controller, mode: 'docked' } });
 
 export function reduce(c: Content, g: Game, x: Action): [Game, Effect] {
   if (x.a === 'toggleController') return [{ ...g, controller: { ...g.controller, visible: !g.controller.visible } }, null];
+  if (x.a === 'find') { const id = `${x.world}/${x.id}`; return [g.finds.includes(id) || !c.worlds[x.world].finds?.some(f => f.id === x.id) ? g : { ...g, finds: [...g.finds, id] }, null]; }
   if (g.controller.mode === 'docking') return x.a === 'dockDone' ? [docked(g, HOME), null] : [g, null];
   if (x.a === 'dockDone') return [g, null];
   if (x.a === 'goto') return [docked(g, x.place), null];

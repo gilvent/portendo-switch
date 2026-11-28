@@ -56,6 +56,22 @@ export default function Controller({ rigRef, mode, visible, lit, near, gate, lin
     return () => { tl.kill(); };
   }, [mode]);
 
+  // The controller on the screen is the one in his hands: a key held on the keyboard holds its button down here, and
+  // the arrows tip the stick. So a first-time player sees which button he has just pressed, and the press is felt.
+  useEffect(() => {
+    const PAD: Record<string, string> = { a: 'A', Enter: 'A', ' ': 'A', b: 'B', Escape: 'B', Backspace: 'B', x: 'X', m: 'X' }, DIR: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    const tilt = new Set<string>(), norm = (e: KeyboardEvent) => (e.key.length === 1 ? e.key.toLowerCase() : e.key);
+    const lean = () => { let x = 0, z = 0; for (const k of tilt) { x += DIR[k][0]; z += DIR[k][1]; } const m = Math.hypot(x, z) || 1; if (nub.current) nub.current.style.transform = tilt.size ? `translate3d(${x / m * 22}px,${z / m * 22}px,0)` : 'none'; };
+    const press = (e: KeyboardEvent, down: boolean) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const k = norm(e);
+      if (PAD[k]) right.current?.querySelector(`.pad-${PAD[k]}`)?.toggleAttribute('data-down', down);
+      if (DIR[k]) { if (down) tilt.add(k); else tilt.delete(k); lean(); }
+    };
+    const down = (e: KeyboardEvent) => press(e, true), up = (e: KeyboardEvent) => press(e, false), blur = () => { tilt.clear(); lean(); right.current?.querySelectorAll('[data-down]').forEach(b => b.removeAttribute('data-down')); };
+    addEventListener('keydown', down); addEventListener('keyup', up); addEventListener('blur', blur);
+    return () => { removeEventListener('keydown', down); removeEventListener('keyup', up); removeEventListener('blur', blur); };
+  }, []);
   const stickMove = (e: React.PointerEvent) => {
     if (!e.buttons) return;
     const r = e.currentTarget.getBoundingClientRect(), R = r.width / 2;
