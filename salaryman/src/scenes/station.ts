@@ -8,7 +8,7 @@ import type { Game } from '../game/game.ts';
 // What every station's place shares: one lane, one way through. He comes out of the station at the left; its title
 // says the role and one line; the way back to the train is at the right end, with the "visit the site" stand before
 // it. Each mechanism is a part: it adds its paper to the group, its mechanism to the list, and runs its own rules.
-export type Part = { tabs?: { tab: Tab; x: number; alive?: () => boolean }[]; update?: (dt: number, g: Game) => void; enter?: (g: Game) => void };
+export type Part = { tabs?: { tab: Tab; x: number; alive?: () => boolean }[]; update?: (dt: number, g: Game) => void; enter?: (g: Game) => void; exit?: (g: Game) => void };
 export type Kit = {
   group: THREE.Group; mechs: Mech[]; parts: Part[]; color: string; id: string;
   // Tell a fact: caption by the thing, and punch its hole the first time.
@@ -47,8 +47,9 @@ export function station(i: number, width: number, look: StationLook, build: (k: 
       g.hero.place(-1.4, 0, 1); g.hero.body.vx = 3; g.stage.scene.background = new THREE.Color(look.sky);
       if (!g.save.visited.includes(st.id)) g.save.visited.push(st.id);
       parts.forEach(p => p.enter?.(g));
-      setTimeout(() => g.pins.show('title', `<span><b>${st.name}</b> · ${st.role}</span>`, new THREE.Vector3(2, 3.3, 0), 'tag', 3800), 500);
+      setTimeout(() => g.pins.show('title', `<span><b>${st.name}</b> · ${st.pin ?? st.role}</span>`, new THREE.Vector3(2, 3.3, 0), 'tag', 3800), 500);
     },
+    exit(g: Game) { parts.forEach(p => p.exit?.(g)); },
     camera(g: Game) { const lead = g.hero.facing * 2.2; g.stage.want = { x: Math.max(3.5, Math.min(x1 - 3.5, g.hero.body.x + lead)), y: 1.95, z: 0, dist: 16.5, pitch: .11, yaw: 0 }; },
     update(dt: number, g: Game) {
       for (const p of parts) {

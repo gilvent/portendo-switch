@@ -10,10 +10,10 @@ export const PERSON = {
   ]
 };
 export type StationId = 'blibli' | 'moperty' | 'radjastone' | 'home';
-export type Station = { id: StationId; name: string; color: string; role: string; line: string; url?: string; jingle: number[] };
+export type Station = { id: StationId; name: string; color: string; role: string; line: string; pin?: string; url?: string; jingle: number[] };
 // The line runs in this order and loops. The terminus is home.
 export const LINE: Station[] = [
-  { id: 'blibli', name: 'Blibli.com', color: '#0092da', role: 'Front-end Developer, Customer Experience', line: 'Indonesia’s big online store. I built its product pages.', url: 'https://blibli.com', jingle: [659, 784, 988] },
+  { id: 'blibli', name: 'Blibli.com', color: '#0092da', role: 'Front-end Developer, Customer Experience', line: 'Indonesia’s big online store. I built its product pages.', pin: 'Indonesia’s big online store. I worked here as a front-end developer.', url: 'https://blibli.com', jingle: [659, 784, 988] },
   { id: 'moperty', name: 'Moperty', color: '#3f51b5', role: 'My own product, start to finish', line: 'Homes for sale and rent around my hometown.', url: 'https://moperty.id', jingle: [587, 740, 880] },
   { id: 'radjastone', name: 'Radjastone', color: '#9a883f', role: 'Freelance: a website for a stone firm', line: 'Natural stone for architecture and interiors.', url: 'https://radjastone.com', jingle: [523, 659, 784] },
   { id: 'home', name: 'Alvaro L.', color: '#e8552d', role: 'Terminus', line: 'End of the line. Thanks for riding.', jingle: [784, 988, 1175] }
@@ -21,7 +21,7 @@ export const LINE: Station[] = [
 // The ticket's rows: how many round holes (facts) and star holes (secrets) each station holds.
 export const ROWS: { id: 'line' | StationId; label: string; round: number; star: number }[] = [
   { id: 'line', label: 'Line', round: 1, star: 1 },
-  { id: 'blibli', label: 'Blibli.com', round: 8, star: 1 },
+  { id: 'blibli', label: 'Blibli.com', round: 5, star: 1 },
   { id: 'moperty', label: 'Moperty', round: 3, star: 1 },
   { id: 'radjastone', label: 'Radjastone', round: 3, star: 1 }
 ];

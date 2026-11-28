@@ -94,6 +94,8 @@ export class Game {
     const r = this.shell.screen.getBoundingClientRect();
     const sx = e.clientX - r.left, sy = e.clientY - r.top;
     input.source = 'touch';
+    // A place may claim the tap first (the car: a tap in the hold window grabs a strap, wherever the finger lands).
+    if ((this.place as Place & { onTap?: (g: Game) => boolean }).onTap?.(this)) return;
     // Mechanisms first: a tap near one's prompt point.
     let best: Mech | null = null, bd = 70;
     for (const m of this.place.mechs) {

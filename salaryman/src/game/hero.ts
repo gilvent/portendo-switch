@@ -23,6 +23,10 @@ export class Hero {
   thin = 0;
   // Hanging from a strap: the strap says where his hands are; he follows it and nothing else moves him.
   hang: (() => { x: number; y: number }) | null = null;
+  // What he has put on (a shop's fitting room): it turns with him, squashes with him, and its price tag swings.
+  wear = new THREE.Group();
+  swingers: THREE.Object3D[] = [];
+  private swing = new Spring(0, 70, 3.2); private lastVx = 0;
   private flipT = 1; private flipFrom = 1;
   private squash = new Spring(1, 320, 14);
   private lean = 0; private stride = 0; private coyote = 0; private buffered = 0; private holding = false;
@@ -53,7 +57,7 @@ export class Hero {
     this.sheet.position.x = 0;
     const sh = new THREE.Mesh(new THREE.CircleGeometry(.36, 20), new THREE.MeshBasicMaterial({ color: '#000', transparent: true, opacity: .18, depthWrite: false }));
     sh.rotation.x = -Math.PI / 2; sh.position.y = .01; this.shadow = sh;
-    this.group.add(this.sheet);
+    this.group.add(this.sheet, this.wear);
   }
   get shadowMesh() { return this.shadow; }
   place(x: number, z: number, facing = 1) { Object.assign(this.body, { x, z, y: 0, vx: 0, vz: 0, vy: 0, ground: true }); this.facing = facing; this.flipT = 1; this.flipFrom = facing; }
@@ -111,6 +115,10 @@ export class Hero {
     const bob = b.ground ? Math.abs(Math.sin(this.stride * Math.PI)) * .06 : 0;
     this.group.position.set(b.x, b.y + bob, b.z);
     this.sheet.scale.set((1.05 + .07) * sx * sxs * (1 - this.thin), (HERO.height + .07) * sy, 1);
+    this.wear.scale.set(sx * sxs * (1 - this.thin), sy, 1);
+    this.swing.kick((this.lastVx - b.vx) * 1.4); this.lastVx = b.vx;
+    const sw = reducedMotion ? 0 : clamp(this.swing.step(0, dt), -1.2, 1.2) * this.facing;
+    for (const o of this.swingers) o.rotation.z = sw;
     this.group.rotation.z = reducedMotion ? 0 : this.lean;
     // A card turning shows its edge: a little yaw sells it as paper.
     this.sheet.rotation.y = this.flipT < 1 ? Math.sin(this.flipT * Math.PI) * .5 : 0;

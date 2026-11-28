@@ -53,7 +53,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   adCard.position.set(-4.4, 2.42, backZ + .12); group.add(adCard);
   // Three poster frames, empty at first: each project he visits puts its poster up.
   let visited: string[] = [];
-  const POSTER: Record<string, { mark: string; line: string }> = { blibli: { mark: '🛍', line: 'Product pages' }, moperty: { mark: '⌂', line: 'Homes near you' }, radjastone: { mark: '◆', line: 'Natural stone' } };
+  const POSTER: Record<string, { mark: string; line: string }> = { blibli: { mark: '🛍', line: 'The big online store' }, moperty: { mark: '⌂', line: 'Homes near you' }, radjastone: { mark: '◆', line: 'Natural stone' } };
   const posters = [2.6, 4.6, 6.6].map((x, j) => { const c = card(1.7, .55, (g, Wd, Ht) => {
     const id = visited[j], st = LINE.find(l => l.id === id);
     if (!st) { rrect(g, 0, 0, Wd, Ht, 8, '#d4d9df'); g.setLineDash([6, 5]); g.strokeStyle = '#b3bac2'; g.lineWidth = 3; g.strokeRect(8, 8, Wd - 16, Ht - 16); return; }
@@ -66,7 +66,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   clock.position.set(-6.75, 2.32, backZ + .12); group.add(clock);
   // Souvenirs from each stop ride on the free end of a seat, and slide with the train like everything loose.
   const souvenirs = [
-    { id: 'blibli', x0: 1.75, x1: 3.05, m: box(.32, .38, .18, '#0092da') },
+    { id: 'blibli', x0: 1.75, x1: 3.05, m: (() => { const b = box(.32, .38, .18, '#0092da'); b.add(box(.06, .22, .01, '#fffaf0', .07, -.02, .095)); return b; })() },
     { id: 'moperty', x0: 4.65, x1: 5.85, m: box(.26, .12, .06, '#f6b73c') },
     { id: 'radjastone', x0: -4.15, x1: -2.85, m: box(.34, .06, .26, '#d8c390') }
   ].map(sv => { sv.m.position.set((sv.x0 + sv.x1) / 2, .48, backZ + .4); sv.m.visible = false; group.add(sv.m); return { ...sv, x: (sv.x0 + sv.x1) / 2, v: 0 }; });
@@ -140,6 +140,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       s.w += -g.hero.body.vx * .5;
       return true;
     },
+    onTap(g: Game) { return self.onA(g); },
     update(dt: number, g: Game) {
       sim.t += dt;
       const ph = sim.phase;
