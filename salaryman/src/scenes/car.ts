@@ -51,8 +51,25 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   let ad = 0;
   const adCard = card(2.6, .62, (g, Wd, Ht) => { rrect(g, 0, 0, Wd, Ht, 10, '#f6b73c'); label(g, HELLO[ad], Wd / 2, Ht / 2, Ht * .42, '#23262b', 'center', 700); }, { rim: .03 });
   adCard.position.set(-4.4, 2.42, backZ + .12); group.add(adCard);
-  const posters = [2.95, 5.85].map(x => { const c = card(2.2, .55, (g, Wd, Ht) => { rrect(g, 0, 0, Wd, Ht, 8, '#d4d9df'); }, { rim: .02 }); c.position.set(x, 2.45, backZ + .12); group.add(c); return c; });
-  void posters;
+  // Three poster frames, empty at first: each project he visits puts its poster up.
+  let visited: string[] = [];
+  const POSTER: Record<string, { mark: string; line: string }> = { blibli: { mark: '🛍', line: 'Product pages' }, moperty: { mark: '⌂', line: 'Homes near you' }, radjastone: { mark: '◆', line: 'Natural stone' } };
+  const posters = [2.6, 4.6, 6.6].map((x, j) => { const c = card(1.7, .55, (g, Wd, Ht) => {
+    const id = visited[j], st = LINE.find(l => l.id === id);
+    if (!st) { rrect(g, 0, 0, Wd, Ht, 8, '#d4d9df'); g.setLineDash([6, 5]); g.strokeStyle = '#b3bac2'; g.lineWidth = 3; g.strokeRect(8, 8, Wd - 16, Ht - 16); return; }
+    rrect(g, 0, 0, Wd, Ht, 8, st.color); label(g, POSTER[id].mark, Ht * .45, Ht / 2, Ht * .5, '#fffaf0'); label(g, st.name, Ht * .9, Ht * .38, Ht * .3, '#fffaf0', 'left', 700); label(g, POSTER[id].line, Ht * .9, Ht * .7, Ht * .2, '#fffaf0cc', 'left', 500);
+  }, { rim: .02 }); c.position.set(x, 2.45, backZ + .12); group.add(c); return c; });
+  // The clock over the far seats: the day goes on, ride by ride. (Underground has no daylight; the clock is the day.)
+  const TIMES = ['8:52', '12:10', '15:24', '18:47', '21:05', '22:30'];
+  let clockText = TIMES[0];
+  const clock = card(.62, .62, (g, Wd, Ht) => { g.fillStyle = '#fffaf0'; g.beginPath(); g.arc(Wd / 2, Ht / 2, Wd / 2, 0, 7); g.fill(); g.strokeStyle = '#3d444e'; g.lineWidth = 6; g.stroke(); label(g, clockText, Wd / 2, Ht / 2, Ht * .26, '#23262b', 'center', 700); }, { rim: .02 });
+  clock.position.set(-6.75, 2.32, backZ + .12); group.add(clock);
+  // Souvenirs from each stop ride on the free end of a seat, and slide with the train like everything loose.
+  const souvenirs = [
+    { id: 'blibli', x0: 1.75, x1: 3.05, m: box(.32, .38, .18, '#0092da') },
+    { id: 'moperty', x0: 4.65, x1: 5.85, m: box(.26, .12, .06, '#f6b73c') },
+    { id: 'radjastone', x0: -4.15, x1: -2.85, m: box(.34, .06, .26, '#d8c390') }
+  ].map(sv => { sv.m.position.set((sv.x0 + sv.x1) / 2, .48, backZ + .4); sv.m.visible = false; group.add(sv.m); return { ...sv, x: (sv.x0 + sv.x1) / 2, v: 0 }; });
   // Outside: the tunnel's lamps rush past; at a stop, the station wall stands in the windows with its name.
   const outside = new THREE.Group(); outside.position.z = -2.9; group.add(outside);
   const tunnel = box(60, 3.6, .1, '#101318', 0, -.1, -.6); tunnel.castShadow = false; outside.add(tunnel);
@@ -102,6 +119,9 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       g.hero.place(0, .1, 1); g.hero.grip = R.grip;
       g.stage.scene.background = new THREE.Color('#0b0d10');
       rideNo = ++g.save.rides; ad = 0; adCard.redraw();
+      visited = g.save.visited.filter(v => v !== 'home'); posters.forEach(p => p.redraw());
+      clockText = TIMES[Math.min(TIMES.length - 1, rideNo - 1)]; clock.redraw();
+      souvenirs.forEach(sv => (sv.m.visible = visited.includes(sv.id as never)));
       // Boarding (from the platform or a station): the doors shut behind him and the train pulls away at once.
       sim.at = from === 'platform' ? 0 : g.save.next; setStation(sim.at); setSign('Next stop', sim.at);
       sim.v = 0; sim.a = 0; doorOpen = 1; go('closing'); held = false; clapped = false;
@@ -163,6 +183,13 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       for (const s of straps) {
         const alpha = -(9.8 / R.strapL) * Math.sin(s.th) - (sim.a / R.strapL) * Math.cos(s.th) - 1.4 * s.w;
         s.w += alpha * dt; s.th += s.w * dt; s.mesh.rotation.z = reducedMotion ? 0 : s.th;
+      }
+      // Souvenirs slide along their seat and knock at its ends.
+      for (const sv of souvenirs) {
+        if (!sv.m.visible) continue;
+        sv.v += -sim.a * .9 * dt; sv.v *= Math.exp(-dt * (Math.abs(sim.a) > .5 ? .6 : 3)); sv.x += sv.v * dt;
+        if (sv.x < sv.x0 || sv.x > sv.x1) { sv.x = Math.max(sv.x0, Math.min(sv.x1, sv.x)); if (Math.abs(sv.v) > .4) { noise({ d: .04, f: 900, q: 2, v: Math.min(.3, Math.abs(sv.v) * .2) }); } sv.v *= -.35; }
+        sv.m.position.x = sv.x; sv.m.rotation.z = reducedMotion ? 0 : -sv.v * .15;
       }
       // His head knocks a strap when he jumps under it.
       if (!hold && g.hero.body.vy > 2 && g.hero.body.y > .5) for (const s of straps) if (Math.abs(s.x - g.hero.body.x) < .4 && Math.abs(s.w) < 2) { s.w += 4 * (Math.random() < .5 ? 1 : -1); sfx.bonk(.2); }

@@ -1,0 +1,12 @@
+:root { --ink: #23262b; --muted: #62676f; --paper: #fff8ec; --bg: #f3ead8; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink: #eceae3; --muted: #a4a9b2; --paper: #23262b; --bg: #15181d; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 Fredoka, system-ui, sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding: 40px 16px 80px; display: grid; gap: 22px; }
+h1 { margin: 0; font-size: 2.4rem; } h2 { margin: 0; } header > p { margin: 0; color: var(--muted); }
+.links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.links a, section a { color: var(--ink); }
+.links a { display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--paper); text-decoration: none; }
+section { background: var(--paper); border-radius: 10px; padding: 18px 20px; border-top: 6px solid var(--c); }
+.role { margin-top: 0; color: var(--muted); font-weight: 600; }
+.stack { display: flex; flex-wrap: wrap; gap: 6px; } .stack span { font-size: 13px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--muted); }
+.play a { color: var(--muted); }

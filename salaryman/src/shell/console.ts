@@ -48,7 +48,7 @@ export class Shell {
     const showVol = () => { vol.dataset.muted = String(isMuted()); vol.title = isMuted() ? 'Sound off' : 'Sound on'; };
     vol.addEventListener('click', () => { setMuted(!isMuted()); showVol(); }); showVol();
     this.place();
-    addEventListener('resize', () => this.place());
+    addEventListener('resize', () => { this.measure(); this.place(); });
   }
   private bindStick(el: HTMLElement) {
     let id = -1, cx = 0, cy = 0;
@@ -72,10 +72,20 @@ export class Shell {
     this.stickKnob.style.transform = `translate(${input.move.x * 12}px, ${input.move.z * 12}px)`;
   }
   // The screen's box: inside the bezel in handheld mode, the whole window once docked.
+  // Where the slot is when the console rests in the hands, whatever it is doing now (it may be sliding into the dock).
+  private slot = { left: 0, top: 0, width: 0, height: 0 };
+  private measure() {
+    const c = this.root.querySelector<HTMLElement>('.console')!, anim = this.root.classList.contains('undocking');
+    if (!anim) { c.style.transition = 'none'; c.style.transform = 'none'; }
+    const r = this.root.querySelector('.slot')!.getBoundingClientRect(), o = this.root.getBoundingClientRect();
+    if (!anim) { c.style.transform = ''; void c.offsetWidth; c.style.transition = ''; }
+    if (!anim) this.slot = { left: r.left - o.left, top: r.top - o.top, width: r.width, height: r.height };
+  }
   place() {
     if (this.mode === 'handheld') {
-      const r = this.root.querySelector('.slot')!.getBoundingClientRect(), o = this.root.getBoundingClientRect();
-      Object.assign(this.screen.style, { left: `${r.left - o.left}px`, top: `${r.top - o.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+      if (!this.slot.width) this.measure();
+      const r = this.slot;
+      Object.assign(this.screen.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
     } else if (this.mode === 'docked') {
       Object.assign(this.screen.style, { left: '0px', top: '0px', width: '100%', height: '100%' });
     }
@@ -92,6 +102,19 @@ export class Shell {
     this.root.dataset.mode = 'docked';
     this.place();
     await wait(900);
+  }
+  // The end: the screen folds back into the dock and the console lifts out with it, in the hand again.
+  async undock(mid?: () => Promise<void> | void) {
+    if (this.mode !== 'docked') return;
+    const wait = (ms: number) => new Promise(r => setTimeout(r, reducedMotion ? 0 : ms));
+    this.root.classList.add('undocking');
+    this.mode = 'docking'; this.root.dataset.mode = 'docking';
+    await wait(600);
+    await mid?.();
+    this.mode = 'handheld'; this.root.dataset.mode = 'handheld';
+    this.place();
+    await wait(900);
+    this.root.classList.remove('undocking');
   }
   setDocked() { this.mode = 'docked'; this.root.dataset.mode = 'docked'; this.place(); }
 }
