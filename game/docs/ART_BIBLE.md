@@ -27,6 +27,7 @@ Each space uses its base colours plus at most two accents. All values come from 
 | MRT car | Shell `#e9edf1`, floor vinyl `#9aa3ad`, seats `#2f6f9f` | Sun `#f6b73c`, coral `#e8552d` | Steel `#3d444e`, tunnel black `#07090c` |
 | First-floor outlet | Brick `#d9a968`, planks `#c58c4d` | Blibli blue `#0092da`, sun `#f6b73c` | Cream `#fff4e2`, ink `#1d2228` |
 | Second-floor store-room | Plank `#8f6f55`, concrete `#8b8275` | Coral `#e8552d`, mint `#35b58a` | Kraft `#b98450`, steel `#3d444e` |
+| Hometown lane (Moperty) | Sky `#a9dcf2`, grass `#8fc878`, paving `#e9dcc3`, earth `#cfa97c`, roof tile `#c8623f` | Moperty indigo `#3f51b5`, coral `#e8552d` | Cream `#fff4e2`, picket white `#f7f2e7` |
 
 Tech colours from `content.ts` appear only as small label bars.
 
@@ -159,7 +160,7 @@ A room diorama is the building seen from the street, cut open. Every room's outl
 
 ## Pipeline
 
-`npm run paper` rebuilds all four spaces. `npm run paper -- street 64` rebuilds one quickly at low samples. `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
+`npm run paper` rebuilds every space. `npm run paper -- street 64` rebuilds one quickly at low samples (the lane was baked on a CPU at 160: `CYCLES_DEVICE=NONE npm run paper -- lane 160`, about 13 minutes). `PAPER_PREVIEW=1 npm run paper -- street` skips Blender and lights everything evenly, for laying a scene out in under a minute; never ship it. Set `BLENDER` and `CHROME` to the binaries when they are not in the macOS default locations, and `CYCLES_DEVICE=NONE` to bake on the CPU.
 
 1. `src/art/kit.ts` holds the parts: panels, boxes, hinges, tabs, slots, layered decals and relief. `src/art/recipes.ts` turns data into objects and print layers. `src/art/scenes/` holds the three spaces as data.
 2. Chrome renders each panel's stock, print, grain and edges into an albedo atlas.
@@ -189,6 +190,7 @@ Measured on the worst case: software GPU, 4x CPU throttle, DPR 2.625, landscape.
 | MRT car | 140 (uses 124) |
 | First-floor outlet | 75 |
 | Second-floor store-room | 115 |
+| Hometown lane | 190 (uses 177) |
 
 Panels that swap with a toy (`show`) or ride a belt (`group`) are baked as phantoms: lit, but casting no shadow, so variants sharing a spot never shade each other and a belt box leaves no shadow where it no longer is. Hidden variants are not in the page, so they cost nothing.
 
@@ -220,6 +222,7 @@ A loop rocks one sheet between two poses in four stepped frames. Each sheet take
 | MRT car | Passengers breathing (the sleeper deeper and slower), on top of the train's own motion |
 | Outlet | Bunting, pendant lamps, the plant, the clerk, the promo burst |
 | Store-room | Pendant lamps, the packer, the roller, on top of the belts |
+| Hometown lane | The mango tree's leaves, the plot's string of pennants, bushes and pot plants, the awning's edge, the cat breathing, the hens pecking, and the visitors walking |
 
 A new loop is one line: a pattern over sheet ids and a kind (`sway`, `skew`, `rustle`, `breathe`, `bob`, `peck`).
 
@@ -266,6 +269,28 @@ Three blind playtests (a fresh player given only the address) set these rules; t
 - B with nothing open asks before it leaves a space: the second press goes.
 - The stamp count shows its total.
 - A stop's tap area and marker stand on the thing used, never on the spot the salaryman stands at.
+
+## The hometown lane: Moperty
+
+`scenes/lane.ts` and `scenes/laneView.ts`. Its design, from the rules to the paper, is recorded in [MOPERTY_DESIGN.md](MOPERTY_DESIGN.md); this is what the art has to keep.
+
+- **A ridge-top lane.** The lane runs along the top of a rise, so the whole back of the scene is open view and the homes stand free against it. It is closed on no side. No other space may be laid out this way.
+- **Nothing is read here.** Every stop is a toy with its own verb, and what one toy does the rest of the lane notices: the visitors, the hens, the cat, the cards on the office's board.
+- **The pop-up house** is the scene's signature. Its inside is plain bond with the plan in pencil; its outside is printed. It lies flat as the plan, the front folds up, the back and sides come up through slots, the roof is put on. Sheets that change pose like this are `phantom`: lit, but casting no baked shadow.
+- **The listed house is a doll's house**: two leaves on side hinges, four papered rooms, furniture on tabs that stands up as it opens. It is two storeys so the upstairs rooms open clear of his head.
+- **Visitors are actors**: baked figures the game walks itself (`crowd.ts`). They come out from behind the planting at the lane's ends.
+- **Pictures, not words.** A price tag is for sale and a key is for rent, on the board, the office's cards and the town's far signs. The only words are FOR SALE, FOR RENT, HOMES and MRT. The Moperty mark appears once, on the listings board.
+- He stands beside every toy, never in front of it, and no visitor's place is in front of one. `npm run rules` holds both.
+
+| Stop | What you do | What it stands for |
+|---|---|---|
+| Road sign | A raises the fingerpost; visitors walk into the lane | I made it findable, and people came |
+| Empty plot | Each A is one fold of the pop-up house; the fifth folds it away | I built the whole product myself |
+| Board | A turns it over: for sale, for rent | A listing is one or the other |
+| Front door | A opens the house's front; its rooms stand up | A listing's detail page |
+| Agent's bell | Each A brings a card: land, a house, a warehouse | Ask an agent; the kinds of property |
+| Office door | Opens moperty.id | It is live |
+| Garden gate, mango tree, hens, cat | Presence, a jump, a brush | The lane's own life |
 
 ## The platform: the handheld's screen
 

@@ -130,7 +130,7 @@ export default function App() {
   const held = useRef(new Set<string>());
   const stick = useRef({ x: 0, z: 0 });
   const stickSpent = useRef(false);
-  const target = useRef<{ stop: Stop; open: boolean } | null>(null), way = useRef<[number, number][]>([]);
+  const target = useRef<{ stop: Stop; open: boolean } | null>(null), way = useRef<[number, number][]>([]), stalled = useRef(0);
   const walker = useRef<Walker>({ x: 0, z: 0, vx: 0, vz: 0 });
   const courierRef = useRef<HTMLDivElement>(null);
   const flipRef = useRef<HTMLDivElement>(null);
@@ -254,8 +254,10 @@ export default function App() {
         lastNear.current = near;
         dispatch({ a: 'arrive', stop: near });
       }
-      if (target.current && near === target.current.stop.id) {
-        const t = target.current; target.current = null;
+      // A tapped stop is used once he has walked right up to it, or as close as he can get.
+      stalled.current = target.current && Math.hypot(n.vx, n.vz) < 12 ? stalled.current + dt : 0;
+      if (target.current && near === target.current.stop.id && (target.current.stop.action.kind === 'road' || stalled.current > .25 || (way.current.length <= 1 && Math.hypot(target.current.stop.x - n.x, target.current.stop.z - n.z) < 14))) {
+        const t = target.current; target.current = null; stalled.current = 0;
         // Walking into a door already went through it: A there would only walk him back out.
         if (t.open && t.stop.action.kind !== 'road') dispatch({ a: 'confirm' });
       }

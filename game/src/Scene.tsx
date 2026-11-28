@@ -64,7 +64,9 @@ export default function Scene({ world, nearStop, toys, line, arrival, fold, onLi
   const [opened, setOpened] = useState(false);
   useEffect(() => { const t = window.setTimeout(() => setOpened(true), 700); return () => clearTimeout(t); }, []);
   return (
-    <div ref={root} className={`tv art-${world.art}`} data-testid={`world-${world.id}`} data-arrival={arrival || undefined} data-fold={fold ?? undefined} onPointerDown={e => { if (!(e.target as HTMLElement).closest('button')) fxRef.current?.tap(e.clientX, e.clientY); }}>
+    <div ref={root} className={`tv art-${world.art}`} data-testid={`world-${world.id}`} data-arrival={arrival || undefined} data-fold={fold ?? undefined}
+      // Focus on a stop that is off screen makes the browser scroll this box to it; the camera is the only thing that may move the view.
+      onScroll={e => { e.currentTarget.scrollLeft = 0; e.currentTarget.scrollTop = 0; }} onPointerDown={e => { if (!(e.target as HTMLElement).closest('button')) fxRef.current?.tap(e.clientX, e.clientY); }}>
       {/* The far backdrop is its own sheet so it can slide against the scene, and a gull crosses it now and then. */}
       {backdrop && <div className="sky" ref={skyRef} aria-hidden="true" style={{ backgroundImage: `url(${backdrop})` }}><i className="gull" /><i className="gull gull-b" /></div>}
       <svg width="0" height="0" className="defs" aria-hidden="true"><defs>

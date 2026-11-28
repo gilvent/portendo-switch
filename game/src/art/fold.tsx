@@ -81,12 +81,17 @@ const Runs = memo(function Runs({ m, url }: { m: Manifest; url: string }) {
 // App.tsx finds the holder by name and sets where it stands, which way it faces and how it bobs.
 const Actors = memo(function Actors({ m, url }: { m: Manifest; url: string }) {
   const names = [...new Set(m.quads.flatMap(q => (q.actor ? [q.actor] : [])))];
-  return <>{names.map(n => (
-    <div key={n} className="actor" data-actor={n} data-testid={`actor-${n}`} hidden>
-      <i className="ground-shadow small" />
-      <div className="actor-pose"><div className="actor-flip">{m.quads.filter(q => q.actor === n).map(q => <i key={q.id} className="pp" style={quadStyle(q, url, m.atlas)} />)}</div></div>
-    </div>
-  ))}</>;
+  return <>{names.map(n => {
+    // The figure is baked where it stands in the scene's data (somewhere in open light); its feet are the middle of
+    // the foot of its first sheet, and it is drawn about that point.
+    const parts = m.quads.filter(q => q.actor === n), a = parts[0], k = a.w / 2 / len(a.u), feet = [a.o[0] + a.u[0] * k, 0, a.o[2] + a.u[2] * k];
+    return (
+      <div key={n} className="actor" data-actor={n} data-testid={`actor-${n}`} hidden>
+        <i className="ground-shadow small" />
+        <div className="actor-pose"><div className="actor-flip">{parts.map(q => <i key={q.id} className="pp" style={quadStyle(q, url, m.atlas, feet)} />)}</div></div>
+      </div>
+    );
+  })}</>;
 });
 
 export function PaperScene({ manifest, url, near, toys, art }: { manifest: Manifest; url: string; near: string | null; toys: Toys; art: string }) {

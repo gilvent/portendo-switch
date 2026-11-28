@@ -7,7 +7,8 @@ export type Panel = {
   // Lit like everything else but casting no shadow: for a sheet whose pose changes so much (a wall that folds up
   // from flat) that a shadow baked at one pose would be wrong at the other.
   phantom?: boolean;
-  // Belongs to a figure the game moves about itself (a visitor walking the lane): drawn about the origin, on [0, 0].
+  // Belongs to a figure the game moves about itself (a visitor walking the lane). Stand it anywhere in open light:
+  // it is baked there, and drawn about the middle of the foot of its first sheet.
   actor?: string;
   // Never culled by the bake's guess at what the game camera sees: for faces a scene knows its own view shows.
   keep?: boolean;

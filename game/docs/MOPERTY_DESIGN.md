@@ -224,3 +224,111 @@ All motion is held frames, never a smooth ease.
 | Reduced motion | Every toy steps with no fold; visitors stand at the listings |
 
 **Phase 2 is ready.** Handed to the art pass: the stops, sizes, poses and timings above are fixed; the lane's two ends need something tall for visitors to come out from behind; the camera needs its height set once there is a background to frame.
+
+## Phase 3: aesthetics
+
+Planned by the nine steps of the scene standard before anything was drawn.
+
+### 1. Container
+
+A ridge-top lane. The lane runs along the top of a rise above the hometown; the ground falls away behind it, so the whole back of the scene is one open view and the homes stand free against it. The container is wide and shallow at the front and very deep at the back. Neither side is walled: the lane runs on past both ends.
+
+### 2. Plan of the main structures
+
+```
+far backdrop     sky · clouds · two volcanoes · far ridges                      flat layers (CSS)
+mid card         the town: roofs, a water tower, fields, tree lines             flat layers on a card
+near card        treetops and near roofs rising from below the ridge, a road    flat layers on a card
+ridge edge  -----railing-----gap for the path------------railing---------------
+                 [ plot ]    path   [ yard: mango · HOUSE · board ]   [ OFFICE ]   freestanding
+verge       sign  barrow   bricks   fence · gate · fence      hens
+lane        ==============================================================  walk
+front edge  planting clump                                         planting clump
+            x -700                       0                              +740
+```
+
+| Structure | Kind |
+|---|---|
+| The house, the office, the pop-up house, the tree, the fence, the plot's kit | Freestanding, folded |
+| The road sign, the board, the fence's pickets, the railing | Flat: plane-shaped things |
+| Window frames, shutters, awnings, the balcony, lamps, the listings board | Relief on the two buildings |
+| Everything beyond the ridge edge | Open view: flat cut layers |
+
+Against the other scenes (1.8): the promenade is a plaza closed by relief shops left, right and back with one gap at the back left; the train is a cutaway car. The lane is closed on no side, its open view runs the full width behind freestanding homes, and its signature is the pop-up house and the people who come.
+
+### 3. The ground
+
+The lane is level so it can be walked. The verge behind it is grass; the plot is bare earth; the yard is paved to the door. Past the homes the ground ends at a railing and drops. The main space continues into the view (3.8) by the path between the plot and the yard: it runs back from the lane to a gap in the railing and goes on as the road that winds down the near card into the town.
+
+### 4. Freestanding objects
+
+| Object | Why it is here | How it is made |
+|---|---|---|
+| Pop-up house | The thing he built | Floor and front on one sheet, hinged; back and gabled sides through slots; a folded roof |
+| Sand heap, brick stack, wheelbarrow, stakes and string | A plot about to be built on | Folded cone; folded boxes; folded tray on a wheel disc; posts with cut pennants |
+| The house | The listing | A box open at the front, two hinged leaves, a folded roof, floors as slabs, furniture as stand-up cards on tabs |
+| Fence and gate | A yard on a lane | Cut pickets on rails; the gate a hinged leaf |
+| Mango tree | A yard tree where he comes from | Forked trunk, scalloped clusters at different depths and greens, fruit glued on; fallen mangoes as crossed pairs |
+| Hens | They walk such lanes | Tent fold with comb, wing and tail glued on |
+| Office | Where the agent is | A shophouse box: shopfront below, a balcony above, a folded roof |
+| Planting clumps at the lane's ends | The edge of the lane; visitors come out from behind them | Bush sheets in layers, a banana plant of cut leaves |
+
+### 5. The open view, front to back
+
+1. The railing along the ridge edge.
+2. Near card: crowns of trees growing below the ridge, in two kinds and two tones.
+3. The nearest roofs of the town, each different, two with a sale or rent sign.
+4. The road from the lane's path, winding down between them, with a row of posts.
+5. A banana grove sweeping in from the left and stopping.
+6. Mid card: paddy fields as striped patches.
+7. A tree line that covers only half the width.
+8. The town's middle: roofs in rows, a water tower, a school with a flag.
+9. A rounded mound with a single tree, not spanning the width.
+10. Far backdrop: a long ridge with woods on part of it.
+11. A hamlet on that ridge's slope.
+12. A second, paler ridge sweeping in from the right.
+13. Two volcano cones, faceted, one lit face and one shaded.
+14. Two rows of cut clouds.
+
+### 6. Relief
+
+The lane is enclosed on no side, so relief sits only on its two buildings: shutters, frames, an awning over the door and a lamp on the house's leaves; on the office an awning over the counter, the sill and bell, a balcony with pots, a wall lamp, and the listings board.
+
+### 7. Characters and sight lines
+
+Three visitors (a short woman in a dress, cheerful; a big man, determined; an average backpacker, cool), the agent (moustache, shouting his wares) on a step behind the counter, and a cat on the fence. Nothing stands between the camera and a toy: the dynamics phase fixed where he and the visitors stand, and a rule check holds it. The tree stands at the yard's left, its crown between the plot and the house and clear of both; the board stands at the yard's right, clear of the house's leaves when they are open.
+
+### 8. How it tells the project
+
+Decided in phase 1 and unchanged. The logo appears once, on the listings board (7.9). The only words are FOR SALE, FOR RENT and HOMES.
+
+### Palette
+
+Sky `#a9dcf2`, grass `#8fc878`, lane paving `#e9dcc3`, earth `#cfa97c`, terracotta roofs `#c8623f`; accents Moperty indigo `#3f51b5` and coral `#e8552d`; neutrals cream `#fff4e2`, picket white `#f7f2e7`.
+
+### Review 4 (against the scene standard)
+
+Checked on screenshots of the baked scene at 1280 by 720, 1720 by 720 and 412 by 915.
+
+| Section | Result |
+|---|---|
+| 1. One coherent place | One theme: a hometown lane on a rise. Every object is listed in step 4 with its reason. Day scene. The homes are whole: four walls, floors, a roof. Its plan is shared with no other scene |
+| 2. Technique by zone | Main space: folded buildings, the pop-up, tree, hens, barrow, bricks. Open view: flat layers on two cards and a far backdrop. Relief only on the two buildings, the lane being enclosed on no side. The ground is level; a raised yard was left out to keep the walk simple |
+| 3. The open view | Fourteen layers of different kinds, each with its own detail; houses differ in roof, wall, chimney and windows; the far signs repeat the tag and the key. The path's stones lead to the gap in the railing and the road goes on below it, though from most of the lane the tree or a roof hides the road: the weakest point of the view |
+| 4. Freestanding objects | Folded bodies with glued pieces; the hens and barrow turned to the camera; the tree is a forked trunk with clusters at three depths and fruit glued on. Flat only where allowed: signs, fence, railing, people, the cat on the fence, the furniture, which is stand-up card on purpose |
+| 5. Placement | Three groups (plot, yard, office) with clear lane between them. He stands beside every toy; no visitor's place is in front of one. One of each sign |
+| 6. Characters | Three visitors in three builds and three faces; the agent stands on a step so his head and shoulders clear the sill |
+| 7. Telling the project | No paragraph, screenshot or tech. Six verbs for six stops. The mark appears once |
+| 8. Paper look | Baked light and shadow from the one sun; cut edges and grain from the stocks. The rooms and the leaves' insides carry their own light, since a doll's house is looked into |
+
+Found on the way and fixed: the tree hid the office door (moved to the yard's left, the board to its right); back-to-back sheets on one plane baked black (set apart); the rooms were dark behind their own roof (they carry light); the visitors were baked under the tree and came out dim (they are baked on the open verge); a tap on a far stop could walk him into the open gate (taps keep to the lane); focus on a stop off screen could scroll the whole view sideways (the view no longer scrolls).
+
+Measured in a cloud container with software rendering, walking with all three visitors out: the lane runs at 27 to 42 frames a second where the promenade runs at 22 to 33. It uses 177 quads of its budget of 190.
+
+**Phase 3 is ready**, with two things left open on purpose: the road below the ridge could be made easier to see, and the frame rate has not been measured on a phone.
+
+![The plot built, the sign up, visitors in the lane](spaces/lane-plot.png)
+
+![The house open](spaces/lane-house.png)
+
+![The board turned to rent, the agent at the window](spaces/lane-office.png)

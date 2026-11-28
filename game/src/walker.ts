@@ -28,10 +28,22 @@ export function seek(w: Walker, tx: number, tz: number): [number, number] {
   return [dx / d * pull, dz / d * pull];
 }
 
-// The way from where he is to a tapped spot, as points to walk to in turn. A straight line is enough everywhere but
-// across a yard's fence, where he goes round by the gate.
+// The way from where he is to a tapped spot, as points to walk to in turn. Near by, a straight line. Further off, he
+// steps out to the space's clear line (`walk`), goes along it and steps in again. Across a yard's fence he goes round by
+// the gate.
 export function route(world: World, from: { x: number; z: number }, to: { x: number; z: number }): [number, number][] {
   const inside = (y: NonNullable<World['yards']>[number], p: { x: number; z: number }) => p.x > y.x0 && p.x < y.x1 && p.z > y.z0 && p.z < y.z1, path: [number, number][] = [];
-  for (const y of world.yards ?? []) { const a = inside(y, from), b = inside(y, to); if (a === b) continue; if (a) path.push([y.gate.x, y.gate.in], [y.gate.x, y.gate.out]); else path.push([y.gate.x, y.gate.out], [y.gate.x, y.gate.in]); }
-  return [...path, [to.x, to.z]];
+  let at = from, end = to;
+  const tail: [number, number][] = [];
+  for (const y of world.yards ?? []) {
+    const a = inside(y, from), b = inside(y, to); if (a === b) continue;
+    if (a) { path.push([y.gate.x, y.gate.in], [y.gate.x, y.gate.out]); at = { x: y.gate.x, z: y.gate.out }; }
+    else { tail.push([y.gate.x, y.gate.out], [y.gate.x, y.gate.in]); end = { x: y.gate.x, z: y.gate.out }; }
+  }
+  const line = world.walk;
+  if (line !== undefined && Math.abs(end.x - at.x) > 90 && !(world.yards ?? []).some(y => inside(y, at) && inside(y, end))) {
+    if (Math.abs(at.z - line) > 6) path.push([at.x, line]);
+    if (Math.abs(end.z - line) > 6) path.push([end.x, line]);
+  }
+  return [...path, ...tail, [to.x, to.z]];
 }

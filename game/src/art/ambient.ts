@@ -109,21 +109,27 @@ export const AMBIENT: Record<string, Ambient> = {
   }
 };
 AMBIENT.lane = {
-  loops: [[/^hen-[ab]$/, { kind: 'peck', amp: 14, secs: 3.1 }]],
+  loops: [
+    [/^hen-[ab]$/, { kind: 'peck', amp: 14, secs: 3.1 }], [/^mango-leaves\d$/, { kind: 'rustle', amp: 1, secs: 3.3 }],
+    [/^plot-string$/, { kind: 'skew', amp: 1.6, secs: 2.1 }], [/^(clump-\d|verge-[abc]|yard-bush|pot-a-plant|balcony-plant)-0$/, { kind: 'sway', amp: 1.1, secs: 3, pivot: 'bottom' }],
+    [/^cat$/, { kind: 'breathe', amp: .03, secs: 2.4 }], [/^(awning-lip)$/, { kind: 'skew', amp: .8, secs: 2.8 }]
+  ],
   touch: [
-    { name: 'hens', match: /^hen-[ab]$/, x: 424, z: 78, r: 70, lift: 22 },
-    { name: 'cat', match: /^cat$/, x: 112, z: 62, r: 50, top: 78, says: '?' },
-    { name: 'barrow', match: /^barrow-/, x: -480, z: 40, r: 60, lift: 6 },
-    { name: 'sand', match: /^sand-/, x: -548, z: 0, r: 60, lift: 3 },
-    { name: 'mangoes', match: /^mango-\d$/, x: 370, z: 116, r: 44, lift: 12 },
-    { name: 'bell', match: /^bell-/, x: 604, z: 10, r: 0, lift: 10 },
-    { name: 'crown', match: /^tree-crown-/, x: 366, z: 30, r: 0, lift: 6 },
-    { name: 'stakes', match: /^stake-[01]-/, x: -300, z: 10, r: 0, lift: 5 }
+    { name: 'hens', match: /^hen-[ab]$/, x: 434, z: 80, r: 70, lift: 22 },
+    { name: 'cat', match: /^cat$/, x: 114, z: 62, r: 50, top: 84, says: '?' },
+    { name: 'barrow', match: /^barrow/, x: -486, z: 34, r: 60, lift: 6 },
+    { name: 'bricks', match: /^brick-\d-/, x: -172, z: 30, r: 50, lift: 5 },
+    { name: 'mangoes', match: /^mango-\d(-x)?$/, x: -50, z: 116, r: 44, lift: 12 },
+    { name: 'bell', match: /^bell$/, x: 604, z: 12, r: 0, lift: 10 },
+    { name: 'crown', match: /^mango-leaves\d$/, x: -50, z: 30, r: 0, lift: 6 },
+    { name: 'stakes', match: /^(stake-[01]-|plot-string)/, x: -300, z: 40, r: 0, lift: 5 },
+    { name: 'arrow', match: /^out-arrow$/, x: -720, z: 110, lift: 6 },
+    { name: 'pot', match: /^pot-a/, x: 98, z: -84, r: 50, lift: 5 }
   ],
   react: [
     { toy: 'build', to: 4, hop: 'stakes', scraps: [-300, 190, -100, 14] }, { toy: 'build', to: 0, dust: [-300, 0, 8] },
-    { toy: 'build', to: 4, hop: 'hens' }, { toy: 'mango', to: 0, hop: 'hens', say: [424, 46, 78, '♪'] }, { toy: 'mango', hop: 'crown' },
-    { toy: 'ask', hop: 'bell', say: [604, 104, 14, '♪'] }, { toy: 'door', to: 1, say: [112, 78, 62, '!'] }, { toy: 'post', to: 1, dust: [-610, 16, 4] }, { toy: 'post', to: 0, dust: [-610, -80, 6] }
+    { toy: 'build', to: 4, hop: 'hens' }, { toy: 'mango', to: 0, hop: 'hens', say: [434, 50, 80, '♪'] }, { toy: 'mango', hop: 'crown' },
+    { toy: 'ask', hop: 'bell', say: [604, 110, 14, '♪'] }, { toy: 'door', to: 1, say: [114, 84, 62, '!'] }, { toy: 'post', to: 1, dust: [-610, 16, 4] }, { toy: 'post', to: 0, dust: [-610, -80, 6] }
   ]
 };
 export const ambientOf = (art: string): Ambient => AMBIENT[art] ?? NONE;

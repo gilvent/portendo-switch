@@ -51,6 +51,9 @@ export type World = {
   // Fenced ground with one way in. A tap that would walk him across the fence takes him round by the gate: to the
   // point `out` in front of it, through to `in`, or the other way.
   yards?: (Rect & { gate: { x: number; out: number; in: number } })[];
+  // A line along the space that is clear from end to end. A tap walks him out to it, along it and in again, so a
+  // straight line to a far stop never drags him across a doorway or a forecourt on the way.
+  walk?: number;
   // Facts this world shows by play instead of text: each names the stops where it is acted out. Never displayed.
   encoded?: { fact: string; at: string[] }[];
 };
