@@ -4,6 +4,10 @@ This is the working design for the rebuild, read through **MDA** (Hunicke, LeBla
 **mechanics → dynamics → aesthetics**: rules, then what those rules do when someone plays, then what the player feels.
 The player meets them the other way round. So each element below is written in build order and checked in play order.
 
+**Direction since pass 3 (the owner's steer):** a stop does not walk the visitor through project details, the tech
+stack or what he built. It only has to match the *theme* of the company: Blibli.com is shopping. The details live on
+the one-page version. Moperty and Radjastone keep their pass-2 greybox for now and are out of scope until revisited.
+
 Creative direction came from a Fable 5.2 consultation (high effort). Calls the lead made on top of it are marked
 **Lead**. Units are metres in the three.js scene. Fable's original numbers were in the old game's units and have been
 converted at about 55 old units to 1 m.
@@ -14,7 +18,7 @@ converted at about 55 old units to 1 m.
 
 | Aesthetic | What it means here | Aesthetic statement (the test) |
 |---|---|---|
-| **Discovery** (first) | Finding out who he is by working paper mechanisms, each of which acts out one true thing he did | "I pulled a tab and understood something about him." |
+| **Discovery** (first) | Finding out how each place plays: its toys (the marked mechanisms), its rule (one thing true everywhere in it) and its surprise (one unmarked set piece). The kind of place says where he worked | "I poked the shop, it did something I did not expect, and I know where he worked." |
 | **Sensation** (first) | Paper that snaps, flutters and swings, and a train whose inertia moves everything at once | "I can almost feel the card stock, and the train moves me." |
 | **Challenge** (mini, for the first visit) | Commuter micro-skills: catch the doors, hold on, don't miss your stop, notice the odd thing. All of it is telegraphed and soft-fail, and each fail is a gag | "I only just made it, and I was better at it by the third ride." |
 
@@ -84,11 +88,15 @@ meant to feel like (A), and how that is checked.
   2. **Snap:** 80–250 ms, stepped like stop-motion.
   3. **Settle:** a 400 ms overshoot wobble.
   4. **Caption:** a stub slides out in first person, at most 9 words, for 3 s, and the ticket is punched (the first time).
-- Captions replace every letter. Unmarked touchables stay as free juice and are not recorded.
+- Captions replace every letter. They are his dry aside as someone in the place, first person, present tense, never
+  a CV line; at most one per stop winks at his having worked there. One per mechanism, first use only; they ride
+  over his head for 1.2 s + 0.35 s a word and come after the settle. Unmarked touchables stay as free juice and are
+  not recorded.
 - **D:** the affordance is learnt once at the gate and recognised everywhere. Players work mechanisms again because each
   state is different.
-- **A:** Sensation (snap, sound) and Discovery (the change of state *is* the fact). **Check:** after play, testers recall
-  at least 3 true facts unprompted.
+- **A:** Sensation (snap, sound) and Discovery (the change of state is the surprise). **Check:** after play, testers
+  name the kind of place for each stop and at least 2 of its toys unprompted. Nobody is asked to recall a fact about
+  the work.
 
 ### 2.3 Platform: the handheld opening
 
@@ -112,8 +120,9 @@ meant to feel like (A), and how that is checked.
 - **M, the ride:** chime 0.8 s, accelerate 1.2 s, cruise 4 s, chime 0.8 s, brake 1.5 s, then the doors open.
 - **M, the dwell:** 6 s, then a 2 s closing chime. At the first stop ever, the doors wait until he gets off. If he stays
   on, the train goes on to the next stop.
-- **M, the express tab:** the strip map over the doors is a pull-tab slider. Slide the paper train to any station and
-  the train runs express, with the skipped stations whooshing past. It is the only navigation UI, and it is optional.
+- **M, the strip map (pass 3: the express slider is cut):** a passive strip map over the doors shows where the train
+  is on the line. The slider would have saved about 28 s, and only for someone already on the way out; the hurry
+  path has the one-page version and the ticket's contact side.
 - **M, the car changes as the day goes on:** the light steps from morning to night; three empty ad frames fill, one
   poster per project visited; a souvenir from each stop rides the luggage rack and obeys the inertia. On ride 1 only,
   the ad panel cycles three intro lines by itself.
@@ -126,21 +135,23 @@ meant to feel like (A), and how that is checked.
 
 - **M:** one continuous side-scroll per project, with no sub-rooms and **one way through**: he gets off at the left,
   and the way back to the train is at the right end. Untimed and unfailable. Each has 3–7 marked mechanisms, one
-  unmarked secret, and one "visit the site" object that opens a new tab and is not punched. An establishing caption
-  appears on arrival (role plus one line). Widths: Blibli about 44 m, the others about 26 m.
+  unmarked secret, and one "visit the site" object that opens a new tab and is not punched. An establishing tag
+  appears on arrival and carries the stop's one fact (the company and what it is). Jump secrets stand at least 2 m
+  from any mechanism, so A never opens a tab when the player meant to jump. Widths: Blibli 38 m, the others about
+  26 m. No timing, score or catch game inside a stop: slapstick with no outcome, reactive juice and noticing only.
 - **D:** walking right naturally meets everything, so even a rusher collects 2–3 punches.
 - **A:** Discovery first. **Check:** more than 70% of marked mechanisms are worked without prompting.
 
 ### 2.7 The ticket: progression, meta and contact in one object (the signature)
 
 - **M:** the gate prints a ticket. The front is the line, with a row of hole outlines per station; the back is his
-  contact. Each fact found punches a uniquely shaped hole: the chad flutters down and light shows through. 18 holes in
-  total, 14 round and 4 star:
+  contact. Each toy found (its first working) punches a hole: the chad flutters down and light shows through. 16 holes
+  in total, 12 round and 4 star:
 
   | Row | Round | Star |
   |---|---|---|
   | Line | 1 | 1 |
-  | Blibli | 7 | 1 |
+  | Blibli | 5 | 1 |
   | Moperty | 3 | 1 |
   | Radjastone | 3 | 1 |
 
@@ -175,18 +186,19 @@ meant to feel like (A), and how that is checked.
 | # | Beat | Tension | Release | Soft fail | Fair hint |
 |---|---|---|---|---|---|
 | 1 | **Make the doors** (platform): open for 8 s, about 1.5 s walk from the gate | "Doors closing 0:08" on the board, a quickening chime, a flashing lamp | He steps in and the console docks. In the last second he turns edge-on and slips through paper-thin | The train leaves in a gust that blows the sleeper's newspaper about; "Next train 0:05" | Countdown, chime, lamp |
-| 2 | **Hold on** (each pull-away and brake): A under the rail grabs the nearest strap within 1.1 m | Chime, passengers brace, straps tremble | He swings out and dismounts with a flourish; a kid claps; the Line star hole, the first time | He slides up to 5.5 m, crumples on the end wall and pops flat. No time lost | On ride 1, which is meant to be failed, every passenger grabs a strap 0.5 s before he flies |
+| 2 | **Hold on** (each pull-away and brake): one A (or a tap anywhere) grabs the nearest strap within 1.45 m and holds until the train settles. The window opens as the doors close and 0.6 s before the arrival chime | Chime, the rings turn coral and kick, standees rise and reach up | He swings out and dismounts; the standees cheer; the Line star hole, the first time; "Held on. Like a local." | He slides the car, crumples on the end wall, holds the pose, the passengers look; the first time, "Note to self: grab a strap." No time lost | Ride 1 is meant to be failed; from ride 2, until he has held once, the nearest strap shows "A Hold on" |
 | 3 | **Don't miss your stop** (from the second stop on): 6 s dwell plus a 2 s chime | The chime while he is busy in the car | A hop out as the doors pinch shut | He rides to the next station, which is still content; the line loops | Announcement, the station name in the windows, the lamp |
 | 4 | **The odd one out**: one secret per place | One empty star outline on the ticket row | A set piece bigger than a normal mechanism | None; it is optional | Once a stop's marked holes are all punched, the secret's corner curls and glints every 4 s |
-| 5 | **Rush hour** (stretch goal, ride 4): a full car whose standees tip like dominoes | Crowded and lit for dusk | He bursts out at the terminus | The crowd carries him out anyway | The crowd parts toward the lit door |
+| 5 | **Rush hour** (ride 4, smallest version, after beat 2 is proven): six extra standees ripple with the pull and cushion him; no new input | Crowded | He bursts out at the terminus | The crowd cushions the throw | The crowd parts toward the lit door |
 
 Beat 2 is the mastery arc: fail on ride 1, succeed by ride 2 or 3.
 
 ### 2.12 Ending and contact
 
 - **M:** the terminus is the home platform at night. The gate takes the ticket and the console undocks. The handheld
-  shows the business card: name, trade, four links, the ticket's punch pattern as a strip, "Ride again", and with all
-  18 holes a gold edge and a "How this was made" link. Contact is never gated.
+  shows the business card: name, trade, four links, the ticket's punch pattern as a labelled strip, "Ride again", and
+  with all 16 holes a gold edge. At tap-out the ticket shows its front and turns over to his contact side before the
+  console comes out. The card focuses the Email link, and Enter or Space work on it. Contact is never gated.
 - **A:** the release, and the moment a visitor gets in touch.
 
 ## 3. Project scenes
@@ -194,22 +206,25 @@ Beat 2 is the mastery arc: fail on ride 1, succeed by ride 2 or 3.
 The metaphors stay between "too literal" (a phone showing the app) and "too far" (a birdhouse tree for a property app).
 The tech stack is never in a scene.
 
-### Blibli.com: the store built around one product
+### Blibli.com: the shop that fills your bag (pass 3)
 
-A department-store floor with one product on a pedestal (a paper desk lamp; no screens), and the customers' review
-wall at the far end. Souvenir: a shopping bag.
+A paper shop floor, 38 m. **Its rule:** whatever he touches ends up in the blue bag on his arm, and what he buys beats
+him to the train. The greeter at the door bows and the bag hops onto his arm. Things stand in a tower out of the bag
+that leans against his acceleration and floats apart when he jumps. Each of the five movable-book mechanisms appears
+once, so the shop is also the showcase of the grammar. Text on paper is shop print only: the "blibli" fascia, price
+tags in rupiah, "SALE". Souvenir: the sealed bag, with its receipt, on the car seat.
 
-| # | Mechanism | What happens | Fact it carries |
-|---|---|---|---|
-| 1 | Pedestal **wheel** | The lamp changes colour; the price tag flips with it; clerks from three counters lean in | The product page: many teams' features on one page, and I built them in |
-| 2 | Promo **pull-tab** | A sale banner drops and the price is struck through | Promotions were among them |
-| 3 | "You may also like" shelf (walk-by **pop-up**) | Items unfold only as he comes near | Recommendations, and only what is in view gets loaded |
-| 4 | Checkout **pull-tab** | A three-turn conveyor refolds into one straight chute | The revamp made add-to-cart simpler |
-| 5 | Facade under renovation | Tabs flip one panel per pull while shoppers keep coming in. A taped lever, "ALL AT ONCE", jams the whole front and scatters them | Incremental release beats big bang |
-| 6 | Review wall **wheel** | Cards without photos, or with too few stars, fold face-down | Filtering reviews by photo or rating |
-| 7 | Instant camera **slot** | The photo comes out sideways; A turns it upright | Phone uploads arrived rotated: test on real devices |
-| 8 | Gallery **pull-tab** | Tall, wide and square photos re-lay from grid to list, and all fit | The review gallery; user images vary in ratio |
-| ★ | Bell over the door (jump) | Flash sale: a flood of paper shoppers, and nothing falls | High traffic; the page had to stay fast |
+| # | x (m) | Mechanism | What happens | His line |
+|---|---|---|---|---|
+| 1 | 4.5 | Lamp carousel **wheel** | Ratchets the lamp to its next colour; a boxed lamp hops into the bag | "Just looking. Fine, I'll take one." |
+| 2 | 11 | Can pyramid **pull-tab** | The bottom can slides out into the bag; a held breath, a clerk's head pops up, the pyramid comes down and rolls everywhere (one for his head); the cans hop back in stop-motion. Second pull: only the top can drops, into the bag | "I only wanted the bottom one." |
+| 3 | 17.5 | Fitting room **flap** | The curtain drops in front of him, three rustles, the old look is tossed over the top, it snaps up on the next (glasses, cap, bow tie, all three). He keeps wearing it, price tag swinging, for the rest of the day | "Tag stays on. That's the look." |
+| 4 | 24 | Surprise box **pop-up** | Springs by itself as he walks past (the rusher's punch); the toy hops onto his tower. A pushes it back in for the next toy | "Didn't need it. Bought it anyway." |
+| 5 | 30 | The till **slot** | Each thing hops over the scanner, one beep up a scale, while the receipt chatters out; ka-ching, the stamp; the sealed bag slides down a chute into a courier's box and the courier pops a wheelie off to the trains | "Do I still get the staff discount?" (the stop's one wink) |
+| ★ | 33 | Sale bell (jump) | A wave of SALE flags drops right to left, prices are struck through, a stampede of shoppers pours in from the trains and back out with bags, coupons flutter, the shelves restock | "Flash sale! Who rang that? Oh. Me." |
+
+Unmarked juice: three shelves whose goods stand up as he comes near, two strollers with bags, the greeter's bow.
+Arrival tag: "Blibli.com · Indonesia's big online store. I worked here as a front-end developer."
 
 ### Moperty: a street in his hometown
 
@@ -239,7 +254,7 @@ A courtyard gallery of a natural-stone firm, with a feature wall and the owner, 
 |---|---|---|
 | **M0** Commute loop | Platform, gate, door timer, dock, car with inertia and straps, auto-arrival, an empty stop with an exit at the right end, the next ride | Is the median time to the first stop under 35 s? Does anyone get stuck? Is the throw funny? Do half grab a strap by ride 3 without being told? Does anyone feel punished by the doors? |
 | **M1** Mechanism grammar | The five mechanisms with snap, sound, caption and punch | Is the tab spotted without a prompt? Is the caption read? Does one A ever do the wrong thing? |
-| **M2** Blibli greybox | All its mechanisms in labelled boxes | Are 3 or more facts recalled? Does the "ALL AT ONCE" lesson land? Where do players skip? |
+| **M2** Blibli greybox | All its mechanisms in labelled boxes | Does anyone say "shop" or "online store" unprompted? Do they connect the courier with the bag on the seat? Do 70% work 4 of 5 toys? Does anyone jump for the bell before the glint? |
 | **M3** Ticket, hub changes, terminus | Holes, the flip for contact, light steps, posters, the undocked ending | Is the car's change noticed? Does an empty star send players looking? Is his email found in under 15 s? |
 | **M4** Moperty and Radjastone | Both scenes, plus beats 3 and 4 | Does the front-and-back house read without explanation? Is missing a stop funny or annoying? |
 | **M5** Art where design leans on it | Ticket; tab colour; station pop-up; the edge-on squeeze and crumple; then the rest | Are affordances as clear as in the greybox? |
@@ -300,3 +315,42 @@ Calls made by the lead in this pass, and why:
 
 Scripted checks (`tests/scene.mjs <station>`): Blibli 8 of 8 marked holes, Moperty 3 of 3, Radjastone 3 of 3,
 walking right and pressing A at each prompt. The terminus runs through tap-out, undock and the card.
+
+### Pass 3: the owner's steer, a player-side review, and the fixes
+
+**Steer.** Scenes match the company's theme, not its project details. Blibli was rebuilt as a shop (§3); the
+engineering-lesson mechanisms (lazy loading, incremental release, rotated uploads, review filters, gallery ratios)
+were cut. The one-page version stays the only home of work detail.
+
+**Review.** Fable 5.2 (high) played the greybox through Playwright, A→D→M, and ranked fixes
+(platform, dock, rides, hold-on, terminus, hurry path, phones). Verdicts on the open calls:
+
+| Call | Verdict |
+|---|---|
+| Express tab | Cut the slider; a passive strip map later (it saved about 28 s, only for someone leaving) |
+| Rush hour | Smallest version only (six standees that cushion him), after hold-on is proven; deferred |
+| Blibli's 8 + secret | Too many: 46.5 s, 13 presses, 57% of round holes worked. 5 + secret |
+| Captions | Mostly unread in the frame (hidden, occluded, flat 3.2 s). His dry aside, timed by length, over his head |
+| Hold-on fair? | The window was right (2.0 s); the teaching and the input were not |
+
+Changes, and what re-measuring showed:
+
+| Measure | Before | Change | After |
+|---|---|---|---|
+| Masher grabs a strap (20 rides) | 9 / 20 | A no longer lets go; window opens as the doors close | 20 / 20 |
+| Single A from 0.1 s to 3.2 s after the doors start closing | grabs only from 0.68 s | as above | every press grabs |
+| Learning to hold | no tell, no fail line | coral rings that kick, standees that reach, "Note to self: grab a strap.", an "A Hold on" pin from ride 2 until the first hold | — |
+| Dock | 17 of 52 frames blank; ride 1 chimes under the black | draw inside `resize()`, ease-in grow, ride 1 waits 0.9 s | car visible through the grow, doors still open when it is full size |
+| Touch strap grab | impossible | a tap anywhere in the window grabs | hangs |
+| Touch jump apex | 0.20 m | a tap-jump is full height | full |
+| Portrait phone, docked | hero off screen | view keeps its width down to a square; camera follows him in narrow views; a "turn sideways" note | hero at x 194 of 390 |
+| End card on phones | two links cut off, 10 px | card and ticket take the viewport, 44 px rows, 16 px type | no overflow, all four links 44 px |
+| "Get off" prompt at rest | missing | reach 1.25 → 2.6 m | shows |
+| Missed train | about 11 s | next train 5 → 2.5 s, gentler departing gust | — |
+| Bell secret | A opened blibli.com from most of its width | bell 3 m from the till, 2.4 m from the Visit stand | rings across its width |
+| Keys on the end card | dead | Enter and Space pass through on links and buttons; Email focused | Enter on "Ride again" reloads |
+
+Scripted checks after the pass: `tests/scene.mjs blibli` punches 5 of 5 and the bell's star; `tests/play.mjs` reaches
+Blibli at 27.8 s of wall-clock time under software rendering (the review measured 17.95 game seconds before the pass;
+the train is now called 1 s later and ride 1 waits 0.9 s for the dock), inside the 35 s target, with no errors.
+
