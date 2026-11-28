@@ -5,6 +5,9 @@ import { bed, buzz, noise } from '../core/audio.ts';
 import { sfx } from '../game/sfx.ts';
 import { HELLO, LINE } from '../game/content.ts';
 import { reducedMotion } from '../core/stage.ts';
+import { Settle } from '../game/mech.ts';
+import { CREST } from './crest.ts';
+import type { StationId } from '../game/content.ts';
 import { slipThrough } from '../game/squeeze.ts';
 import type { Mech, Place } from '../game/place.ts';
 import type { Game } from '../game/game.ts';
@@ -49,7 +52,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   let signText = { top: 'Next stop', name: LINE[0].name, color: LINE[0].color };
   const sign = card(1.9, .5, (g, Wd, Ht) => {
     rrect(g, 0, 0, Wd, Ht, 10, '#1d2026'); label(g, signText.top, Wd / 2, Ht * .27, Ht * .22, '#9aa3ad', 'center', 600);
-    label(g, signText.name, Wd / 2, Ht * .68, Ht * .4, signText.color === '#e8552d' ? '#ff8a5c' : '#ffd27a', 'center', 700);
+    label(g, signText.name, Wd / 2, Ht * .68, Ht * .4, signText.color === '#35b58a' ? '#7fe0b4' : '#ffd27a', 'center', 700);
   }, { rim: .02 });
   sign.position.set(0, 2.76, backZ + .12); group.add(sign);
   const setSign = (top: string, i: number) => { const s = LINE[i]; if (signText.top !== top || signText.name !== s.name) { signText = { top, name: s.name, color: s.color }; sign.redraw(); } };
@@ -84,15 +87,28 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   const lamps: THREE.Mesh[] = [];
   for (let i = 0; i < 12; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(.7, .12, .05), new THREE.MeshBasicMaterial({ color: '#ffe3a0' })); l.position.set(-30 + i * 5, 2.2, -.5); outside.add(l); lamps.push(l); }
   const station = new THREE.Group(); outside.add(station);
-  const stWall = box(40, 3.6, .1, '#dfe2e6', 0, -.1, -.4); stWall.castShadow = false; station.add(stWall);
-  const stBand = box(40, .4, .12, '#0092da', 0, .9, -.38); station.add(stBand);
-  let stName = LINE[0];
-  const stSigns = [-9, 0, 9].map(x => { const c = card(2.8, .7, (g, Wd, Ht) => { rrect(g, 0, 0, Wd, Ht, 10, '#fffaf0'); g.fillStyle = stName.color; g.fillRect(0, Ht - 12, Wd, 12); label(g, stName.name, Wd / 2, Ht * .45, Ht * .45, '#23262b', 'center', 700); }, { rim: .02 }); c.position.set(x, 1.45, -.3); station.add(c); return c; });
+  // The station lights itself (it is outside the car's shadow), and columns cross the windows as it slides in; at rest
+  // each hides behind a pillar so the windows are clean.
+  const selfLit = (m: THREE.Mesh, c: string, k: number) => { m.receiveShadow = false; m.castShadow = false; const mt = m.material as THREE.MeshStandardMaterial; mt.emissive.set(c); mt.emissiveIntensity = k; };
+  const stWall = box(40, 3.6, .1, '#dfe2e6', 0, -.1, -.4); selfLit(stWall, '#dfe2e6', .35); station.add(stWall);
+  const stBand = box(40, .4, .12, '#0092da', 0, .9, -.38); selfLit(stBand, '#0092da', .3); station.add(stBand);
+  for (const px of [-16.8, -13.7, -10.7, -7.6, -4.58, -1.51, 1.51, 4.58, 7.6, 10.7, 13.7, 16.8]) { const c = box(.26, 2.9, .3, '#f4efe4', px, -.1, .15); selfLit(c, '#f4efe4', .3); station.add(c); }
+  // Over the roofline, the place itself: two cut sheets hinged at their feet that stand up as the train stops.
+  let crestId: StationId = 'blibli', crestHidden = true;
+  const crestBack = card(7.6, 2.3, (g, Wd, Ht) => CREST[crestId].back(g, Wd, Ht, Wd / 7.6), { res: 110, rim: .05 });
+  const crestFront = card(10.2, 1.9, (g, Wd, Ht) => CREST[crestId].front(g, Wd, Ht, Wd / 10.2), { res: 110, rim: .05 });
+  crestBack.position.set(0, 2.97, -1.5); crestFront.position.set(0, 2.97, -1); station.add(crestBack, crestFront);
+  const crests = [{ c: crestFront, settle: new Settle(), lead: 0, shown: false }, { c: crestBack, settle: new Settle(), lead: .167, shown: false }];
+  const POSE = [-90, -62, -34, -10, 8, -3, 0].map(d => d * Math.PI / 180);
   // Nothing outside shows past the car's end walls.
   const clip = [new THREE.Plane(new THREE.Vector3(1, 0, 0), W / 2), new THREE.Plane(new THREE.Vector3(-1, 0, 0), W / 2)];
   const clipAll = () => outside.traverse(o => { const m = (o as THREE.Mesh).material as THREE.Material | undefined; if (m) m.clippingPlanes = clip; });
   clipAll();
-  const setStation = (i: number) => { stName = LINE[i]; (stBand.material as THREE.MeshStandardMaterial).color.set(stName.color); stSigns.forEach(c => c.redraw()); };
+  const setStation = (i: number) => {
+    const st = LINE[i]; (stBand.material as THREE.MeshStandardMaterial).color.set(st.color); (stBand.material as THREE.MeshStandardMaterial).emissive.set(st.color);
+    crestId = st.id; crestBack.redraw(); crestFront.redraw();
+    for (const c of [crestBack, crestFront]) { const mt = c.material as THREE.MeshStandardMaterial; mt.emissiveMap = CREST[crestId].night ? mt.map : null; mt.emissive.set(CREST[crestId].night ? '#fff' : '#000'); mt.emissiveIntensity = .5; mt.needsUpdate = true; }
+  };
   // Straps over the aisle, clear of the doors.
   const straps: { x: number; th: number; w: number; mesh: THREE.Group; ring: THREE.Mesh }[] = [];
   for (let x = -6.6; x <= 6.61; x += 1.1) {
@@ -135,7 +151,9 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       clockText = TIMES[Math.min(TIMES.length - 1, rideNo - 1)]; clock.redraw();
       souvenirs.forEach(sv => (sv.m.visible = visited.includes(sv.id as never)));
       // Boarding (from the platform or a station): the doors shut behind him and the train pulls away at once.
-      sim.at = from === 'platform' ? 0 : g.save.next; setStation(sim.at); setSign('Next stop', sim.at);
+      sim.at = from === 'platform' ? 0 : g.save.next; setSign('Next stop', sim.at);
+      // Outside stands the stop he is leaving (none, from the morning platform); the next one is dressed on the way.
+      crestHidden = from === 'platform'; setStation(from === 'platform' ? sim.at : (sim.at + LINE.length - 1) % LINE.length);
       sim.v = 0; sim.a = 0; doorOpen = 1; go('closing'); if (from === 'platform') sim.t = -.9; held = false; clapped = false; crumpled = false;
       station.position.x = 0; lamps.forEach(l => (l.visible = false));
     },
@@ -163,12 +181,12 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
         if (sim.t > 0) doorOpen = Math.max(0, doorOpen - dt / R.closing);
         if (sim.t > R.closing) { go('chime'); sfx.chime(); buzz(15); g.emit('ride', rideNo); } }
       else if (ph === 'chime') { if (sim.t > R.chime) { go('accel'); g.stage.nudge(-.22, 0); sfx.lurch(); } }
-      else if (ph === 'accel') { sim.a = R.a; if (sim.t > R.accel) { go('cruise'); sim.a = 0; endHold(g); } }
+      else if (ph === 'accel') { sim.a = R.a; if (sim.t > R.accel) { go('cruise'); sim.a = 0; endHold(g); crestHidden = false; setStation(sim.at); } }
       else if (ph === 'cruise') { sim.a = Math.sin(sim.t * 2.3) * .25; if (sim.t > R.cruise) { go('warn'); setSign('Arriving', sim.at); sfx.jingle(LINE[sim.at].jingle); g.emit('arriving', sim.at); } }
       else if (ph === 'warn') { sim.a = 0; if (sim.t > R.chime) { go('brake'); sfx.squeal(); g.stage.nudge(.12, 0); sim.stopAt = sim.dist + sim.v * sim.v / (2 * R.a * 1.1); } }
       else if (ph === 'brake') {
         sim.a = -R.a * 1.1;
-        if (sim.v + sim.a * dt <= 0) { sim.v = 0; sim.a = 0; go('stand'); g.stage.shake(.4); g.stage.nudge(.26, 0); buzz(30); sfx.doors(); noise({ d: .3, f: 300, q: .7, v: .4 }); endHold(g); folk.forEach(f => f.jolt.kick(-4)); setSign('This stop', sim.at); g.emit('stand', sim.at); }
+        if (sim.v + sim.a * dt <= 0) { sim.v = 0; sim.a = 0; go('stand'); g.stage.shake(.4); crests.forEach(c => c.settle.kick(1)); g.stage.nudge(.26, 0); buzz(30); sfx.doors(); noise({ d: .3, f: 300, q: .7, v: .4 }); endHold(g); folk.forEach(f => f.jolt.kick(-4)); setSign('This stop', sim.at); g.emit('stand', sim.at); }
       } else if (ph === 'stand') {
         doorOpen = Math.min(1, doorOpen + dt * 2.2);
         // The doors wait at the first stop ever, and at the terminus; anywhere else they close after the dwell.
@@ -180,6 +198,20 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
           if (hurry) { const k = Math.floor((R.warn - left) * 4); if (k !== tickN) { tickN = k; sfx.tick(true); } }
           if (left <= 0) { hurry = false; tickN = -1; if (!missedOnce) { missedOnce = true; setTimeout(() => g.say('…that was my stop.'), 600); } sim.at = (sim.at + 1) % LINE.length; g.save.next = sim.at; setSign('Next stop', sim.at); go('closing'); doorOpen = 1; g.emit('missed'); }
         }
+      }
+      // The pop-up: the back sheet stands first, the front reaches upright on the stop; on the pull-away they fold.
+      const tau = sim.v / (R.a * 1.1), phz = sim.phase;
+      for (const cr of crests) {
+        let k = 0;
+        if (crestHidden) k = 0;
+        else if (phz === 'brake') k = reducedMotion ? 0 : 1 - (tau - cr.lead) / .5;
+        else if (phz === 'stand' || phz === 'closing' || phz === 'chime') k = 1;
+        else if (phz === 'accel') k = reducedMotion ? 0 : 1 - (sim.t - cr.lead) / .42;
+        k = clamp(k, 0, 1);
+        const idx = Math.floor(k * 6);
+        cr.c.visible = idx > 0; cr.c.rotation.x = POSE[idx] + cr.settle.step(dt) * .07;
+        if (idx > 0 && !cr.shown && phz === 'brake') { cr.shown = true; sfx.paper(); }
+        if (idx === 0) cr.shown = false;
       }
       // Speed and distance; the tunnel lamps rush past, and the station slides in to stand at the windows.
       sim.v = Math.max(0, sim.v + sim.a * dt);

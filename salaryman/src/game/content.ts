@@ -16,7 +16,7 @@ export const LINE: Station[] = [
   { id: 'blibli', name: 'Blibli.com', color: '#0092da', role: 'Front-end Developer, Customer Experience', line: 'Indonesia’s big online store. I built its product pages.', pin: 'Indonesia’s big online store. I worked here as a front-end developer.', url: 'https://blibli.com', jingle: [659, 784, 988] },
   { id: 'moperty', name: 'Moperty', color: '#3f51b5', role: 'My own product, start to finish', line: 'Homes for sale and rent around my hometown.', url: 'https://moperty.id', jingle: [587, 740, 880] },
   { id: 'radjastone', name: 'Radjastone', color: '#9a883f', role: 'Freelance: a website for a stone firm', line: 'Natural stone for architecture and interiors.', url: 'https://radjastone.com', jingle: [523, 659, 784] },
-  { id: 'home', name: 'Alvaro L.', color: '#e8552d', role: 'Terminus', line: 'End of the line. Thanks for riding.', jingle: [784, 988, 1175] }
+  { id: 'home', name: 'Alvaro L.', color: '#35b58a', role: 'Terminus', line: 'End of the line. Thanks for riding.', jingle: [784, 988, 1175] }
 ];
 // The ticket's rows: how many round holes (facts) and star holes (secrets) each station holds.
 export const ROWS: { id: 'line' | StationId; label: string; round: number; star: number }[] = [
