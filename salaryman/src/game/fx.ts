@@ -22,6 +22,11 @@ export class Fx {
       this.ps.push({ x, y, z, vx: Math.cos(a) * sp, vy: rand(3, 6.5) * power, vz: Math.sin(a) * sp * .5, rx: rand(0, 6), ry: rand(0, 6), spin: rand(-14, 14), life: 0, max: rand(1.2, 2.2), s: rand(.7, 1.3), dust: false, floor: 0, col: new THREE.Color(colors[i % colors.length]) });
     }
   }
+  // Wind you can see: scraps of litter blown along the floor from one side.
+  gust(x0: number, x1: number, dir: number, n = 8) {
+    if (reducedMotion) return;
+    for (let i = 0; i < n && this.ps.length < N; i++) this.ps.push({ x: rand(x0, x1), y: rand(.05, .6), z: rand(-1.2, .8), vx: dir * rand(4, 8), vy: rand(1, 2.5), vz: 0, rx: rand(0, 6), ry: rand(0, 6), spin: rand(-14, 14), life: 0, max: rand(1.2, 1.8), s: rand(.8, 1.3), dust: false, floor: 0, col: new THREE.Color(['#f4f1e8', '#d9dcdf', '#e8e1d3'][i % 3]) });
+  }
   puff(x: number, y: number, z: number, n = 5, spread = .5) {
     if (reducedMotion) return;
     for (let i = 0; i < n; i++) this.ps.push({ x: x + rand(-spread, spread) * .3, y: y + .05, z: z + rand(-.1, .1), vx: rand(-spread, spread) * 2, vy: rand(.2, .8), vz: 0, rx: 0, ry: 0, spin: 0, life: 0, max: rand(.35, .6), s: rand(.6, 1.1), dust: true, floor: 0 });

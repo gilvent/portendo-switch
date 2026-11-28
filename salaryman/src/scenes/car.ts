@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { box, card, label, rrect } from '../game/paper.ts';
 import { clamp, Spring } from '../core/math.ts';
-import { bed, buzz, noise, tone } from '../core/audio.ts';
+import { bed, buzz, noise } from '../core/audio.ts';
 import { sfx } from '../game/sfx.ts';
 import { HELLO, LINE } from '../game/content.ts';
 import { reducedMotion } from '../core/stage.ts';
@@ -12,12 +12,12 @@ import type { Game } from '../game/game.ts';
 // runs by itself (chime, pull-away, cruise, chime, brake, doors); holding a strap through the pull-away or the brake is
 // the one skill, and missing it throws him down the car, which is the joke and the lesson.
 export const RIDE = {
-  closing: .7, chime: .8, accel: 1.2, cruise: 4, brake: 1.5, dwell: 6, warn: 2,
+  closing: .7, chime: .8, accel: 1.2, cruise: 4, brake: 1.5, dwell: 4, warn: 2,
   a: 3.2,            // m/s² while pulling away and braking
   throw: 4.6,        // how hard the train's push acts on him
   grip: .12,         // how well his shoes hold on the vinyl
   reach: 1.45,        // A this close to a strap grabs it
-  strapL: .55, railY: 2.7, joint: 9
+  strapL: .55, railY: 2.7, joint: 4.2
 };
 type Phase = 'closing' | 'chime' | 'accel' | 'cruise' | 'warn' | 'brake' | 'stand' | 'leave';
 const W = 15.6, H = 3.3, D = 3.2;
@@ -38,7 +38,12 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   const doorL = box(.86, 2.25, .06, '#cfd5dc', -.45, 0, backZ + .1), doorR = box(.86, 2.25, .06, '#cfd5dc', .45, 0, backZ + .1);
   group.add(doorL, doorR, box(1.9, .1, .2, '#3d444e', 0, 2.25, backZ + .1));
   const lamp = new THREE.Mesh(new THREE.SphereGeometry(.08, 12, 8), new THREE.MeshStandardMaterial({ color: '#f6b73c', emissive: '#000' }));
-  lamp.position.set(.85, 2.45, backZ + .15); group.add(lamp);
+  lamp.position.set(.85, 2.45, backZ + .15); lamp.visible = false; group.add(lamp);
+  // The bar over the doors: the eye's twin of every warning. Amber, three pulses: brace (the chime, the arrival).
+  // Coral, four a second: the doors are closing.
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(1.9, .08, .05), new THREE.MeshStandardMaterial({ color: '#3d444e', emissive: '#000' }));
+  bar.position.set(0, 2.4, backZ + .16); group.add(bar);
+  const barSet = (c: string | null) => { const m = bar.material as THREE.MeshStandardMaterial; m.emissive.set(c ?? '#000'); m.color.set(c ?? '#3d444e'); };
   // Over the doors: the next-stop sign.
   let signText = { top: 'Next stop', name: LINE[0].name, color: LINE[0].color };
   const sign = card(1.9, .5, (g, Wd, Ht) => {
@@ -109,12 +114,12 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
   });
   // The sim.
   const sim = { phase: 'stand' as Phase, t: 0, v: 0, a: 0, at: 0, dist: 0, stopAt: 0, express: false };
-  const rumble = bed(180);
+  const rumble = bed(420, .7);
   let hold: typeof straps[number] | null = null, held = false, lastJoint = 0, doorOpen = 1, clapped = false, rideNo = 0;
   const holdWindow = () => sim.phase === 'closing' || sim.phase === 'chime' || sim.phase === 'accel' || sim.phase === 'warn' || sim.phase === 'brake' || (sim.phase === 'cruise' && sim.t > R.cruise - .6);
   const door: Mech = {
     id: 'doors', x: 0, reach: 2.6, at: new THREE.Vector3(0, 2.0, -1), up: true,
-    label: () => `Get off: ${LINE[sim.at].name}`, on: () => sim.phase === 'stand' && doorOpen > .9, use: g => void getOff(g)
+    label: () => `Get off: ${LINE[sim.at].name}`, hurry: () => hurry, on: () => sim.phase === 'stand' && doorOpen > .9, use: g => void getOff(g)
   };
   const go = (p: Phase) => { sim.phase = p; sim.t = 0; };
   const self = {
@@ -133,7 +138,7 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       sim.v = 0; sim.a = 0; doorOpen = 1; go('closing'); if (from === 'platform') sim.t = -.9; held = false; clapped = false; crumpled = false;
       station.position.x = 0; lamps.forEach(l => (l.visible = false));
     },
-    camera(g: Game) { const room = Math.max(1.5, W / 2 + .5 - g.stage.halfWidth(22.5)); g.stage.want = { x: clamp(g.hero.body.x * (room > 1.5 ? 1 : .3), -room, room), y: 1.75, z: 0, dist: 22.5, pitch: .13, yaw: 0 }; },
+    camera(g: Game) { const room = Math.max(1.5, W / 2 + .5 - g.stage.halfWidth(22.5)); g.stage.want = { x: clamp(g.hero.body.x * (room > 1.5 ? 1 : reducedMotion ? 0 : .3), -room, room), y: 1.75, z: 0, dist: 22.5, pitch: .13, yaw: 0 }; },
     onA(g: Game) {
       // In the hold window, A reaches for the nearest strap; while hanging, A lets go.
       if (hold) return true;
@@ -141,40 +146,45 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       let best = null, bd = R.reach;
       for (const s of straps) { const d = Math.abs(s.x - g.hero.body.x); if (d < bd) { bd = d; best = s; } }
       if (!best) return false;
-      hold = best; held = true; sfx.pop(); buzz(10);
+      hold = best; held = true; sfx.grip();
       const s = best; g.hero.hang = () => ({ x: s.mesh.position.x + Math.sin(s.th) * R.strapL, y: R.railY - Math.cos(s.th) * R.strapL - 1.42 });
       s.w += -g.hero.body.vx * .5;
       return true;
     },
     onTap(g: Game) { return self.onA(g); },
+    exit() { rumble.set(0); },
     update(dt: number, g: Game) {
-      sim.t += dt;
+      const t0 = sim.t; sim.t += dt;
       const ph = sim.phase;
       // Phases.
-      if (ph === 'closing') { if (sim.t > 0) doorOpen = Math.max(0, doorOpen - dt / R.closing); if (sim.t > R.closing) { go('chime'); sfx.chime(); g.emit('ride', rideNo); } }
-      else if (ph === 'chime') { if (sim.t > R.chime) { go('accel'); g.stage.nudge(-.15, 0); } }
+      if (ph === 'closing') {
+        if (t0 <= 0 && sim.t > 0) { sfx.doors(); [0, .23, .46].forEach(at => setTimeout(() => sfx.tick(true), at * 1000)); }
+        if (sim.t > 0) doorOpen = Math.max(0, doorOpen - dt / R.closing);
+        if (sim.t > R.closing) { go('chime'); sfx.chime(); buzz(15); g.emit('ride', rideNo); } }
+      else if (ph === 'chime') { if (sim.t > R.chime) { go('accel'); g.stage.nudge(-.22, 0); sfx.lurch(); } }
       else if (ph === 'accel') { sim.a = R.a; if (sim.t > R.accel) { go('cruise'); sim.a = 0; endHold(g); } }
-      else if (ph === 'cruise') { sim.a = Math.sin(sim.t * 2.3) * .25; if (sim.t > R.cruise) { go('warn'); setSign('Arriving', sim.at); const j = LINE[sim.at].jingle; j.forEach((f, i) => tone({ f, d: .5, type: 'sine', v: .2, at: i * .22 })); g.emit('arriving', sim.at); } }
-      else if (ph === 'warn') { sim.a = 0; if (sim.t > R.chime) { go('brake'); sim.stopAt = sim.dist + sim.v * sim.v / (2 * R.a * 1.1); } }
+      else if (ph === 'cruise') { sim.a = Math.sin(sim.t * 2.3) * .25; if (sim.t > R.cruise) { go('warn'); setSign('Arriving', sim.at); sfx.jingle(LINE[sim.at].jingle); g.emit('arriving', sim.at); } }
+      else if (ph === 'warn') { sim.a = 0; if (sim.t > R.chime) { go('brake'); sfx.squeal(); g.stage.nudge(.12, 0); sim.stopAt = sim.dist + sim.v * sim.v / (2 * R.a * 1.1); } }
       else if (ph === 'brake') {
         sim.a = -R.a * 1.1;
-        if (sim.v + sim.a * dt <= 0) { sim.v = 0; sim.a = 0; go('stand'); g.stage.shake(.25); g.stage.nudge(.2, 0); sfx.doors(); noise({ d: .3, f: 300, q: .7, v: .4 }); endHold(g); folk.forEach(f => f.jolt.kick(-4)); setSign('This stop', sim.at); g.emit('stand', sim.at); }
+        if (sim.v + sim.a * dt <= 0) { sim.v = 0; sim.a = 0; go('stand'); g.stage.shake(.4); g.stage.nudge(.26, 0); buzz(30); sfx.doors(); noise({ d: .3, f: 300, q: .7, v: .4 }); endHold(g); folk.forEach(f => f.jolt.kick(-4)); setSign('This stop', sim.at); g.emit('stand', sim.at); }
       } else if (ph === 'stand') {
         doorOpen = Math.min(1, doorOpen + dt * 2.2);
         // The doors wait at the first stop ever, and at the terminus; anywhere else they close after the dwell.
         const waits = !g.save.firstStop || LINE[sim.at].id === 'home';
         if (!waits && !leaving) {
           const left = R.dwell + R.warn - sim.t;
-          (lamp.material as THREE.MeshStandardMaterial).emissive.set(left < R.warn && Math.floor(sim.t * 6) % 2 ? '#f6b73c' : '#000');
-          if (left < R.warn && !warned) { warned = true; sfx.chime(); }
-          if (left <= 0) { warned = false; (lamp.material as THREE.MeshStandardMaterial).emissive.set('#000'); sim.at = (sim.at + 1) % LINE.length; g.save.next = sim.at; setSign('Next stop', sim.at); go('closing'); doorOpen = 1; g.emit('missed'); }
+          // The last 2 s: the doors' ticks, four a second (the chime means only 'brace').
+          hurry = left < R.warn;
+          if (hurry) { const k = Math.floor((R.warn - left) * 4); if (k !== tickN) { tickN = k; sfx.tick(true); } }
+          if (left <= 0) { hurry = false; tickN = -1; if (!missedOnce) { missedOnce = true; setTimeout(() => g.say('…that was my stop.'), 600); } sim.at = (sim.at + 1) % LINE.length; g.save.next = sim.at; setSign('Next stop', sim.at); go('closing'); doorOpen = 1; g.emit('missed'); }
         }
       }
       // Speed and distance; the tunnel lamps rush past, and the station slides in to stand at the windows.
       sim.v = Math.max(0, sim.v + sim.a * dt);
       sim.dist += sim.v * dt;
       const vis = sim.v * 4.5;
-      lamps.forEach((l, i) => { l.visible = sim.phase !== 'stand' && sim.phase !== 'closing'; l.position.x = ((-30 + i * 5 - sim.dist * 4.5) % 60 + 90) % 60 - 30; });
+      lamps.forEach((l, i) => { l.visible = sim.phase !== 'stand' && sim.phase !== 'closing'; l.position.x = ((-30 + i * 5 - sim.dist * (reducedMotion ? 1.2 : 4.5)) % 60 + 90) % 60 - 30; });
       if (sim.phase === 'brake' || sim.phase === 'stand') station.position.x = (sim.stopAt - sim.dist) * 4.5 * (sim.phase === 'stand' ? 0 : 1);
       else if (sim.phase === 'closing' || sim.phase === 'chime') station.position.x = 0;
       else station.position.x = -sim.dist * 4.5 - 1;
@@ -182,26 +192,34 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
       tunnel.visible = !station.visible || Math.abs(station.position.x) > 1;
       void vis;
       // Rumble as loud as it is fast; two knocks at each rail joint.
-      rumble.set(Math.min(.5, sim.v * .06), .7 + sim.v * .1);
-      if (sim.dist - lastJoint > R.joint && sim.v > 1) { lastJoint = sim.dist; noise({ d: .05, f: 160, q: 1, v: .35 }); noise({ d: .05, f: 150, q: 1, v: .3, at: .11 }); }
+      rumble.set(Math.min(.5, .035 + sim.v * .07), .7 + sim.v * .12);
+      if (sim.dist - lastJoint > R.joint && sim.v > 1) { lastJoint = sim.dist; noise({ d: .05, f: 160, q: 1, v: .35 }); noise({ d: .05, f: 150, q: 1, v: .3, at: .11 }); noise({ d: .02, f: 1400, q: 3, v: .16 }); noise({ d: .02, f: 1400, q: 3, v: .13, at: .11 }); folk.forEach(f => f.jolt.kick(.6)); }
+      // The bar: amber pulses with the brace notes, coral at four a second while the doors close.
+      const ptn = (ph === 'chime' || ph === 'warn') && sim.t < .6 && sim.t % .2 < .13 ? '#f6b73c' : hurry && Math.floor(sim.t * 8) % 2 ? '#e8552d' : null;
+      barSet(reducedMotion && hurry ? '#e8552d' : ptn);
       doorL.position.x = -.45 - doorOpen * .82; doorR.position.x = .45 + doorOpen * .82;
       // The push: -a acts on everything loose. He slides unless he is holding on.
       g.hero.push = -sim.a * R.throw; g.hero.grip = R.grip;
       for (const s of straps) {
         const alpha = -(9.8 / R.strapL) * Math.sin(s.th) - (sim.a / R.strapL) * Math.cos(s.th) - 1.4 * s.w;
-        s.w += alpha * dt; s.th += s.w * dt; s.mesh.rotation.z = reducedMotion ? 0 : s.th;
+        s.w += alpha * dt; s.th += s.w * dt;
+        // Reduced motion: no swing, a held lean against the force (it still says which way the train pulls).
+        if (reducedMotion) { s.th += (Math.atan(-sim.a / 9.8) - s.th) * Math.min(1, dt * 6); s.w = 0; }
+        s.mesh.rotation.z = s.th;
       }
+      // Hanging: the strap creaks each time its swing turns.
+      if (hold) { const sg = Math.sign(hold.w); if (sg && sg !== creakSign) { creakSign = sg; if (Math.abs(hold.th) > .06) sfx.creak(); } }
       // Souvenirs slide along their seat and knock at its ends.
       for (const sv of souvenirs) {
         if (!sv.m.visible) continue;
         sv.v += -sim.a * .9 * dt; sv.v *= Math.exp(-dt * (Math.abs(sim.a) > .5 ? .6 : 3)); sv.x += sv.v * dt;
-        if (sv.x < sv.x0 || sv.x > sv.x1) { sv.x = Math.max(sv.x0, Math.min(sv.x1, sv.x)); if (Math.abs(sv.v) > .4) { noise({ d: .04, f: 900, q: 2, v: Math.min(.3, Math.abs(sv.v) * .2) }); } sv.v *= -.35; }
+        if (sv.x < sv.x0 || sv.x > sv.x1) { sv.x = Math.max(sv.x0, Math.min(sv.x1, sv.x)); if (Math.abs(sv.v) > .4) { noise({ d: .04, f: 700 + souvenirs.indexOf(sv) * 200, q: 2, v: Math.min(.3, Math.abs(sv.v) * .2) }); } sv.v *= -.35; }
         sv.m.position.x = sv.x; sv.m.rotation.z = reducedMotion ? 0 : -sv.v * .15;
       }
       // His head knocks a strap when he jumps under it.
-      if (!hold && g.hero.body.vy > 2 && g.hero.body.y > .5) for (const s of straps) if (Math.abs(s.x - g.hero.body.x) < .4 && Math.abs(s.w) < 2) { s.w += 4 * (Math.random() < .5 ? 1 : -1); sfx.bonk(.2); }
+      if (!hold && g.time > quietStraps && g.hero.body.vy > 2 && g.hero.body.y > .5) for (const s of straps) if (Math.abs(s.x - g.hero.body.x) < .4 && Math.abs(s.w) < 2) { s.w += 4 * (Math.random() < .5 ? 1 : -1); sfx.bonk(.2); }
       // Passengers jolt with the train; standees grab straps half a second before the pull.
-      for (const f of folk) { f.jolt.kick(-sim.a * dt * 2.5); f.c.rotation.z = reducedMotion ? 0 : f.jolt.step(0, dt) * .12; }
+      for (const f of folk) { f.jolt.kick(-sim.a * dt * 2.5); f.c.rotation.z = reducedMotion ? clamp(-sim.a * .03, -.1, .1) : f.jolt.step(0, dt) * .12; }
       const win = holdWindow();
       if (win && !wasWin) { for (const s of straps) s.w += (Math.random() - .5) * 1.2; }
       wasWin = win;
@@ -218,20 +236,21 @@ export function trainCar(): Place & { sim: { phase: Phase; t: number; v: number;
         s.c.position.x = s.x + Math.sin(st.th) * R.strapL * s.hold; s.c.position.y = s.hold * .35 + s.cheer; s.cheer = Math.max(0, s.cheer - dt * 1.2); s.arm.visible = s.hold > .5;
       }
       // Thrown into the end wall: he crumples flat and pops back.
-      if (!hold && Math.abs(g.hero.body.vx) > 2.4 && (g.hero.body.x < self.lane.x0 + .35 || g.hero.body.x > self.lane.x1 - .35)) { g.hero.crumple(); g.hero.body.vx = 0; sfx.bonk(.9); g.stage.shake(.3); g.fx.burst(g.hero.body.x, 1, .1, ['#fffaf0', '#d9dde2'], 6, .5); folk.forEach(f => f.jolt.kick(Math.sign(g.hero.body.x - f.x) * 3)); g.emit('crumple');
+      if (!hold && Math.abs(g.hero.body.vx) > 2.4 && (g.hero.body.x < self.lane.x0 + .35 || g.hero.body.x > self.lane.x1 - .35)) { g.hero.crumple(); g.hero.body.vx = 0; sfx.crumple(); g.freeze = .083; g.stage.shake(.55); g.fx.burst(g.hero.body.x, 1, .1, ['#fffaf0', '#d9dde2'], 12, .5); setTimeout(() => sfx.pop(), 360);
+        const near = folk.reduce((a, b) => (Math.abs(b.x - g.hero.body.x) < Math.abs(a.x - g.hero.body.x) ? b : a)); g.pins.show('oops', '<span>!</span>', new THREE.Vector3(near.x, 1.75, backZ + .55), 'tag', 600); folk.forEach(f => f.jolt.kick(Math.sign(g.hero.body.x - f.x) * 3)); g.emit('crumple');
         if (!crumpled && g.save.holds === 0) { crumpled = true; g.say('Note to self: grab a strap.'); } }
       // The first ride's ad panel says hello by itself.
       if (rideNo === 1 && !adLine) { const n = Math.min(HELLO.length - 1, Math.floor((sim.phase === 'closing' || sim.phase === 'chime' ? 0 : (sim.phase === 'accel' ? .5 : sim.phase === 'cruise' ? 1 + sim.t / 2 : 3)))); if (n !== ad) { ad = n; adCard.redraw(); sfx.paper(); } }
       if (sim.phase !== 'stand') leaving = false;
     }
   };
-  let warned = false, leaving = false, wasWin = false, crumpled = false;
+  let leaving = false, wasWin = false, crumpled = false, hurry = false, tickN = -1, missedOnce = false, quietStraps = 0, creakSign = 0;
   function endHold(g: Game) {
     if (hold && held) {
       g.save.holds++;
-      g.hero.hang = null; g.hero.kick(0, 4.5); hold = null; sfx.jump();
-      if (g.punch('line', 'hold', true)) { g.say('Held on. Like a local.'); }
-      if (!clapped) { clapped = true; standees.forEach(s => (s.cheer = .4)); sfx.pop(); }
+      g.hero.hang = null; g.hero.kick(0, 4.5); hold = null; sfx.jump(); buzz(8); quietStraps = g.time + .6;
+      if (g.punch('line', 'hold', true, 120)) { g.say('Held on. Like a local.'); }
+      if (!clapped) { clapped = true; standees.forEach(s => (s.cheer = .4)); setTimeout(() => sfx.clap(), 500); }
     }
     held = false;
   }

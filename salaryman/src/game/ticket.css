@@ -37,7 +37,15 @@
 .tk-links b { display: inline-block; width: 70px; color: #e8552d; }
 .tk-hint { margin: 0; color: #fffd; font: 500 13px Fredoka, sans-serif; text-shadow: 0 1px 2px #000; }
 .ticket-layer[data-state="print"] .tk-hint { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { .tk-card, .ticket-corner { transition: none; animation: none !important; } }
+/* Taken at the gate: no backdrop, small at the upper left; its contact side stays clickable. */
+.ticket-layer[data-state^="taken"] .ticket-big { opacity: 1; background: #0000; pointer-events: none; }
+.ticket-layer[data-state^="taken"] .tk-card { transform: translate(-60%, -42%) scale(.55); pointer-events: auto; }
+.ticket-layer[data-state="taken-back"] .tk-card { transform: translate(-60%, -42%) scale(.55) rotateY(180deg); }
+.ticket-layer[data-state^="taken"] .tk-hint { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .tk-card, .ticket-corner { transition: none; animation: none !important; }
+  .ticket-layer[data-state="print"] .tk-card { transform: translate(-45%, -35%) scale(.62); }
+  .ticket-corner.kachunk { animation: flash .3s !important; } }
+@keyframes flash { from { background: #e8552d; } to { background: #fff6e3; } }
 
 @media (max-width: 700px), (max-height: 500px) {
   .ticket-big { position: fixed; z-index: 20; }

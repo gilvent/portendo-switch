@@ -24,6 +24,8 @@ export function tab(dir: 'left' | 'right' | 'down' | 'up' | 'turn' = 'right', si
       clock += dt;
       if (alive && !done && near < GRAMMAR.wiggleNear && clock % GRAMMAR.wiggleEvery < dt) wob.kick(9);
       g.rotation.z = (reducedMotion ? 0 : wob.step(0, dt) * .25);
+      // Still, the tab brightens instead of wiggling.
+      if (reducedMotion) (t.material as THREE.MeshStandardMaterial).emissive.set(alive && !done && near < GRAMMAR.wiggleNear && clock % GRAMMAR.wiggleEvery < .3 ? '#5a1a08' : '#000');
       g.visible = alive;
     },
     kick() { wob.kick(-14); },
@@ -33,14 +35,17 @@ export function tab(dir: 'left' | 'right' | 'down' | 'up' | 'turn' = 'right', si
 export type Tab = ReturnType<typeof tab>;
 
 // Stepped time: a snap holds each pose for a frame of a 12 fps stop-motion film, so paper moves in clicks, not glides.
-export const stepped = (k: number, fps = GRAMMAR.snapFps, ms = 250) => (reducedMotion ? 1 : Math.min(1, Math.ceil(k * fps * ms / 1000) / (fps * ms / 1000)));
+// Under reduced motion a snap does not travel: it holds its first pose and cuts to its last at the end of its time.
+export const stepped = (k: number, fps = GRAMMAR.snapFps, ms = 250) => (reducedMotion ? (k >= 1 ? 1 : 0) : Math.min(1, Math.ceil(k * fps * ms / 1000) / (fps * ms / 1000)));
 
 // Little timelines the scenes run: `play(ms, f)` calls f(k) with k from 0 to 1 and resolves at the end.
 export class Anims {
   private list: { t: number; ms: number; f: (k: number) => void; done: () => void }[] = [];
+  // Reduced motion keeps every timeline's length (time is never shortened, only travel): the pose holds at its
+  // start and cuts to its end when the time is up.
   play(ms: number, f: (k: number) => void) {
-    if (reducedMotion) { f(1); return Promise.resolve(); }
-    return new Promise<void>(done => this.list.push({ t: 0, ms, f, done }));
+    const g = reducedMotion ? (k: number) => f(k >= 1 ? 1 : 0) : f;
+    return new Promise<void>(done => this.list.push({ t: 0, ms, f: g, done }));
   }
   wait(ms: number) { return this.play(ms, () => {}); }
   update(dt: number) {

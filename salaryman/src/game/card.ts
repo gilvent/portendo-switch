@@ -2,6 +2,7 @@ import { PERSON, ROWS } from './content.ts';
 import type { Game } from './game.ts';
 import type { Shell } from '../shell/console.ts';
 import './card.css';
+import { sfx } from './sfx.ts';
 
 // The ending: his business card on the handheld's screen. Name, trade, how to reach him, and the day's ticket as a
 // strip of punched holes. Every hole found gilds its edge.
@@ -12,6 +13,7 @@ export class EndCard {
     shell.screen.appendChild(this.el);
   }
   show() {
+    sfx.card();
     const holes = this.g.save.holes, total = ROWS.reduce((n, r) => n + r.round + r.star, 0);
     const all = holes.length >= total;
     const strip = ROWS.map(r => { const got = holes.filter(h => h.startsWith(`${r.id}/`)); const st = got.filter(h => h.endsWith('*')).length; return `<span title="${r.label}"><em>${r.label}</em>${Array.from({ length: r.round }, (_, i) => `<i class="${i < got.length - st ? 'on' : ''}"></i>`).join('')}${Array.from({ length: r.star }, (_, i) => `<i class="star ${i < st ? 'on' : ''}"></i>`).join('')}</span>`; }).join('');

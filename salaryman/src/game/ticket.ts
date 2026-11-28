@@ -68,6 +68,12 @@ export class Ticket {
     this.drawFront(); this.hint(); sfx.paper();
     this.state = s; this.el.dataset.state = s;
   }
+  // The gate takes it: small, at the upper left, so the walk home is seen. Front first, then his contact side.
+  take() {
+    this.drawFront(); sfx.paper();
+    this.state = 'front'; this.el.dataset.state = 'taken';
+    setTimeout(() => { this.state = 'back'; this.el.dataset.state = 'taken-back'; sfx.fold(); }, 800);
+  }
   close() { this.state = 'corner'; this.el.dataset.state = 'corner'; sfx.fold(); this.drawCorner(); }
   private punched(d: { row: string; star: boolean }) {
     this.drawCorner(d.star ? 2 : 1); this.drawFront();

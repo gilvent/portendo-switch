@@ -31,6 +31,7 @@ export class Shell {
         </div>
         <div class="screen" data-testid="screen"><div class="overlay"></div></div>
         <a class="hurry" href="./one-page.html" data-testid="one-page">In a hurry? One-page version</a>
+        <button class="mute-docked" data-testid="mute-docked" aria-label="Sound (M)">♪</button>
       </div>`;
     this.root = host.querySelector('.shell')!;
     this.screen = host.querySelector('.screen')!;
@@ -44,9 +45,13 @@ export class Shell {
       el.addEventListener('pointerup', up); el.addEventListener('pointerleave', up); el.addEventListener('pointercancel', up);
     }
     this.bindStick(host.querySelector('.stick')!);
-    const vol = host.querySelector<HTMLElement>('.vol')!;
-    const showVol = () => { vol.dataset.muted = String(isMuted()); vol.title = isMuted() ? 'Sound off' : 'Sound on'; };
-    vol.addEventListener('click', () => { setMuted(!isMuted()); showVol(); }); showVol();
+    // The volume key on the console; once docked, a small key at the screen's corner; M anywhere.
+    const vol = host.querySelector<HTMLElement>('.vol')!, vol2 = host.querySelector<HTMLElement>('.mute-docked')!;
+    const showVol = () => { for (const v of [vol, vol2]) { v.dataset.muted = String(isMuted()); v.title = isMuted() ? 'Sound off (M)' : 'Sound on (M)'; } };
+    const toggle = () => { setMuted(!isMuted()); showVol(); };
+    vol.addEventListener('click', toggle); vol2.addEventListener('click', toggle);
+    addEventListener('keydown', e => { if (e.code === 'KeyM' && !e.repeat && !e.metaKey && !e.ctrlKey) toggle(); });
+    showVol();
     this.place();
     addEventListener('resize', () => { this.measure(); this.place(); });
   }
@@ -95,7 +100,7 @@ export class Shell {
     if (this.mode !== 'handheld') return;
     this.mode = 'docking';
     this.root.dataset.mode = 'docking';
-    const wait = (ms: number) => new Promise(r => setTimeout(r, reducedMotion ? 0 : ms));
+    const wait = (ms: number) => new Promise(r => setTimeout(r, reducedMotion ? Math.min(ms, 300) : ms));
     await wait(650);
     await mid?.();
     this.mode = 'docked';
@@ -106,7 +111,7 @@ export class Shell {
   // The end: the screen folds back into the dock and the console lifts out with it, in the hand again.
   async undock(mid?: () => Promise<void> | void) {
     if (this.mode !== 'docked') return;
-    const wait = (ms: number) => new Promise(r => setTimeout(r, reducedMotion ? 0 : ms));
+    const wait = (ms: number) => new Promise(r => setTimeout(r, reducedMotion ? Math.min(ms, 300) : ms));
     this.root.classList.add('undocking');
     this.mode = 'docking'; this.root.dataset.mode = 'docking';
     await wait(600);

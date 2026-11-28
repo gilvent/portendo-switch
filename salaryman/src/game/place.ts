@@ -12,6 +12,8 @@ export type Mech = {
   on?: () => boolean;
   // ↑ also works it (doors).
   up?: boolean;
+  // Time is running out on it (the doors closing): its prompt pulses.
+  hurry?: () => boolean;
   use: (g: Game) => void;
 };
 // One space he can be in. A scene builds its group, its lane and its mechanisms, and runs its own rules each step.

@@ -17,4 +17,8 @@
 .wipe:not(.shut):not(.open) { visibility: hidden; }
 .wipe.shut i { transform: rotateY(0); }
 .wipe.open i { transition-duration: .42s; }
-@media (prefers-reduced-motion: reduce) { .wipe i { transition: none; } }
+/* Reduced motion: the page does not turn, it fades through paper. */
+@media (prefers-reduced-motion: reduce) { .wipe i { transition: none; transform: none !important; } .wipe { opacity: 0; transition: opacity .18s; } .wipe.shut { opacity: 1; } .wipe.open { opacity: 0; } }
+.hurry .prompt { box-shadow: 0 0 0 3px #e8552d, 0 3px 0 #0003; animation: hurry .25s ease-in-out infinite alternate; }
+@keyframes hurry { to { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .prompt b, .hurry .prompt { animation: none; } }

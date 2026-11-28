@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { box, card, label, mat, rrect } from '../game/paper.ts';
 import { Settle, stepped } from '../game/mech.ts';
 import { sfx } from '../game/sfx.ts';
-import { noise, tone } from '../core/audio.ts';
+import { bed, buzz, noise, tone } from '../core/audio.ts';
 import { clamp, rand, Spring } from '../core/math.ts';
 import { person, CROWD } from '../game/people.ts';
 import { reducedMotion } from '../core/stage.ts';
@@ -175,7 +175,7 @@ function shelf(k: Kit, x: number, colors: string[]) {
       it.m.scale.y = Math.max(.05, stepped(it.t, 12, 220)) + it.settle.step(dt) * .12;
     }
   } });
-  return { x, fold() { folded = true; }, restock(g: Game) { folded = false; goods.forEach((it, j) => { it.up = false; setTimeout(() => { if (Math.abs(g.hero.body.x - it.ix) < 40) { it.up = true; it.settle.kick(1.2); tone({ f: 700 + j * 80, d: .06, type: 'sine', v: .1 }); } }, j * 70); }); } };
+  return { x, fold() { folded = true; }, restock(g: Game, sing = true) { folded = false; goods.forEach((it, j) => { it.up = false; setTimeout(() => { if (Math.abs(g.hero.body.x - it.ix) < 40) { it.up = true; it.settle.kick(1.2); if (sing) tone({ f: 700 + j * 80, d: .06, type: 'sine', v: .1 }); } }, j * 70); }); } };
 }
 // 2. The can pyramid (pull-tab): pull the bottom can and the pyramid holds its breath, then comes down and rolls all
 // over the floor; the cans hop back up in stop-motion. Second time, only the top can drops (into the bag). Third, down.
@@ -220,7 +220,7 @@ function cans(k: Kit, bag: Bag) {
       reset(p, pull); reset(s, topCan); sfx.pop(); clerkUp = 0; busy = false; return;
     }
     // Down it comes.
-    sfx.bonk(.7); g.stage.shake(.25); noise({ d: .5, f: 1200, to: 400, q: .6, v: .35 });
+    sfx.bonk(.7); g.stage.shake(.45); buzz([14, 30, 10, 30, 8]); noise({ d: .5, f: 1200, to: 400, q: .6, v: .35 });
     tins.forEach((s, j) => { if (j === pull) return; s.loose = true; s.vx = (s.x - x) * 4 + rand(-2.6, 2.6); s.vy = rand(.5, 3); s.inner.rotation.x = Math.PI / 2; });
     // One rolls for his head.
     const hx = g.hero.body.x;
@@ -285,7 +285,7 @@ function fitting(k: Kit) {
     const x0 = h.body.x; await g.anims.play(160, kk => { h.body.x = x0 + (x - x0) * kk; });
     noise({ d: .14, f: 380, q: .7, v: .45 }); sfx.fold();
     await g.anims.play(200, kk => { piv.scale.y = Math.max(.03, stepped(kk, 12, 200)); });
-    g.stage.shake(.08);
+    g.stage.shake(.2); buzz(20);
     // Three rustles; the old look is tossed over the top.
     n = (n + 1) % LOOKS.length;
     const old = worn.now;
@@ -345,7 +345,7 @@ function surprise(k: Kit, bag: Bag) {
     await g.anims.play(120, kk => { lid.rotation.x = -stepped(kk, 12, 120) * 1.9; });
     manual = -1; lenS.x = .05; lenS.v = 0; lenS.kick(14); sway.kick(3);
     tone({ f: 260, to: 900, d: .25, type: 'sine', v: .3 }); tone({ f: 900, to: 700, d: .18, type: 'sine', v: .15, at: .2 });
-    g.fx.burst(x, 1.2, z, [SUN, CREAM, '#d9cdb6'], 18, .9); g.stage.shake(.1);
+    g.fx.burst(x, 1.2, z, [SUN, CREAM, '#d9cdb6'], 18, .9); g.stage.shake(.3); buzz(16);
     if (Math.abs(g.hero.body.x - x) < 2.2) g.hero.hop(3);
     if (!told) { told = true; k.tell(g, 'box', 'Didn’t need it. Bought it anyway.', V(x, 2.9)); }
     await g.anims.wait(650);
@@ -421,7 +421,7 @@ function till(k: Kit, bag: Bag) {
     tone({ f: 1568, d: .12, type: 'triangle', v: .25 }); tone({ f: 2093, d: .35, type: 'triangle', v: .22, at: .08 }); noise({ d: .08, f: 5000, q: 2, v: .2 });
     await g.anims.play(100, kk => { drawer.position.z = z + .1 + stepped(kk, 12, 100) * .35; });
     g.fx.burst(x - .45, top + 1.3, z, [CREAM], 6, .4);
-    sfx.stamp(); clerk.position.y = .5;
+    clerk.position.y = .5; if (told) sfx.clack(.5);
     if (!told) { told = true; k.tell(g, 'till', 'Do I still get the staff discount?', V(x, 2.95)); }
     await g.anims.wait(220); clerk.position.y = .35;
     void g.anims.play(400, kk => { rpiv.scale.y = Math.max(.001, (1 - kk) * rpiv.scale.y); });
@@ -432,7 +432,9 @@ function till(k: Kit, bag: Bag) {
     sfx.land(.5); g.fx.puff(cx - .3, .9, z + .3, 5); g.stage.shake(.08);
     await g.anims.play(100, kk => { drawer.position.z = z + .1 + (1 - kk) * .35; });
     // Beep beep; a wheelie; off to the trains.
-    sfx.beep(); await g.anims.wait(250); sfx.beep();
+    const horn = () => { tone({ f: 440, d: .07, type: 'triangle', v: .2 }); tone({ f: 494, d: .07, type: 'triangle', v: .2, at: .08 }); };
+    horn(); await g.anims.wait(250); horn();
+    for (let j = 0; j < 18; j++) noise({ d: .03, f: 420, q: 2, v: .2 * (1 - j / 18), at: .15 + j / 12 });
     wheelie = 1; away = 9; busy = false;
   } });
   k.parts.push({ update: (dt, g) => {
@@ -465,7 +467,7 @@ function flashSale(k: Kit, bell: THREE.Group, shelves: ReturnType<typeof shelf>[
   const B = BLIBLI;
   const cup = new THREE.Mesh(new THREE.ConeGeometry(.24, .32, 16, 1, true), new THREE.MeshStandardMaterial({ color: SUN, side: THREE.DoubleSide, metalness: .3, roughness: .5 }));
   cup.position.y = -.16; cup.castShadow = true;
-  bell.add(cup, box(.03, .3, .03, '#8a919b', 0, 0, 0), box(.015, .3, .015, '#d9cdb6', 0, -.62, 0), box(.08, .14, .08, SUN, 0, -.48, 0)); k.group.add(bell);
+  bell.add(cup, box(.03, .3, .03, '#8a919b', 0, 0, 0), box(.015, .4, .015, '#d9cdb6', 0, -.72, 0), box(.08, .14, .08, SUN, 0, -.58, 0)); k.group.add(bell);
   const xs = [B.lamp, B.cans, B.fitting, B.box, B.till];
   const flags = xs.map(fx => {
     const p = new THREE.Group(); p.position.set(fx, 3.45, -2.95); k.group.add(p);
@@ -474,22 +476,27 @@ function flashSale(k: Kit, bell: THREE.Group, shelves: ReturnType<typeof shelf>[
   });
   const crowd = Array.from({ length: 22 }, (_, j) => { const c = person(CROWD[j % CROWD.length]); const bg = box(.3, .32, .14, BLUE, .1, 1.3, .06); bg.visible = false; c.add(bg); c.visible = false; c.position.set(-3, 0, -.5 - (j % 3) * .5); k.group.add(c); return { c, bg, d: j * .07 }; });
   let rush = -1, swing = 0, sw = 0, rung = false;
-  k.parts.push({ update: (dt, g) => {
+  const herd = bed(360, .8);
+  k.parts.push({ exit: () => herd.set(0), update: (dt, g) => {
     const h = g.hero.body;
     if (!h.ground && Math.abs(h.x - B.bell) < 3 && Math.random() < dt * 4) sw += rand(-.4, .4);
-    if (rush < 0 && h.vy > 0 && Math.abs(h.x - B.bell) < .65 && h.y + 1.45 > 2.15) {
+    if (rush < 0 && h.vy > 0 && Math.abs(h.x - B.bell) < .65 && h.y + 1.45 > 2.05) {
       rush = 0; sw = 6;
       tone({ f: 1320, d: .7, type: 'sine', v: .3 }); tone({ f: 1760, d: .6, type: 'sine', v: .2, at: .05 }); tone({ f: 1320, d: .5, type: 'sine', v: .2, at: .35 });
       if (!rung) { rung = true; k.tell(g, 'bell', 'Flash sale! Who rang that? Oh. Me.', V(B.bell - 1, 3.5, -.4), true); }
       // The wave of flags, right to left.
-      flags.forEach((p, j) => { const at = (B.bell - xs[j]) / 14; void g.anims.wait(at * 1000).then(() => { p.visible = true; return g.anims.play(180, kk => { p.rotation.x = -Math.PI / 2 * (1 - stepped(kk, 12, 180)); }); }).then(() => { sfx.pop(); g.fx.burst(xs[j], 2.8, -2.6, [SUN, CREAM], 10, .7); if (j === 0) { shop.sale = true; shop.redraws.forEach(f => f()); } }); });
+      flags.forEach((p, j) => { const at = (B.bell - xs[j]) / 14; void g.anims.wait(at * 1000).then(() => { p.visible = true; return g.anims.play(180, kk => { p.rotation.x = -Math.PI / 2 * (1 - stepped(kk, 12, 180)); }); }).then(() => { tone({ f: [820, 730, 650, 580, 520][j], to: [820, 730, 650, 580, 520][j] * 1.6, d: .09, type: 'sine', v: .28 }); g.fx.burst(xs[j], 2.8, -2.6, [SUN, CREAM], 10, .7); if (j === 0) { shop.sale = true; shop.redraws.forEach(f => f()); } }); });
     }
     sw += (-swing * 40 - sw * 3) * dt; swing += sw * dt; bell.rotation.z = reducedMotion ? 0 : swing * .4;
     if (rush >= 0) {
       const was = rush; rush += dt;
+      const on = rush > .2 && rush < 5.4;
+      herd.set(on ? .3 : 0, 1); if (on && Math.random() < dt * 8) sfx.step();
+      const close = Math.abs((rush < 2.6 ? B.width - (rush / 2.6) * (B.width + 3) : -3 + ((rush - 2.6) / 2.6) * (B.width + 3)) - h.x) < 6;
+      if (on && close && Math.floor(rush * 4) !== Math.floor(was * 4)) { g.stage.shake(.15); buzz(10); }
       for (const p of crowd) {
         const tt = rush - p.d;
-        if (tt < 0 || tt > 5.2) { p.c.visible = false; continue; }
+        if (tt < 0 || tt > 5.2 || (reducedMotion && crowd.indexOf(p) >= 8)) { p.c.visible = false; continue; }
         p.c.visible = true;
         const going = tt < 2.6, k2 = going ? tt / 2.6 : (tt - 2.6) / 2.6;
         p.c.position.x = going ? B.width - k2 * (B.width + 3) : -3 + k2 * (B.width + 3);
@@ -499,10 +506,10 @@ function flashSale(k: Kit, bell: THREE.Group, shelves: ReturnType<typeof shelf>[
       // The front of the crowd folds each shelf as it passes; he is bowled into a hop.
       const front = B.width - (rush / 2.6) * (B.width + 3);
       if (rush < 5.6) shelves.forEach(s => { if (was > 0 && front < s.x) s.fold(); });
-      if (Math.abs(front - h.x) < .5 && h.ground) { g.hero.hop(5); g.stage.shake(.2); sfx.bonk(.3); }
+      if (Math.abs(front - h.x) < .5 && h.ground) { g.hero.hop(5); g.stage.shake(.4); sfx.bonk(.3); }
       if (rush > 4.8 && rush < 8) { if (Math.random() < dt * 14) g.fx.burst(h.x + rand(-7, 7), 4.2, rand(-1.5, .5), [SUN, CREAM, '#ffd27a'], 2, .25); }
-      if (was < 5.6 && rush >= 5.6) shelves.forEach(s => s.restock(g));
-      if (rush > 8.2) { rush = -1; crowd.forEach(p => (p.c.visible = false)); }
+      if (was < 5.6 && rush >= 5.6) shelves.forEach((s, j) => s.restock(g, j === 0));
+      if (rush > 8.2) { rush = -1; crowd.forEach(p => (p.c.visible = false)); herd.set(0); }
     }
   } });
 }

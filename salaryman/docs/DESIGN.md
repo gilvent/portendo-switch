@@ -73,7 +73,8 @@ meant to feel like (A), and how that is checked.
 
 - **M:** walk left and right on **one lane** at 4.4 m/s. Depth is set dressing only (Fable cut z-walking. **Lead:**
   agreed; it halves the control and collision work and makes touch trivial). **A** works the mechanism in reach (1.3 m);
-  with nothing in reach it jumps (apex about 1.6 m, 0.45 s; hold for height). **X** flips the ticket. **B / Esc** closes
+  with nothing in reach it jumps (apex about 1.1 m held, 0.75 m on a tap, 0.55 s; the cut on release waits 0.11 s so a
+  tap still rings the bell; 1.6 m would put a 1.5 m salaryman's head through the strap rail). **X** flips the ticket. **B / Esc** closes
   what is open. Touch: tap a spot to walk there; tap an object to walk to it and work it. Mechanisms stand at least 3 m
   apart, so A is never ambiguous.
 - **D:** a non-gamer holds → and taps A. A gamer jumps at everything, which the secrets reward.
@@ -117,8 +118,9 @@ meant to feel like (A), and how that is checked.
 
 ### 2.5 The train: hub and navigation
 
-- **M, the ride:** chime 0.8 s, accelerate 1.2 s, cruise 4 s, chime 0.8 s, brake 1.5 s, then the doors open.
-- **M, the dwell:** 6 s, then a 2 s closing chime. At the first stop ever, the doors wait until he gets off. If he stays
+- **M, the ride:** chime 0.8 s, accelerate 1.2 s, cruise 4 s, chime 0.8 s, brake about 1.1 s (a × 1.1), then the doors
+  open. Unheld, the pull slides him half the car (7.4 m) into the end wall.
+- **M, the dwell:** 4 s, then 2 s of closing ticks (four a second) with the bar over the doors flashing coral. At the first stop ever, the doors wait until he gets off. If he stays
   on, the train goes on to the next stop.
 - **M, the strip map (pass 3: the express slider is cut):** a passive strip map over the doors shows where the train
   is on the line. The slider would have saved about 28 s, and only for someone already on the way out; the hurry
@@ -163,16 +165,24 @@ meant to feel like (A), and how that is checked.
 
 ### 2.8 Camera
 
-- **M:** fixed in handheld mode. Docked, the car fits one screen. Scenes follow with a 2.2 m lead in the direction he
+- **M:** fixed in handheld mode. Docked, the car fits one screen (on a phone held upright the view keeps its width
+  and follows him). At the terminus the camera closes in at tap-out with the game's only yaw toward the doorway, holds
+  for the wave and the lamps going out, and pulls back as the console comes out. Scenes follow with a 2.2 m lead in the direction he
   faces. Working a mechanism pushes in 1.12× for 0.6 s. A knock on a brake, a landing or a punch.
 - **A:** Sensation. It keeps the caption and the mechanism in one glance.
 
 ### 2.9 Audio
 
-- **M:** synthesised. The rumble follows the speed, with knocks at the rail joints. The punch's "ka-chunk" is the
-  signature sound. Each station has its own three-note arrival jingle. The door chime is the challenge's warning and is
-  never the only cue: the door lamp flashes with it. Sound starts on the first input; mute is the volume key on the
-  console.
+- **M:** synthesised, in families that each mean one thing (pass 4): *paper* (him and what he touches), *train* (a
+  lurch and rising whine on the pull, a squeal on the brake, a rumble with an idle hum, rail-joint knocks every 4.2 m),
+  *three sine notes 0.2 s apart* (brace: they end as the force starts), *square ticks* (doors closing, platform and
+  car), the *reader beep* (the gate), *shop* plinks and scanner beeps, and the signature *ka-chunk* (click, 70 ms gap,
+  thud, chad flutter), which means a hole in the ticket and nothing else; the star adds an arpeggio. It lands 160 ms
+  after the toy's snap, with a 50 ms held frame and a downward knock. Every sound under 300 Hz has a partner above
+  400 Hz for phone speakers. The dock clacks; the ending resolves the line's last jingle (G) to a held C.
+  Haptics: a pulse per brace note, the pull, the brake, the stop, the dock, the punch. They are not silenced by mute
+  (with sound off they are the second channel) and are never the only channel. Mute: the console's volume key, a ♪ key
+  at the screen's corner once docked, or M.
 - **A:** Sensation. The jingles make an arrival feel discovered.
 
 ### 2.10 UI and HUD
@@ -353,4 +363,29 @@ Changes, and what re-measuring showed:
 Scripted checks after the pass: `tests/scene.mjs blibli` punches 5 of 5 and the bell's star; `tests/play.mjs` reaches
 Blibli at 27.8 s of wall-clock time under software rendering (the review measured 17.95 game seconds before the pass;
 the train is now called 1 s later and ride 1 waits 0.9 s for the dock), inside the 35 s target, with no errors.
+
+### Pass 4: dynamics and Sensation
+
+A Fable 5.2 (xhigh) plan, judged by instrumenting every sound, haptic, shake and nudge against the game clock. What it
+found, and what was built:
+
+| Found | Built |
+|---|---|
+| The train made no sound a phone could play; two rail knocks a ride | lurch + rising whine on the pull, squeal on the brake, door ticks as they close, an idle hum, knocks every 4.2 m with a click partner; on the platform, wind and rail beds that follow the arriving train, a squeal as it stops, litter that blows past |
+| Shake moved the picture 2 px at most | gains ×3.6, capped at 0.6; the crumple, the cans, the stop and the dock now read; a 50 ms held frame on each punch, 83 ms on the crumple |
+| The punch was a 110 Hz thud on the toy's own frame; the till played it twice; tap-out had none | one ka-chunk, 160 ms after the snap, everywhere a hole is made; the gate's ka-chunk keeps the ticket at tap-out |
+| The brace chime rang 0.46 s into the pull, and the dwell-end warning reused it | the notes end as the force starts; the dwell end is ticks, so the chime means only "brace" |
+| Dock, undock and card nearly mute | whirr, clack, knock and a long whoosh at the dock, the LED's ding; reverse whoosh and clack at the undock; paper at the card |
+| Reduced motion collapsed every timeline into one frame (17 sounds at once) and made the camera faster | timelines keep their length and cut to the end pose; the camera eases at the normal rate with no lead; page turn and dock fade; straps and passengers hold a lean instead of swinging; tunnel lamps slow; the tab brightens instead of wiggling |
+| Sound-off players lost the door warnings and could not mute once docked | a bar over the car doors (amber pulses for brace, coral four a second for closing) and over the platform door (lit on each tick); the "Get off" prompt pulses while the doors close; "…that was my stop." the first time he misses one; ♪ key and M |
+| The terminus was lit from behind the paper, still and silent | lamps in front of the paper, a skyline when the last train leaves, a newspaper blown off the bench, crickets, a flickering lamp, a warm doorway; at tap-out a close shot with a slight yaw, a wave, the lamps out one by one, a pull-back, then the card; the ticket is taken at the upper left instead of covering it |
+
+Also: a slide scuffs instead of stepping; a strap creaks as it swings and claps follow a held ride; the courier has its
+own horn and putter; flags pop on a rising scale; the stampede is heard and felt; prompts tick instead of popping.
+Dwell 6 → 4 s.
+
+Measured after: under reduced motion the can pyramid spreads its sounds over its normal 2.7 s, and a turn moves the
+camera 0.35 m in 150 ms (was 4.7 m). `tests/play.mjs` reaches Blibli at 23.8 s, `tests/scene.mjs blibli` punches 5 of 5
+and the star, a tap grabs a strap on a phone, all with no errors. Still to do: one listening pass on a laptop and a
+phone, expecting to trim levels rather than timings.
 

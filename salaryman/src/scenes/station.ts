@@ -4,6 +4,7 @@ import { LINE, ROWS } from '../game/content.ts';
 import { tab, type Tab } from '../game/mech.ts';
 import type { Mech, Place } from '../game/place.ts';
 import type { Game } from '../game/game.ts';
+import { reducedMotion } from '../core/stage.ts';
 
 // What every station's place shares: one lane, one way through. He comes out of the station at the left; its title
 // says the role and one line; the way back to the train is at the right end, with the "visit the site" stand before
@@ -51,7 +52,7 @@ export function station(i: number, width: number, look: StationLook, build: (k: 
       setTimeout(() => g.pins.show('title', `<span><b>${st.name}</b> · ${st.pin ?? st.role}</span>`, new THREE.Vector3(2, 3.3, 0), 'tag', 3800), 500);
     },
     exit(g: Game) { parts.forEach(p => p.exit?.(g)); },
-    camera(g: Game) { const hw = g.stage.halfWidth(16.5), lead = g.hero.facing * Math.min(2.2, hw * .4), lo = Math.min(3.5, hw - 2); g.stage.want = { x: Math.max(lo, Math.min(x1 - lo, g.hero.body.x + lead)), y: 1.95, z: 0, dist: 16.5, pitch: .11, yaw: 0 }; },
+    camera(g: Game) { const hw = g.stage.halfWidth(16.5), lead = reducedMotion ? 0 : g.hero.facing * Math.min(2.2, hw * .4), lo = Math.min(3.5, hw - 2); g.stage.want = { x: Math.max(lo, Math.min(x1 - lo, g.hero.body.x + lead)), y: 1.95, z: 0, dist: 16.5, pitch: .11, yaw: 0 }; },
     update(dt: number, g: Game) {
       for (const p of parts) {
         p.update?.(dt, g);

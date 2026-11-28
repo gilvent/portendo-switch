@@ -116,7 +116,7 @@ function rough(k: Kit, block: THREE.Group) {
     const b = g.hero.body;
     if (!wasGround && b.ground && b.floor >= h - .01 && Math.abs(b.x - x) < .6 && !done) {
       hits++; sfx.bonk(.4 + hits * .15); g.stage.shake(.08 * hits); g.fx.puff(x, h, 0, 4, .6); block.rotation.z = (hits % 2 ? 1 : -1) * .05;
-      if (hits >= 3) { done = true; sfx.find(); open = .001; solid.h = 0; g.hero.kick(0, 5); statue.visible = true; k.tell(g, 'block', 'Freelance: one client, one developer, start to finish.', V(x, 2.6, -.1), true); }
+      if (hits >= 3) { done = true; sfx.punch(true); open = .001; solid.h = 0; g.hero.kick(0, 5); statue.visible = true; k.tell(g, 'block', 'Freelance: one client, one developer, start to finish.', V(x, 2.6, -.1), true); }
     }
     wasGround = b.ground;
     block.rotation.z *= Math.exp(-dt * 10);

@@ -41,7 +41,7 @@ export class Stage {
     this.resize();
   }
   // Every place starts in the same daylight; a scene may dim it (an evening, a night platform).
-  resetLight() { this.sun.intensity = 2.3; this.hemi.intensity = 1.15; this.sun.color.set('#fff4e6'); this.hemi.color.set('#dfe9f5'); }
+  resetLight() { this.sun.intensity = 2.3; this.hemi.intensity = 1.15; this.sun.color.set('#fff4e6'); this.hemi.color.set('#dfe9f5'); this.hemi.groundColor.set('#8a8170'); }
   resize() {
     const w = this.host.clientWidth || 1, h = this.host.clientHeight || 1;
     this.renderer.setSize(w, h, false);
@@ -54,7 +54,7 @@ export class Stage {
     this.render();
   }
   // Shake on a hit: trauma 0..1, felt as its square so small knocks stay small.
-  shake(amount: number) { if (!reducedMotion) this.trauma = clamp(this.trauma + amount, 0, 1); }
+  shake(amount: number) { if (!reducedMotion) this.trauma = clamp(this.trauma + amount, 0, .6); }
   // A one-off shove of the whole view (a landing, a brake), springing back.
   nudge(x: number, y: number) { if (!reducedMotion) { this.kick.x += x; this.kick.y += y; } }
   // Half the width of floor the camera sees at a distance.
@@ -62,17 +62,17 @@ export class Stage {
   snap() { Object.assign(this.rig, this.want); }
   update(dt: number) {
     this.t += dt;
-    const r = this.rig, w = this.want, k = reducedMotion ? 30 : 5;
+    const r = this.rig, w = this.want, k = 5;
     r.x = damp(r.x, w.x, k, dt); r.y = damp(r.y, w.y, k, dt); r.z = damp(r.z, w.z, k, dt);
     r.dist = damp(r.dist, w.dist, k * .8, dt); r.pitch = damp(r.pitch, w.pitch, k, dt); r.yaw = damp(r.yaw, w.yaw, k, dt);
-    this.trauma = Math.max(0, this.trauma - dt * 1.6);
+    this.trauma = Math.max(0, this.trauma - dt * 2.2);
     this.kick.multiplyScalar(Math.exp(-dt * 9));
     const sh = this.trauma * this.trauma, n = (o: number) => Math.sin(this.t * 37 + o) * Math.sin(this.t * 23.1 + o * 2);
-    this.look.set(r.x + this.kick.x + sh * .25 * n(1), r.y + this.kick.y + sh * .2 * n(2), r.z);
+    this.look.set(r.x + this.kick.x + sh * .9 * n(1), r.y + this.kick.y + sh * .7 * n(2), r.z);
     const cp = Math.cos(r.pitch);
     this.camera.position.set(this.look.x + Math.sin(r.yaw) * cp * r.dist, this.look.y + Math.sin(r.pitch) * r.dist, this.look.z + Math.cos(r.yaw) * cp * r.dist);
     this.camera.lookAt(this.look);
-    this.camera.rotation.z += sh * .02 * n(3);
+    this.camera.rotation.z += sh * .05 * n(3);
     // The sun's shadow box follows the camera so shadows stay sharp wherever he walks.
     this.sun.target.position.set(r.x, 0, r.z);
     this.sun.position.copy(SUN).multiplyScalar(30).add(this.sun.target.position);

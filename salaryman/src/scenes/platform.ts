@@ -3,7 +3,8 @@ import { box, card, label, rrect } from '../game/paper.ts';
 import { Spring } from '../core/math.ts';
 import { input } from '../core/input.ts';
 import { sfx } from '../game/sfx.ts';
-import { tone } from '../core/audio.ts';
+import { bed, buzz, noise } from '../core/audio.ts';
+import { reducedMotion } from '../core/stage.ts';
 import { LINE, PERSON } from '../game/content.ts';
 import type { Mech, Place } from '../game/place.ts';
 import type { Game } from '../game/game.ts';
@@ -75,19 +76,23 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
   for (let i = -4; i <= 4; i++) if (i !== 0) tg.add(box(1.5, 1, .05, '#2b3038', i * 3.6, .75, 1.31));
   const doorL = box(.62, 2.1, .06, '#cfd5dc', -.32, -.1, 1.32), doorR = box(.62, 2.1, .06, '#cfd5dc', .32, -.1, 1.32);
   const doorGap = box(1.26, 2.1, .04, '#2b3038', 0, -.1, 1.3);
-  const lamp = new THREE.Mesh(new THREE.SphereGeometry(.09, 12, 8), new THREE.MeshStandardMaterial({ color: '#f6b73c', emissive: '#000' }));
-  lamp.position.set(0, 2.25, 1.35);
+  // The bar over the door: it lights with every tick of the countdown (the eye's twin of the sound).
+  const lamp = new THREE.Mesh(new THREE.BoxGeometry(1.3, .1, .05), new THREE.MeshStandardMaterial({ color: '#5c6168', emissive: '#000' }));
+  lamp.position.set(0, 2.2, 1.35);
   const doorG = new THREE.Group(); doorG.add(doorGap, doorL, doorR, lamp); tg.add(doorG); doorG.position.x = 0;
   group.add(tg);
   // The door mark on the floor.
   const mark = box(1.3, .015, .5, '#f2c230', P.doorX, 0, -1.7); group.add(mark);
-  let doorOpen = 0, lastTick = -1, gust = 0, called = false;
+  let doorOpen = 0, lastTick = -1, gust = 0, called = false, flash = 0, squealed = false, littered = false, lurched = false;
+  // The air a train pushes, and its wheels on the rail: two held sounds set every frame.
+  const windBed = bed(700, .6), railBed = bed(380, .7);
   const door: Mech = { id: 'door', x: P.doorX, reach: 1.1, at: new THREE.Vector3(P.doorX, 2.3, -1), label: 'Board', up: true, on: () => train.state === 'open', use: g => void board_(g) };
   const tap: Mech = { id: 'gate', x: P.gateX - .55, reach: 1, at: new THREE.Vector3(P.gateX, 1.6, 0), label: 'Tap in', on: () => !called, use: g => openGate(g) };
   let boarding = false;
   const self = {
     id: 'platform', group, lane: { x0: -7.4, x1: 7.4, z: 0 }, solids: [gateSolid] as Solid[], mechs: [tap, door], train,
     enter(g: Game) { g.hero.place(-6.6, 0, 1); g.stage.scene.background = new THREE.Color('#2a2e35'); say('Walk to the gate', input.source === 'touch' ? 'tap floor' : '→'); },
+    exit() { windBed.set(0); railBed.set(0); },
     camera(g: Game) { g.stage.want = { x: .2, y: 2.2, z: 0, dist: 16.5, pitch: .1, yaw: 0 }; },
     update(dt: number, g: Game) {
       // The gate's paddles.
@@ -98,21 +103,25 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
       if (train.state === 'arriving') {
         const k = Math.min(1, train.t / P.arrive), x = P.doorX + 42 * Math.pow(1 - k, 2.2);
         train.v = (x - train.x) / dt; train.x = x;
-        if (k >= 1) { train.state = 'open'; train.t = 0; train.v = 0; sfx.doors(); g.stage.shake(.12); }
+        if (!squealed && train.t > 1.5) { squealed = true; sfx.squeal(.9); }
+        if (!littered && train.x < 20) { littered = true; g.fx.gust(-8, 8, -1); }
+        if (k >= 1) { train.state = 'open'; train.t = 0; train.v = 0; sfx.doors(); g.stage.shake(.3); buzz(15); squealed = false; littered = false; }
       } else if (train.state === 'open') {
         doorOpen = Math.min(1, doorOpen + dt * 3);
         const left = Math.max(0, P.doorsOpen - train.t), sec = Math.ceil(left);
         if (!boarding) say(`Doors close 0:0${sec}`, input.source === 'touch' ? 'tap door' : 'A: board');
         // The countdown ticks, quicker in the last three seconds, and the lamp flashes.
         const rate = left < 3 ? 4 : 1, tick = Math.floor(train.t * rate);
-        if (tick !== lastTick) { lastTick = tick; if (!boarding) tone({ f: left < 3 ? 1480 : 1180, d: .06, type: 'square', v: left < 3 ? .14 : .08 }); }
-        (lamp.material as THREE.MeshStandardMaterial).emissive.set(left < 3 && Math.floor(train.t * 6) % 2 ? '#f6b73c' : '#000');
-        if (left <= 0 && !boarding) { train.state = 'closing'; train.t = 0; sfx.chime(); }
+        if (tick !== lastTick) { lastTick = tick; if (!boarding) { sfx.tick(left < 3); flash = .08; if (left < 3 && tick % 4 === 0) buzz(8); } }
+        flash -= dt; const lit = flash > 0 || (reducedMotion && left < 3);
+        (lamp.material as THREE.MeshStandardMaterial).emissive.set(lit ? '#e8552d' : '#000'); (mark.material as THREE.MeshStandardMaterial).emissive.set(lit ? '#7a3a00' : '#000');
+        if (left <= 0 && !boarding) { train.state = 'closing'; train.t = 0; sfx.doors(); (lamp.material as THREE.MeshStandardMaterial).emissive.set('#000'); (mark.material as THREE.MeshStandardMaterial).emissive.set('#000'); }
       } else if (train.state === 'closing') {
         doorOpen = Math.max(0, doorOpen - dt * 2.5);
-        if (train.t > .9) { train.state = 'leaving'; train.t = 0; }
+        if (train.t > .9) { train.state = 'leaving'; train.t = 0; lurched = false; }
       } else if (train.state === 'leaving') {
         const x = P.doorX - 2.2 * train.t * train.t * 4; train.v = (x - train.x) / dt; train.x = x;
+        if (!lurched) { lurched = true; sfx.lurch(); }
         say(`Next train 0:0${Math.max(0, Math.ceil(P.nextTrain - train.t))}`, '');
         if (train.t > P.nextTrain) { train.state = 'arriving'; train.t = 0; train.x = 60; lastTick = -1; say('Train arriving', ''); }
       }
@@ -123,26 +132,29 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
       gust += (wind - gust) * Math.min(1, dt * 4);
       g.hero.push = gust * P.wind * 14 * (train.state === 'leaving' ? .5 : 1); g.hero.grip = .35;
       if (gateOpen && !behind && g.hero.body.x > P.gateX + .5) { behind = true; self.solids = [gateSolid]; gateOpen = false; }
+      windBed.set(Math.abs(gust) * .35, .6 + Math.abs(gust) * .8); railBed.set(Math.min(.3, Math.abs(train.v) / 25 * .3), .8 + Math.min(1, Math.abs(train.v) / 25) * .6);
       if (Math.abs(gust) > .2 && Math.random() < dt * 30) g.fx.puff(g.hero.body.x - 1.5 * Math.sign(gust), .3, -.5, 1, .8);
-      signSwing.kick(-gust * dt * 2.2); sign.rotation.x = 0; sign.rotation.z = signSwing.step(0, dt) * .3;
+      signSwing.kick(-gust * dt * 2.2); sign.rotation.x = 0; sign.rotation.z = reducedMotion ? 0 : signSwing.step(0, dt) * .3;
       board.rotation.z = sign.rotation.z * .6;
-      if (Math.abs(gust) > .3 && sleeperAwake <= 0 && train.state === 'leaving') { sleeperAwake = 1.2; g.fx.burst(1.1, 1, -1.2, ['#f4f1e8', '#d9dcdf'], 10, .8); }
+      if (Math.abs(gust) > .3 && sleeperAwake <= 0 && train.state === 'leaving') { sleeperAwake = 1.2; g.fx.burst(1.1, 1, -1.2, ['#f4f1e8', '#d9dcdf'], 10, .8); sfx.paper(); }
       // The sleeper: jump beside him and he startles.
       if (!g.hero.body.ground && Math.abs(g.hero.body.x - 1.1) < 1 && sleeperAwake <= 0 && g.hero.body.vy < 0) { sleeperAwake = 1.6; sleeperHop.kick(5); sfx.bonk(.2); g.caption('Huh? …zzz', new THREE.Vector3(1.1, 2.1, -1.2), 1400); }
       sleeperAwake -= dt; sleeper.position.y = .3 + Math.max(0, sleeperHop.step(0, dt)) * .2;
       // Bumping into the shut gate: it says no.
-      if (!gateOpen && !called && g.near !== tap && Math.abs(g.hero.body.x - (P.gateX - .48)) < .05 && input.move.x > .2) {
-        if (!bumped) { bumped = true; sfx.deny(); g.stage.nudge(.08, 0); (reader.material as THREE.MeshStandardMaterial).color.set('#e8552d'); setTimeout(() => (reader.material as THREE.MeshStandardMaterial).color.set('#35b58a'), 350); }
-      } else bumped = false;
+      if (!called && Math.abs(g.hero.body.x - (P.gateX - .48)) < .05 && input.move.x > .2) {
+        if (!bumped) { bumped = true; sfx.bonk(.2); gateSpring.kick(2); g.stage.nudge(.08, 0); (reader.material as THREE.MeshStandardMaterial).color.set('#e8552d'); setTimeout(() => (reader.material as THREE.MeshStandardMaterial).color.set('#35b58a'), 350); }
+      } else if (g.hero.body.x < P.gateX - 1.2) bumped = false;
       if (!called) say(g.hero.body.x > P.gateX - 2.2 ? 'Tap in at the gate' : 'Walk to the gate', g.hero.body.x > P.gateX - 2.2 ? (input.source === 'touch' ? 'tap gate' : 'A') : (input.source === 'touch' ? 'tap floor' : '→'));
     }
   };
   let bumped = false, behind = false;
   function openGate(g: Game) {
     gateOpen = true; called = true; self.solids = [];
+    // The reader beeps, the printer chatters, the ticket comes out, and the first ka-chunk lands on it.
     sfx.beep(); gateSpring.kick(6);
+    [60, 130, 200, 270].forEach(ms => setTimeout(() => noise({ d: .05, f: 3000, q: 1.5, v: .12 }), ms));
     g.save.ticket = true; g.emit('ticket-print');
-    g.punch('line', 'ticket');
+    g.punch('line', 'ticket', false, 750);
     setTimeout(() => g.caption('Tap in. Coffee can wait.', new THREE.Vector3(P.gateX, 2.2, 0)), 1300);
     say('Train arriving', '');
     setTimeout(() => { train.state = 'arriving'; train.t = 0; }, 1400);
@@ -152,7 +164,7 @@ export function platform(): Place & { train: { state: TrainState; x: number; t: 
     const last = train.state === 'open' && P.doorsOpen - train.t < 1;
     say('Doors closing', last ? 'just made it!' : '');
     // He turns edge-on and slips in (paper-thin when it is close).
-    const h = g.hero; const x0 = h.body.x, t0 = performance.now();
+    const h = g.hero; const x0 = h.body.x, t0 = performance.now(); sfx.fwip();
     await new Promise<void>(res => { const f = () => { const k = Math.min(1, (performance.now() - t0) / 380); h.body.x = x0 + (P.doorX - x0) * k; h.body.z = -2.4 * k; h.thin = k * (last ? .95 : .8); if (k < 1) requestAnimationFrame(f); else res(); }; f(); });
     sfx.doors();
     g.emit('board');

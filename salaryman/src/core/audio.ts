@@ -42,6 +42,14 @@ export function bed(f: number, q = .8) {
     }
   };
 }
-export const buzz = (ms: number | number[]) => { try { if (!muted) navigator.vibrate?.(ms); } catch { /* not a phone */ } };
+// Haptics are the second channel when the sound is off, so mute does not silence them. Rate-limited: a buzz within
+// 60 ms of the last is dropped unless it is longer. (iOS Safari has none; never the only channel.)
+let lastBuzz = 0, lastLen = 0;
+export const buzz = (ms: number | number[]) => {
+  const now = performance.now(), len = Array.isArray(ms) ? ms.reduce((a, b) => a + b, 0) : ms;
+  if (now - lastBuzz < 60 && len <= lastLen) return;
+  lastBuzz = now; lastLen = len;
+  try { navigator.vibrate?.(ms); } catch { /* not a phone */ }
+};
 export const isMuted = () => muted;
 export function setMuted(m: boolean) { muted = m; try { localStorage.setItem('ps-mute', m ? '1' : '0'); } catch { /* private window */ } if (out) out.gain.value = m ? 0 : .22; }

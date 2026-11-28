@@ -18,12 +18,13 @@ const car = trainCar();
 const ticket = new Ticket(shell, game);
 const card = new EndCard(shell, game);
 game.listeners.add((e, d) => {
-  if (e === 'board') void shell.dock(async () => { await game.go(car, 'platform', false); sfx.whoosh(); game.stage.shake(.3); });
+  // The dock: a falling whirr, the clack as it seats, the screen opening out on a long whoosh, the LED's ding.
+  if (e === 'board') { sfx.whirr(); void shell.dock(async () => { await game.go(car, 'platform', false); sfx.clack(); game.stage.nudge(0, -.25); game.stage.shake(.6); sfx.whoosh(.8); setTimeout(() => sfx.ding(), 900); }); }
   if (e === 'getoff') void game.go(sceneFor(d as number), 'car');
   if (e === 'reboard') void game.go(car, 'stop');
   // The gate takes the ticket: it shows its front, turns over to his contact side, and the console comes out with his card.
-  if (e === 'tap-out') { ticket.open('front'); setTimeout(() => ticket.open('back'), 800); }
-  if (e === 'end') setTimeout(() => void shell.undock(() => { ticket.el.hidden = true; }).then(() => card.show()), 1200);
+  if (e === 'tap-out') ticket.take();
+  if (e === 'end') setTimeout(() => { sfx.whoosh(.6, 2400, 400); void shell.undock(() => { ticket.el.hidden = true; sfx.clack(.7); }).then(() => card.show()); }, 400);
 });
 void ticket;
 const params = new URLSearchParams(location.search);

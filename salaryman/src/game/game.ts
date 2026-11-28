@@ -39,9 +39,9 @@ export class Game {
     this.pins = new Pins(shell.overlay, this.stage.camera);
     this.wipe = new Wipe(shell.screen);
     this.stage.scene.add(this.hero.group, this.hero.shadowMesh);
-    this.hero.onStep = () => { sfx.step(); if (Math.random() < .5) this.fx.puff(this.hero.body.x, 0, this.hero.body.z, 1, .2); };
+    this.hero.onStep = () => { if (this.hero.sliding) { sfx.scuff(); this.fx.puff(this.hero.body.x, 0, this.hero.body.z, 2, .3); return; } sfx.step(); if (Math.random() < .5) this.fx.puff(this.hero.body.x, 0, this.hero.body.z, 1, .2); };
     this.hero.onJump = () => { sfx.jump(); this.fx.puff(this.hero.body.x, this.hero.body.y, this.hero.body.z, 3, .4); };
-    this.hero.onLand = v => { const p = Math.min(1, v / 12); sfx.land(p); this.fx.puff(this.hero.body.x, this.hero.body.y, this.hero.body.z, 3 + Math.round(p * 4), .6); if (p > .5) this.stage.shake(.18); };
+    this.hero.onLand = v => { const p = Math.min(1, v / 12); sfx.land(p); this.fx.puff(this.hero.body.x, this.hero.body.y, this.hero.body.z, 3 + Math.round(p * 4), .6); if (p > .5) this.stage.shake(.25); };
     input.onPress(b => this.press(b));
     shell.screen.addEventListener('pointerdown', e => this.tap(e));
   }
@@ -63,15 +63,16 @@ export class Game {
     this.emit('place', next.id);
   }
   // Punch a hole in the ticket, once.
-  punch(row: string, id: string, star = false) {
+  // The hole is recorded at once, but heard and seen a beat later, after the toy's own snap: snap, ka-chunk, line.
+  punch(row: string, id: string, star = false, delay = 160) {
     const key = `${row}/${id}${star ? '*' : ''}`;
     if (this.save.holes.includes(key)) return false;
     this.save.holes.push(key);
-    star ? sfx.find() : sfx.stamp();
-    this.stage.shake(.12);
-    this.emit('punch', { row, id, star });
+    setTimeout(() => { sfx.punch(star); this.stage.nudge(0, -.14); this.freeze = .05; this.emit('punch', { row, id, star }); }, delay);
     return true;
   }
+  // A held frame: the rules stop for a moment while the picture goes on (a stop-motion hit).
+  freeze = 0;
   // A first-person caption stub by the thing that told it.
   // It stays up long enough to read: 1.2 s plus a little per word.
   caption(text: string, at: THREE.Vector3, ms = 1200 + 350 * text.split(' ').length) { this.pins.show('caption', `<span>${text}</span>`, at, 'say', ms); }
@@ -123,6 +124,7 @@ export class Game {
     }
   }
   update(dt: number) {
+    if (this.freeze > 0) { this.freeze -= dt; return; }
     this.time += dt;
     input.poll();
     const p = this.place; if (!p) return;
@@ -146,8 +148,8 @@ export class Game {
       const d = Math.abs(m.x - this.hero.body.x);
       if (d < (m.reach ?? 1.3) && d < nd) { nd = d; near = m; }
     }
-    if (near !== this.near) { this.near = near; if (near) sfx.pop(); }
-    if (near) this.pins.show('prompt', `<div class="prompt"><b>A</b>${typeof near.label === 'string' ? near.label : near.label()}</div>`, near.at, 'pin');
+    if (near !== this.near) { this.near = near; if (near) sfx.near(); }
+    if (near) this.pins.show('prompt', `<div class="prompt"><b>A</b>${typeof near.label === 'string' ? near.label : near.label()}</div>`, near.at, near.hurry?.() ? 'pin hurry' : 'pin');
     else this.pins.hide('prompt');
     p.camera(this);
   }

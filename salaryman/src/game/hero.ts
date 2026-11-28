@@ -64,7 +64,7 @@ export class Hero {
   // A pressed with nothing to use: a jump (buffered a moment so a slightly early press still counts).
   // A finger has no button to hold, so a tap jumps full height.
   jump(full = false) { this.buffered = HERO.buffer; this.full = full; }
-  private full = false;
+  private full = false; private rise = 0;
   release() { this.holding = false; }
   hop(v = 4) { if (this.body.ground) { this.body.vy = v; this.body.ground = false; this.squash.x = 1.12; } }
   kick(vx: number, vy = 0) { this.body.vx += vx; if (vy) { this.body.vy = vy; this.body.ground = false; } }
@@ -94,9 +94,10 @@ export class Hero {
     this.coyote = b.ground ? H.coyote : Math.max(0, this.coyote - dt);
     if (this.buffered > 0) {
       this.buffered -= dt;
-      if (this.coyote > 0 && !this.frozen) { b.vy = H.jump; b.ground = false; this.coyote = 0; this.buffered = 0; this.holding = !this.full; this.squash.x = .78; this.squash.kick(6); this.onJump?.(); }
+      if (this.coyote > 0 && !this.frozen) { b.vy = H.jump; b.ground = false; this.coyote = 0; this.buffered = 0; this.holding = !this.full; this.rise = 0; this.squash.x = .78; this.squash.kick(6); this.onJump?.(); }
     }
-    if (this.holding && !holdA && b.vy > 0) { b.vy *= H.cut; this.holding = false; }
+    this.rise += dt;
+    if (this.holding && !holdA && b.vy > 0 && this.rise > .11) { b.vy *= H.cut; this.holding = false; }
     const wasGround = b.ground, vy = b.vy;
     const hits = moveBody(b, dt, bounds, solids, b.vy > 0 ? H.rise : H.fall);
     if (!wasGround && b.ground) { this.squash.x = clamp(1 + vy * .028, .7, .95); this.onLand?.(-vy); }
@@ -107,7 +108,9 @@ export class Hero {
     return hits;
   }
   private pushCarry = 0;
-  private turn(f: number) { this.flipFrom = this.facing; this.facing = f; this.flipT = reducedMotion ? 1 : 0; }
+  // Thrown by the train rather than walking: shoes skid on the vinyl.
+  get sliding() { return this.body.ground && Math.abs(this.pushCarry) > 1.2; }
+  turn(f: number) { this.flipFrom = this.facing; this.facing = f; this.flipT = reducedMotion ? 1 : 0; }
   // Draw: position, the flip, squash and stretch, lean and bob.
   render(dt: number) {
     const b = this.body;
@@ -123,7 +126,7 @@ export class Hero {
     this.swing.kick((this.lastVx - b.vx) * 1.4); this.lastVx = b.vx;
     const sw = reducedMotion ? 0 : clamp(this.swing.step(0, dt), -1.2, 1.2) * this.facing;
     for (const o of this.swingers) o.rotation.z = sw;
-    this.group.rotation.z = reducedMotion ? 0 : this.lean;
+    this.group.rotation.z = reducedMotion ? clamp(this.lean, -.15, .15) : this.lean;
     // A card turning shows its edge: a little yaw sells it as paper.
     this.sheet.rotation.y = this.flipT < 1 ? Math.sin(this.flipT * Math.PI) * .5 : 0;
     this.shadow.position.set(b.x + .08, b.floor + .012, b.z + .02);
